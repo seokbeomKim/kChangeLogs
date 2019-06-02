@@ -1,7 +1,7 @@
 * kChangeLogDownloader
-This is an application to find a keyword in kernel change-logs. If you
-want to download all changelog files in kernel source code, you can
-use this script to download.
+This is an *simple* script to find a keyword in kernel change-logs. If
+you want to download all changelog files in kernel source code, you
+can use this script to download.
 
 ** Usage
 #+BEGIN_SRC shell
