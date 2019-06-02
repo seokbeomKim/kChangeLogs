@@ -1,4 +1,4 @@
-* kChangeLogFinder
+* kChangeLogDownloader
 This is an application to find a keyword in kernel change-logs. If you
 want to download all changelog files in kernel source code, you can
 use this script to download.
