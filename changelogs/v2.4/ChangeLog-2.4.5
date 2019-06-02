@@ -1,0 +1,76 @@
+-final:
+ - Alan Cox: camera conversion missed parts
+ - Neil Brown: md graceful alloc failure
+ - Andrea Arkangeli: more alpha fixups, bounce buffer deadlock avoidance
+ - Adam Fritzler: tms380tr driver update
+ - Al Viro: VFS layer cleanups
+
+-pre6:
+ - Johannes Erdfelt: OHCI hash-chain corruption fix, USB updates
+ - Richard Henderson, Ivan Kokshaysky: alpha PCI iommu fixes
+ - Tim Waugh: parport changelogs and printk levels
+ - Andrew Morton: vmalloc off-by-one (overly sensitive) test
+ - Al Viro: VFS layer cleanups
+ - Cort Dougan: PPC updates (big bootloader re-org)
+ - Alan Cox: more merges, remove phillips camera conversion code
+ - Andrea Arkangeli: alpha fixups
+ - OGAWA Hirofumi: big-sector support with FAT
+ - Neil Brown: more md fixes
+
+-pre5:
+ - Al Viro: fs cleanups
+ - David Miller: sparc semaphores
+ - Christoph Hellwig: VxFS update
+ - Asit Mallick: set machine check bit with set_in_cr4
+ - Richard Henderson: fix alpha pci_controller_num(), sg_fill, SRM poweroff.
+ - Johannes Erdfelt: USB updates
+ - Cort Dougan: bitkeeper Id's on the ppc side
+ - Matt Chapman: NFS file locking SMP lock fix
+ - Alan Cox: further merging
+
+-pre4:
+ - Russell King: ARM updates
+ - Al Viro: more init cleanups
+ - Cort Dougan: more PPC updates
+ - David Miller: cleanups, pci mmap updates
+ - Neil Brown: raid resync by sector
+ - Alan Cox: more merging with -ac
+ - Johannes Erdfelt: USB updates
+ - Kai Germaschewski: ISDN updates
+ - Tobias Ringstrom: dmfe.c network driver update
+ - Trond Myklebust: NFS client updates and cleanups
+
+-pre3:
+ - Al Viro: sanity-check user arguments, zero-terminated strings etc.
+ - Urban Widmark: smbfs update (server/client cache coherency etc)
+ - Rik van Riel, Marcelo Tosatti: VM updates
+ - Cort Dougan: PPC updates
+ - Neil Brown: raid1/5 failed drive fixups, NULL ptr checking, md error cleanup
+ - Neil Brown: knfsd fix for 64-bit architectures, and filehandle resolveir
+ - Ken Brownfield: workaround for menuconfig CPU selection glitch
+ - David Miller: sparc64 MM setup fix, arpfilter forward port
+ - Keith Owens: Remove obsolete IPv6 provider based addressing
+ - Jari Ruusu: block_write error case cleanup fix
+ - Jeff Garzik: netdriver update
+
+-pre2:
+ - David Miller: network syncup (better TCP page fault handling by Andrea etc)
+ - Tim Hockin: moxa driver fixes
+ - Alexander Viro: clean up process reaping procedures, make /proc use
+   the proper fields to notice that the process is gone, gone, gone.
+ - Justin Gibbs: aic7xxx driver update to 6.1.13.
+ - me: fix PCI allocation so that it doesn't stomp on unknown memory
+ - Jeff Garzik: 8139too net drvr fix
+ - Nigel Gamble: merge page fault interrupt gate from preemtible kernel.
+   Fixes problem noticed by Brian Gerst.
+ - Jean Tourrilhes: Orinoco / Airport support diff. Mucho cleanups.
+
+-pre1:
+ - Al Viro: clean up driver "invalidate_device()" mess
+ - Andries Brouwer: make sd.c work with USB Dane-Elec CompactFlash Card
+   Reader
+ - me: fix nasty lazy kernel page table update problem
+ - me: undo fork changes. Too many user-level bugs and unresolved issues.
+ - Peter Anvin: iso9660 cleanups
+ - Alan Cox: big merge
+ - Johannes Erdfelt: UHCI pci DMA setup fix

@@ -1,0 +1,32 @@
+commit f5b3c543818f0c189875207f694b0e4a120a5c4a
+Author: Chris Wright <chrisw@osdl.org>
+Date:   Wed Jun 22 12:33:05 2005 -0700
+
+    Linux 2.6.12.1
+
+commit df0112ae92e768bda81105cff85d7c8e46004d7b
+Author: Matthew Chapman <matthewc@hp.com>
+Date:   Mon Jun 20 20:53:01 2005 -0700
+
+    [PATCH] ia64 ptrace + sigrestore_context (CAN-2005-1761)
+    
+    This patch fixes handling of accesses to ar.rsc via ptrace &
+    restore_sigcontext
+    
+    Signed-off-by: Matthew Chapman <matthewc@hp.com>
+    Acked-by: David Mosberger <davidm@hpl.hp.com>
+    Acked-by: Tony Luck <tony.luck@intel.com>
+    Signed-off-by: Chris Wright <chrisw@osdl.org>
+
+commit fe3d5c8793fcaf33c5d3118a7f3ffc135eadaf4d
+Author: Linus Torvalds <torvalds@osdl.org>
+Date:   Sat Jun 18 13:17:49 2005 -0700
+
+    [PATCH] Clean up subthread exec (CAN-2005-1913)
+    
+    Make sure we re-parent itimers.  If subthread exec's with timer pending,
+    signal is delivered to old group-leader and can panic kernel.
+    
+    Signed-off-by: Linus Torvalds <torvalds@ppc970.osdl.org>
+    Signed-off-by: Chris Wright <chrisw@osdl.org>
+

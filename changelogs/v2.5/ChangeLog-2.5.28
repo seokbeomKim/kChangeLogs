@@ -1,0 +1,1193 @@
+
+Summary of changes from v2.5.27 to v2.5.28
+============================================
+
+<anton@samba.org>
+	ppc64: enable eeh on non-LPAR
+
+<anton@samba.org>
+	ppc64: copy_user_page and clear_user_page now take a page *
+	ppc64: updates for mmu gather code
+
+<anton@samba.org>
+	ppc64: Use non context synchronising mtmsrd. Cleanup init.c
+
+<anton@samba.org>
+	ppc64: 64 and 32 bit signal cleanups from Stephen Rothwell
+
+<anton@samba.org>
+	ppc64: Implement copy_siginfo_to_user32 from Stephen Rothwell
+
+<anton@samba.org>
+	ppc64: Remove POWER4 special case for cache_decay_ticks.
+
+<anton@samba.org>
+	ppc64: Initial DISCONTIGMEM and NUMA support
+
+<anton@samba.org>
+	ppc64: Only use irq balancing on openpic for the moment
+
+<anton@samba.org>
+	ppc64: update ppc64 tlb batch code
+
+<anton@samba.org>
+	ppc64: Add fls
+
+<anton@samba.org>
+	ppc64: POWER4 lazy icache flushing
+
+<anton@samba.org>
+	ppc64: add missing gcc barrier in softirq code.
+
+<anton@samba.org>
+	ppc64: export timebase frequency in /proc/cpuinfo
+
+<anton@samba.org>
+	pSeries HVC console: Fix hang up race - from Dave Engebretsen
+
+<anton@samba.org>
+	pSeries HVC console: Add SYSRQ and handle errors better from Dave Engebretsen
+
+<anton@samba.org>
+	pSeries firmware flash support from Todd Inglett
+
+<anton@samba.org>
+	ppc64: iSeries updates
+
+<anton@samba.org>
+	ppc64: increase IRQ_KMALLOC_ENTRIES
+
+<anton@samba.org>
+	ppc64: ptrace cleanup from Stephen Rothwell
+
+<anton@samba.org>
+	ppc64: ptrace32 fix when tracing 64bit tasks from Will Schmidt
+
+<anton@samba.org>
+	ppc64: config.h resync and remove some stale code
+	ppc64: turn off STRICT_MM_TYPECHECKS
+
+<anton@samba.org>
+	pSeries HVC console: fix hvc_hangup definition
+
+<anton@samba.org>
+	ppc64: remove __openfirmware and __chrp
+
+<anton@samba.org>
+	ppc64: include/asm/md.h is not used any more
+
+<anton@samba.org>
+	ppc64: remove some stale code
+
+<anton@samba.org>
+	ppc64: updates for 2.5.21
+
+<jsimmons@maxwell.earthlink.net>
+	Added help for the Toshbia and Permedia3 framebuffer devices. Small fixes for the ATI 128 card and the logo drawing code in fbcon.c. Proper handling of data for pci handling.
+
+<jsimmons@heisenberg.transvirtual.com>
+	Removal of nonexistant iplan16 support. Compile fix for aty128fb driver. Proper handling of PCI private data for fbdev drivers.
+
+<jsimmons@maxwell.earthlink.net>
+	Added VBI support to VESA. ATY 128 compiles now :-)
+
+<jsimmons@heisenberg.transvirtual.com>
+	Removed old FB_COMPAT_XPMAC stuff. Ported over the Riva framebuffer driver over to the new api. Updated the Voodoo 1 driver.
+
+<jsimmons@heisenberg.transvirtual.com>
+	Added Help info for Permedia 3 and Toshiba TX3912 graphics card support.
+
+<jsimmons@heisenberg.transvirtual.com>
+	Updated Voodoo 1 documentation
+
+<jsimmons@heisenberg.transvirtual.com>
+	Finished the NVIDIA driver port to the new api. Killed a strtok in sstfb.
+
+<jsimmons@heisenberg.transvirtual.com>
+	Added VBI support to VESA
+
+<jsimmons@heisenberg.transvirtual.com>
+	Supports more NVIDIA cards.
+
+<jsimmons@heisenberg.transvirtual.com>
+	NVIDIA fixes to handle HSYNC and VSYNC flags. Set the registers to read the image data as big endian. Handle the different smem_len for different kinds of cards.
+
+<jsimmons@heisenberg.transvirtual.com>
+	Cleanusp for the 3Dfx driver.
+
+<jsimmons@heisenberg.transvirtual.com>
+	Finally touchs to the New mac framebuffer driver. Started the port of the ATI 128 driver to the new api. A few small optimizations and a bug fix for SUN 12x22 fonts with the new accel code.
+
+<anton@samba.org>
+	ppc64: Makefile updates
+
+<anton@samba.org>
+	ppc64: non linear cpu support
+
+<anton@samba.org>
+	ppc64: define new scheduler hooks
+
+<jsimmons@heisenberg.transvirtual.com>
+	M68K updates for there framebuffer devices.
+
+<jsimmons@heisenberg.transvirtual.com>
+	More changes to port over teh ATI 128 driver to new api. Optimizations for fbgen and small bug fix for gen_update_var 
+
+<jsimmons@heisenberg.transvirtual.com>
+	Ported over ATI 128 Rage driver to new api. A few config mistakes where fixed.
+
+<jsimmons@heisenberg.transvirtual.com>
+	Ported SA1100 framebuffer over to new fbdev api.
+
+<jsimmons@heisenberg.transvirtual.com>
+	Fixed bug for large logos. Also had to make a patch to handle X server reversing the image order programming verses how the riva fbdev driver does it.
+
+<jsimmons@heisenberg.transvirtual.com>
+	Removed fbcon-vga.c and the old fbgen code. Ported over the SgiVW, OpenFirmware fbdev driver and started the Mach64 fbdev driver to the new api. A few simple typos as well.
+
+<greg@kroah.com>
+	PCI Hotplug: fix i_nlink for root inode in pcihpfs
+
+<greg@kroah.com>
+	PCI Hotplug: fix the dbg() macro to work properly on older versions of gcc
+
+<jsimmons@heisenberg.transvirtual.com>
+	Port step some changes at authors request.
+
+<jsimmons@heisenberg.transvirtual.com>
+	Reversed so more changes.
+
+<jsimmons@heisenberg.transvirtual.com>
+	Permiedia 2 support on PowerPC platform.
+
+<jsimmons@heisenberg.transvirtual.com>
+	Updates to SIS framebuffer driver
+
+<shaggy@kleikamp.austin.ibm.com>
+	Clean up Documentation/filesystems/jfs.txt
+
+<jsimmons@heisenberg.transvirtual.com>
+	Porting Mach 64 drive over to new api.
+
+<anton@samba.org>
+	ppc64: update for recent 32/64bit binutils
+
+<anton@samba.org>
+	ppc64: Fix warnings
+
+<anton@samba.org>
+	ppc64: Fix for 32 bit ELF timeval handling, from sparc64
+
+<anton@samba.org>
+	ppc64: define SMP_CACHE_BYTES and cleanup HZ handling
+
+<anton@samba.org>
+	ppc64: use symbolic names for fault types
+
+<anton@samba.org>
+	ppc64: _switch_to -> __switch_to
+
+<anton@samba.org>
+	ppc64: defconfig update
+
+<anton@samba.org>
+	ppc64: exception should be 0x480 for instruction SLB miss - jimix
+
+<anton@samba.org>
+	ppc64: misc cleanups
+
+<anton@samba.org>
+	ppc64: __clear_user should return number of bytes not copied
+
+<anton@samba.org>
+	ppc64: iSeries update - from 2.4
+
+<anton@samba.org>
+	ppc64: add comment and missing include
+
+<anton@samba.org>
+	ppc64: Add northstar CPU
+
+<anton@samba.org>
+	ppc64: Add winnipeg support
+
+<anton@samba.org>
+	ppc64: UP fix for irq affinity
+
+<anton@samba.org>
+	ppc64: add POWER4+ (GQ) support
+
+<shaggy@kleikamp.austin.ibm.com>
+	JFS: Use cond_resched()
+	
+	Simple janitoral code cleanup submitted by Christoph Hellwig
+
+<shaggy@kleikamp.austin.ibm.com>
+	JFS: cosmetic syncup with 2.4 code
+	
+	These are cosmetic changes to avoid unneeded diffs between the 2.4
+	and 2.5 code.  Submitted by Christoph Hellwig
+
+<anton@samba.org>
+	ppc64: add rmap.h
+
+<anton@samba.org>
+	ppc64: workaround for gcc 3.1, otherwise we busy loop in pte_chain_lock()
+
+<torvalds@home.transmeta.com>
+	Fix incoherent LDT at mmap exit.
+	
+	We should _not_ update the current LDT if it's not the current
+	MM that we are tearing down.
+
+<viro@math.psu.edu>
+	[PATCH] make hfs use regular semaphores
+	
+	unrelated to the rest, replaces home-grown (racy) semaphores in fs/hfs
+	with the real thing.
+
+<viro@math.psu.edu>
+	[PATCH] Use wipe_partitions() where appropriate
+	
+	a bunch of places doing invalidate_device() either didn't need it at all
+	or actually wanted wipe_partitions().  Switched.
+
+<viro@math.psu.edu>
+	[PATCH] partition parsing cleanup
+	
+	struct gendisk and partition parsers divorced; all these parsers (IBM style,
+	disklabel, etc.) just fill the structure they get from check_partitions().
+	
+	Actual setting the things up (filling hd_struct arrays, telling RAID that
+	we had found partitions worth a look, etc.) is taken into check_partitions()
+	and done only when we are done with parsing.  Parsers don't know (or care)
+	what majors/minors they are dealing with; that knowledge also went to
+	check_partitions().
+
+<viro@math.psu.edu>
+	[PATCH] block device size cleanups
+	
+	for partitioned devices we use ->nr_sect to find the size; blk_size[] is
+	still used for things like floppy.c, etc.; that will go away later.
+	
+	There was only one place (do_open()) that needed it - the rest uses
+	->bd_inode->i_size now.  So blkdev_size_in_bytes() is gone - it's
+	expanded in its only caller.  Same place (do_open()) finds the partition
+	offset and stores it in new field ->bd_offset.  As the result, call of
+	get_gendisk() is gone from the IO path - in blk_partition_remap() we
+	just add ->bd_offset.
+	
+	Additionally, we take driver probing (get_blkfops()) outside of ->bd_sem
+	(again, do_open()) - that will allow to kill ad-hackery in check_partitions()
+	(opening bdev by hand).
+
+<viro@math.psu.edu>
+	[PATCH] partition handling locking cleanups
+	
+	Horrors with open/reread_partition exclusion are starting to get fixed.
+	
+	It's not the final variant, but at least we are getting the logics into
+	one place; switch to final variant will happen once we get per-disk
+	analog of gendisks.  New fields - ->bd_part_sem and ->bd_part_count.
+	
+	The latter counts the amount of opened partitions.  The former protects
+	said count _and_ is held while we are rereading partition tables.
+	Helpers - dev_part_lock()/dev_part_unlock() (currently taking kdev_t; that
+	will change pretty soon).  No more ->open() and ->release() for partitions,
+	all that logics went to generic code.  Lock hierachy is currently messy:
+	
+	  ->bd_sem for partitions -> ->bd_part_sem -> ->bd_sem for entire disks
+	
+	Ugly, but that'll go away and to get the final variant of locking right
+	now would take _really_ big patch - with a lot of steps glued together.
+	The damn thing is large as it is...
+
+<viro@math.psu.edu>
+	[PATCH] blk_ioctl() not exported anymore
+	
+	blk_ioctl() not exported anymore; calls moved from drivers to block_dev.c.
+
+<viro@math.psu.edu>
+	[PATCH] paride cleanup and fixes
+	
+	somewhat related to the above - drivers/block/paride/* switched to
+	module_init()/module_exit(), pd.c taught to use LBA if disks support
+	it (needed for paride disks >8Gb; change is fairly trivial and I've
+	got 40Gb one ;-)
+
+<viro@math.psu.edu>
+	[PATCH] SCSI ->bios_param() switched to struct block_device *
+	
+	->bios_param() switched from kdev_t to struct block_device *.
+	
+	Caller and all instances updated.
+
+<viro@math.psu.edu>
+	[PATCH] removal of dead prototypes
+	
+	Removed prototypes of several functions that do not exist...
+
+<viro@math.psu.edu>
+	[PATCH] jffs kdev_t cleanups
+	
+	In the /proc/fs/jffs/* code we switch to passing number of mtd device
+	(as an integer) instead of messing with kdev_t (which would always be
+	mk_kdev(MTD_BLOCK_MAJOR, device_number) anyway).
+
+<mingo@elte.hu>
+	[PATCH] "big IRQ lock" removal, IRQ cleanups
+	
+	This is a massive cleanup of the IRQ subsystem.  It's losely based on
+	Linus' original idea and DaveM's original implementation, to fold our
+	various irq, softirq and bh counters into the preemption counter.
+	
+	with this approach it was possible:
+	
+	 - to remove the 'big IRQ lock' on SMP - on which sti() and cli() relied.
+	
+	 - to streamline/simplify arch/i386/kernel/irq.c significantly.
+	
+	 - to simplify the softirq code.
+	
+	 - to remove the preemption count increase/decrease code from the lowlevel
+	   IRQ assembly code.
+	
+	 - to speed up schedule() a bit.
+	
+	Global sti() and cli() is gone forever on SMP, there is no more globally
+	synchronizing irq-disabling capability.  All code that relied on sti()
+	and cli() and restore_flags() must use other locking mechanisms from now
+	on (spinlocks and __cli()/__sti()).
+	
+	obviously this patch breaks massive amounts of code, so only limited
+	.configs are working at the moment (UP is expected to be unaffected, but
+	SMP will require various driver updates).
+	
+	The patch was developed and tested on SMP systems, and while the code is
+	still a bit rough in places, the base IRQ code appears to be pretty
+	robust and clean.
+	
+	while it boots already so the worst is over, there is lots of work left:
+	eg. to fix the serial layer to not use cli()/sti() and bhs ...
+
+<rmk@arm.linux.org.uk>
+	[PATCH] Serial driver stuff
+	
+	The serial layer is restructured to allow less code duplication (and
+	hence bug duplication) across various serial drivers.  Since ARM adds
+	six extra serial drivers, maintaining six copies of serial.c was not
+	my idea of fun.
+	
+	Therefore, we've ended up with a core serial driver, which knows about
+	the interactions with the tty layer, and low-level hardware drivers,
+	which know all about the hardware.  The interface between the two is
+	described in "Documentation/serial/driver".
+	
+	This patch completely removes the old serial.c driver and its associated
+	configuration options, as you requested at KS2002.  We keep a certain
+	amount of configuration compatibility with the per-architecture serial.h
+	file for the moment; this *will* be killed in the next round of patches.
+	The biggest user of this is x86, and since I don't have an x86 box to
+	test this stuff on, I think the changes are best kept separate.
+
+<anton@samba.org>
+	ppc64: fix test_bit and remove workaround in cpu_relax
+
+<mingo@elte.hu>
+	[PATCH] "big IRQ lock" removal docs
+	
+	i've done a minor comment update in softirq.c, plus i've written a
+	cli-sti-removal.txt guide to help driver writers do the transition.
+
+<torvalds@home.transmeta.com>
+	Update ensoniq sound driver to new irq serialization
+
+<rml@tech9.net>
+	[PATCH] Re: "big IRQ lock" removal docs
+	
+	One more doc correction while we are at it...
+
+<torvalds@home.transmeta.com>
+	Remove extraneous dget/dput pair in vfs_unlink() that
+	confused the NFS client code wrt the exclusiveness of
+	a dentry getting removed.
+
+<viro@math.psu.edu>
+	[PATCH] fix for nfs_unlink and vfs_unlink
+	
+	Ugh.  nfs_unlink() is actually racy as hell - look what happens if
+	we enter it with ->d_count == 1, see that nfs_sillyrename() doesn't
+	need to do anything and call nfs_safe_remove().  In the meanwhile
+	somebody does dcache lookup (without going into NFS code - plain
+	and simple cache hit) and increments ->d_count.  nfs_safe_remove()
+	decides that something is very rotten and fails.
+	
+	AFAICS we should take the test for ->d_count + d_drop if it's 1
+	under dcache_lock (and in one place).  Comments?
+	
+	Proposed fix follows:
+		* dget/dput killed in vfs_unlink() (safely)
+		* nfs_unlink() starts with check for ->d_count (under dcache_lock)
+		* if it's > 1 - sillyrename
+		* if it is 1 - immediately unhash, then drop dcache_lock.
+			after that we do as in old variant, except that
+			rehashing is done in nfs_unlink() and only if there
+			was an error - if there was none we simply leave
+			d_delete() to vfs_unlink().
+
+<rmk@flint.arm.linux.org.uk>
+	[SERIAL] Rename files to remove serial_ prefix.
+
+<rmk@flint.arm.linux.org.uk>
+	[SERIAL] Fix up various filenames, etc, from Ingo's merge of serial.
+
+<viro@math.psu.edu>
+	[PATCH] Fix dcache deadlock introduced by previous fix
+	
+	So the fix for our problems is:
+	
+	 a) in fs/namei.c replace d_unhash() with a safe version.
+	 b) in fs/nfs/dir.c replace d_drop(dentry) in beginning of nfs_unlink()
+	 with list_del_init(&dentry->d_hash);
+
+<torvalds@penguin.transmeta.com>
+	Ingo Molnar's update to remove irqlock (documentation and fixing
+	a number of drivers)
+
+<mingo@elte.hu>
+	[PATCH] Re: [patch] cli()/sti() cleanup
+	
+	Make people use the proper cli/sti replacements
+
+<torvalds@penguin.transmeta.com>
+	Fixups for previous changesets, avoid warnings etc.
+
+<greg@kroah.com>
+	[PATCH] USB pl2303: new device support added
+	
+	Thanks to Ang Sei Heng <seiheng@talariax.com> for the information.
+
+<jaharkes@cs.cmu.edu>
+	[PATCH] uhci-hcd suspend fix
+	
+	Problem:
+	
+	When resuming after a suspend, the driver disconnects. Later on, (next
+	usb interrupt?) or suspend/resume, the kernel oopses.
+	
+	Cause:
+	
+	hcd.state is never set to 'USB_STATE_READY' when resuming. The following
+	patch fixes this. Maybe Johannes might want to do it differently, i.e.
+	by adding hcd.state = USB_STATE_READY to uhci_resume instead of moving
+	the state change into start_hc.
+
+<david-b@pacbell.net>
+	[PATCH] usb_set_interface() doc
+	
+	This patch updates the kerneldoc for usb_set_interface()
+	to capture the point that it must not be called while
+	any URBs are pending to endpoints in that interface.
+	(Else state in the hcds, and devices, can get confused.)
+
+<ch@hpl.hp.com>
+	[PATCH] for ohci on SA-1111
+	
+	This is needed by 2.5.26-rmk1.
+
+<ch@hpl.hp.com>
+	[PATCH] set_device_description oops fixage mk2
+	
+	Unlike previous version, this one doesn't oops and is perspicuous.
+	Please apply.
+
+<david-b@pacbell.net>
+	[PATCH] hid_ff_init could not find initializer...
+	
+	Lately I get warnings whenever I plug in a device with
+	a HID interface ... when force feedback support is
+	configured, that's what it does.
+	
+	Yeech ... that should should at most be a dbg().
+
+<greg@kroah.com>
+	[PATCH] USB: rio500.c bugfix
+	
+	patch from Silvio Cesare to fix signed problem.
+
+<rmk@flint.arm.linux.org.uk>
+	[SERIAL] Fix another SMP deadlock with modem status signal changes
+	The original fix sent to Ingo for stop_tx didn't take account that
+	the start_tx and stop_tx methods can be called from the device
+	specific code under the port spinlock.  Consequently, we move the
+	spinlock to the callers of these methods.  Documentation updated
+	to reflect the change.
+
+<greg@kroah.com>
+	[PATCH] USB: usb-serial.h cleanups.
+	
+	removed tty_driver from struct usb_serial, as it's not used.
+	(thanks to Stuart MacDonald for pointing this out.)
+	
+	Updated the documentation for the structures to the proper style.
+
+<jb@jblache.org>
+	[PATCH] drivers/usb/misc/tiglusb.c v1.04
+	
+	Update to the latest version of the tiglusb driver
+
+<anton@samba.org>
+	ppc64: big IRQ lock removal
+
+<anton@samba.org>
+	ppc64: Fix for spurious interrupts in LPAR without ISA.
+
+<anton@samba.org>
+	ppc64: merge some 2.4 fixes
+
+<anton@samba.org>
+	ppc64: missed during last merge
+
+<rmk@flint.arm.linux.org.uk>
+	[SERIAL] Fix deadlock in __uart_start introduced in previous cset
+	Thanks to Zwane Mwaikambo for finding this.
+
+<anton@samba.org>
+	ppc64: Designated initializers from Rusty
+
+<anton@samba.org>
+	ppc64: add Config.help
+
+<anton@samba.org>
+	ppc64: Optimise for 630 by default.
+
+<anton@samba.org>
+	ppc64: put paca in r13 and fix non zero boot cpu
+
+<shaggy@kleikamp.austin.ibm.com>
+	JFS: Replace depreciated initializer syntax with C99 style.
+	
+	Originally submitted by Art Haas.
+	Cleaned up by Christoph Hellwig.
+
+<Kai.Makisara@kolumbus.fi>
+	[PATCH] SCSI tape driver fixes for 2.5.27
+	
+	This patch contains the following changes to the SCSI tape driver:
+	
+	- fixes EOM bug in large transfer in fixed block mode
+	- enables writing trailers by alternating error with ENOSPC and
+	  attempting a new write
+	- the write loop cleaned and simplified
+	- set the scatter/gather list element lengths to sum up to the
+	  desired transfer length
+	- MTERASE to use the short erase SCSI command if argument is zero
+	- set the can-bsr flag for drives with SCSI level >= 3
+	- C99 structure initializations
+	- some janitorial changes
+
+<riel@conectiva.com.br>
+	[PATCH] urgent rmap bugfix
+	
+	It turns out there was a subtle bug in Craig Kulesa's port of
+	the rmap patch to 2.5, which is only apparent on non-x86 machines
+	where pfn 0 isn't valid.
+	
+	The problem was that zap_pte_range() would clear the pte before
+	page_remove_rmap() would get called. This means that on these
+	machines the pte chain would never be removed and the machine
+	would oops at page_alloc.c line 98...
+	
+	Thanks to Russell King for helping track down this bug.
+
+<rmk@flint.arm.linux.org.uk>
+	[SERIAL] Fix sa1100 serial driver stop function parameters.
+
+<trond.myklebust@fys.uio.no>
+	[PATCH] 2.5.27 fix potential spinlocking race.
+	
+	In case of socket transmission errors etc. kfree_skb(), and hence
+	xprt_write_space() can potentially get called outside of a bh-safe
+	context.
+
+<anton@samba.org>
+	[PATCH] flags must be unsigned long]
+	
+	We must pass an unsigned long into __save_flags() etc.
+
+<anton@samba.org>
+	[PATCH] Make tlb_remove_tlb_entry take ptep]
+	
+	It seems only ppc32 and ppc64 use tlb_remove_tlb_entry. On ppc64 we need
+	a pointer to the pte so we can change some of the pte bits.
+	
+	Paul has some nice patches to clean up tlb teardown, but the following
+	patch should allow ppc32 and ppc64 to work in the meantime.
+
+<anton@samba.org>
+	[PATCH] Fix token ring compile]
+	
+	Since we EXPORT_SYMBOL(tr_source_route) in net/netsyms.c and it needs a
+	prototype, move it into include/linux/trdevice.h
+
+<akpm@zip.com.au>
+	[PATCH] disable highpte in rmap kernels
+	
+	Can we please disable highpte in config until it gets fixed?
+	
+	Patch from Martin Bligh.
+
+<akpm@zip.com.au>
+	[PATCH] page-writeback.c compile warning fix
+	
+
+<geert@linux-m68k.org>
+	[PATCH] M68k update (part 1)
+	
+	Update MVME i82596 Ethernet driver (from 2.4.x)
+	  - Add support for BVME6000
+	  - Add KERN_* prefixes to printk() calls
+	  - Wait for config change requests
+
+<geert@linux-m68k.org>
+	[PATCH] M68k update (part 2)
+	
+	Mac/m68k ADB updates (from 2.4.x)
+	 - Add support for m68k Macs
+	 - Add missing call to VIA CUDA initialization routine
+	 - Update Mac II VIA support
+	 - Make local functions static and add their prototypes
+	 - Add missing defines for Mac/m68k PMUs
+
+<geert@linux-m68k.org>
+	[PATCH] M68k update (part 3)
+	
+	 Amiga native graphics updates
+	  - Fix typo
+	  - Make monitor capability parsing a separate routine (strsep() must be able
+	    to modify the passed pointer)
+	
+	 The Cirrus Logic frame buffer device needs access to the memory mapped VGA I/O space on Amiga
+	
+	 Add video mode initialization code to the CyberVision64/3D driver
+	
+	 Add S3 ViRGE register definitions for the CyberVision64/3D driver
+
+<geert@linux-m68k.org>
+	[PATCH] M68k update (part 4)
+	
+	Port Apollo mouse driver to the `new' busmouse API
+
+<geert@linux-m68k.org>
+	[PATCH] M68k update (part 5)
+	
+	Fix Apollo frame buffer device breakage after the recent fbdev changes
+
+<geert@linux-m68k.org>
+	[PATCH] M68k update (part 6)
+	
+	Fix breakage introduced by seq_printf() changes
+
+<geert@linux-m68k.org>
+	[PATCH] M68k update (part 7)
+	
+	Atari frame buffer device updates
+	  - Move static function definition before usage
+	  - Fix breakage caused by recent fbdev changes
+	  - Make some setup parameter parsing separate routines (strsep() must be able
+	    to modify the passed pointers)
+	  - On Atari the ATI Mach64 registers are memory mapped, but it's not on
+	    the PCI bus, so we cannot use writel() and friends.
+	  - Kill warnings by protecting unused data with the appropriate #ifdef
+	  - On Atari the ATI Mach64 registers are memory mapped, but it's not on the
+	    PCI bus, so we cannot use writel() and friends.
+	  - Fix assignment of addresses for Atari
+
+<geert@linux-m68k.org>
+	[PATCH] M68k update (part 8)
+	
+	M68k bitops updates
+	  - use bitmap_member() for bitops data declaration
+	  - Make the m68k bitops really operate on unsigned long
+	  - Add fls()
+
+<geert@linux-m68k.org>
+	[PATCH] M68k update (part 9)
+	
+	M68k cache handling updates
+	  - Add missing definition of L1_CACHE_SHIFT
+	  - Define L1_CACHE_BYTES in terms of L1_CACHE_SHIFT
+	  - Add missing include
+	  - Fix address types and casts
+
+<geert@linux-m68k.org>
+	[PATCH] M68k update (part 10)
+	
+	Enable Q40 keyboard and serial, and Apollo keyboard
+
+<geert@linux-m68k.org>
+	[PATCH] M68k update (part 11)
+	
+	Fix miscellaneous compilation warnings and errors
+
+<geert@linux-m68k.org>
+	[PATCH] M68k update (part 12)
+	
+	Linux/m68k configuration updates
+	  - Unify serial console questions
+	  - Move serial driver config questions together
+	  - The Atari mouse driver depends on the Atari keyboard driver, hence on
+	    CONFIG_VT
+	  - Don't hardcode CONFIG_VT=n on VME, you may want it for a multi-machine
+	    kernel
+	  - The IRQ_* definitions are not used on Amiga, but we need them if we
+	    build a multi-machine kernel, too
+
+<geert@linux-m68k.org>
+	[PATCH] M68k update (part 13)
+	
+	 - Atari joystick device number updates
+	 - Atari ACSI hard disk driver device updates
+	 - Atari floppy driver device updates
+	 - MVME147 serial driver dev_t update
+
+<geert@linux-m68k.org>
+	[PATCH] M68k update (part 14)
+	
+	HP300 DIO bus updates
+
+<geert@linux-m68k.org>
+	[PATCH] M68k update (part 15)
+	
+	M68k DMA address type update: Add definition for dma64_addr_t on m68k
+
+<geert@linux-m68k.org>
+	[PATCH] M68k update (part 16)
+	
+	The penguin logo resides in normal RAM, not in frame buffer memory, so we must
+	not use fb_readb()
+
+<geert@linux-m68k.org>
+	[PATCH] M68k update (part 17)
+	
+	The Mac6x11 font depends on CONFIG_FBCON_MAC, not on CONFIG_MAC
+
+<geert@linux-m68k.org>
+	[PATCH] M68k update (part 18)
+	
+	Add Sun-3x floppy support (from 2.4.x)
+
+<geert@linux-m68k.org>
+	[PATCH] M68k update (part 19)
+	
+	Fix Mac build if no fonts are selected
+
+<geert@linux-m68k.org>
+	[PATCH] M68k update (part 20)
+	
+	Merge remaining bits of core HP300 support
+
+<geert@linux-m68k.org>
+	[PATCH] M68k update (part 21)
+	
+	HP300 LANCE driver updates
+	  - Update DIO probe code
+	  - Use out_8() instead of writeb() for non-PCI memory mapped I/O
+	  - Kill warnings
+
+<geert@linux-m68k.org>
+	[PATCH] M68k update (part 22)
+	
+	M68k USER_HZ updates
+
+<geert@linux-m68k.org>
+	[PATCH] M68k update (part 23)
+	
+	The old form of designated initializers are obsolete: we need to replace them
+	with the ISO C forms before 2.6.  Gcc has always supported both forms anyway.
+	
+	(from Rusty Russell <rusty@rustcorp.com.au>, with some mods by me)
+
+<geert@linux-m68k.org>
+	[PATCH] M68k update (part 24)
+	
+	M68k I/O core updates
+	 - Use memory mapped I/O access routines for non-ISA/PCI/PCMCIA m68k devices
+	 - Don't use writel() and friends on m68k memory mapped I/O
+	 - Fix typo in definition of writew()
+	 - Add missing definitions for {in,out}_le{16,32}()
+
+<geert@linux-m68k.org>
+	[PATCH] M68k update (part 25)
+	
+	Update ISA space code on m68k (from 2.4.x)
+	 - Add support for multiple types of ISA busses in one kernel image (e.g. an
+	   image for both Q40 and Amiga with PCMCIA)
+	 - Allow port operations on m68k if CONFIG_ISA is defined
+
+<geert@linux-m68k.org>
+	[PATCH] M68k update (part 26)
+	
+	Misc Mac/m68k updates
+	 - Make sure we have one instance of mac_hw_present
+	 - Kill warning
+	 - Rename struct SCC to struct mac_SCC to avoid type conflict
+
+<geert@linux-m68k.org>
+	[PATCH] M68k update (part 27)
+	
+	Mac m68k Ethernet driver updates (from 2.4.x)
+	 - mace68k_probe() got renamed to mace_probe()
+	 - Add missing MODULE_LICENSE()
+	 - Add missing register definition for SONIC_DCR2
+
+<geert@linux-m68k.org>
+	[PATCH] M68k update (part 28)
+	
+	Mac/m68k doesn't use the PowerMac NVRAM driver
+
+<geert@linux-m68k.org>
+	[PATCH] M68k update (part 29)
+	
+	Add Mac/m68k support to valkyriefb
+
+<geert@linux-m68k.org>
+	[PATCH] M68k update (part 30)
+	
+	M68k core mm updates
+	  - Update fault handling
+	  - Remove superfluous flush_tlb_page()
+	  - Remove obsolete comment
+	  - empty_zero_page becomes a void *
+	  - Type and cast clean ups
+	  - Remove duplicated test for voff == 0
+	  - Move check_pgt_cache() to pgtable.h
+	  - Pte and pmd updates
+	  - Add additional parameter to {clear,copy}_user_page()
+	  - pfn updates
+	  - BUG() updates
+	  - Move check_pgt_cache() from motorola_pgalloc.h
+	  - Misc updates
+	  - Add __page_address() and page_to_phys()
+
+<geert@linux-m68k.org>
+	[PATCH] M68k update (part 31)
+	
+	Add definition for PROT_SEM on m68k
+
+<geert@linux-m68k.org>
+	[PATCH] M68k update (part 32)
+	
+	Mac/m68k Nubus updates
+	  - Use nubus_{read,write}[bwl]()
+	  - Fix /proc/bus/nubus
+	  - Fix type and linkage of nubus_init()
+	  - Use nubus_{read,write}[bwl]()
+	  - Kill some address assignment warnings
+	  - Include <asm/nubus.h>
+	  - nubus_init() is an initcall, hence static
+
+<geert@linux-m68k.org>
+	[PATCH] M68k update (part 33)
+	
+	M68k parport updates
+	 - Remove workaround code for parport bug (parport without FIFO)
+	 - ->dma_buf is used in FIFO mode only
+	 - Add missing prototype for parport_atari_init()
+	 - Initialize uninitialized variable
+
+<geert@linux-m68k.org>
+	[PATCH] M68k update (part 34)
+	
+	Add PCI_DMA_BUS_IS_PHYS for m68k
+
+<geert@linux-m68k.org>
+	[PATCH] M68k update (part 35)
+	
+	Remove CPU information from /proc/hardware (already in /proc/cpuinfo)
+
+<geert@linux-m68k.org>
+	[PATCH] M68k update (part 36)
+	
+	Q40/Q60 keyboard updates
+	  - Ignore illegal scancodes
+	  - Remove unused q40kbd_leds()
+	  - Fix return type and return value of q40kbd_init_hw()
+
+<geert@linux-m68k.org>
+	[PATCH] M68k update (part 37)
+	
+	SCSI scatterlist updates for m68k
+	  - Fix printk() format
+	  - Update for page/offset in scatterlist
+
+<geert@linux-m68k.org>
+	[PATCH] M68k update (part 38)
+	
+	Spelling fix
+
+<geert@linux-m68k.org>
+	[PATCH] M68k update (part 39)
+	
+	Atari STRAM fixes
+	  - Add missing include
+	  - Fix parameter passing to atari_stram_reserve_pages()
+
+<geert@linux-m68k.org>
+	[PATCH] M68k update (part 40)
+	
+	Sun-3/3x frame buffer device updates
+	  - Fix breakage from recent fbdev changes
+	  - Add support for CG3 graphics on Sun-3/3x
+
+<geert@linux-m68k.org>
+	[PATCH] M68k update (part 41)
+	
+	Add new syscalls to m68k
+	  - Add syscall entries for sys_pivot_root, extended attributes, and futex
+	  - Fix formatting
+
+<geert@linux-m68k.org>
+	[PATCH] M68k update (part 42)
+	
+	M68k task and thread updates
+
+<geert@linux-m68k.org>
+	[PATCH] M68k update (part 43)
+	
+	M68k TLB updates
+
+<geert@linux-m68k.org>
+	[PATCH] M68k update (part 44)
+	
+	M68k fault handling updates
+	  - Fix incorrect page alignment
+	  - Merge related inline asm statements to avoid .chip confusion
+	  - Add Sun-3 bus mapping test code
+	  - Kill warning
+
+<geert@linux-m68k.org>
+	[PATCH] M68k update (part 45)
+	
+	MVME SCSI updates
+	 - Fix return type in prototype of ncr53c7xx_init()
+
+<geert@linux-m68k.org>
+	[PATCH] M68k update (part 46)
+	
+	MVME serial driver updates (from 2.4.x)
+	  - Add missing save of interrupt state
+	  - _tty_name() got renamed to tty_name()
+	  - Add devfs support
+	  - Simplify baud logic
+	  - Add missing MOD_DEC_USE_COUNT
+	  - Add missing cli()
+	  - block_til_ready() got renamed to gs_block_til_ready()
+
+<geert@linux-m68k.org>
+	[PATCH] M68k update (part 47)
+	
+	M68k VT updates:
+	  - Include <linux/vt_kern.h> instead of copying the kd_mksound() prototype
+	  - Lots of stuff depends on CONFIG_VT:
+	      o SYSRQ_KEY
+	      o kd_mksound()
+	      o mach_keyb_init()
+	      o mach_kbdrate()
+	      o mach_kbd_leds()
+	      o mach_kbd_translate()
+	      o mach_sysrq_xlate()
+	      o Atari keyboard and joystick drivers
+	  - There's no need to provide dummy routines for kbd{rate,_leds}()
+	  - dummy_con depends on CONFIG_DUMMY_CONSOLE
+
+<geert@linux-m68k.org>
+	[PATCH] M68k update (part 48)
+	
+	console.wait_key was removed
+
+<geert@linux-m68k.org>
+	[PATCH] M68k update (part 49)
+	
+	Amiga Zorro bus updates
+	 - Bring APUS Zorro bus announcement in sync with the m68k version
+	 - Fix typo in Zorro device generator name
+	 - Kill duplicate ] in Zorro device ID database
+	 - Include <asm/io.h> instead of duplicating definitions from <asm/io.h>
+
+<jsimmons@maxwell.earthlink.net>
+	Removed all old fbgen code. Small cleanups.
+
+<axboe@burns.home.kernel.dk>
+	add __blk_stop_queue() as locked variant of blk_stop_queue() and
+	make cpqarray and cciss use these
+
+<rgooch@atnf.csiro.au>
+	Switched to ISO C structure field initialisers.
+	Switch to set_current_state() and move before add_wait_queue().
+	Updated README from master HTML file.
+	Fixed devfs entry leak in <devfs_readdir> when *readdir fails.
+
+<jsimmons@maxwell.earthlink.net>
+	Synced up to m68k changes
+
+<greg@kroah.com>
+	[PATCH] USB: changed the interface name to be a bit more unique.
+	
+	This is needed as long as we have the directory of symlinks in the bus
+	subdir in driverfs to point to the unique interfaces.
+
+<rusty@rustcorp.com.au>
+	[PATCH] AGP designated initializer update.
+	
+	The old form of designated initializers are obsolete: we need to
+	replace them with the ISO C forms before 2.6.  Gcc has always supported
+	both forms anyway.
+
+<rgooch@atnf.csiro.au>
+	no message
+
+<mingo@elte.hu>
+	[PATCH] irqlock patch 2.5.27-H6
+	
+	 - init thread needs to have preempt_count of 1 until sched_init().
+	   (William Lee Irwin III)
+	 - clean up the irq-mask macros. (Linus)
+	 - add barrier() to irq_enter() and irq_exit(). (based on Oleg Nesterov's
+	   comment.)
+	 - move the irqs-off check into preempt_schedule() and remove
+	   CONFIG_DEBUG_IRQ_SCHEDULE.
+	 - remove spin_unlock_no_resched() and comment the affected places more
+	   agressively.
+	 - slab.c needs to spin_unlock_no_resched(), instead of spin_unlock(). (It
+	   also has to check for preemption in the right spot.) This should fix
+	   the memory corruption.
+	 - irq_exit() needs to run softirqs if interrupts not active - in the
+	   previous patch it ran them when preempt_count() was 0, which is
+	   incorrect.
+	 - spinlock macros are updated to enable preemption after enabling
+	   interrupts. Besides avoiding false positive warnings, this also
+	 - fork.c has to call scheduler_tick() with preemption disabled -
+	   otherwise scheduler_tick()'s spin_unlock can preempt!
+	 - irqs_disabled() macro introduced.
+	 - [ all other local_irq_enable() or sti instances conditional on
+	     CONFIG_DEBUG_IRQ_SCHEDULE are to fix false positive warnings. ]
+	 - fix buggy in_softirq(). Fortunately the bug made the test broader,
+	   which didnt result in algorithmical breakage, just suboptimal
+	   performance.
+	 - move do_softirq() processing into irq_exit() => this also fixes the
+	   softirq processing bugs present in apic.c IRQ handlers that did not
+	   test for softirqs after irq_exit().
+	 - simplify local_bh_enable().
+
+<torvalds@home.transmeta.com>
+	Remove unused variable
+
+<dalecki@evision.ag>
+	[PATCH] IDE-101
+	
+	Here is a quick fix.  I would like to synchronize with the irq handler
+	changes as well.  Becouse right now I know that preemption is killing
+	the disk subsystem when moving data between disks using different
+	request queues...  In esp.  It get's me in to do_request() with a queue
+	in unplugged state.  (Not everything is my fault, after all :-).
+
+<torvalds@home.transmeta.com>
+	Fix up irqlock removal patch, avoid compiler warnings
+
+<hugh@veritas.com>
+	[PATCH] shm_destroy lock hang
+	
+	Martin Schwidefsky <schwidefsky@de.ibm.com> reported "Bug with shared
+	memory" to LKML 14 May: hang due to schedule in truncate_list_pages
+	called from .... shm_destroy holding shm_lock spinlock.  shm_destroy
+	needs that lock for shm_rmid, but it can be safely unlocked once link
+	from id to shp has been removed.
+
+<hugh@veritas.com>
+	[PATCH] shmem_link duplicated test
+	
+	Trivial: vfs_link in 2.5 checks S_ISDIR first, shmem_link
+	need not repeat it, but test crept back in at some stage.
+
+<hugh@veritas.com>
+	[PATCH] shmem_file_write double kunmap
+	
+	Found by Simon Trimmer <simon@veritas.com>: shmem_file_write
+	failure path duplicates kunmap, causing oops holding kmap_lock.
+
+<hugh@veritas.com>
+	[PATCH] shmem_getpage_locked missing unlock
+	
+	Dawson Engler's Stanford Checker reported this missing unlock to
+	LKML 11 July (amongst "56 potential lock/unlock bugs in 2.5.8").
+
+<rusty@rustcorp.com.au>
+	[PATCH] drivers/hotplug designated initializers
+	
+	 The old form of designated initializers are obsolete: we need to
+	 replace them with the ISO C forms before 2.6.  Gcc has always supported
+	 both forms anyway.
+
+<petkan@users.sourceforge.net>
+	[PATCH] USB: rtl8150 updated
+	
+	  new vendor/device ID;
+	  redundant check removed from probe();
+
+<neilb@cse.unsw.edu.au>
+	[PATCH] type safe(r) list_entry repacement: container_of
+	
+	Define container_of which cast from member to struct with some type checking.
+	
+	This is much like list_entry but is cearly for things other than lists.
+	
+	List_entry now uses container_of.
+
+<neilb@cse.unsw.edu.au>
+	[PATCH] MD - Fix two bugs that would cause sync_sbs to Oops
+	
+	Sync_sbs tries to access the ->sb for the first rdev of an mddev.
+	This can oops as the wrong arg is given to list_entry, and also
+	if a define was faound to be failed, as failed devices have their ->sb
+	removed.  But that removal isn't necessary, so now an rdev will always
+	have an ->sb.
+
+<neilb@cse.unsw.edu.au>
+	[PATCH] MD - Convert struct initialised in md to "the new way"
+	
+
+<neilb@cse.unsw.edu.au>
+	[PATCH] MD - Remove get_spare declaration and associated warning
+	
+	get_spare recently became static and no-one told md_k.h
+
+<neilb@cse.unsw.edu.au>
+	[PATCH] NFSD - new struct initialisers for nfsd
+	
+	Heading Rusty off at the pass...
+	
+	This also changes and array initialiser...
+
+<levon@movementarian.org>
+	[PATCH] consolidate task->mm code + fix
+	
+	The patch below consolidates some duplicate code, reduces some
+	indentation, and adds a freeing of a page in mem_read() that could be left
+	unfreed, as far as I can see.
+
+<mingo@elte.hu>
+	[PATCH] scheduler fixes
+	
+	 - introduce new type of context-switch locking, this is a must-have for
+	   ia64 and sparc64.
+	
+	 - load_balance() bug noticed by Scott Rhine and myself: scan the
+	   whole list to find imbalance number of tasks, not just the tail
+	   of the list.
+	
+	 - sched_yield() fix: use current->array not rq->active.
+
+<torvalds@penguin.transmeta.com>
+	Linux v2.5.28
+

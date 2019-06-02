@@ -1,0 +1,1732 @@
+
+Summary of changes from v2.5.49 to v2.5.50
+============================================
+
+<greg@kroah.com>
+	LSM: add #include <linux/security.h> to a lot of files as they all have security calls in them.
+	
+	This is needed for the next patches that change the way the security calls work.
+
+<greg@kroah.com>
+	LSM:  Create CONFIG_SECURITY and disable it by default for now.
+	
+	This allows the security hooks to be compiled away into nothingness if CONFIG_SECURITY
+	is disabled.  When disabled, the default capabilities functionality is preserved.
+	When enabled, security modules are allowed to be loaded.
+
+<greg@kroah.com>
+	LSM: change all usages of security_ops->ptrace() to security_ptrace()
+
+<greg@kroah.com>
+	LSM: change all security bprm related calls to the new format.
+
+<greg@kroah.com>
+	LSM: change all of the VFS related security calls to the new format.
+
+<greg@kroah.com>
+	LSM: convert over the remaining security calls to the new format.
+
+<hch@infradead.org>
+	[PATCH] remove sys_security
+	
+	I've been auditing the LSM stuff a bit more..
+	
+	They have registered an implemented a syscall, sys_security
+	that does nothing but switch into the individual modules
+	based on the first argument, i.e. it's ioctl() switching
+	on the security module instead of device node.  Yuck.
+	
+	Patch below removes it (no intree users), maybe selinux/etc
+	folks should send their actual syscall for review instead..
+
+<greg@kroah.com>
+	LSM: remove last remanants of sys_security missed by last patch.
+
+<aris@cathedrallabs.org>
+	drivers/acpi/ac.c: convert to seq_file
+
+<kai@tp1.ruhr-uni-bochum.de>
+	ISDN: Simplify chip init
+	
+	clear_pending_interrupts can be made internal to the chipset driver,
+	simplifying the callers a somewhat and also fixing bugs where
+	work_queues would be scheduled before they are initialized.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	ISDN: Un-split inithscxisac
+	
+	It works just as nicely unsplit AFAICS, so no need for the added
+	complexity.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	ISDN: Move transmitter reset into initisac()
+	
+	Move some duplicated code into a common and more
+	sensible place.
+
+<aris@cathedrallabs.org>
+	o acpi: convert drivers/acpi/button.c to seq_file
+
+<kai@tp1.ruhr-uni-bochum.de>
+	ISDN: Remove compatibility ifdefs
+	
+	Compatibility code checking for 2.1.60 can surely go away...
+
+<kai@tp1.ruhr-uni-bochum.de>
+	ISDN: Introduce .owner
+	
+	The current way of passing a command to inc the module use count is
+	inherently racy, so expose a struct module *owner instead (which makes
+	it possible to fix this race, though that's not done yet).
+	
+	Also, add some missing #include <linux/interrupt.h>
+
+<kai@tp1.ruhr-uni-bochum.de>
+	ISDN: Remove unused commands
+	
+	There's a number of commands which are never used by the link layer, so
+	no reason to have them stick around.
+
+<dledford@aladin.rdu.redhat.com>
+	aic7xxx_old: fix up the biosparam function to do 64bit math safely
+
+<kai@tp1.ruhr-uni-bochum.de>
+	ISDN: Move isdn_slot into isdn_driver
+	
+	Conceptually, we have struct isdn_driver, which describes one ISDN card.
+	Each card provides some (normally 2) channels, called isdn_slot. Instead
+	of having a global array of struct isdn_slot, move the slots provided by
+	one card into the corresponding struct isdn_driver.
+	
+	When binding to a channel (isdn_get_free_slot), this inc's the refcount on
+	the struct isdn_driver, making sure that slot and slot->drv cannot
+	disappear under us.
+
+<dledford@aladin.rdu.redhat.com>
+	aic7xxx_old: update biosparam function with the (ugly) detail that
+		cylinder values > 65535 get truncated
+
+<dledford@aladin.rdu.redhat.com>
+	scsi.c, scsi.h, scsi_syms.c, aic7xxx_old: add new function to track queue
+		full events at the mid layer instead of at the low level device
+		driver
+
+<hch@lst.de>
+	[PATCH] remove unused include in scsi_ioctl.c
+	
+	This time I explicitly checked for the in_atomic mess..
+
+<hch@lst.de>
+	[PATCH] split busy check out of scsi_remove_host
+	
+	just a simple code cleanup
+
+<hch@lst.de>
+	[PATCH] make a few more routines private to scsi_lib.c
+
+<hch@lst.de>
+	[PATCH] cleanup code for /proc add/remove single device
+	
+	two new helpers in scsi_scan.c: scsi_add_single_device and
+	scsi_remove_single_device that do all hard work.  Thanks to
+	beeing in scsi_scan.c and using proper helpers they're a lot
+	smaller and cleaner.
+
+<hch@lst.de>
+	[PATCH] get rid of scan_scsis
+	
+	this function was a multiplexer for two very different things, but
+	with my last patch one of those faded away and only one callers
+	is left.  Simplify it to what's still needed and rename to
+	scsi_scan_host.
+
+<hch@lst.de>
+	[PATCH] remove useless includes from scsi.h
+
+<hch@lst.de>
+	[PATCH] some HBA compile warning fixes
+
+<hch@lst.de>
+	[PATCH] turn scsi_allocate_device into readable code
+
+<patmans@us.ibm.com>
+	[PATCH] current scsi-misc-2.5 include files
+	
+	On Thu, Nov 21, 2002 at 10:12:23AM -0600, J.E.J. Bottomley wrote:
+	> The scsi-misc-2.5 resync should be done now.
+	>
+	> James
+	
+	Hi -
+	
+	hardirq.h and init.h were removed from scsi.h. So I had to make the
+	following changes to compile. I also removed two extraneous includes.
+
+<patmans@us.ibm.com>
+	[PATCH] cleanup code for /proc add/remove single device
+	
+	On Thu, Nov 21, 2002 at 02:23:14AM +0100, Christoph Hellwig wrote:
+	> two new helpers in scsi_scan.c: scsi_add_single_device and
+	> scsi_remove_single_device that do all hard work.  Thanks to
+	> beeing in scsi_scan.c and using proper helpers they're a lot
+	> smaller and cleaner.
+	>
+	>
+	> --- 1.44/drivers/scsi/scsi.h	Sun Nov 17 16:44:35 2002
+	> +++ edited/drivers/scsi/scsi.h	Thu Nov 21 01:05:39 2002
+	> -
+	> -		err = -ENOSYS;
+	> -		if (sdev)
+	> -			goto out;	/* We do not yet support unplugging */
+	> -
+	> -		scan_scsis(shost, 1, channel, id, lun);
+	> -		err = length;
+	> -		goto out;
+	> -	}
+	> +		err = scsi_add_single_device(host, channel, id, lun);
+	> +		if (err >= 0)
+	> +			err = length;
+	
+	> ===== drivers/scsi/scsi_scan.c 1.38 vs edited =====
+	> --- 1.38/drivers/scsi/scsi_scan.c	Sun Nov 17 16:47:20 2002
+	> +++ edited/drivers/scsi/scsi_scan.c	Thu Nov 21 01:16:03 2002
+	> @@ -1862,6 +1862,69 @@
+	>
+	>  }
+	>
+	> +int scsi_add_single_device(uint host, uint channel, uint id, uint lun)
+	> +{
+	> +	struct scsi_device *sdevscan, *sdev;
+	> +	struct Scsi_Host *shost;
+	> +	int error = -ENODEV;
+	> +
+	> +	shost = scsi_host_hn_get(host);
+	> +	if (!shost)
+	> +		return -ENODEV;
+	> +	sdev = scsi_find_device(shost, channel, id, lun);
+	> +	if (!sdev)
+	> +		goto out;
+	> +
+	
+	James/Christoph -
+	
+	I had to change the above to a "if (sdev)" per the following patch (against
+	current scsi-misc-2.5) to get the add to work correctly. Otherwise, this
+	worked fine.
+
+<dledford@dledford.theledfords.org>
+	scsi: Update lldd API to slave_alloc/slave_configure/slave_destroy interface
+		instead of slave_attach/slave_detach interface.  Change all users
+		of existing interface to new interface, update scan code for new
+		device attachement semantics
+
+<paulus@samba.org>
+	PPC32: update for recent changes to clone system call.
+
+<dledford@dledford.theledfords.org>
+	Convert from host->host_queue to host->my_devices list usage
+	Add in usage of new same_target_siblings list
+	Add scsi_release_commandblocks() call to scsi_free_sdev()
+	Make all scsi device freeing use scsi_free_sdev()
+
+<zaitcev@redhat.com>
+	[sparc]: Clobber %l3 in switch_to
+
+<agrover@groveronline.com>
+	ACPI: Interpreter update to 20021122
+	  Fixed a problem with RefOf and named fields
+	  Fixed a protection fault involving Packages with Null/nested packages
+	  Fixed GPE initialization to handle a pathological case
+
+<agrover@groveronline.com>
+	ACPI: Fix IRQ assignment on Tiger (JI Lee)
+
+<dledford@aladin.rdu.redhat.com>
+	st.c:   Clean up init failure paths
+		Fix the detach code so it doesn't call sysfs unregister with
+			a lock held
+
+<dledford@aladin.rdu.redhat.com>
+	fs/proc/inode.c: Make proc use new module loader semantics so that
+		touching a /proc/* file doesn't pin a module in memory
+
+<aris@cathedrallabs.org>
+	o acpi: convert drivers/acpi/power.c to seq_file
+
+<aris@cathedrallabs.org>
+	o acpi: convert drivers/acpi/processor.c to seq_file
+
+<aris@cathedrallabs.org>
+	o acpi: convert drivers/acpi/sleep.c to seq_file
+
+<acme@conectiva.com.br>
+	o acpi/processor.o: fix up seq_file conversion, add missing comma
+
+<aris@cathedrallabs.org>
+	o acpi: convert drivers/acpi/thermal.c
+
+<aris@cathedrallabs.org>
+	o acpi: convert drivers/acpi/toshiba_acpi.c to seq_file
+
+<kai@tp1.ruhr-uni-bochum.de>
+	ISDN: Introduce get/put_slot()
+	
+	When an application needs an ISDN channel ("slot"), it now should
+	use get_slot() which will make sure that the corresponding driver module
+	doesn't unregister under us.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	ISDN: Update eicon driver for removal of pcibios_*
+	
+	Fairly obviously, but untested.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	ISDN: Remove cli()/.. from hisax/hscx driver
+	
+	We use a per-card spinlock to protect interrupt and normal tx
+	path from each other.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	ISDN/HiSax: Don't call back up in hard-IRQ context
+	
+	We used to call writewakeup() directly from handling the "frame sent"
+	IRQ which potentially would call back up into the common ISDN layer and
+	higher up still in hard-IRQ context. Instead, queue the event and use
+	the usual mechanism of passing it up.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	ISDN/HiSax: Remove pcibios_* leftovers
+	
+	For the most part, Linux drivers shouldn't muck with that low-level
+	stuff at all, but rather leave it to the generic layer.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	ISDN/HiSax: Shared function for scheduling a B-channel event
+	
+	There's no need for each hardware driver to implement its own
+	(short) xxx_schedule_event().
+
+<kai@tp1.ruhr-uni-bochum.de>
+	ISDN/HiSax: Unified xmit_complete_b()
+	
+	Again, this code sequence is repeated in a lot of drivers, so 
+	separate it out.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	ISDN/HiSax: Separate out xmit_ready_b()
+	
+	A lot of drivers do the same thing when they're ready for transmitting
+	the next frame, so let's share that code.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	ISDN/HiSax: Shared xmit_data_req() for B-channel
+	
+	Again, lots of drivers duplicated code to start transmitting a
+	B-channel frame. Now we do this from one place, and the converted
+	drivers are obviously serialized w.r.t. calling ->BC_Send_Data()
+
+<kai@tp1.ruhr-uni-bochum.de>
+	ISDN/HiSax: Shared PH_PULL handling for B-Channel
+	
+	More obviously duplicated code moved into just one place.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	ISDN/HiSax: Share XPR interrupt handling for B-Channel
+	
+	Six of the hardware chips for B-channel xmit work so similar that we can
+	share the code to handle XPR (transmit pool ready).
+
+<kai@tp1.ruhr-uni-bochum.de>
+	ISDN/HiSax: Share code for retransmitting frame on B-channel
+	
+	If we lose a fragment of a frame, we need to restart from the beginning,
+	share that code.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	ISDN/HiSax: Share XDU handling for B-Channel
+	
+	Again, the hardware is similar enough to use a shared function,
+	only the method of resetting the transmitter needs to be specified.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	ISDN/HiSax: Share fill_fifo() for B-Channels
+	
+	Something else which can be nicely shared amongst various drivers...
+
+<david-b@pacbell.net>
+	[PATCH] drivers/base/hotplug.c, fix $DEVPATH
+	
+	Hotplug agents couldn't use /sys/$DEVPATH after /sys/root
+	morphed into /sys/devices ... now they can do it again.
+
+<david-b@pacbell.net>
+	[PATCH] remove CONFIG_USB_LONG_TIMEOUT
+	
+	Basically, no point in having short and long timeout options
+	where both are _shorter_ than the timeout from the USB spec.
+
+<david-b@pacbell.net>
+	[PATCH] ohci uses less slab memory
+	
+	When chasing down some of those 'bad entry' diagnostics, I once
+	got suspicious that the problem was slab corruption coming from
+	the way the td hashtable code worked.   So I put together this
+	patch, eliminating some kmallocation, and the next times I ran
+	that test, the oops went away and it worked like a charm.  Hmm.
+	
+	This patch is good because it shrinks memory and code, and gets
+	rid of some could-fail allocations, so I figured I'd send it on
+	(low priority) even if I don't think it fixes the root problem.
+
+<randy.dunlap@verizon.net>
+	[PATCH] USB: use time_before() to compare times
+
+<ganesh@vxindia.veritas.com>
+	[PATCH] uninitialized spinlock in ipaq.c
+	
+	this fixes an uninitialzed spinlock in ipaq.c. the driver should work
+	on smp machines now.
+
+<baldrick@wanadoo.fr>
+	[PATCH] usbdevfs: finalize urbs on interface release
+	
+	Description: When an urb has been submitted via usbdevfs, and is still
+	pending when the interface it was submitted to is released, force the
+	urb to be completed.  This is the correct behaviour.  It fixes an oops on
+	system shutdown when using the user space driver for the speedtouch
+	modem.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	ISDN/HiSax: Shared xmit_fill_fifo() for D-Channel.
+	
+	Now repeat the steps of unifying the xmit path for B-Channels for
+	D-Channel handling. Parts of xmit_fill_fifo() can easily be shared.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	ISDN/HiSax: Shared sched_event() for D-channel
+	
+	No reason to duplicate sched_event() all over the drivers...
+
+<kai@tp1.ruhr-uni-bochum.de>
+	ISDN/HiSax: Share xmit_ready_d()
+	
+	Same as for the B-Channels. We need to make sure that this doesn't
+	race with a new frame arriving from the upper layer, which will be done
+	shortly by sharing the upper layer interface as well. Protection is
+	provided by card->lock, which is now always taken around the entire
+	interrupt - more coarse-grained than possible, but still better than
+	the global cli(), and correctness and simplicity first.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	ISDN/HiSax: Consolidate D-Channel XPR interrupt handling
+	
+	More code which can be nicely shared...
+
+<kai@tp1.ruhr-uni-bochum.de>
+	ISDN/HiSax: Share D-Channel XDU interrupt handling
+	
+	The FIFO based cards can share the data underrun handling.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	ISDN/HiSax: Move more code into the shared xmit_xpr_d()
+	
+	Another bit of D-channel busy handling can move as well.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	ISDN/HiSax: Share D-channel PH_DATA request handling
+	
+	As usual, lots of duplicated code gone.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	ISDN/HiSax: Share D-Channel PH_PULL code
+	
+	More duplicated code gone.
+	
+	Also, remove the unused skb argument from xmit_pull_req_b().
+
+<kai@tp1.ruhr-uni-bochum.de>
+	ISDN/HiSax: Remove broken home-made lock primitives
+	
+	The HFC subdrivers chose to use atomic ops to re-implement sth
+	like broken spinlocks. That's now gone. Basically all races should
+	be taken care of by the fact that we take cs->lock before going down
+	to the hardware, this locks protects from concurrent accesses from
+	IRQ context. Well, some rare paths (setting mode etc) don't take the
+	lock yet, so it's not quite done yet.
+
+<rmk@flint.arm.linux.org.uk>
+	[ARM] 2.5.49 Build fixes
+	
+	- Fix include files in various drivers to kill warnings about
+	  free_irq() and request_irq()
+	- Make ARM cpufreq files build
+	- Convert arthur.c initialisers to C99 style, fixing an init
+	  bug.
+	- Allow ARM binaries to execute on Thumb-capable CPUs again.
+	- Remove arxescsi.h; it is no longer required.
+
+<rmk@flint.arm.linux.org.uk>
+	[ARM PATCH] 1311/1: BadgePAD 4 PCMCIA Update
+	
+	Patch from Christopher Hoover
+	
+	- make compile/link under 2.5.40-rmk1
+	- always apply power to pcmcia slot regardless of jumpering
+
+<rmk@flint.arm.linux.org.uk>
+	[ARM PATCH] 1329/1: Shark: new def-config
+	
+	Patch from Alexander Schulz
+	
+	A new def-config for the Shark.
+
+<rmk@flint.arm.linux.org.uk>
+	[ARM PATCH] 1330/1: Shark: Fixes for via PCI
+	
+	Patch from Alexander Schulz
+	
+	Hello,
+	
+	this fixes some bugs in the via82c505 PCI code used
+	on the Shark. It didn't compile as is.
+	
+	Regards
+	  Alexander
+
+<rmk@flint.arm.linux.org.uk>
+	[ARM PATCH] 1331/1: Shark: Compilation fixes
+	
+	Patch from Alexander Schulz
+	
+	Hello,
+	
+	the current kernel version gave me some errors when compiling for
+	the Shark. This patch fixes those errors.
+	
+	Regards
+	  Alexander
+
+<rmk@flint.arm.linux.org.uk>
+	[ARM PATCH] 1332/1: DMA Scatter-Gather Primitives for SA-1111 Bounce Buffer Layer
+	
+	Patch from Christopher Hoover
+	
+	- implements the dma scatter-gather primitives for the SA-1111 bounce
+	buffer layer.  these are required by usb-storage.
+	
+	- adds (optionally) a tiny bit of statistics
+	
+	- adjust the large buffer pool down to 4KiB (suggested by the stats)
+
+<davem@nuts.ninka.net>
+	[ELF] Enter KERNEL_DS after fill_psinfo, which does user acceses.
+
+<davem@nuts.ninka.net>
+	[SPARC64]: Fix spinlock init in sparc64 parport support.
+
+<davem@nuts.ninka.net>
+	[SPARC]: Update elf coredump macros for recent threading changes.
+
+<davej@suse.de>
+	watchdog compile fixes
+
+<greg@kroah.com>
+	[PATCH] driver core: fix compiler warning if CONFIG_HOTPLUG is not defined
+	
+	fixes bug #26 <http://bugme.osdl.org/show_bug.cgi?id=26>
+
+<davem@redhat.com>
+	[PATCH] sys_swapoff bug
+	
+	filp_open expects a kernel pointer not a user one.
+
+<ralf@linux-mips.org>
+	[PATCH] do_mounts.c ioctl fix
+	
+	init/do_mounts.c is using the BLKGETSIZE ioctl which expects a pointer to
+	an unsigned long but actually it passes a pointer to an int which of
+	course is blowing up on 64-bit systems.
+
+<greg@kroah.com>
+	[PATCH] USB: added Palm Tungsten W support.
+	
+	Thanks to Ralf Dietrich <ralle@envicon.de> for the information.
+
+<jtyner@cs.ucr.edu>
+	[PATCH] USB: [patch] fix vicam disconnect/locking
+	
+	Here is a patch that fixes the disconnect handling and locking for the
+	vicam driver. It does the following.
+	
+	1.)	Change the parameters of send_control_msg to take a struct
+		vicam_camera instead of struct usb_device to allow for locking
+		of the device. Note that __send_control_msg does not lock the
+		camera. send_control_msg locks the camera before calling
+		__send_control_msg.
+	2.)	Remove all instances of busy_lock. busy_lock was renamed to
+		cam_lock and used to lock out simultaneous uses of the camera
+		and handle disconnects. We may want to add back a different lock
+		to handle smp type stuff.
+	3.)	Separate read_frame and vicam_decode_color. This should move us
+		along toward asynchronous urbs.
+	
+	This patch does not address the locking of the camera that is still
+	needed by the proc interface.
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] mips people cant spell either
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] trivial exception typo fix in m68k
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] fix journalling api doc
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] update mouse drivers doc
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] big much needed magic number update from Petr Baudis
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] acpi people can't spell
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] update nbd driver to large sizes etc
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] AGP defines for intel 7505
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] rescue ftape from the ravages of that Rusty chap
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] fix up ip2main for rusty
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] add extra pad/app mappings for ARM/PC98 keyboars
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] fix tpqic02 + tidy it up
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] fixups for error path on sc1200 wdog
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] fix cpq asm
+	
+	Somewhat happier in gcc 3.2 this way
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] Make IDEDMA handled by a tuning option not masses of ifdef
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] switch ide taskfile to new DMA policy
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] remove IDE DMA conditionals from tape
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] add printk levels to ide taskfile
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] put back the comment someone randomly deleted
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] printk levels for cmd640
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] add prototype Cyrix 5510/5520 driver for IDE PIO VDMA
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] clean up cs5530 driver DMA ifdef
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] clean up generic IDE dma for new ifdefs
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] clean up ite ide for new ifdef stuff
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] clean up highpoint ide for new dma ifdef stuff
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] clean up natsemi IDE for new ifdef stuff
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] clean up nvidia dma for new ifdef stuff, fox pci res type
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] clean up opti ide for new ifdef stuff
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] clean up promise IDE, ifdefs, unused code etc
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] clean up pdc adma for new dma bits
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] clean up intel PIIX for new style dma ifdefs
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] driver for National SCx200 IDE
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] clean up serverworks DMA handling, fix /proc bugs etc
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] clean up siiimage ide for new ifdef style
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] clean up trm290 for new ifdef style
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] clean up sis ide for new ifdef style
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] clean up via dma for new ifdef stuff
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] split up setup-pci further
+	
+	This allows drivers to do partial setup themselves and to handle boards
+	that don't follow the normal PCI BAR4 allocation policy. Also fix the
+	oops on boot and simplex bits.
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] update amd7xx ide for new dma bits
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] update ALi IDE for new ifdefs, avoid ali/ati combo
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] update cmd64x for new ide bits
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] update cy82c693 ide for new dma bits
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] update aec ide for new ifdefs
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] add new ide stuff to makefile
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] update ide i/o ops to new dma, saner naming
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] remove io related stuff from ide.c
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] update ide-disk
+	
+	New PM bits
+	Support for virtual DMA
+	New dma ifdef stuff
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] add new ide config entries fix cmd680 doc
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] clean up ide floppy
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] IDE DMA updates
+	
+	Fix oops with slave only
+	Fix and enable new drive blacklist matching
+	Add documentation
+	Clean up ifdefs
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] put ide i/o code from ide.c into ide-io.c and comment it
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] update ide makefile for split ide
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] ide-probe bits
+	
+	New pm stuff
+	Dont crash when ACPI feeds us crap
+	Add dead flag
+	Make region reuse noisier
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] ide headers
+	
+	Add new callbacks
+	Add dead field
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] make some gameports compile again
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] isdn people cant spell
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] make bttv compile
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] update sa7111/7185 to new i2c
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] dvb updates - mostly typedef to structs and other similar cleaning
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] make arcnet compile
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] bring i2o back into sync, clean up oddments
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] mpt fusion update from vendor
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] make ewrk3/depca work again
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] update baycom drivers, remove soundmodem deps
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] locking for dmascc
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] kill soundmodem makefile entry
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] make aironet compile
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] fix missing PCMCIA timer inits
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] make vlsi IR compile
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] kill soundmodem
+	
+	It was dead before 2.4 (replaced by better userspace versions)
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] more people cant spell
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] printk levels for slip
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] fix tokenring builds
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] fix hostess driver for 2.5
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] add missing attributions to pc300
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] update sealevel isa sync card to 2.5.x
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] add a fixme for the pci
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] update nec pci idents
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] update quirks
+	
+	Add quirks for SiS APIC bug
+	Move apic quirks together
+	Add quirk for cyrix setup
+	Add quirk to reserve space on ATI IGP
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] add sis apic workaround support
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] sanitize pnp init order
+	
+	Must be post acpi
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] davem cant spell 8()
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] 3ware needs interrupt.h
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] domex driver needs interrupt.h
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] more scsi header cleanup/fixes
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] fix eata_pio
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] i60scsi to new eh
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] fix in2000 compile
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] inia header
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] new eh for inia wrapper too
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] switch ips to request_region check
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] dont include removed header
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] pas16 needs interrupt.h
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] restore lost proc_print_scsi prototype
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] t128 needs interrupt.h
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] ultrastor reset callback bug
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] 68328 frame buffer
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] fix vga16 build until James console updates are merged
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] proc is in the wrong order
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] dvb header updates
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] more pci ident defines
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] reserve a serio bit for PC98
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] we can kill off the soundmodem headers too now
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] remove junk from vlsi_ir
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] dm updates merged with 2.5.49 ones
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] place pnp early but after acpi
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] forward port 2.4 isa handling
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] 2.4 pci ops fix backport
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] kill soundmodem docs
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] update /proc/sys doc
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] fix mce setup for SMP with cpus=1
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] fix cs46xx build
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] update to OSDL DAC960 driver
+	
+	Its not perfect but it works
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] cyrix cpu optimisations
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] fix crap in cs4281 pm save
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] update i810 audio
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] fix lxdialog behaviour
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] fix sound kconfig file locations
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] fix wanrouter build
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] quieten ATM noise
+
+<davej@codemonkey.org.uk>
+	[PATCH] CONFIG_DEBUG_SPINLOCK_SLEEP
+	
+	This makes the sleep-under-spinlock-held check a CONFIG_ option.
+
+<davej@suse.de>
+	[PATCH] Credits update
+	
+	We moved offices..
+
+<davej@codemonkey.org.uk>
+	[PATCH] Extra ID for aic7770
+
+<davej@codemonkey.org.uk>
+	[PATCH] incorrect flags sizes.
+
+<davej@codemonkey.org.uk>
+	[PATCH] Coding style police.
+	
+	Various patches to make things conform to Documentation/CodingStyle
+
+<davej@codemonkey.org.uk>
+	[PATCH] make cardbus PCI enable earlier
+	
+	Accesses PCI config space before enabling the device..
+
+<davej@codemonkey.org.uk>
+	[PATCH] Remove unused 486 string copies
+	
+	This stuff hasn't been used since 2.1.x days (due to it being
+	broken), and with no sign of anyone trying to fix it, we may as well
+	remove it.
+
+<davej@codemonkey.org.uk>
+	[PATCH] Overflow checks in i2c
+
+<davej@codemonkey.org.uk>
+	[PATCH] Jiffies wrap fix for w9966 driver
+
+<davej@codemonkey.org.uk>
+	[PATCH] sb_card addition/deletion
+	
+	47 is a dupe, 46 is a new one.
+
+<davej@codemonkey.org.uk>
+	[PATCH] Plug memory leak in iph5526
+
+<davej@codemonkey.org.uk>
+	[PATCH] hd64465 region handling cleanup
+
+<davej@codemonkey.org.uk>
+	[PATCH] Indentation brain damage
+	
+	Whoever did the copy_to_user changes a few months back used
+	a braindamaged editor which screwed the indentation..
+
+<davej@codemonkey.org.uk>
+	[PATCH] missing kmalloc check in airo_cs
+
+<davej@codemonkey.org.uk>
+	[PATCH] missing kmalloc check in qnx4fs
+
+<davej@codemonkey.org.uk>
+	[PATCH] cmpxchg8b needs lock prefix
+	
+	From 2.4
+
+<davej@codemonkey.org.uk>
+	[PATCH] missing unlock_kernel()'s in reboot path
+
+<davej@codemonkey.org.uk>
+	[PATCH] Mobility_pp parport support
+
+<davej@codemonkey.org.uk>
+	[PATCH] memleak in myri_sbus
+
+<davej@codemonkey.org.uk>
+	[PATCH] i810 audio - skip softmodems
+
+<davej@codemonkey.org.uk>
+	[PATCH] MCE fixes.
+	
+	Make things work if SMP kernel, and only 1 CPU.
+
+<davej@codemonkey.org.uk>
+	[PATCH] delete obsolete includes from sdla_fr
+
+<davej@codemonkey.org.uk>
+	[PATCH] OSS Makefile fixes
+	
+	emu10k1 is a dupe
+	add missing ite8172
+
+<davej@codemonkey.org.uk>
+	[PATCH] speed clarification in sb_audio
+	
+	from 2.4
+
+<davej@suse.de>
+	[PATCH] CONFIG_FRAME_POINTER
+	
+	From 2.4, this adds a CONFIG_ option to disable
+	the usage of -fomit-frame-pointer
+
+<davej@codemonkey.org.uk>
+	[PATCH] MODULE_DESCRIPTION doesn't need a \n
+
+<davej@codemonkey.org.uk>
+	[PATCH] nm256 dell latitude fix.
+	
+	From 2.4
+
+<davej@codemonkey.org.uk>
+	[PATCH] Fix PPPoE oops.
+	
+	From Andi Kleen
+
+<davej@codemonkey.org.uk>
+	[PATCH] i810 audio new idents
+
+<davej@codemonkey.org.uk>
+	[PATCH] cs4232 memleak
+
+<davej@codemonkey.org.uk>
+	[PATCH] region handling cleanups for ali-ircc
+
+<davej@codemonkey.org.uk>
+	[PATCH] MPU401 resource cleanups
+
+<davej@codemonkey.org.uk>
+	[PATCH] sbc60xxwdt region fix
+	
+	From 2.4
+
+<davej@codemonkey.org.uk>
+	[PATCH] stradis overflow check
+
+<davej@codemonkey.org.uk>
+	[PATCH] sf16fmi janitor work
+
+<davej@codemonkey.org.uk>
+	[PATCH] wan sbni region cleanups
+
+<davej@codemonkey.org.uk>
+	[PATCH] microoptimise do_exit()
+
+<davej@codemonkey.org.uk>
+	[PATCH] Mem leak in sunbmac
+
+<davej@codemonkey.org.uk>
+	[PATCH] rocket driver janitor bits
+
+<davej@codemonkey.org.uk>
+	[PATCH] pcmcia tcic region cleanups
+
+<davej@codemonkey.org.uk>
+	[PATCH] request_region fix in madgemc.c
+
+<davej@codemonkey.org.uk>
+	[PATCH] scsi scan blacklist update
+
+<davej@codemonkey.org.uk>
+	[PATCH] extern inline -> static inline
+	
+	As per CodingStyle
+
+<davej@codemonkey.org.uk>
+	[PATCH] unwrapped var usage in unbz64wrap
+
+<davej@codemonkey.org.uk>
+	[PATCH] Make various bits of synclink static
+
+<davej@codemonkey.org.uk>
+	[PATCH] named struct initialiser updates
+
+<davej@codemonkey.org.uk>
+	[PATCH] add missing clipping for zr36067
+	
+	from 2.4
+
+<davej@codemonkey.org.uk>
+	[PATCH] Check request_region() in inia100
+
+<davej@codemonkey.org.uk>
+	[PATCH] region cleanups etc in ips driver
+
+<davej@codemonkey.org.uk>
+	[PATCH] remove unused EISA_bus__is_a_macro macro
+
+<davej@codemonkey.org.uk>
+	[PATCH] Remove unneeded verify_area from sg.c
+	
+	Makes the code simpler..
+
+<davej@codemonkey.org.uk>
+	[PATCH] region handling cleanups for appletalk ltpc
+
+<davej@codemonkey.org.uk>
+	[PATCH] extra parport IDs
+
+<davej@codemonkey.org.uk>
+	[PATCH] si1_isa board addition to sx driver
+	
+	From 2.4
+
+<davej@codemonkey.org.uk>
+	[PATCH] memleak in macsonic
+
+<davej@codemonkey.org.uk>
+	[PATCH] region handling cleanup for de600
+
+<torvalds@penguin.transmeta.com>
+	Fix up Alan's huge patch set. It couldn't have compiled for
+	him either. Tssk, tssk.
+
+<greg@kroah.com>
+	LSM: fix up some needed header file #includes
+
+<greg@kroah.com>
+	LSM: Move the definition of capable() into sched.h if CONFIG_SECURITY is set to help
+	make the #include nightmare more managable.
+
+<greg@kroah.com>
+	LSM: put CONFIG_SECURITY back into the Kconfig file (was lost in the merge)
+
+<davem@nuts.ninka.net>
+	[SPARC]: Ignore SIGURG if not caught.
+
+<davem@nuts.ninka.net>
+	[SPARC]: Add DEBUG_SPINLOCK_SLEEP config option.
+
+<akpm@digeo.com>
+	[PATCH] IDE fix for -ac merge
+	
+	do_ide_setup_pci_device() is returning an uninitialised
+	ata_index_t causing an oops at bootup.
+
+<anton@samba.org>
+	[PATCH] fix build with IDE disabled
+	
+	More fall-out from the -ac merge.
+
+<davem@nuts.ninka.net>
+	[AIC7XXX]: aic7xxx_osm.h needs asm/io.h
+
+<davem@nuts.ninka.net>
+	[SPARC ESP]: Convert to slave_{attach,destroy}
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] PATCH: fix wrong check in BUG() test for UDMA on serverworks
+	
+	Otherwise a UDMA CD-ROM is correctly set up and then panics the kernel 8(
+	The UDMA rule is on disks not on CD
+
+<torvalds@home.transmeta.com>
+	Undo bogon from the -dj merge.
+
+<torvalds@home.transmeta.com>
+	Revert duplicate initialization from -ac merge
+	Cset exclude: alan@lxorguk.ukuu.org.uk|ChangeSet|20021126021252|43411
+
+<torvalds@home.transmeta.com>
+	Revert over-eager memory leak "fix" from the -dj merge
+
+<torvalds@home.transmeta.com>
+	Revert bad PCI bridge resource handling from -dj tree
+	Cset exclude: davej@codemonkey.org.uk|ChangeSet|20021126023731|33210
+
+<akpm@digeo.com>
+	[PATCH] blk_run_queues() locking fix
+	
+	blk_run_queues() places queues onto a local list without locking.  But
+	interrupt-time activity in scsi_lib.c will replug these queues, which
+	involves accessing that list which blk_run_queues() is walking.
+	
+	Net effect: list corruption and an oops.  Very hard to reproduce...
+	
+	So hold the lock while blk_run_queues() is walking the local list.
+	
+	The patch was acked by Jens.  It also uninlines a few largeish
+	functions and adds a couple of WARN_ON()s in code which worried me.
+
+<akpm@digeo.com>
+	[PATCH] misc fixes
+	
+	- Missing parentheses around macro arg in __pte_offest()
+	
+	- struct page_state needs to be cacheline aligned (the first seven
+	  fields should be in the same cacheline)
+
+<akpm@digeo.com>
+	[PATCH] Allow for profile_buf size = kernel text size
+	
+	Patch from Ravikiran G Thirumalai <kiran@in.ibm.com>
+	
+	Allows the kernel profiler to use a shift value of zero for
+	high-resolution profiling.
+	
+	So instead of overloading a shift of zero to mean "not profiling", use
+	a separate flag for that.
+	
+	This means that anyone who is currently using "profile=0" to disable
+	profiling has accidentally turned profiling on, so I added a printk.
+
+<akpm@digeo.com>
+	[PATCH] kernel_stat cleanup
+	
+	Patch from Dipankar Sarma <dipankar@gamebox.net>
+	
+	This is a trivial cleanup removing two old unused macros from
+	kernel_stat.h that made no sense with the new per-CPU kstat.
+	Also included a few finicky coding style changes. Please apply.
+
+<akpm@digeo.com>
+	[PATCH] Updated Documentation/kernel-parameters.txt
+	
+	Patch from Petr Baudis <pasky@ucw.cz>
+	
+	This patch (against 2.5.49) updates Documentation/kernel-parameters.txt
+	to the current state of kernel.  It was somehow abadonded lately, so I
+	did my best, but it's possible that I still missed some of the options
+	- thus, if you will notice your favourite boot option missing there,
+	please speak up.  Note also that I will probably send up another update
+	after few further kernel releases..
+	
+	Also, I attempted to introduce some uniform format to the entries, I
+	added the format description where I was able to find it out and
+	decypher it, and I also added gross amount of external links to the
+	headers of the source files or to the README-like files, where the
+	options are described into more degree.  This way, hopefully this file
+	has a chance to be actually usable for the users ;-).
+	
+	There are almost certainly some entries which I missed, it was really a
+	huge number and the main reason is that some of the boot options don't
+	use the __setup macro, which I grep'd for.
+	
+	I hope the patch is ok, there should be no problems with it. Please apply.
+	
+	Note that this is the fourth submission of the patch - I took the
+	opportunity and updated the patch from 2.5.48 to 2.5.49.  AFAIK mutt
+	shouldn't mangle the patch in any way, so it should apply cleanly to
+	your tree, Linus.
+
+<akpm@digeo.com>
+	[PATCH] shrink task_struct by removing per_cpu utime and stime
+	
+	Patch from Bill Irwin.  It has the potential to break userspace
+	monitoring tools a little bit, and I'm a rater uncertain about
+	how useful the per-process per-cpu accounting is.
+	
+	Bill sent this out as an RFC on July 29:
+	
+	"These statistics severely bloat the task_struct and nothing in
+	 userspace can rely on them as they're conditional on CONFIG_SMP.  If
+	 anyone is using them (or just wants them around), please speak up."
+	
+	And nobody spoke up.
+	
+	If we apply this, the contents of /proc/783/cpu will go from
+	
+		cpu  1 1
+		cpu0 0 0
+		cpu1 0 0
+		cpu2 1 1
+		cpu3 0 0
+	
+	to
+	
+		cpu  1 1
+	
+	And we shall save 256 bytes from the ia32 task_struct.
+	
+	On my SMP build with NR_CPUS=32:
+	
+	Without this patch, sizeof(task_struct) is 1824, slab uses a 1-order
+	allocation and we are getting 2 task_structs per page.
+	
+	With this patch, sizeof(task_struct) is 1568, slab uses a 2-order
+	allocation and we are getting 2.5 task_structs per page.
+	
+	So it seems worthwhile.
+	
+	(Maybe this highlights a shortcoming in slab.  For the 1824-byte case
+	it could have used a 0-order allocation)
+
+<akpm@digeo.com>
+	[PATCH] reduced context switch rate in writeback
+	
+	pdflush writes back chunks of ~1000 pages.  It currently takes a short
+	nap if it writes back no pages at all.  That could cause it to write
+	back lots of small batches of pages, as it bounces against a congested
+	queue.
+	
+	Change it to sleep if it failed to write back the entire batch against
+	a congested queue.  Ths reduces the context switch rate a little.
+	
+	The context switch rate is still fairly high (150/sec) - this appears
+	to be due to add_disk_randomness() scheduling a work function.
+
+<akpm@digeo.com>
+	[PATCH] Add some low-latency scheduling points
+	
+	This is the first in a little batch of patches which address long-held
+	locks in the VFS/MM layer which are affecting our worst-case scheduling
+	latency, and are making CONFIG_PREEMPT not very useful.
+	
+	We end up with a worst-case of 500 microseconds at 500MHz, which is
+	very good.  Unless you do an exit with lots of mmapped memory.
+	unmap_page_range() needs work.
+	
+	Some of these patches also add rescheduling points for non-preemptible
+	kernels - where I felt that the code path could be long enough to be
+	perceptible.
+	
+	
+	
+	Three places in the generic pagecache functions need manual
+	rescheduling points even for non-preemptible kernels:
+	
+	- generic_file_read()  (Can hold the CPU for seconds)
+	
+	- generic_file_write() (ditto)
+	
+	- filemap_fdatawait().  This won't hold the CPU for so long, but it
+	  can walk many thousands of pages under the lock.  It needs a lock
+	  drop and scheduling point for both preemptible and non-preemptible
+	  kernels.  (This one's a bit ugly...)
+
+<akpm@digeo.com>
+	[PATCH] realtime swapspace accounting
+	
+	There are a couple of statistical functions which scan the entire swap
+	map counting things up, to display in /proc.
+	
+	On my machine, these hold spinlocks for 19 milliseconds which is
+	unacceptable from a scheduling latency point of view.
+	
+	And an application which sits in a loop reading /proc/swaps on a large
+	machine is probably a decent denial-of-service attack - it will limit
+	swap allocations to tens of pages per second.
+	
+	So add a counter to swap_info_struct and use it to track how many pages
+	are currently in use, so those reporting functions don't need to add
+	them all up.
+
+<akpm@digeo.com>
+	[PATCH] swapoff accounting cleanup
+	
+	From Hugh.  Remove some strangeness in the swapoff path.
+	
+	"it dates from the days when that block set *swap_map to 0, but in
+	 2.4.13 I changed it to set *swap_map to 1 and delete_from_swap_cache
+	 afterwards: it's been wrong ever since, hasn't it?  swap_list_locking
+	 can go, it was there to guard nr_swap_pages for si_swapinfo; the
+	 swap_device_locking has to stay because swap_map is an array of
+	 unsigned _shorts_."
+
+<akpm@digeo.com>
+	[PATCH] Add a scheduling point to page reclaim
+	
+	When the VM is under heavy load and a page allocator caller is holding
+	the BKL there can be several-millisecond scheduling stalls.
+	
+	So add a cond_resched() at every 32nd page (approx).
+
+<akpm@digeo.com>
+	[PATCH] Don't hold BKL across sync_blockdev() in blkdev_put()
+	
+	Running sync_blockdev() inside lock_kernel causes long scheduling
+	stalls under some conditions because the lock_kernel() disables
+	preemption.
+	
+	We don't need the BKL across sync_blockdev(), so move it down a bit.
+	
+	This is a minimal fix - we probably don't need BKL for much at all in
+	there.
+
+<akpm@digeo.com>
+	[PATCH] reduced latency in dentry and inode cache shrinking
+	
+	Shrinking a huge number of dentries or inodes can hold dcache_lock or
+	inode_lock for a long time.  Not only does this hold off preemption -
+	holding those locks basically shuts down the whole VFS.
+	
+	A neat fix for all such caches is to chunk the work up at the
+	shrink_slab() level.
+	
+	I made the chunksize pretty small, for scalability reasons - avoid
+	holding the lock for too long so another CPU can come in, acquire it
+	and go off to do some work.
+
+<Andries.Brouwer@cwi.nl>
+	[PATCH] Silence debugging message
+	
+	That annoying ldm message is just debugging output somebody forgot to
+	remove.
+
+<greg@kroah.com>
+	[PATCH] USB serial: move the ezusb functions into their own file.
+	
+
+<randy.dunlap@verizon.net>
+	[PATCH] tiglusb timeouts
+	
+	It addresses the timeout parameter in the tiglusb driver.
+	
+	1.  timeout could be 0, causing a divide-by-zero.
+	The patch prevents this.
+	
+	2.  The timeout value to usb_bulk_msg() could be rounded
+	down to cause a divide-by-zero if timeout was < 10, e.g. 9,
+	in:
+		result = usb_bulk_msg (s->dev, pipe, buffer, bytes_to_read,
+				       &bytes_read, HZ / (timeout / 10));
+	9 / 10 == 0 => divide-by-zero !!
+	
+	3.  The timeout value above doesn't do very well on converting
+	timeout to tenths of seconds.  Even for the default timeout
+	value of 15 (1.5 seconds), it becomes:
+		HZ / (15 / 10) == HZ / 1 == HZ, or 1 second.
+	The patch corrects this formula to use:
+		(HZ * 10) / timeout
+
+<greg@kroah.com>
+	[PATCH] USB serial: split the generic functions out into their own file
+	
+
+<akpm@digeo.com>
+	[PATCH] oprofile build fix
+	
+	cpu_buffer.c needs errno.h for ENOMEM.
+
+<miles@lsi.nec.co.jp>
+	[PATCH] Consolidate various v850 platform banner printks
+	
+	Consolidate various v850 platform banner printks
+
+<miles@lsi.nec.co.jp>
+	[PATCH] Fix some minor type problems in v850 code
+	
+	Fix some minor type problems in v850 code
+	[Mostly signed/unsigned mismatches]
+
+<miles@lsi.nec.co.jp>
+	[PATCH] Add asm macros on v850 so the size of asm data objects can be recorded
+	
+	Add asm macros on v850 so the size of asm data objects can be recorded
+	[This just makes it easier to see the sizes using readelf or whatever]
+
+<miles@lsi.nec.co.jp>
+	[PATCH] Add v850 support for new module loader
+	
+	Add v850 support for new module loader
+
+<miles@lsi.nec.co.jp>
+	[PATCH] Add v850 versions of dump_stack and show_stack
+	
+	Add v850 versions of dump_stack and show_stack
+	Also move v850 show_regs to same source file (bug.c)
+
+<miles@lsi.nec.co.jp>
+	[PATCH] Add support for AS85EP1 platform to v850 arch
+	
+	Add support for AS85EP1 platform to v850 arch
+
+<miles@lsi.nec.co.jp>
+	[PATCH] Add v850 nanosecond stat fields
+	
+	Add v850 nanosecond stat fields
+
+<miles@lsi.nec.co.jp>
+	[PATCH] Make NB85E_UART_CKSR_MAX_FREQ (in nb85e_uart driver) overridable
+	
+	Make NB85E_UART_CKSR_MAX_FREQ (in nb85e_uart driver) overridable
+	[The proper value is CPU-dependent]
+
+<miles@lsi.nec.co.jp>
+	[PATCH] Update `nb85e_uart' driver for recent serial framework changes
+	
+	Update `nb85e_uart' driver for recent serial framework changes
+
+<miles@lsi.nec.co.jp>
+	[PATCH] Random minor fixes for v850 `anna' platform
+	
+	Random minor fixes for v850 `anna' platform
+
+<miles@lsi.nec.co.jp>
+	[PATCH] Add v850 support for initramfs
+	
+	Add v850 support for initramfs
+
+<miles@lsi.nec.co.jp>
+	[PATCH] Update v850 usage of do_fork to supply new args
+	
+	Update v850 usage of do_fork to supply new args
+
+<miles@lsi.nec.co.jp>
+	[PATCH] Add TASK_UNMAPPED_BASE for v850
+	
+	Add TASK_UNMAPPED_BASE for v850
+
+<miles@lsi.nec.co.jp>
+	[PATCH] The v850 doesn't need sys_old_getrlimit
+	
+	The v850 doesn't need sys_old_getrlimit
+
+<miles@lsi.nec.co.jp>
+	[PATCH] Update v850 to use kstat_cpu in irqs.c
+	
+	Update v850 to use kstat_cpu in irqs.c
+
+<miles@lsi.nec.co.jp>
+	[PATCH] Update includes in v850 files to reflect recent header changes
+	
+	Update includes in v850 files to reflect recent header changes
+
+<miles@lsi.nec.co.jp>
+	[PATCH] Add my name to CREDITS file
+	
+	Add my name to CREDITS file
+
+<miles@lsi.nec.co.jp>
+	[PATCH] Random whitespace tweaks in v850 files
+	
+	Random whitespace tweaks in v850 files
+
+<miles@lsi.nec.co.jp>
+	[PATCH] Tweak some v850 name strings
+	
+	Tweak some v850 name strings
+	[basically only affects printed output]
+
+<miles@lsi.nec.co.jp>
+	[PATCH] Change the default baud rate of the `nb85e_uart' driver to 115200
+	
+	Change the default baud rate of the `nb85e_uart' driver to 115200
+
+<miles@lsi.nec.co.jp>
+	[PATCH] Update make variable used by initramfs `binary blob' creation on v850
+	
+	Update make variable used by initramfs `binary blob' creation on v850
+
+<miles@lsi.nec.co.jp>
+	[PATCH] Make the v850 leds driver's seek routine always return a value
+	
+	Make the v850 leds driver's seek routine always return a value
+
+<miles@lsi.nec.co.jp>
+	[PATCH] Give a compile-time error on the v850 if MAX_ORDER is too large
+	
+	Give a compile-time error on the v850 if MAX_ORDER is too large
+
+<miles@lsi.nec.co.jp>
+	[PATCH] Add id for v850 `nb85e_uart' to serial_core.h
+	
+	Add id for v850 `nb85e_uart' to serial_core.h
+
+<miles@lsi.nec.co.jp>
+	[PATCH] Make v850 syscall6 macro support both old and new gcc versions
+	
+	Make v850 syscall6 macro support both old and new gcc versions
+
+<miles@lsi.nec.co.jp>
+	[PATCH] Change type of v850 function `gbus_int_disable_irqs' to void
+	
+	Change type of v850 function `gbus_int_disable_irqs' to void
+
+<miles@lsi.nec.co.jp>
+	[PATCH] Shrink v850 exception-trap handling code a bit
+	
+	Shrink v850 exception-trap handling code a bit
+
+<miles@lsi.nec.co.jp>
+	[PATCH] Add `unlikely' to error-return path in v850 __syscall_return macro
+	
+	Add `unlikely' to error-return path in v850 __syscall_return macro
+
+<ganesh@tuxtop.vxindia.veritas.com>
+	[PATCH] added support for insmod options to specify vendor/product id. this
+
+<mark@hal9000.dyndns.org>
+	[PATCH] USB ov511 driver: Update to version 1.63
+
+<nemosoft@smcc.demon.nl>
+	[PATCH] [PATCH] PWC 8.9
+	
+	After a little absence, here's a patch to bring the Philips Webcam driver up
+	to version 8.9 (skipping 8.8 which has been available as a download on my
+	website for a while).
+	
+	This patch is against 2.5.49, and includes some of the following:
+	* New USB IDs for Logitech and Visionite webcams.
+	* Better URB link/unlink sequence when opening/closing device
+	  and switching resolutions.
+	* Adding probe for CCD/CMOS sensor type.
+	* Removed remnants of YUV420 palette stuff.
+	
+	Also updated the description in 'Kconfig'.
+
+<jtyner@cs.ucr.edu>
+	[PATCH] [patch] speed/clean up vicam_decode_color
+	
+	This patch cleans up the vicam_decode_color function by removing
+	unused/useless variables and combining the two "x" loops inside the
+	y loop into one. It also reduces the number of times that the "x"
+	loop occurs from 512 to 320 which should provide a decent speed
+	increase. It also fixes a bug in the y loop that wrote beyond its bound.
+
+<stuartm@connecttech.com>
+	[PATCH] usb-serial.c disconnect race
+	
+	Attached is a patch that changes the 2.5.x disconnect to be similar to
+	2.4.x disconnect. This doesn't fix the race, but does shrink the
+	window such that I've never seen it trigger, even under testing
+	designed to do that.
+	
+	There doesn't seem to be a good way to fix the race. The fix should be
+	to have _disconnect force any sleeping semaphore holders to run to
+	completion between the end of the loop in the patch below and the spot
+	where the underlying memory is freed, but I don't see a way to do
+	that.
+	
+	
+	diff -Naur linux-2.5.49-2-fix-taint/drivers/usb/serial/usb-serial.c linux-2.5.49-3-fix-drvdata/drivers/usb/serial/usb-
+	serial.c
+
+<stuartm@connecttech.com>
+	[PATCH] WhiteHEAT update
+	
+	1-fix-lowlat:
+	
+	QA found that running all four ports at 460800 would drop data. I
+	traced it to data being dropped in the read callback because the flip
+	buffers were full. Turning on the low latency flag fixed things.
+	
+	2-fix-taint
+	
+	A side-effect of turning on low latency; the interrupt context from
+	the callback is now passed through to the tty layer, passing it on to
+	calls back into usb-serial.c. Which causes deadlocks when trying to
+	re-acquire the per-port semaphore. We've already talked about this.
+	This patch is my work-around for the usb-serial.c brokenness.
+	Basically, implemement a buffering scheme, and schedule a software
+	interrupt to handle the data handoff to the tty layer sometime later.
+	urb_pool_size defaults to 8, but is a module parameter and can be
+	modified at runtime.
+	The buffering is needed so that the driver can run while data is
+	waiting to be processed, but I could have used the tty layer
+	scheduling instead of doing my own by turning off low latency.
+	However, I looked at the tty layer and it seems to me that there's
+	nothing preventing a really fast device from flipping one buffer,
+	flipping the next, and flipping back to the still full buffer from
+	before (actually, the flip just gets scheduled for later), so my
+	driver needs to be able to hold onto buffered data and schedule them
+	for processing later anyway. So, might as well leave low_latency on.
+	
+	
+	diff -Naur linux-2.5.49-0-virgin/drivers/usb/serial/whiteheat.c linux-2.5.49-1-fix-
+	lowlat/drivers/usb/serial/whiteheat.c
+
+<torvalds@home.transmeta.com>
+	Linux v2.5.50
+

@@ -1,0 +1,36 @@
+
+Summary of changes from v2.6.11.3 to v2.6.11.4
+==============================================
+
+<paulus@au1.ibm.com>
+	[PATCH] CAN-2005-0384: Remote Linux DoS on ppp servers
+	
+	Martin Schulze writes:
+	
+	> Ben Martel and Stephen Blackheath have discovered a denial-of-service attack
+	> that a client of pppd can make that can hang the server machine.  The bug is
+	> in the Linux kernel 2.6 (tested on 2.6.9), but it looks like it also exists
+	> in the 2.4 series.
+	
+	Yes, this is my bug. :(
+	
+	I would just do this instead:
+	
+	Signed-off-by: Chris Wright <chrisw@osdl.org>
+	Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
+
+<akpm@osdl.org>
+	[PATCH] use strncpy in get_task_comm
+	
+	From: Prasanna Meda <pmeda@akamai.com>
+	
+	Set_task_comm uses strlcpy, so get_task_comm must use strncpy.
+	
+	Signed-Off-by: Prasanna Meda <pmeda@akamai.com>
+	Signed-off-by: Andrew Morton <akpm@osdl.org>
+	Signed-off-by: Chris Wright <chrisw@osdl.org>
+	Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
+
+<gregkh@suse.de>
+	Linux 2.6.11.4
+

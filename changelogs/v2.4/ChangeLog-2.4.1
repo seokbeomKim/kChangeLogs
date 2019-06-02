@@ -1,0 +1,70 @@
+final:
+ - Al Viro: core file hardlink attack avoidance fix
+
+pre12:
+ - Get non-cpuid Cyrix probing right (it's not a NexGen)
+ - Jens Axboe: cdrom tray status and queing cleanups
+ - AGP GART: don't disable VIA, and allow i815 with external AGP
+ - Coda: use iget4() in order to have big inode numbers without clashes.
+ - Fix UDF writepage() page locking
+ - NIIBE Yutaka: SuperH update
+ - Martin Diehl and others: SiS pirq routing fixes
+ - Andy Grover: ACPI update
+ - Andrea Arkangeli: LVM update
+ - Ingo Molnar: RAID cleanups
+ - David Miller: sparc and networking updates
+ - Make NFS really be able to handle large files
+
+pre11:
+ - Trond Myklebust: NFS/RPC client SMP fixes
+ - rth: alpha pyxis and cabriolet fixes
+ - remove broken sys_wait4() declarations
+ - disable radeon debugging code
+ - VIA IDE driver should not enable autodma unless asked for
+ - Andrey Savochkin: eepro100 update. Should fix the resource timing problems.
+ - Jeff Garzik: via82cxxx_audio update
+ - YMF7xx PCI audio update: get rid of old broken driver, make new
+   driver handle legacy control too. 
+ - fix missed wakeup on block device request list
+ - hpt366 controller doesn't play nice with some IBM harddisks
+ - remove inode pages from the page cache only after having removed them
+   from the page tables.
+ - shared memory out-of-swap writepage() fixup (no more magic return)
+
+pre10:
+ - got a few too-new R128 #defines in the Radeon merge. Fix.
+ - tulip driver update from Jeff Garzik
+ - more cpq and DAC elevator fixes from Jens. Looks good.
+ - Petr Vandrovec: nicer ncpfs behaviour
+ - Andy Grover: APCI update
+ - Cort Dougan: PPC update
+ - David Miller: sparc updates
+ - David Miller: networking updates
+ - Neil Brown: RAID5 fixes
+
+pre9:
+ - cpq array driver elevator fixes 
+ - merge radeon driver from X CVS tree
+ - ispnp cleanups
+ - emu10k unlock on error fixes
+ - hpfs doesn't allow truncate to larger
+
+pre8:
+ - Don't drop a megabyte off the old-style memory size detection
+ - remember to UnlockPage() in ramfs_writepage()
+ - 3c59x driver update from Andrew Morton
+ - egcs-1.1.2 miscompiles depca: workaround by Andrew Morton
+ - dmfe.c module init fix: Andrew Morton
+ - dynamic XMM support. Andrea Arkangeli.
+ - ReiserFS merge
+ - USB hotplug updates/fixes
+ - boots on real i386 machines
+ - blk-14 from Jens Axboe
+ - fix DRM R128/AGP dependency
+ - fix n_tty "canon" mode SMP race
+ - ISDN fixes
+ - ppp UP deadlock attack fix
+ - FAT fat_cache SMP race fix
+ - VM balancing tuning
+ - Locked SHM segment deadlock fix
+ - fork() page table copy race fix

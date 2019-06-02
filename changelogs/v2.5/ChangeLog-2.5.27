@@ -1,0 +1,890 @@
+
+Summary of changes from v2.5.26 to v2.5.27
+============================================
+
+<greg@kroah.com>
+	agpgart: Split agpgart code into separate files.
+	
+	The majority of this work was done by Dave Jones, I merely converted the
+	driver to the "new" pci api.
+
+<greg@kroah.com>
+	agpgart: fix syntax error in the i8x0 file.
+
+<greg@kroah.com>
+	agpgart: renamed the agp files to make more sense
+
+<greg@kroah.com>
+	agpgart: added agp prefix to the debug printk
+
+<greg@kroah.com>
+	LSM: move the struct msg_msg and struct msg_queue definitions out of the msg.c file to the msg.h file
+	
+	Also move where the msg->q_perm.mode and .key values get set to before 
+	ipc_addid() gets called to make placing a hook there easier.
+
+<greg@kroah.com>
+	LSM: move struct shmid_kernel out of ipc/shm.c to include/linux/shm.h
+	
+	Also move where we set sma->sem_perm.mode and .key to before ipc_addid() gets called.
+
+<greg@kroah.com>
+	agpgart: added "-agp" to the .c files that are for specific hardware types, based on mailing list comments.
+
+<trond.myklebust@fys.uio.no>
+	[PATCH] Fix NFS locking bug
+	
+	Here's one bugfix which might help to explain the GRANTED failure. The
+	bug has been there all along (so I'll probably want to send this to
+	Marcelo too).
+	
+	The code in question in supposed to ensure that we don't wait on a
+	reply if the RPC call doesn't expect one. However, if the socket
+	transmission failed for some reason, we do actually want to loop and
+	try again...
+	
+	This bug will hit the RPC call in nlmsvc_grant_blocked().
+
+<greg@kroah.com>
+	USB: removed the usb-ohci driver, as it is no longer being used.
+
+<mark@alpha.dyndns.org>
+	[PATCH] USB: ov511 1.61 for 2.5.25
+	
+	Update ov511 driver to version 1.61:
+	
+	- Remove kernel I2C support and related TV tuner code. It will
+	  be reimplemented correctly in the 2.x driver series
+	- Fix warnings when compiling without procfs support
+	- Fix reg_r() debug message (was printing wrong values)
+	- Fix printing of hex values
+	- Fix bogus error handling in ov51x_v4l_open()
+	- Improve definition of unit_video module param
+	- Eliminate trailing whitespace, and other code cleanups
+	- Remove documentation of obsolete module params
+
+<oliver@neukum.name>
+	[PATCH] USB: lots of locking and other SMP race fixes
+	
+	This is a merge of a bunch of SMP and locking fixes for the USB code
+	that Oliver has sent me (greg k-h) over the past few weeks.
+
+<lists@mdiehl.de>
+	[PATCH] USB: patch to make USB_ZERO_PACKET work in ohci-hcd.c
+	
+
+<david-b@pacbell.net>
+	[PATCH] USB: usbnet queuing
+	
+	- Enables use of bulk queueing
+	- Avoids stopping the tx queue until it's really needed
+	
+	If enabling bulk queuing causes any problems in any of the
+	HCDs, we'll want to find out ... :)
+
+<trond.myklebust@fys.uio.no>
+	[PATCH] Fix typo in net/sunrpc/xprt.c
+	
+	The appended patch fixes a typo in net/sunrpc/xprt.c: We want to
+	ensure that we play safe, and only increment the UDP congestion window
+	when we have successfully transmitted a full frame of data.
+	
+	In addition, we should perhaps still 'slow start' the UDP congestion
+	code rather than assuming that we can immediately fire off 8
+	requests. IOW revert the value of RPC_INITCWND.
+
+<neilb@cse.unsw.edu.au>
+	[PATCH] MD - Remove bdput calls from raid personalities.
+	
+	Remove bdput calls from raid personalities.
+	
+	Some of the md personalities currently hold a counted reference
+	on a bdev.  This is not necessary as the main md module will always
+	hold a counted reference in the rdev.
+	This patch removes the code to take and drop these unnecessary
+	references.
+
+<neilb@cse.unsw.edu.au>
+	[PATCH] MD - Remove dead consistancy checking code from multipath.
+	
+	Remove dead consistancy checking code from multipath.
+	
+	This "consistancy_check" is carried over from raid1 on which multipath
+	was based, and was not used in raid1 and has since been removed.  Now
+	it gets removed from multipath too.
+
+<neilb@cse.unsw.edu.au>
+	[PATCH] MD - Get multipath to use mempool
+	
+	Get multipath to use mempool
+	
+	... rather than maintaining it's own mempool
+
+<neilb@cse.unsw.edu.au>
+	[PATCH] MD - 27 - Remove state field from multipath mp_bh structure.
+	
+	Remove state field from multipath mp_bh structure.
+	
+	The MPBH_Uptodate flag is set but never used,
+	The MPBH_SyncPhase flag was never used.
+	These a both legacy from the copying of raid1.c
+	
+	MPBH_PreAlloc is no longer needed as due to use of
+	mempools, so the state field can go...
+
+<neilb@cse.unsw.edu.au>
+	[PATCH] MD - Embed bio in mp_bh rather than separate allocation.
+	
+	Embed bio in mp_bh rather than separate allocation.
+	
+	multipath currently allocates an mp_bh and a bio for each
+	request.  With this patch, the bio is made to be part of the
+	mp_bh so there is only one allocation, and it from a private
+	pool (the bio was allocated from a shared pool).
+	
+	Also remove "remaining" and "cmd" from mp_bh which aren't used.
+	And remove spare (unused) from multipath_private_data.
+
+<neilb@cse.unsw.edu.au>
+	[PATCH] MD - Don't "analyze_sb" when creating new array.
+	
+	Don't "analyze_sb" when creating new array.
+	
+	When creating a new array (and we have an mddev->sb),
+	don't both to analyze the superblocks.  There is no point.
+	Also, these means we always allocate the array sb in
+	analyze_sbs, rather than conditionally.
+
+<neilb@cse.unsw.edu.au>
+	[PATCH] MD - Use symbolic names for multipath (-4) and linear (-1)
+	
+	Use symbolic names for multipath (-4) and linear (-1)
+	
+	Also, a variable called "level" was being used to store a
+	"level" and a "personality" number.  This is potentially
+	confusing, so it is now two variables.
+
+<neilb@cse.unsw.edu.au>
+	[PATCH] MD - Get rid of find_rdev_all
+	
+	Get rid of find_rdev_all
+	
+	find_rdev_all is now only used to check if a device is already
+	used in an md array.
+	
+	We change lock_rdev so that it claims the bdev for
+	the specific rdev rather than for rdevs in general.
+	Now lock_rdev will check if the bdev is inuse by another array
+	or not, so the find_rdev_all check isn't needed and is removed,
+	along with find_rdev_all itself.
+	
+	We also make sure that the error code from lock_rdev is
+	propagated up properly.
+
+<neilb@cse.unsw.edu.au>
+	[PATCH] MD - Rdev list cleanups.
+	
+	Rdev list cleanups.
+	
+	An "rdev" can be on three different lists.
+	 - the list of all rdevs
+	 - the list of pending rdevs
+	 - the list of rdevs for a given mddev
+	
+	The first list is now only used to list "unused" devices in
+	/proc/mdstat, and only pending rdevs can be unused, so this list
+	isn't necessary.
+	An rdev cannot be both pending and in an mddev, so we know rdev will
+	only be on one list at at time.
+	
+	This patch discards  the all_raid_disks list, and changes the
+	pending list to use "same_set" in the rdev.  It also changes
+	/proc/mdstat to iterate through pending devices, rather than through
+	all devices.
+	
+	So now an rdev is only on one list, either the pending list
+	or the list of rdevs for a given mddev.  This means that
+	ITERATE_RDEV_GENERIC doesn't need to be told which field,
+	to walk down: there is ony one.
+
+<neilb@cse.unsw.edu.au>
+	[PATCH] MD - Pass the correct bdev to md_error
+	
+	Pass the correct bdev to md_error
+	
+	After a call to generic_make_request, bio->bi_bdev can have changed
+	(e.g. by a re-mapped like raid0).  So we cannot trust it for reporting
+	the source of an error.  This patch takes care to find the correct
+	bdev.
+
+<neilb@cse.unsw.edu.au>
+	[PATCH] MD - Move md_update_sb calls
+	
+	Move md_update_sb calls
+	
+	When a change which requires a superblock update happens
+	at interrupt time, we currently set a flag (sb_dirty) and
+	wakeup to per-array thread (raid1/raid5d/multipathd) to
+	do the actual update.
+	
+	This patch centralises this.  The sb_update is now done
+	by the mdrecoveryd thread.  As this is always woken up after
+	the error handler is called, we don't need the call to wakeup
+	the local thread any more.
+	
+	With this, we don't need "md_update_sb" to lock the array
+	any more and only use __md_update_sb which is local to md.c
+	So we rename __md_update_sb back to md_update_sb and stop
+	exporting it.
+
+<neilb@cse.unsw.edu.au>
+	[PATCH] MD - Set desc_nr more sanely.
+	
+	Set desc_nr more sanely.
+	
+	Currently rdev->desc_nr is set in sync_sbs which is typcially
+	called just before writing out the superblocks, which is an
+	odd place to set it.
+	It is also called when a new disk is added (which is sane) and
+	when an old disc is imported ... which is quesitonable.
+	
+	With this patch it is set when a new disk is added, and when
+	the superblocks are being analysed, which makes lots of sense.
+	
+	MULTIPATH is particularly an issue here.  The old code tried
+	to figure the desc_nr for an rdev by matching device numbers in
+	the superblock.  This doesn't make a lot of sense as
+	device numbers can change.  Now MULTIPATH components
+	get sequential desc_nrs.
+
+<neilb@cse.unsw.edu.au>
+	[PATCH] MD - Remove concept of 'spare' drive for multipath.
+	
+	Remove concept of 'spare' drive for multipath.
+	
+	Multipath now treats all working devices as
+	active and does io to to first working one.
+
+<neilb@cse.unsw.edu.au>
+	[PATCH] MD - Improve handling of spares in md
+	
+	Improve handling of spares in md
+	
+	- hot_remove_disk is given the raid_disk rather than descriptor number
+	  so that it can find the device in internal array directly, no search.
+	- spare_inactive now uses mddev->spare->raid_disk instead of
+	  mddev->spare->number so it can find the device directly without searching
+	- spare_write does not need number.  It can use mddev->spare->raid_disk as above.
+	- spare_active does not need &mddev->spare.  It finds the descriptor directly
+	  and fixes it without this pointer
+
+<neilb@cse.unsw.edu.au>
+	[PATCH] MD - Add raid_disk field to rdev
+	
+	Add raid_disk field to rdev
+	
+	Also change find_rdev_nr to find based on position
+	in array (raid_disk) not position in superblock (number).
+
+<neilb@cse.unsw.edu.au>
+	[PATCH] MD - Add in_sync flag to each rdev
+	
+	Add in_sync flag to each rdev
+	
+	This currently mirrors the MD_DISK_SYNC superblock flag,
+	but soon it will be authoritative and the superblock will
+	only be consulted at start time.
+
+<neilb@cse.unsw.edu.au>
+	[PATCH] MD - Add "degraded" field to md device
+	
+	Add "degraded" field to md device
+	
+	This is used to determine if a spare should be added
+	without relying on the superblock.
+
+<neilb@cse.unsw.edu.au>
+	[PATCH] MD - when writing superblock, generate from mddev/rdev info.
+	
+	when writing superblock, generate from mddev/rdev info.
+	
+	Rather than relying on the superblock info being kept up-to-date,
+	we regenerate the superblock from mddev/rdev info before
+	each write.
+
+<neilb@cse.unsw.edu.au>
+	[PATCH] MD - Don't maintain disc status in superblock.
+	
+	Don't maintain disc status in superblock.
+	
+	The state is now in rdev so we don't maintain it
+	in superblock any more.
+	We also nolonger test content of superblock for
+	disk status
+	mddev->spare is now an rdev and not a superblock fragment.
+
+<neilb@cse.unsw.edu.au>
+	[PATCH] MD - Remove old_dev field.
+	
+	Remove old_dev field.
+	
+	We used to monitor the pervious device number of a
+	component device for superblock maintenance.  This is
+	not needed any more.
+
+<neilb@cse.unsw.edu.au>
+	[PATCH] MD - nr_disks is gone from multipath/raid1
+	
+	nr_disks is gone from multipath/raid1
+	
+	Never used.
+
+<neilb@cse.unsw.edu.au>
+	[PATCH] MD - Remove number and raid_disk from personality arrays
+	
+	Remove number and raid_disk from personality arrays
+	
+	These are redundant.  number not needed any more
+	raid_disk never was as that is the index.
+
+<neilb@cse.unsw.edu.au>
+	[PATCH] MD - Move persistent from superblock to mddev
+	
+	Move persistent from superblock to mddev
+	
+	Tidyup calc_dev_sboffset and calc_dev_size on the way
+
+<neilb@cse.unsw.edu.au>
+	[PATCH] MD - Remove dependance on superblock
+	
+	Remove dependance on superblock
+	
+	All the remaining field of interest in the superblock
+	get duplicated in the mddev struture and this is treated as
+	authoritative.  The superblock gets completely generated at
+	write time, and all useful information extracted at read time.
+	
+	This means that we can slot in different superblock formats
+	without affecting the bulk of the code.
+
+<neilb@cse.unsw.edu.au>
+	[PATCH] MD - Remove the sb from the mddev
+	
+	Remove the sb from the mddev
+	
+	Now that al the important information is in mddev, we don't need
+	to have an sb off the mddev.  We only keep the per-device ones.
+	
+	Previously we determined if "set_array_info" had been run byb checking
+	mddev->sb.  Now we check mddev->raid_disks on the assumption that
+	any valid array MUST have a non-zero number of devices.
+
+<neilb@cse.unsw.edu.au>
+	[PATCH] MD - Change partition_name calls to bdev_partition_name were possible.
+	
+	Change partition_name calls to bdev_partition_name were possible.
+	
+	All part of decreasing reliance on device numbers... atleast in
+	appearance.
+
+<neilb@cse.unsw.edu.au>
+	[PATCH] MD - Get rid of dev in rdev and use bdev exclusively.
+	
+	Get rid of dev in rdev and use bdev exclusively.
+	
+	There is an awkwardness here in that userspace sometimes
+	passed down a dev_t (e.g. hot_add_disk) and sometime
+	a major and a minor (e.g. add_new_disk).  Should we convert
+	both to kdev_t as the uniform standard....
+	That is what was being done but it seemed very clumsy and
+	things were gets converted back and forth a lot.
+	
+	As bdget used a dev_t, I felt safe in staying with dev_t once I
+	had one rather than converting to kdev_t and back.
+
+<dalecki@evision-ventures.com>
+	[PATCH] 2.5.26 IDE 99
+	
+	Most noticable in the patch:
+	
+	1. we handle IRQ sharing now better then ever
+	
+	2. survives quite a lot of testing by few people. Forexample
+	cat /dev/hdb > /dev/null, where /dev/hdb contains a CD-ROM
+	with a big cratch on the surface making sure it's broken :-).
+	it's BTW. amanzing how wide the cratch had to be until errors
+	ocurred.
+	
+	3. Doesn't play with rq_rdev and friends
+	
+	Fri Jul 12 05:04:32 CEST 2002 ide-clean-99
+	
+	- Push nIEN disabling down at the place where we are finished with a particular
+	   request.
+	
+	- First round of command line parser cleanups by Gerald Champagne.
+	
+	- Unfold the drive eviction functions in do_request(). This allowed us to
+	   realize that we don't have to re-get the major/minor numbers of the device we
+	   are action on from the raw device field of the currently running request. One
+	   significant place less in kernel where major/minor data gets manipulated.
+	
+	- Move the big IDE_BUSY loop out of do_request to do_ide_request().  This makes
+	   us realize that we don't have to clear the IDE_BUSY bit just before
+	   reentering do_request to look for more requests still pending on the queue
+	   and set it immediately again.
+	
+	   This is fixing a tinny race on the code path from IRQ or timer function,
+	   where we had a tinny window between the clearing of the IDE_BUSY bit and
+	   reentering the request queue for completely unrelated requests to come in to
+	   our way.
+	
+	- Don't return any value in do_reset1(). It's always ATA_OP_CONTINUES. Split it
+	   up in to two functions one for disks (well in fact channels) and one for
+	   ATAPI devices. It turns out that they can be moved to the places where they
+	   are used to clarify the code flow. The only function remaining is
+	   do_reset_channel() now.
+	
+	- Duplicate code from ide_do_drive_code explicitely in ide_raw_taskfile().
+	   Simplify ide_raw_taskfile() thereafter. Realize that ide_do_drive_cmd()
+	   is now only used by ATAPI devices. Move it therefore to atapi.c.
+	
+	- Do busy polling for ATAPI reset operations. This is much safer then the
+	   previous timer games played there. It simply doesn't make sense to give the
+	   bus up during such a subtile operation. We don't have to disable IRQs here as
+	   well, since we are already under the protection of the do_request mechanisms.
+	   (Well hopefully...)
+	
+	- Remove no longer used reset_poll() function. poll_timeout and friends are now
+	   used only in pdc4030 code. Those function where not called from IRQ context
+	   but they where set as handlers and not as expiry functions.
+	
+	- Return ATA_OP_CONTINUES instead of ATA_OP_FINISHED in ata_error(), to signal
+	   that we are willing to retry the operation until the maximal number of retry
+	   attempts is exceeded. Returning ATA_OP_FINISHED without prior end_request()
+	   hangs the system.
+	
+	- Apply trivia from DJ patch set.
+	
+	- Apply small configuration fix to ide-pci.c from Muli Ben-Yehuda.
+	
+	- Feed add_blkdev_randomness with information we already have in struct
+	   ata_channel *ch->major, instead of using the major(macro) on the request in
+	   question.
+	
+	- Make ide_raw_taskfile use the same request submission mechanism as
+	   tcq_invalidate_queue(). Something similar would be ideal for ioctl() code as
+	   well.
+	
+	- Implement actual device reset. Realize that the recalibration procedure is
+	   doomed by the standard. Don't try to recover by recalibrating devices
+	   therefore -just our retry mechanism should work in those cases. And suddenly
+	   the error handling code is IRQ safe.
+	
+	- Reinvent the ATA reset operation, since it is apparently needed. We still
+	   have to do the whole transfer timing reconfiguration there.
+	
+	- Move drive_is_ready(), which is in reality an attempt to check for IRQ
+	   requesters without clearing the IRQ line, over to the place where it belongs:
+	   device.c, which is the direct device access abstraction place.  Rename it to
+	   ata_status_irq() to prevent global name space pollution.
+	
+	- Updates to the pdc202xxx host chip controller setup code by Bart³omiej
+	   ¯o³nierkiewicz:
+	
+	   Forward port 2.4 patch by Hank Yang from Promise:
+	
+		- Add PDC20271 support
+		- Disable LBA48 support on PDC20262
+		- Fix ATAPI UDMA port value
+		- Add new quirk drive
+		- Adjust timings for all drives when using ATA133
+		- Update pdc202xx_reset() waiting time
+	
+	- Mark TCQ as dangerous and add some bits about it to the help.
+	
+	- Add some missing exports.
+	
+	- Some small ide-scsi.c host allocation fixes by sullivan.
+
+<dalecki@evision.ag>
+	[PATCH] IDE 100
+	
+	  Trivia time:
+	
+	  - C99 conforming initializations by Rusty.
+	
+	  - ide__sti() -> local_irq_enable() and its friends.
+
+<rusty@rustcorp.com.au>
+	[PATCH] drivers/usb/* designated initializer rework
+	
+	Name: Designated initializers for drivers/usb
+	Author: Rusty Russell
+	Status: Trivial
+	
+	D: The old form of designated initializers are obsolete: we need to
+	D: replace them with the ISO C forms before 2.6.  Gcc has always supported
+	D: both forms anyway.
+
+<stuartm@connecttech.com>
+	[PATCH] USB: usbserial.c fixup
+	
+	create_serial, get_free_serial and usb_serial_probe all do pretty much
+	the same thing. I'd like to reorg this into create_serial does all the
+	alloc and most of the setup, and get_free_serial just fills in the
+	MAGIC.
+	
+	There's currently a memory leak: if create_serial is called at probe
+	time or calc_ports time, and then get_free_serial returns NULL because
+	the table has no entries left, that usb_serial struct is leaked.
+	
+	get_free_serial doesn't check properly for free slots. The middle loop
+	doesn't terminate when the end of the table is reached, although the
+	assignment loop later does. The effect is that stuff past the end of
+	the table is allowed to decide if there's free space or not, and
+	occasionally it'll say "yes" and then the assignment loop will only
+	allocate slots up to the end of the table, preventing memory
+	scribbling.
+	
+	I haven't fixed any of this just yet because I'm not sure what the
+	intended behaviour is. Should get_free_serial allocate as many slots
+	as possible, or just be all or nothing? Similarly, I don't see a
+	problem with calling create_serial early in usb_serial_probe, and
+	removing the alloc code from get_free_serial; this would fix the leak.
+	
+	Ah heck, here's a patch. This is what I think things should look like.
+	get_free_serial is all or none, the leak is fixed and create_serial
+	does all the allocation.
+
+<akpm@zip.com.au>
+	[PATCH] minimal rmap
+	
+	This is the "minimal rmap" patch, writen by Rik, ported to 2.5 by Craig
+	Kulsea.
+	
+	Basically,
+	
+	before: When the page reclaim code decides that is has scanned too many
+	unreclaimable pages on the LRU it does a scan of process virtual
+	address spaces for pages to add to swapcache.  ptes pointing at the
+	page are unmapped as the scan proceeds.  When all ptes referring to a
+	page have been unmapped and it has been written to swap the page is
+	reclaimable.
+	
+	after: When an anonymous page is encountered on the tail of the LRU we
+	use the rmap to see if it hasn't been referenced lately.  If so then
+	add it to swapcache.  When the page is again encountered on the LRU, if
+	it is still unreferenced then try to unmap all ptes which refer to it
+	in one hit, and if it is clean (ie: on swap) then free it.
+	
+	The rest of the VM - list management, the classzone concept, etc
+	remains unchanged.
+	
+	There are a number of things which the per-page pte chain could be
+	used for.  Bill Irwin has identified the following.
+	
+	
+	(1)  page replacement no longer goes around randomly unmapping things
+	
+	(2)  referenced bits are more accurate because there aren't several ms
+	        or even seconds between find the multiple pte's mapping a page
+	
+	(3)  reduces page replacement from O(total virtually mapped) to O(physical)
+	
+	(4)  enables defragmentation of physical memory
+	
+	(5)  enables cooperative offlining of memory for friendly guest instance
+	        behavior in UML and/or LPAR settings
+	
+	(6)  demonstrable benefit in performance of swapping which is common in
+	        end-user interactive workstation workloads (I don't like the word
+	        "desktop"). c.f. Craig Kulesa's post wrt. swapping performance
+	
+	(7)  evidence from 2.4-based rmap trees indicates approximate parity
+	        with mainline in kernel compiles with appropriate locking bits
+	
+	(8)  partitioning of physical memory can reduce the complexity of page
+	        replacement searches by scanning only the "interesting" zones
+	        implemented and merged in 2.4-based rmap
+	
+	(9)  partitioning of physical memory can increase the parallelism of page
+	        replacement searches by independently processing different zones
+	        implemented, but not merged in 2.4-based rmap
+	
+	(10) the reverse mappings may be used for efficiently keeping pte cache
+	        attributes coherent
+	
+	(11) they may be used for virtual cache invalidation (with changes)
+	
+	(12) the reverse mappings enable proper RSS limit enforcement
+	        implemented and merged in 2.4-based rmap
+	
+	
+	
+	The code adds a pointer to struct page, consumes additional storage for
+	the pte chains and adds computational expense to the page reclaim code
+	(I measured it at 3% additional load during streaming I/O).  The
+	benefits which we get back for all this are, I must say, theoretical
+	and unproven.  If it has real advantages (or, indeed, disadvantages)
+	then why has nobody demonstrated them?
+	
+	
+	
+	There are a number of things remaining to be done:
+	
+	1: Demonstrate the above advantages.
+	
+	2: Make it work with pte-highmem  (Bill Irwin is signed up for this)
+	
+	3: Don't add pte_chains to non-shared pages optimisation (Dave McCracken's
+	   patch does this)
+	
+	4: Move the pte_chains into highmem too (Bill, I guess)
+	
+	5: per-cpu pte_chain freelists (Rik?)
+	
+	6: maybe GC the pte_chain backing pages. (Seems unavoidable.  Rik?)
+	
+	7: multithread the page reclaim code.  (I have patches).
+	
+	8: clustered add-to-swap.  Not sure if I buy this.  anon pages are
+	   often well-ordered-by-virtual-address on the LRU, so it "just
+	   works" for benchmarky loads.  But there may be some other loads...
+	
+	9: Fix bad IO latency in page reclaim (I have lame patches)
+	
+	10: Develop tuning tools, use them.
+	
+	11: The nightly updatedb run is still evicting everything.
+
+<akpm@zip.com.au>
+	[PATCH] leave truncate's orphaned pages on the LRU
+	
+	Fix to the page reclaim code from Rik.
+	
+	Anonymous pages which have buffers arise when
+	truncate_complete_page()'s call to ->releasepage() failed.  Those pages
+	may still be mapped into process address spaces.
+	
+	We should not remove them from the LRU, because that makes them
+	unswappable and they hang around until process exit.
+
+<akpm@zip.com.au>
+	[PATCH] avoid allocating pte_chains for unshared pages
+	
+	Patch from David McCracken.  It is an optimisation to the rmap
+	pte_chains.
+	
+	In the common case where a page is mapped by only a single pte, we
+	don't need to allocate a pte_chain structure.  Just make the page's
+	pte_chain pointer point straight at that pte and flag this with
+	PG_direct.
+
+<akpm@zip.com.au>
+	[PATCH] VM instrumentation
+	
+	A patch from Rik which adds some operational statitics to the VM.
+	
+	In /proc/meminfo:
+	
+	PageTables:	Amount of memory used for process pagetables
+	PteChainTot:	Amount of memory allocated for pte_chain objects
+	PteChainUsed:	Amount of memory currently in use for pte chains.
+	
+	In /proc/stat:
+	
+	pageallocs:	Number of pages allocated in the page allocator
+	pagefrees:	Number of pages returned to the page allocator
+	
+			(These can be used to measure the allocation rate)
+	
+	pageactiv:	Number of pages activated (moved to the active list)
+	pagedeact:	Number of pages deactivated (moved to the inactive list)
+	pagefault:	Total pagefaults
+	majorfault:	Major pagefaults
+	pagescan:	Number of pages which shrink_cache looked at
+	pagesteal:	Number of pages which shrink_cache freed
+	pageoutrun:	Number of calls to try_to_free_pages()
+	allocstall:	Number of calls to balance_classzone()
+	
+	
+	Rik will be writing a userspace app which interprets these things.
+	
+	The /proc/meminfo stats are efficient, but the /proc/stat accumulators
+	will cause undesirable cacheline bouncing.  We need to break the disk
+	statistics out of struct kernel_stat and make everything else in there
+	per-cpu.  If that doesn't happen in time for 2.6 then we disable
+	KERNEL_STAT_INC().
+
+<akpm@zip.com.au>
+	[PATCH] O_DIRECT open check
+	
+	Updated forward-port of Aodrea's O_DIRECT open() checks.  If the user
+	asked for O_DIRECT and the inode has no mapping or no a_ops then fail
+	the open up-front.
+
+<akpm@zip.com.au>
+	[PATCH] restore CHECK_EMERGENCY_SYNC.  Again.
+	
+	Put the CHECK_EMERGENCY_SYNC back into the kupdate function.  I seem to
+	keep removing it.
+
+<akpm@zip.com.au>
+	[PATCH] inline generic_writepages()
+	
+	generic_writepages() is just a wrapper around mpage_writepages(), so
+	inline it.
+
+<akpm@zip.com.au>
+	[PATCH] alloc_pages cleanup
+	
+	Cleanup patch from Martin Bligh: convert some loops which want to be
+	`for' loops into that, and add some commentary.
+
+<akpm@zip.com.au>
+	[PATCH] direct_io mopup
+	
+	Some cleanup from the surprise direct-to-bio for O_DIRECT merge.
+	
+	- Remove bits and pieces from the kiobuf implementation
+	
+	- Replace the waitqueue in struct dio with just a task_struct pointer
+	  and use wake_up_process.  (Ben).
+	
+	- Only take mmap_sem around the individual calls to get_user_pages().
+	   (It pins the vmas, yes?)
+	
+	- Remove some debug code.
+	
+	- Fix JFS.
+
+<akpm@zip.com.au>
+	[PATCH] remove add_to_page_cache_unique()
+	
+	A tasty patch from Hugh Dickens.  radix_tree_insert() fails if something
+	was already present at the target index, so that error can be
+	propagated back through add_to_page_cache().  Hence
+	add_to_page_cache_unique() is obsolete.
+	
+	Hugh's patch removes add_to_page_cache_unique() and cleans up a bunch of
+	stuff.
+
+<akpm@zip.com.au>
+	[PATCH] writeback scalability improvements
+	
+	The kernel has a number of problems wrt heavy write traffic to multiple
+	spindles.  What keeps on happening is that all processes which are
+	responsible for writeback get blocked on one of the queues and all the
+	others fall idle.
+	
+	This happens in the balance_dirty_pages() path (balance_dirty() in 2.4)
+	and in the page reclaim code, when a dirty page is found on the LRU.
+	
+	The latter is particularly bad because it causes "innocent" processes
+	to be suspended for long periods due to the activity of heavy writers.
+	
+	The general idea is: the primary resource for writeback should be the
+	process which is dirtying memory.  The secondary resource is the
+	pdflush pool (although this is mainly for providing async writeback in
+	the presence of light-moderate loads).  Add the final
+	oh-gee-we-screwed-up resource for writeback is a caller to
+	shrink_cache().
+	
+	This patch addresses the balance_dirty_pages() path.  This code was
+	initially modelled on the 2.4 writeback scheme: throttled processes
+	writeback all data regardless of its queue.  Instead, the patch changes
+	it so that the balance_dirty_pages() caller only writes back pages
+	which are dirty against the queue which that caller just dirtied.
+	
+	So the effect is a better allocation of writeback resources across the
+	queues and increased parallelism.
+	
+	The per-queue writeback is implemented by using
+	mapping->backing_dev_info as a search key during the walk across the
+	superblocks and inodes.
+	
+	The patch also fixes an initialisation problem in
+	block_dev.c:do_open(): it was setting up the blockdev's
+	mapping->backing_dev_info too early, before the queue has been
+	identified.
+	
+	Generally, this patch doesn't help much, because of the stalls in the
+	page allocator.  I have a patch which mostly fixes that up, and taken
+	together the kernel is achieving almost platter speed against six
+	spindles, but only when the system has a small amount of memory.  More
+	work is needed there.
+
+<akpm@zip.com.au>
+	[PATCH] readahead optimisations
+	
+	Been looking at a workload which involves several processes which seek
+	around and read from a large file.  There are a few problems:
+	generic_file_lseek is bouncing i_sem around like mad, and readahead is
+	doing lots of pointless pagecache probing.
+	
+	This patch addresses readahead.
+	
+	Presumably the change will be larger on machines which have higher
+	bandwidth memory than my test box, of which there are many.
+	
+	This patch teaches readahead to detect the situation where no IO is
+	actually being performed as a result of its actions.  Now, we don't
+	want to sacrifice IO efficiency to save a bit of CPU, so the code is
+	very cautious.  But eventually, after some tens of consecutive
+	readahead attempts were found to perform no I/O at all, readahead will
+	turn itself off.
+	
+	readahead will be turned on again when either generic_file_read() or
+	filemap_nopage() get a pagecache miss.  The function
+	handle_ra_thrashing() has been renamed to handle_ra_miss() to reflect
+	its widened role.
+	
+	A performance bug in page_cache_readround() was fixed - if
+	ra->next_size is zero, that function needs to leave it well alone,
+	because next_size==0 is a magic value meaning that the file has just
+	been opened and that readahead needs to get aggressive.  This change
+	makes a `make dep' run at the same speed as in the 2.4 kernel.  It used
+	to take 4x as long...
+	
+	`make dep' is an interesting test because it uses mmap to read the files.
+
+<hirofumi@mail.parknet.co.jp>
+	[PATCH] Add 4G-1 file support to FAT32
+	
+	This patch changes cont_prepare_write(), in order to support a 4G-1
+	file for FAT32.
+	
+	 int cont_prepare_write(struct page *page, unsigned offset,
+	-		unsigned to, get_block_t *get_block, unsigned long *bytes)
+	+		unsigned to, get_block_t *get_block, loff_t *bytes)
+	
+	And it fixes broken adfs/affs/fat/hfs/hpfs/qnx4 by this
+	cont_prepare_write() change.
+
+<greg@kroah.com>
+	LSM: change BUS_ISA to CTL_BUS_ISA to prevent namespace collision with the input subsystem.
+	
+	This is needed due to the next header file changes.
+
+<greg@kroah.com>
+	LSM: Add all of the new security/* files for basic task control
+	
+	This includes the security_* functions, and the default and capability
+	modules.
+
+<greg@kroah.com>
+	LSM:  Enable the security framework.  This includes basic task control hooks.
+
+<greg@kroah.com>
+	LSM: for now, always set CONFIG_SECURITY_CAPABILITIES to y
+	
+	This can be overridden by editing the .config file if you really want it.
+
+<torvalds@home.transmeta.com>
+	Remove "tristate" for CONFIG_SECURITY_CAPABILITIES, make
+	it unconditional for now.
+
+<torvalds@home.transmeta.com>
+	Kernel version 2.5.27
+

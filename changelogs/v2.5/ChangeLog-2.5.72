@@ -1,0 +1,853 @@
+
+Summary of changes from v2.5.71 to v2.5.72
+============================================
+
+<warp@mercury.d2dc.net>
+	input: Implement input device grabbing so that it is possible to steal
+	an input device from other handlers and have an exclusive access
+	to events.
+
+<vojtech@suse.cz>
+	input: fix sunkbd to properly set its bitfields up to key #127.
+
+<warp@mercury.d2dc.net>
+	input: Implement a HID quirk for 2-wheel A4Tech mice.
+
+<miura@da-cha.org>
+	input: Add default mapping for the hiragana/katakana key.
+
+<rmk@arm.linux.org.uk>
+	input: PCI PS/2 keyboard and mouse controller (Mobility Docking station)
+
+<deller@gmx.de>
+	input: Turn on the NumLock ON by default on PARISC HP-HIL machines.
+
+<vojtech@suse.cz>
+	input: Add key definitions for HP-HIL keyboards.
+
+<vojtech@suse.cz>
+	input: Change input/misc/pcspkr.c to use CLOCK_TICK_RATE instead of
+	a fixed value of 1193182. And change CLOCK_TICK_RATE and several
+	usages of a fixed value 1193180 to a slightly more correct value
+	of 1193182. (True freq is 1.193181818181...).
+
+<peter@chubb.wattle.id.au>
+	input: The appended fix is needed on I2000 machines, to map the
+	legacy ISA interrupt onto the actual interrupt provided.  Otherwise
+	the mouse and keyboard won't work.  Patch against 2.5.70.
+
+<vsu@altlinux.ru>
+	hid: fix HID feature/output report writing to devices. This should
+	fix most problems with UPS shutdown.
+
+<vsu@altlinux.ru>
+	hid: Add missing 'return 0's in hiddev ioctl handler.
+
+<paulus@samba.org>
+	PPC32: Fix pci_domain_nr()
+
+<paulus@samba.org>
+	PPC32: only define cond_syscall if it isn't already defined.
+
+<paulus@samba.org>
+	PPC32: Update the defconfigs
+
+<ink@jurassic.park.msu.ru>
+	[ALPHA] Fix Jensen PCI domains warning
+	
+	Alternatively, we can set CONFIG_PCI_DOMAINS=y unconditionally to
+	avoid ifdefs - jensen has dummy PCI infrastructure anyway.
+	
+	Ivan.
+
+<rth@kanga.twiddle.net>
+	[ALPHA] Update Jensen call to ide_register_hw.
+
+<paulus@samba.org>
+	PPC32: vmlinux.lds.S cleanup + discard .exitcall.exit sections
+
+<petero2@telia.com>
+	input: fix some minor errors found in the input-programming.txt file
+
+<linux@de.rmk.(none)>
+	[PCMCIA] Remove stale structure definition.
+	
+	pcmcia_socket_class_data is (fortunately) not needed any longer.
+
+<linux@de.rmk.(none)>
+	[PCMCIA] Fix class device name.
+	
+	A "\n" was at the end of the device name, sorry.
+
+<petero2@telia.com>
+	input: Add Synaptics touchpad absolute mode support.
+
+<linux@de.rmk.(none)>
+	[PCMCIA] Move socket /proc to sysfs
+	
+	Remove the proc_setup callback. The drivers can use CLASS_DEVICE_ATTR
+	instead. Example: i82365.c.
+
+<linux@de.rmk.(none)>
+	[PCMCIA] move creation of /proc/pccard to ds.c
+	
+	Move the creation of /proc/pccard to ds.c so that ds.c is the only
+	file that needs to include linux/proc_fs.h any longer.
+
+<linux@de.rmk.(none)>
+	[PCMCIA] Remove inquire_socket
+	
+	Remove the inquire_socket callback by moving the (static) capability
+	information to the top-level of struct pcmcia_socket.
+
+<rmk@flint.arm.linux.org.uk>
+	[PCMCIA] Remove inquire_socket method from sa11xx_core.c
+	
+	Update sa11xx_core.c for Dominik's previous patch.
+
+<daniel.ritz@ch.rmk.(none)>
+	[PCMCIA] fix yenta unload oops
+	
+	Patch from Daniel Ritz
+	
+	rmmod yenta produces the following oops:
+	Unable to handle kernel paging request at virtual address d084781e
+	EIP is at yenta_config_init+0x18f/0x1e0 [yenta]
+	Process pccardd (pid: 2618, threadinfo=c3236000 task=c988ae60)
+
+<riel@redhat.com>
+	[NET]: Fix error message when registering IGMP.
+
+<acme@conectiva.com.br>
+	[NET]: net/core/flow.c needs linux/cpu.h
+
+<akpm@digeo.com>
+	[PATCH] fix deadlock over proc_lock
+	
+	From: Manfred Spraul <manfred@colorfullife.com>
+	
+	Martin found out what caused the deadlocks with 2.5.70 and SDET: I forgot
+	to initialize proc_lock during fork().  Usually this works, because the
+	parent lock is unlocked.  But a proc lookup during fork can cause it to be
+	locked, and then the system locks up.
+
+<B.Zolnierkiewicz@elka.pw.edu.pl>
+	[PATCH] ide: bring non-taskfile code back
+	
+	Unexpectedly there are some taskfile IO bugreports,
+	so bring back old code and add taskfile IO config option (default y).
+	This aids testing and lets people use safe(?) old code.
+
+<B.Zolnierkiewicz@elka.pw.edu.pl>
+	[PATCH] ide: Power Management
+	
+	Patch by Benjamin Herrenschmidt, minor fixes by me.
+
+<B.Zolnierkiewicz@elka.pw.edu.pl>
+	[PATCH] ide: move "config IDE" to drivers/ide/Kconfig
+	
+	Patch by Matthew Wilcox.
+	
+	Allows all architectures to simply include the drivers/ide/Kconfig file.
+
+<mikpe@csd.uu.se>
+	[PATCH] local APIC blacklist rules updates
+	
+	This patch removes the x86 local APIC blacklist rules for the
+	Microstar 6163 and Intel AL440LX mainboards. These boards do
+	work with local APIC enabled. Heavily tested. Please apply.
+	
+	Long story: When I worked on the initial UP_APIC code, these
+	two mainboard (MS-6163 and AL440LX) were the only ones that
+	caused hangs when the local APIC was enabled. At the time,
+	I attributed these hangs to broken BIOSen and implemented DMI
+	scan blacklist rules to prevent enabling the local APIC on them.
+	
+	However, the last year I've observed hangs on other mainboards
+	that initially were believed to be safe for local APIC. The
+	hangs turned out to be caused by APM's DISPLAY_BLANK option:
+	When this option is enabled, APM will invoke BIOS and graphics
+	card BIOS code without disabling the local APIC first. In many
+	cases, a local APIC timer interrupt while APM is trying to blank
+	the console will hang the system.
+	
+	APM also has two other options that can hang the system: CPU_IDLE
+	and building APM as a module, both of which causes it to do BIOS
+	calls without disabling the local APIC first. On all my systems,
+	the only reliable configuration is to keep APM's DISPLAY_BLANK and
+	CPU_IDLE disabled, and to build APM non-modular.
+
+<davem@nuts.ninka.net>
+	[BLUETOOTH]: Remove unused local var in rfcomm/tty.c
+
+<mikpe@csd.uu.se>
+	[PATCH] local APIC driver model cleanups
+	
+	This patch cleans up a few leftovers after Mochel's recent
+	driver model changes. Tested. Please apply.
+	
+	- arch/i386/kernel/apic.c: <linux/module.h> no longer needed
+	- include/asm-i386/apic.h: device_lapic no longer exported
+
+<davem@nuts.ninka.net>
+	[TCP]: Make sure tcp_tw_bucket tw_daddr is aligned properly.
+
+<paulus@samba.org>
+	[PATCH] fix weird kmalloc bug
+	
+	Last night, Manfred and I found an interesting bug with kmalloc on
+	ppc32, where the kmalloc in alloc_super() (fs/super.c) was requesting
+	432 bytes but only getting 256 bytes.  The reason was that PAGE_SIZE
+	wasn't defined at the point where the kmalloc() inline function
+	occurs.  Thus the CACHE(32) entry got omitted from the list in
+	kmalloc_sizes.h, and kmalloc therefore used the entry in
+	malloc_sizes[] before the correct entry.
+	
+	This patch fixes it by including asm/page.h and asm/cache.h in
+	linux/slab.h.  The list in kmalloc_sizes.h depends on L1_CACHE_BYTES
+	as well as PAGE_SIZE, which is why I added asm/cache.h.
+
+<anton@samba.org>
+	[PATCH] fix compat_sys_getrusage
+	
+	compat_sys_getrusage was returning the result of a logical or. Make
+	it return the result of sys_getrusage if it fails or -EFAULT if we
+	cant write it out to userspace.
+
+<robert.olsson@data.slu.se>
+	[IPV4]: Add rtcache hash lookup statistics to rtstat.
+
+<torvalds@home.transmeta.com>
+	Fix up missing header files
+
+<yoshfuji@linux-ipv6.org>
+	[IPSEC]: Fix xfrm_alloc_spi() always selecting minspi.
+
+<akpm@digeo.com>
+	[PATCH] NUMA fixes
+	
+	From: Anton Blanchard <anton@samba.org>
+	
+	
+	Anton has been testing odd setups:
+	
+	/* node 0 - no cpus, no memory */
+	/* node 1 - 1 cpu, no memory */
+	/* node 2 - 0 cpus, 1GB memory */
+	/* node 3 - 3 cpus, 3GB memory */
+	
+	Two things tripped so far.  Firstly the ppc64 debug check for invalid cpus
+	in cpu_to_node().  Fix that in kernel/sched.c:node_nr_running_init().
+	
+	The other problem concerned nodes with memory but no cpus.  kswapd tries to
+	set_cpus_allowed(0) and bad things happen.  So we only set cpu affinity
+	for kswapd if there are cpus in the node.
+
+<kiran@in.ibm.com>
+	[DECNET]: Fix signedness error in dm_ioctl().
+
+<akpm@digeo.com>
+	[PATCH] compat_ioctl fixes
+	
+	From: Anton Blanchard <anton@samba.org>
+	
+	- Add BLKRASET/BLKFRASET as compatible ioctls
+	
+	- Remove ifdefs around RTC ioctls - ppc64 implements its own rtc driver
+	  and doesnt define CONFIG_RTC.
+	
+	- remove SG_IO which is not compatible
+	
+	- extra loop, autofs, NCP and bluetooth ioctls
+
+<kiran@in.ibm.com>
+	[TUN]: Fix signedness error in tun_get_user().
+
+<akpm@digeo.com>
+	[PATCH] Unisys ES7000 platform subarch 1/2: generic bits
+	
+	From: "Protasevich, Natalie" <Natalie.Protasevich@unisys.com>
+	
+	The patch set adds support for the Unisys ES7000 series architecture.
+	It covers different ES7000 platform variations with their corresponding APIC
+	architectures, such as Fosters-Gallatins based (XAPIC) ES7000s as well as
+	older Cascades based (logical cluster) ES7000 machines.
+	The patch was discussed among platform developers on LK and later resided in
+	the Alan's tree for 4-5 weeks for testing. Alan indicated that there are
+	"Zero complaints of any kind, zero problems from the changed code". He
+	recommended submit the patch. The code was tested by IBM as well as others
+	and did not have any impact on existing subarchs and on standard systems.
+	
+	
+	Here is the "generic" patch #1.  It deals with the IRQ overrides (most of
+	changes in mpparse.c and PCI range adjustment in io_apic.c), insufficient
+	width of IO-APIC ID, and a corner case for defining quantities of things like
+	APICs, IRQ sources, etc.  (the attempt to make easier defining these items in
+	subarchs resulted in separation of MP definition portion in
+	include/asm-i386/mpparse.h from its enumeration portion).  It has also
+	Venkatesh Palladi's fix that he suggested earlier for the correct APIC
+	version; I had to have it for this platform since the correct APIC version
+	will be needed later for dynamic platform discovery when es7000 will be
+	incorporated into genapic.
+
+<shemminger@osdl.org>
+	[NET]: Convert SLIP driver to alloc_netdev.
+
+<akpm@digeo.com>
+	[PATCH] Unisys ES7000 2/2: platform subarch
+	
+	From: "Protasevich, Natalie" <Natalie.Protasevich@UNISYS.com>
+	
+	Include ES7000 specific code for es7000 subarch.
+
+<shemminger@osdl.org>
+	[NET]: Network hotplug via class_device/kobject.
+	
+	This patch changes network devices to run hotplug out of the
+	kobject/class_device infrastructure rather than calling it
+	from the network code.  The code gets simpler and there is
+	only one place for Greg to fix when he changes the API.
+	
+	All hotplug now happens off the chain:
+	     rtnl_unlock -> netdev_run_todo -> netdev_sysfs_{un}register
+	
+	The state flag deadbeef was converted to a state enumeration tp
+	handle necessary book keeping, and adds some defense against
+	drivers that have unexpected semantics.
+
+<akpm@digeo.com>
+	[PATCH] pcips2.c compile fix
+	
+	From: Vojtech Pavlik <vojtech@suse.cz>
+	
+	- irq_return_t fixes
+	
+	- remove obsolete pci_driver.driver bits
+
+<paulus@samba.org>
+	[NET]: Use unregister_netdev() in ppp.
+
+<akpm@digeo.com>
+	[PATCH] Some clean up of the time code.
+	
+	From: george anzinger <george@mvista.com>
+	
+	This patch does the following:
+	
+	Pushs down the change from timeval to timespec in the settime routines.
+	
+	Fixes two places where time was set without updating the monotonic clock
+	offset.  (Changes sys_stime() to call do_settimeofday() and changes
+	clock_warp to do the update directly.) These were bugs!
+	
+	Changes the uptime code to use the posix_clock_monotonic notion of uptime
+	instead of the jiffies.  This time will track NTP changes and so should be
+	better than your standard wristwatch (if your using ntp).
+	
+	Changes posix_clock_monotonic to start at 0 on boot (was set to start at
+	initial jiffies).
+	
+	Fixes a bug (never experienced) in timer_create() in posix-timers.c where
+	we "could" have released timer_id 0 if "id resources" were low.
+	
+	Adds a test in do_settimeofday() to error out (EINVAL) attempts to use
+	unnormalized times.  This is passed back up to both settimeofday and
+	posix_setclock().
+	
+	Warning: Requires changes in .../arch/???/kernel/time.c to change
+	do_settimeofday() to return an error if time is not normalized and to use a
+	timespec instead of timeval for its input.
+
+<davem@nuts.ninka.net>
+	[TCP]: Use proper time_*() comparisons on jiffies.
+
+<akpm@digeo.com>
+	[PATCH] More time clean up stuff
+	
+	From: george anzinger <george@mvista.com>
+	
+	This patch addresses issues of roundoff error in the time keeping and NTP
+	code as follows:
+	
+	The conversion of "actual jiffies" to TICK_USEC and then to TICK_NSEC
+	introduced large errors if jiffies was not a power of 10 (e.g.  1024 for
+	the ia64).  Most of this is avoided by converting directly to TICK_NSEC.
+	
+	The calculation of MAX_SEC_IN_JIFFIES (the largest timespec or timeval the
+	kernel will attempt) had overflow problems in the 64-bit machines.  We
+	introduce a different equation for those machines.
+	
+	The NTP frequency update code was allowing a micro second of error to
+	accumulate before applying the correction.  We change FINEUSEC to FINENSEC
+	to do the correction as soon as a full nanosecond has accumulated.
+	
+	The initial calculation of time_freq for NTP had severe roundoff errors for
+	HZ not a power of 10 (i.e.  1024).  A new equation fixes this.
+	
+	clock_nanosleep is changed to round up to the next jiffie to cover starting
+	between jiffies.
+
+<davem@nuts.ninka.net>
+	[DECNET]: Fix bogus pointer cast to int.
+
+<akpm@digeo.com>
+	[PATCH] ppc64: fix do_settimeofday() for new API
+
+<kazunori@miyazawa.org>
+	[IPV6]: Fix ipv6 header handling of AH input.
+
+<akpm@digeo.com>
+	[PATCH] sparc64: fix do_settimeofday() for new API
+
+<akpm@digeo.com>
+	[PATCH] x86_64: fix do_settimeofday() for new API
+
+<akpm@digeo.com>
+	[PATCH] ia64: fix do_settimeofday() for new API
+
+<akpm@digeo.com>
+	[PATCH] parisc: fix do_settimeofday() for new API
+
+<akpm@digeo.com>
+	[PATCH] s390: fix do_settimeofday() for new API
+
+<akpm@digeo.com>
+	[PATCH] alpha: fix do_settimeofday() for new API
+
+<akpm@digeo.com>
+	[PATCH] arm: fix do_settimeofday() for new API
+
+<akpm@digeo.com>
+	[PATCH] cris: fix do_settimeofday() for new API
+
+<akpm@digeo.com>
+	[PATCH] m68k: fix do_settimeofday() for new API
+
+<akpm@digeo.com>
+	[PATCH] ppc: fix do_settimeofday() for new API
+
+<akpm@digeo.com>
+	[PATCH] arm26: fix do_settimeofday() for new API
+
+<akpm@digeo.com>
+	[PATCH] sh: fix do_settimeofday() for new API
+
+<akpm@digeo.com>
+	[PATCH] sparc: fix do_settimeofday() for new API
+
+<akpm@digeo.com>
+	[PATCH] um: fix do_settimeofday() for new API
+
+<akpm@digeo.com>
+	[PATCH] v850: fix do_settimeofday() for new API
+
+<akpm@digeo.com>
+	[PATCH] arcnet oops fix
+	
+	From: Dipankar Sarma <dipankar@in.ibm.com>
+	
+	Forward-port of a fix Alan merged into 2.4.21-pre.  It fixes arcnet oopses
+	with raw sockets.
+
+<akpm@digeo.com>
+	[PATCH] remove anon_hash_chain
+	
+	From: James Morris <jmorris@intercode.com.au>
+	
+	This patch against current bk removes anon_hash_chain from fs/inode.c, as
+	all inodes in the 2.5 kernel must be associated with a superblock, and the
+	anon hash is no longer needed.
+	
+	(akpm: Well there's one inode with a null i_sb: swapper_inode.  But it
+	shouldn't get here and if it does, we'll fix it by other means).
+
+<akpm@digeo.com>
+	[PATCH] tmpfs: revert license to 2.4 version
+	
+	From: Hugh Dickins <hugh@veritas.com>, Christoph Rohland <cr@sap.com>
+	
+	Switches the long GPL blurb which Hugh took from the 2.4-ac version of
+	mm/shmem.c, back to the original oneliner (as in 2.4.current).
+	
+	Christoph spotted that the long blurb says "either version 2 of the License,
+	or (at your option) any later version", whereas he intended it be as COPYING
+	says, version 2 period.  Hugh and Christoph are happier with known version 2
+	than undefined future variants.
+
+<akpm@digeo.com>
+	[PATCH] dm: Repair persistent minors
+	
+	From: Joe Thornber <thornber@sistina.com>
+	
+	Split the dm_create() function into two variants, depending on whether you
+	want the device to have a specific minor number.  This avoids the broken
+	overloading of the minor argument to the old dm_create().
+
+<akpm@digeo.com>
+	[PATCH] make pid_max readable
+	
+	From: Albert Cahalan <albert@users.sourceforge.net>
+	
+	This is needed so that apps can set appropriate column widths for PID
+	display.
+
+<akpm@digeo.com>
+	[PATCH] Fix sign handling bugs in Decnet
+	
+	From: Ravikiran G Thirumalai <kiran@in.ibm.com>
+	
+	Fix decnet ioctl(TIOCOUTQ).
+
+<akpm@digeo.com>
+	[PATCH] Fix sign handling bugs in epca
+	
+	From: Ravikiran G Thirumalai <kiran@in.ibm.com>
+	
+	Don't check unsigned values for <= 0.
+
+<akpm@digeo.com>
+	[PATCH] Fix sign handling bugs in mpt fusion
+	
+	From: Ravikiran G Thirumalai <kiran@in.ibm.com>
+	
+	Don't compare unsigned value for < 0.
+
+<akpm@digeo.com>
+	[PATCH] Fix sign handling bugs in tun
+	
+	From: Ravikiran G Thirumalai <kiran@in.ibm.com>
+	
+	Fix a check for underflow.
+
+<akpm@digeo.com>
+	[PATCH] Fix sign handling bugs in aacraid
+	
+	From: Ravikiran G Thirumalai <kiran@in.ibm.com>
+	
+	As we'll be checking `status' for errors, it had better not be unsigned.
+
+<akpm@digeo.com>
+	[PATCH] Parenthesisation fix in dpt_i2o
+	
+	From: Ravikiran G Thirumalai <kiran@in.ibm.com>
+	
+	Fix parenthesisation in a combined assign-and-check-error statement.
+
+<akpm@digeo.com>
+	[PATCH] Parenthesisation fix in jffs
+	
+	From: Ravikiran G Thirumalai <kiran@in.ibm.com>
+	
+	Fix parenthesisation in a combined assign-and-check-error statement.
+
+<akpm@digeo.com>
+	[PATCH] Parenthesisation fix in es1371
+	
+	From: Ravikiran G Thirumalai <kiran@in.ibm.com>
+	
+	Fix parenthesisation in a combined assign-and-check-error statement.
+
+<akpm@digeo.com>
+	[PATCH] efs typo fix
+	
+	It's using "||" instead of "|".  Makes slab go BUG.
+
+<akpm@digeo.com>
+	[PATCH] new eepro100 PDI ID
+	
+	From: Tom Alsberg <alsbergt@cs.huji.ac.il>
+	
+	Add support for a new eepro100 PCI ID.
+
+<trond.myklebust@fys.uio.no>
+	[PATCH] Fix rpc dentry list usage
+	
+	This fixes the problems with NFS that got triggered by the list
+	poisoning.
+	
+	The problem is that whereas using the dentry->d_hash list for private
+	purposes was previously harmless, it is not allowed with the RCU lists,
+	because we depend on the unhashed node continuing to point back to the
+	original list.
+	
+	So keep a small vector of dentries around instead of using the d_hash
+	list to keep track of them.
+
+<davem@nuts.ninka.net>
+	[SPARC64]: Update sys32_settimeofday for do_settimeofday() changes.
+
+<rmk@flint.arm.linux.org.uk>
+	[PCMCIA] Prevent class_device related oops.
+	
+	Although no such oops has been reported, removing a socket driver
+	while a file under /sysfs/class/pcmcia_socket/pcmcia_socket* is
+	held open by user space could potentially cause an oops.
+	
+	Plug this by preventing pcmcia_unregister_socket from returning
+	until all references by sysfs to the pcmcia socket have been dropped.
+
+<willy@debian.org>
+	[NET]: Kill extraneous CONFIG_{NET,KMOD} in net/socket.c
+
+<davem@nuts.ninka.net>
+	[SPARC64]: Update defconfig.
+
+<hch@lst.de>
+	[NET]: Move iph5526_probe to initcalls.
+
+<bgerst@didntduck.org>
+	[PATCH] small cleanup for powernow-k7
+	
+	Use local_irq_[disable|enable]() instead of hand-coded asm.
+
+<stelian@popies.net>
+	[PATCH] sonypi driver update
+	
+	* fix a hang problem when loading the driver on (at least) a
+	  PCG-FX105k. Thanks to Jozef Kruger for reporting the problem
+	  and testing different versions of this fix.
+	
+	* fix a .text.exit problem in the sonypi driver related to the
+	  recent PM changes (thanks to Adrian Bunk for the patch).
+	
+	* fix the irq handling reports (make sonypi always report IRQ_HANDLED)
+	  because there *are* events belonging to the sonypi device which
+	  are not (yet) recognized by the driver and we don't want those
+	  to pollute the logs...
+	
+	* test if the ACPI subsystem is not disabled before trying to
+	  use its ec_read/ec_write methods.
+	
+	* fix the hangs when enabling bluetooth (thanks to Daniel K. for
+	  the patch).
+	
+	* other miscellaneous small fixes.
+
+<stelian@popies.net>
+	[PATCH] meye driver update
+	
+	* replace the pci_alloc_consistent calls with dma_alloc_coherent
+	  because we want to do the allocations at GFP_KERNEL priority and
+	  not GFP_ATOMIC because we request quite a bit of memory and the
+	  allocation fails quite frequently.
+	
+	  It would be better to have a pci_alloc_consistent with an extra
+	  parameter (priority) but since we haven't, and the meye driver is
+	  supposed to work only on ix86 platforms we can safely do the
+	  change.
+	
+	* fix the DMA engine stop request. The hard freezes encountered
+	  when using this driver and repeatedly opening/closing the device
+	  have been tracked down to this particular piece of code. The new
+	  version seems to work way better, I haven't had a single freeze
+	  since the change.
+	
+	* fix the irq handler prototype (irqreturn_t changes).
+
+<lethal@linux-sh.org>
+	[PATCH] Fix PCI hotplug path for SH
+	
+	drivers/hotplug/Kconfig moved to drivers/pci/hotplug/Kconfig.
+	
+	This updates arch/sh/Kconfig respectively.
+
+<lethal@linux-sh.org>
+	[PATCH] Add mach-type generation for SH
+	
+	This adds the missing arch/sh/tools directory, which includes mach-type
+	generation scripts for building include/asm-sh/machtypes.h.
+
+<acme@conectiva.com.br>
+	o list.h: implement hlist_for_each_entry_{from,continue}
+
+<ak@colin.muc.de>
+	[PATCH] Fix over-alignment problem on x86-64
+	
+	Thanks to Jan Hubicka who suggested this fix.
+	
+	The problem seems to be that gcc generates a 32byte alignment for static
+	objects > 32bytes.  This causes gas to set a high alignment on the
+	section, which causes the uneven (not multiple of sizeof(struct
+	kernel_param)) section size.  The pointer division with a base not being
+	a multiple of sizeof(*ptr) then causes the invalid result.
+	
+	This just forces a small alignment, which makes the section end come out
+	with the correct alignment.
+	
+	The only mystery left is why ld chose a 16 byte padding instead of
+	32byte.
+
+<zippel@linux-m68k.org>
+	[PATCH] Clean up kernel parameter array declaration
+	
+	Declare the parameter array as an array, rather than a single entry.
+	
+	This doesn't matter for code generation, but may be less likely to cause
+	problems down the line, since we're telling gcc more about the real
+	situation.
+
+<acme@conectiva.com.br>
+	o net: use hlist for struct sock hash lists
+
+<Samuel.Thibault@ens-lyon.fr>
+	[PATCH] Fix ma600.c compile
+	
+	At least gcc 3.3 complains about this incorrect token pasting thing in
+	the ASSERT macro of drivers/net/irda/ma600.c
+
+<acme@conectiva.com.br>
+	o tcp: convert struct tcp_bind_bucket to hlist
+
+<acme@conectiva.com.br>
+	o tcp: convert tcp_tw_bucket->tw_death* to hlist
+
+<willy@debian.org>
+	[PATCH] parisc arch update
+	
+	This update covers a lot of changes to arch/parisc and parisc-specific
+	drivers.
+	
+	 - irq_return_t changes
+	 - more work on the module loader (James Bottomley)
+	 - rewrite of led.c by Helge Deller
+	 - many miscellaneous updates
+
+<acme@conectiva.com.br>
+	o af_unix: remove typedef unix_socket, use plain struct sock
+
+<mdharm-usb@one-eyed-alien.net>
+	[PATCH] unusual_devs fixups
+	
+	This moves the initialization of the struct scsi_device fields
+	use_10_for_ms and use_10_for_rw into a central place.  This allows the
+	host's slave_configure() function to change them (with effect).  This
+	also collapses two identical sections of code into a single one.
+	
+	This is needed by usb-storage, so we can resolve some Babble problems,
+	some device-crashing problems, and remove a great deal of troublesome
+	mode-sense-translation code.
+
+<ak@suse.de>
+	[PATCH] Fix typo in timing changes + support for x86-64
+	
+	The us->ns conversion must be in the "tv" if branch of settimeofday,
+	not in the "tz" if.
+	
+	Also make it compile for x86-64 again. The 32bit emulation was forgotten
+	in the conversion.
+
+<ak@suse.de>
+	[PATCH] Fix compilation of 32bit ioctl emulation on x86-64
+	
+	The NCP ioctls are declared unconditionally in compat_ioctl now, which needs this
+	include to still compile on x86-64.
+
+<gerg@snapgear.com>
+	[PATCH] DragonEngine board name change
+	
+	Minor board name change in m68knommu setup,
+	"Dragon Engine" -> "DragonEngine".
+
+<gerg@snapgear.com>
+	[PATCH] conditional ROMfs copy for M5206eLITE board
+	
+	Make the ROMfs copy in the startup code for Motorola/M5206eLITE board
+	conditional on actually using a ROMfs setup.
+
+<gerg@snapgear.com>
+	[PATCH] remove 68328 arch specific irq init
+	
+	We no longer use sub-architecture speicific interrupt setups
+	in the m68knommu branch. Remove obsolete call to 68328 irq
+	init.
+
+<gerg@snapgear.com>
+	[PATCH] ColdFire serial driver fixups
+	
+	A number of small ColdFire serial driver fixups:
+	 - use correct irq handler return type (irqreturn_t)
+	 - add support for mark and space parity
+	 - some casting to keep types clean (and remove compile warnings)
+	 - fix missing ";" after local tty_driver struct definition
+
+<rusty@rustcorp.com.au>
+	[PATCH] clean up overzealous deprecated warning
+	
+	1) We export __check_region, so making it __deprecated gives a spurious
+	   warning in kernel/ksyms.c.
+	2) Other warnings refer to __check_region rather than check_region,
+	   which has confused some people.
+	
+	Make check_region an inline, not a macro, and deprecate *that*.
+
+<davem@nuts.ninka.net>
+	[SPARC64]: Merge sysinfo32 corrections from ppc64 port.
+
+<vnuorval@tcs.hut.fi>
+	[IPV6]: Fix refcount leaks in udpv6_connect().
+
+<kuznet@ms2.inr.ac.ru>
+	[IPV4]: More sane rtcache behavior.
+	1) More reasonable ip_rt_gc_min_interval default
+	2) Trim less valuable entries in hash chain during
+	   rt_intern_hash when such chains grow too long.
+
+<ak@suse.de>
+	[PATCH] Minor 32bit compatibility fix for /dev/rtc
+	
+	Handle both unsigned int and unsigned long in rtc_read. This helps
+	when running 32bit userland under an 64bit kernel.
+
+<ak@suse.de>
+	[PATCH] x86-64 merge
+	
+	Lots of small fixes and I merged the PCI subsystem with i386 again
+	because it was mostly identical. This makes the patch quite big,
+	but it only removes files.
+	
+	 - Merge PCI subsystem with i386.
+	
+	   This changes the initialization order of PCI and IOMMU slightly.  It
+	   didn't see any problems yet, but it could cause some in theory.  It
+	   re-adds some code that used to be removed, but it's only small stuff
+	   and it should hopefully cause less mainteance overhead longer term.
+	
+	 - Fix warnings
+	 - Merge cpuid.c with i386.c
+	 - Sync msr.c with i386
+	 - Consolidate externs in asm/proto.h
+	 - sysfs/sysdev fixes for apic/nmi (Bryan O'Sullivan)
+	 - Fix /proc/kcore access
+	 - Add real kern_addr_valid (used for above).
+	 - Support consistent dma_mask in IOMMU
+	 - Fix double print of AMD for CPU model.
+	 - Remove unused wakeup.S file.
+	 - Remove obsolete CONFIG_SIMNOW ifdef.
+	 - Support ptrace access for 32bit vsyscalls.
+	 - Fix warnings in 32bit boot code compilation.
+
+<robert.olsson@data.slu.se>
+	[IPV4]: In rt_intern_hash, reinit all state vars on branch to "restart".
+
+<romieu@fr.zoreil.com>
+	[PATCH] resync of dscc4 driver with 2.4.x version
+	
+	- 2.4 resync
+	  - incorrect size usage in pci_unmap_single();
+	  - s/ETH_P_IP/hdlc_type_trans()/
+	- inccorect debug message in dscc4_clock_setting();
+	- split of TO_STATE() into TO_STATE_{RX/TX} for documentation purpose.
+
+<ink@jurassic.park.msu.ru>
+	[PATCH] alpha osf_settimeofday fix
+	
+	Propagate do_settimeofday() change into osf_settimeofday().
+	
+	Ivan.
+
+<shemminger@osdl.org>
+	[NET]: Fix spurious kfree and missed initialization in TUN driver.
+
+<torvalds@home.transmeta.com>
+	Linux 2.5.72
+

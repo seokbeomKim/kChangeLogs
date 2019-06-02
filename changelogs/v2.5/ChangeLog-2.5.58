@@ -1,0 +1,1029 @@
+
+Summary of changes from v2.5.57 to v2.5.58
+============================================
+
+<dougg@torque.net>
+	SG_IO ioctl in block layer
+	
+	The attachment modifies the SG_IO ioctl that is in
+	the block layer to:
+	   - convey the SCSI status value back via the sg_io_hdr
+	     structure
+	   - in the event of CHECK CONDITION, convey the sense
+	     buffer back via the sg_io_hdr structure
+	   - set "output" fields in sg_io_hdr structure to sane
+	     values
+	   - modify the errno behaviour to be more like the
+	     SCSI generic driver's SG_IO ioctl
+	
+	This patch was presented around lk 2.5.51 but fell between
+	the cracks. The only modification is to take account of
+	the changes to scsi/scsi_lib.c since then.
+
+<patmans@us.ibm.com>
+	[PATCH] add scsi_level to scsi_device sysfs attributes
+	
+	Hi -
+	
+	This simple patch adds scsi_level to the scsi_device sysfs attributes,
+	mainly for use with Doug Gilbert's lsscsi program.
+
+<wrlk@riede.org>
+	Change signal used to exit scsi error handlers
+	
+	I earlier reported, that the error handler for ide-scsi exits prematurely if modprobed
+	from rc.sysinit. I put in some debug prints to apprehend the culprit responsible for
+	sending the SIGHUP signal that causes the exit.
+	
+	This is what my log captured:
+	
+	Jan  1 12:20:13 fallguy kernel: Process 223 [modprobe] starting scsi error handler
+	Jan  1 12:20:13 fallguy kernel: Wake up parent of scsi_eh_2, pid 224
+	Jan  1 12:20:13 fallguy kernel: Signals pending for scsi_eh_2: 00000000 00000000
+	Jan  1 12:20:13 fallguy kernel: Error handler scsi_eh_2 sleeping
+	Jan  1 12:20:13 fallguy kernel: scsi2 : SCSI host adapter emulation for IDE ATAPI devices
+	[detected devices skipped]
+	Jan  1 12:20:14 fallguy kernel: Signal 15 sent from 181 [rc.sysinit] to 182 [getkey]
+	Jan  1 12:20:14 fallguy kernel: Signal 1 sent from 22 [init] to 22 [init]
+	Jan  1 12:20:14 fallguy kernel: Signal 18 sent from 22 [init] to 22 [init]
+	Jan  1 12:20:14 fallguy kernel: Signal 1 sent from 22 [init] to 22 [init]
+	Jan  1 12:20:14 fallguy kernel: Signal 1 sent from 22 [init] to 24 [initlog]
+	Jan  1 12:20:14 fallguy kernel: Signal 1 sent from 22 [init] to 78 [khubd]
+	Jan  1 12:20:14 fallguy kernel: Signal 1 sent from 22 [init] to 224 [scsi_eh_2]
+	Jan  1 12:20:14 fallguy kernel: Signals pending for scsi_eh_2: 00000001 00000000
+	Jan  1 12:20:14 fallguy kernel: Error handler scsi_eh_2 exiting
+	
+	Here is a snapshot of some processes made during rc.sysinit:
+	
+	  F   UID   PID  PPID PRI  NI   VSZ  RSS WCHAN  STAT TTY        TIME COMMAND
+	100     0     1     0  15   0  1332  420 schedu S    ?          0:05 init
+	...
+	040     0    22     1  16   0  1332  388 wait4  S    tty1       0:00 init
+	000     0    23    22  15   0  4116 1316 wait4  S    tty1       0:00 /bin/bash /
+	040     0    24    23  16   0  2160 1364 schedu S    tty1       0:00 /sbin/initl
+	...
+	
+	Init must have forked to exec bash to exec rc.sysinit which then gets re-executed
+	through initlog. When rc.sysinit ends, the last thing it does is send that TERM
+	signal from sub-process 181 to getkey (process 182) -- the 'Signal 15 ...' line 
+	above.
+	
+	As the forked init (process 22) exits, it sends a flurry of signals to all surviving
+	processes created from it. That looks like standard "if I am to die I need to take
+	all my offspring down with me" behavior -- do you agree?
+	
+	Since we want error handlers to survive, IMHO that means that the choice of signal
+	for error handler exit is unfortunate. The source of scsi_error suggests SIGPWR
+	might be a worthy alternative. I think that is true. From inspecting init source,
+	it is not capable of sending SIGPWR. SIGPWR should never be sent by dying processes
+	(its sole use should be from a power daemon _to_ init to shut the system down when
+	the juice is running out).
+	
+	So I suggest the following changes to hosts.c and scsi_error.c:
+
+<greg@kroah.com>
+	[PATCH] USB: fix error message when loading the digi_acceleport driver.
+
+<greg@kroah.com>
+	[PATCH] USB: Fix problem of sending the wrong device_id to the usb serial driver on probe()
+
+<greg@kroah.com>
+	[PATCH] USB: visor driver, add the proper structure for the palm request 4 command
+
+<greg@kroah.com>
+	[PATCH] USB visor: Split up the initialization command logic to handle different device types better.
+
+<jejb@mulgrave.(none)>
+	remove SCSI's use of signals for killing the error handler thread
+	
+	- change the eh_notify semaphore to a completion
+	- add complete_and_exit() to the thread
+	- use a host structure flag to signal thread death instead of the signal
+
+<jejb@mulgrave.(none)>
+	[SCSI] add missing eh_thread kill instruction
+
+<hch@lst.de>
+	[PATCH] allow NULL dev argument to scsi_add_host
+	
+	We need scsi_add_host sometimes without having a struct device (i.e.
+	eisa/vlb drivers, ieee1394 storage), so handle that case gracefully.
+
+<baldrick@wanadoo.fr>
+	[PATCH] get rid of speedtouch kernel thread
+	
+	  speedtouch: remove the kernel thread and all the junk that went with it.
+	  The work it did can all be done in interrupt context, so use a tasklet instead.
+
+<baldrick@wanadoo.fr>
+	[PATCH] eliminate global minor array in speedtouch
+	
+	This is the mysterious masked patch I just sent, but with a name this time.
+	
+	  speedtouch: get rid of the global minor_data array.  This means that there is now no
+	  limit to the number of devices that can be handled by the driver.
+
+<baldrick@wanadoo.fr>
+	[PATCH] remove redundant casts in speedtouch
+	
+	  speedtouch: remove some redundant casts.
+
+<greg@kroah.com>
+	[PATCH] USB bluetty: fix incorrect url in help text.
+
+<greg@kroah.com>
+	[PATCH] USB: usb-skeleton MINOR_BASE change
+	
+	Mirrors a change made in the 2.4 version of the driver by Randy Dunlap.
+
+<baldrick@wanadoo.fr>
+	[PATCH] remove duplicate spinlocks from speedtouch
+	
+	  speedtouch: struct sk_buff_head has a spinlock built in, so no need for our own.
+
+<oliver@oenone.homelinux.org>
+	[PATCH] USB midi fixes
+	
+	    - correct write error path
+	    - use GFP_ATOMIC in interrupt
+
+<greg@kroah.com>
+	[PATCH] USB midi: fix typo in previous patch
+
+<oliver@oenone.homelinux.org>
+	[PATCH] USB audio: using GFP_KERNEL with a spinlock held
+	
+	 - with a spinlock held GFP_ATOMIC must be used
+
+<oliver@oenone.homelinux.org>
+	[PATCH] USB xpad: fix URB leak in open error path
+	
+	 - fix error path in open
+
+<cobra@compuserve.com>
+	[PATCH] Trivial USB doc patch
+	
+	  David Brownell suggested I forward this to you.  I ran across it while
+	trying to setup some USB debug info...
+
+<mdharm-usb@one-eyed-alien.net>
+	[PATCH] USB storage: clean up debugging
+	
+	This patch makes the debug system only print out the valid bytes of a
+	command.  Greg, please apply.
+	
+	Andries suggested this... while some would think that seeing the extra
+	bytes might be good, it is kinda noisy.
+
+<mochel@osdl.org>
+	sysfs: return -EFAULT if copy_{to,from}_user() doesn't copy all bytes. 
+	
+	...instead of returning the error value (which is number of bytes remaining).
+
+<mochel@osdl.org>
+	sysfs: restore count parameter to struct sysfs_ops::store().
+	
+	- Fixup subsys_sysfs_ops along the way.
+
+<jejb@raven.il.steeleye.com>
+	Update the generic DMA API to take GFP_ flags on allocation
+	
+	dma_alloc_[non]coherent now takes the GFP_ flags as the last argument.
+	The flags passed in may not interfere with the memory zone.
+
+<jejb@raven.il.steeleye.com>
+	Update x86 DMA API implementation to take GFP_ flags
+
+<jejb@raven.il.steeleye.com>
+	Update arm implementation of DMA API to include GFP_ flags
+
+<jejb@raven.il.steeleye.com>
+	update drivers using dma_alloc_[non]coherent for GFP_ flags
+
+<mochel@osdl.org>
+	sysfs: reinstate count parameter for sysfs_ops.store() methods.
+	
+	- Fixup bus, driver, and class methods.
+
+<mochel@osdl.org>
+	sysfs: reinstate count parameter to sysfs_ops.store() methods.
+	
+	- Fixup struct device_attribute.
+	- Fix the default device attributes.
+
+<mochel@osdl.org>
+	sysfs: reinstate count parameter for PNP store() methods.
+
+<mochel@osdl.org>
+	sysfs: fixup SCSI sysfs files
+	
+	- Reinstate count parameter for store() methods.
+	- Remove off parameter from st.c and osst.c sysfs methods.
+	- Remove count parameter from st.c and osst.c show() methods.
+
+<mochel@osdl.org>
+	sysfs: Fixup s390 sysfs files.
+	
+	- Remove count and off parameters from show() methods.
+	- Remove off parameter from store() methods.
+	
+	Note 1: These have not been tested, but should be obviously correct.
+	
+	Note 2: snprintf() was replaced with sprintf() where the filled buffer 
+	would obviously be < PAGE_SIZE. (like when printing single integer values).
+	In places where strings were printed, PAGE_SIZE is used as the max string
+	size.
+	
+
+<rth@kanga.twiddle.net>
+	[MODULES] Centralize undefined symbol checks; handle undef weak.
+
+<mochel@osdl.org>
+	sysfs: Fixup MCA sysfs files.
+	
+	- Remove count and off parameters from show() methods.
+	- Remove manual handling of reading from an offset, since the sysfs core
+	  handles that now. 
+	- Remove temp. buffer. 
+
+<mochel@osdl.org>
+	sysfs: Fixup NUMA sysfs file.
+	
+	- Remove count and off parameters from per-node meminfo show() method.
+
+<perex@suse.cz>
+	PnP update
+	  - ISA PnP - removed isapnp_card_protocol reference
+	  - NE1000/2000 - fixed exit sequence and bugs in PnP code
+	  - aironet4500 - fixed exit sequence
+	  - ISDN - hisax_fcpcipnp - fixed compilation
+	  - OSS sound drivers - ad1848, cs4232 - updated to latest PnP code
+
+<greg@kroah.com>
+	Cset exclude: greg@kroah.com|ChangeSet|20030112082136|46568
+
+<jochen@scram.de>
+	[PATCH] NFSv2 READDIR encoding fix
+	
+	When mounting a Linux partition with NFSv2, READDIR fills in the last
+	cookie without properly byte-swapping it.  The following READDIR will
+	fail, so the NFS client sees a truncated directory.
+	
+	Fix it thus.
+
+<Andries.Brouwer@cwi.nl>
+	[PATCH] sd.c
+	
+	The below does two things:
+	(i) do not try to spin up a CF reader without media
+	(ii) be careful when asking for the cache parameters mode page
+	
+	[do not ask for this page when no media are present:
+	it is meaningless, and some devices react badly if we do;
+	check the reply so that we do not read past the end of the reply;
+	first give a small transport length - some USB devices are unhappy
+	if we ask for more than they provide]
+	
+	Andries
+
+<cminyard@mvista.com>
+	[PATCH] IPMI (Intelligent Platform Management Interface) driver
+
+<linux@brodo.de>
+	[PATCH] cpufreq: add sysfs interface
+	
+	This patch adds a sysfs interface to the cpufreq core, and marks the
+	previous /proc/cpufreq interface as deprecated.
+	
+	As in drivers/base/cpu.c a "CPU driver" is registered, cpufreq acts as
+	"interface" to this, offering the following files for each CPU
+	(in /system/devices/sys/cpu.../) where CPUfreq support is present
+	
+	cpuinfo_min_freq (ro)	- minimum frequency (in kHz) the CPU supports
+	cpuinfo_max_freq (ro)	- maximum frequency (in kHz) the CPU supports
+	scaling_min_freq (rw)	- minimum frequency (in kHz) cpufreq may scale
+				     the CPU core to
+	scaling_max_freq (rw)	- maximum frequency (in kHz) cpufreq may scale
+				     the CPU core to
+	scaling_governor (rw)	- governor == "A feedback device on a machine
+				      or engine that is used to provide
+				      automatic control, as of speed,
+				      pressure, or temperature" [1, as noted
+				      by David Kimdon]. Decides what frequency
+				      is used. Currently, only "performance"
+				      and "powersave" are supported, more may
+				      be added later.
+	
+	(In future, a file scaling_driver (ro) which shows what CPUfreq driver
+	is used (arm-sa1100,  gx-suspmod, speedstep, longrun, powernow-k6,
+	...) might be added, and this driver will be allowed to add files
+	scaling_driver_* for driver-specific settings like "prefer fast FSB".
+	And scaling_governor_* files might offer settings for the governor.)
+	
+	To implement this sysfs interface, the driver model "interface" code
+	is used. Unfortunately, it has a non-trivial locking bug in
+	drivers/base/intf.c: there's a down_write call for
+	cls->subsys.rwsem in add_intf(), which then calls add(), which may call
+	intf->add_device(), which may call interface_add_data(), which calls
+	kobject_register(), which calls kobject_add(), which then tries to
+	down_write cls->subsys.rwsem. Remember, that was already locked writable
+	in add_intf().
+	
+	Because of that, interface_add_data() is commented out; this means
+	that no link in /system/class/cpu/cpufreq is added, and that the
+	dev-removal code isn't called. This shouldn't be a problem yet,
+	though; as no cpufreq driver I know of is capable of CPU hotplugging.
+	
+	    Dominik
+	
+	[1] http://dictionary.reference.com/search?q=governor
+
+<linux@brodo.de>
+	[PATCH] cpufreq: add driver for NatSemi Geode / Cyrix MediaGX
+	
+	This patch by Hiroshi Miura adds a cpufreq driver for Cyrix MediaGX and
+	National Semiconductor Geode processors using "Suspend Modulation". It's
+	partly based on Zwane Mwaikambo's work.
+
+<willy@debian.org>
+	[PATCH] parisc updates for 2.5.56
+	
+	Updates for 2.5.56:
+	 - Integrate Stephen Rothwell's compat code
+	 - OProfile support for Randolph Chung
+	 - Makefile updates from Sam Ravnborg
+	 - Regenerated defconfig as requested by Rusty
+	 - Generic device model updates (James Bottomley)
+	 - And lots of general updating bugfixing, etc.
+
+<axboe@suse.de>
+	[PATCH] rbtree core for io scheduler
+	
+	This patch has a bunch of io scheduler goodies that are, by now, well
+	tested in -mm and by self and Nick Piggin. In order of interest:
+	
+	- Use rbtree data structure for sorting of requests. Even with the
+	  default queue lengths that are fairly short, this cuts a lot of run
+	  time for io scheduler intensive work loads. If we go to longer queue
+	  lengths, it very quickly becomes a necessity.
+	
+	- Add sysfs interface for the tunables. At the same time, finally kill
+	  the BLKELVGET/BLKELVSET completely. I made these return -ENOTTY in
+	  2.5.1, but there are left-overs around the kernel. This old interface
+	  was never any good, it was centered around just one io scheduler.
+	
+	The io scheduler core itself has received count less hours of tuning by
+	myself and Nick, should be in pretty good shape. Please apply.
+	
+	Andrew, I made some sysfs changes to the version from 2.5.56-mm1. It
+	didn't even compile without warnings (or work, for that matter), as the
+	sysfs store/show procedures needed updating. Hmm?
+
+<trond.myklebust@fys.uio.no>
+	[PATCH] Clean up RPC client credcache lookups [1/6]
+	
+	Clean up RPC client credcache lookups.
+	
+	    - Remove the limitation whereby the RPC client may only look up
+	      credentials for the current task.
+	
+	The ability to lookup arbitrary credentials is needed in order to allow
+	a user daemon to set the RPCSEC_GSS private information once it
+	has finished negotiating the RPCSEC user context with the server.
+
+<trond.myklebust@fys.uio.no>
+	[PATCH] XDR 'encode' phase move [2/6]
+	
+	The RPCSEC_GSS user context defines a 'sequence number' in the AUTH header
+	fields in order to provide protection against replay attacks. This
+	number needs to lie within a given 'window', and is required to be updated
+	even when retransmitting dropped requests.
+	
+	In order to allow this update to occur, move the XDR 'encode' phase
+	so that it is done immediately before writing the data to the socket.
+
+<trond.myklebust@fys.uio.no>
+	[PATCH] RPCSEC upcall mechanism [3/6]
+	
+	This patch provides the upcall mechanism that will be used for communicating
+	with the RPCSEC client user daemons.
+	
+	It sets up a 'ramfs' style filesystem (rpc_pipefs) that is populated with
+	named pipes. Each time the kernel initializes a new NFS, lockd, statd or
+	portmapper client, a directory automatically gets set up in this fs.
+	The directory is initially only populated with a single file "info"
+	that provides information such as the server IP address, the port number
+	and the RPC service for the benefit of the user daemon.
+	
+	When an RPCSEC_GSS mechanism needs to communicate with the daemon, it
+	is provided with a toolkit for setting up a named pipe in the same
+	directory. It can then perform upcalls/downcalls in order to talk to the
+	daemon in much the same way as is done by CODA.
+	
+	The NFSv4 client will also need to use this same filesystem to communicate
+	with its user daemon in order to do name-to-uid/name-from-uid and
+	name-to-gid/name-from-gid translation.
+
+<trond.myklebust@fys.uio.no>
+	[PATCH] RPCSEC_GSS authentication framework [4/6]
+	
+	This patch provides the basic framework for RPCSEC_GSS authentication
+	in the RPC client. The protocol is fully described in RFC-2203.
+	Sun has supported it in their commercial NFSv3 and v2 implementations
+	for quite some time, and it has been specified in RFC3010 as being
+	mandatory for NFSv4.
+	
+	  - Update the mount_data struct for NFSv2 and v3 in order to allow them
+	    to pass an RPCSEC_GSS security flavour. Compatibility with existing
+	    versions of the 'mount' program is ensured by requiring that RPCSEC
+	    support be enabled using the new flag NFS_MOUNT_SECFLAVOUR.
+	  - Provide secure authentication, and later data encryption on
+	    a per-user basis. A later patch will an provide an implementation
+	    of the Kerberos 5 security mechanism. SPKM and LIPKEY are still
+	    being planned.
+	  - Security context negotiation and initialization are all assumed
+	    to be done in userland. A later patch will provide the actual upcall
+	    mechanisms to allow for this.
+
+<trond.myklebust@fys.uio.no>
+	[PATCH] RPCSEC_GSS client upcall user [5/6]
+	
+	This patches the RPCSEC_GSS client to make use of the upcall mechanism
+	that was provided by patch [3/6].
+	
+	If an RPC task presents a non-uptodate credential to call_refresh(),
+	a user daemon is contacted by means of a dedicated rpc_pipefs pipe.
+	The daemon is then fed the uid for which it must establish a new RPCSEC
+	security context.
+	
+	While the daemon goes about its business, the RPC task is put to sleep
+	on a wait queue in order to allow the 'rpciod' process to service other
+	requests. If another task wants to use the same credential, it too will
+	be put to sleep once it reaches call_refresh(). A timeout mechanism
+	ensures that requests are retried (or that 'soft' mounts fail) if the
+	daemon crashes / is killed.
+	
+	Once the daemon has established the RPCSEC context, it writes the result
+	back to the pipe, causing the credential to be updated. Those RPC tasks
+	that were sleeping on the context are automatically woken up, and
+	their execution can proceed.
+
+<trond.myklebust@fys.uio.no>
+	[PATCH] minimal Kerberos V5 client support [6/6]
+	
+	The following patch provides minimal client support for the
+	(mandatory) Kerberos V5 authentication mechanism under RPCSEC_GSS.
+	See RFC2623 and RFC3010 for protocol details.
+	
+	Only authentication is supported for the moment. Data integrity and/or
+	data privacy (encryption) will be implemented at a later stage.
+
+<cobra@compuserve.com>
+	[PATCH] ohci/ehci debug updates for 2.5.56
+	
+	  These two files needed to be touched after the recent changes to
+	DRIVER_ATTR/driver_attribute structure members in 2.5.56.  Personally,
+	it doesn't look to me like the size parameter should be removed, as now
+	users will need to hardcode PAGE_SIZE into their functions, rather than
+	it being passed from the place of allocation.  But I'm not familiar with
+	the driverfs changes, so can't really say.
+	
+	These changes, or something similar, are needed to make ohci-dbg and
+	ehci-dbg work at all in 2.5.56.  ehci is untested, but compiles here.
+	I've tested the ohci changes and they appear to work.
+
+<mochel@osdl.org>
+	[PATCH] cpufreq: sysfs interface update
+	
+	This updates new cpufreq sysfs code to new rules.
+
+<mochel@osdl.org>
+	[PATCH] sysfs: Fixup deadline iosched sysfs files.
+	
+	This reinstates the count parameter to store() methods.
+
+<linux@brodo.de>
+	[PATCH] cpufreq: per-CPU initialization
+	
+	Allow for per-CPU initialization of CPUfreq. Therefore, it's not
+	necessary any longer to kmalloc the per-CPU policy struct. To use
+	this, cpufreq_driver->policy has to be set to NULL. Of course,
+	cpufreq_driver->init is needed then, which is the appropriate function
+	for CPU initialization. cpufreq_driver->exit is available for cleanup.
+	
+	All existing drivers continue to work without any changes, just for
+	clarity ->init and ->exit are set to NULL, and the names accordingly.
+
+<willy@debian.org>
+	[PATCH] More parisc updates
+	
+	Updates for drivers/parisc.  Mostly conversion to generic device model.
+	New hppb driver from Ryan Bradetich.
+
+<jejb@raven.il.steeleye.com>
+	generic/dma-mapping.h: remove BUG_ON flags not GFP_ATOMIC
+	
+	drivers should always check for a NULL return anyway, so the fact
+	that the pci_ API is GFP_ATOMIC shouldn't matter.
+
+<mochel@osdl.org>
+	[PATCH] fix cpufreq compilation
+	
+	This is needed to compile kernel/cpufreq.c if the legacy procfs interface
+	is not enabled in the latest BK tree.
+
+<cubic@miee.ru>
+	[PATCH] Fix AMD device ID table bug
+	
+	This fixes the wrong order of array(amd_ide_chips) that causes a BUG()
+	in 436 line with any conditions, because we use the wrong amd_config.
+
+<trini@kernel.crashing.org>
+	[PATCH] Don't ask about "Enhanced Real Time Clock Support" on some archs
+	
+	The following patch adds an explicit no list of arches who do not want
+	to have the "Enhanced Real Time Clock Support" RTC driver asked.  This
+	adds PPC32 (who for a long time had their own 'generic' RTC driver, and
+	then have adopted the genrtc driver) and PARISC (who have always used
+	the genrtc driver).  Per request of Peter Chubb, IA64 is on this list as
+	well.
+	
+	The problem is that on some archs there is no hope of this driver
+	working, and having it compiled into the kernel can cause many different
+	problems.  On the other hand, there are some arches for whom that driver
+	does work, on some platforms.  So having an explicit yes list would
+	result in some rather ugly statements.
+
+<rmk@arm.linux.org.uk>
+	[PATCH] use <asm/bug.h> for BUG() defines
+	
+	This patch moves BUG() and PAGE_BUG() from asm/page.h into asm/bug.h.
+	
+	We also fix up linux/dcache.h, which included asm/page.h for the sole
+	purpose of getting the BUG() definition.
+	
+	Since linux/kernel.h and linux/smp.h make use of BUG(), asm/bug.h is
+	included there as well.
+	
+	In addition, linux/jbd.h did not contain a clear path with which to
+	obtain the archtecture BUG() definition, but did contain its own
+	definition.
+
+<johnstul@us.ibm.com>
+	[PATCH] linux-2.5.57_timer-none_A0.patch
+	
+	This creates an empty timer_opt structure (timer_none) which is then
+	used as a default initializer to the timer pointer.  This lets us avoid
+	having to check before dereferencing the timer in future code.
+
+<johnstul@us.ibm.com>
+	[PATCH] linux-2.5.57_delay-cleanup_A1.patch
+	
+	This cleans up the delay code by moving the timer-specific
+	implementations into the timer_ops struct.  Thus, rather then doing:
+	
+		if(x86_delay_tsc)
+			__rdtsc_delay(loops);
+		else if(x86_delay_cyclone)
+			__cyclone_delay(loops);
+		else if(whatever....
+	
+	we just simply do:
+	
+		timer->delay(loops);
+	
+	Making it much easier to accommodate alternate time sources.
+
+<jejb@raven.il.steeleye.com>
+	Add GFP_ flags to parisc DMA API implementation
+
+<rusty@rustcorp.com.au>
+	[PATCH] namespace pollution in skfddi driver
+	
+	From:  Arnd Bergmann <arnd@bergmann-dalldorf.de>
+	
+	  The skfp driver has a global function named 'set_int'. This makes
+	  it static to avoid namespace pollution.
+
+<rusty@rustcorp.com.au>
+	[PATCH] move snd_legacy_find_free_ioport to opti92x-ad1848.c
+	
+	From:  Marcus Alanen <maalanen@ra.abo.fi>
+	
+	  Moves the snd_legacy_find_free_ioport definition to opti92x-ad1848.c,
+	  since it is the only user.
+
+<rusty@rustcorp.com.au>
+	[PATCH] Module state and address in /proc/modules.
+	
+	The address allows oprofile and ksymoops to work again.  The state is
+	simply informative.
+
+<rusty@rustcorp.com.au>
+	[PATCH] namespace pollution in eth bridge driver
+	
+	From:  Arnd Bergmann <arnd@bergmann-dalldorf.de>
+	
+	  A global variable should not be called 'ioctl_mutex',
+	  this makes it static.
+
+<rusty@rustcorp.com.au>
+	[PATCH] namespace pollution in HDLC driver
+	
+	From:  Arnd Bergmann <arnd@bergmann-dalldorf.de>
+	
+	  A global variable should not be called 'debuglevel'. It can
+	  be made static since it is only used in one file.
+
+<rusty@rustcorp.com.au>
+	[PATCH] Remove compile warning from drivers_ide_pci_cs5520.c
+	
+	From:  Bob Miller <rem@osdl.org>
+	
+	  The function, cs5520_tune_chipset() is declared to return an int.
+	  Added a return statement instead of just falling of off the bottom.
+
+<rusty@rustcorp.com.au>
+	[PATCH] remove check_region from drivers_atm_ambassador.c
+	
+	From:  william stinson <wstinson@wanadoo.fr>
+	
+	  this proposed patch for drivers/atm/ambassador.c atm driver for Linux
+	  removes one call to check_region using request_region instead
+	
+	  I don't have this hardware so patch is not tested.  This patch removes
+	  all references to check_region in this driver.
+	
+	  This is patch number 30 in a series of check_region patches I am doing as
+	   part of the kernel janitors project.
+
+<rusty@rustcorp.com.au>
+	[PATCH] cli_sti in drivers_net_hamradio_bpqether.c
+	
+	From:  Chris Wilson <chris@qwirx.com>
+	
+	  As part of the Linux Kernel Janitors project, I would like to submit my
+	  patch for bpqether.c.
+	
+	  The document Documentation/cli-sti-removal.txt says that cli() should no
+	  longer be used to disable interrupts. This patch removes all references to
+	  cli() and {save,restore}_flags.
+	
+	  - added a static spinlock to protect bpq_devices
+	  - changed cli/sti and {save,restore}_flags to taking the spinlock and
+	    disabling interrupts with spin_lock_irqsave
+	  - included my previous patch for proc_net_create, but as a separate hunk,
+	    so if you've already applied then just ignore the rejected hunk.
+	
+	  I have verified that the patched driver compiles without warnings, but
+	  since I don't have the hardware I can't test it. Please treat with
+	  caution.
+
+<rusty@rustcorp.com.au>
+	[PATCH] duplicate extern char _stext
+	
+	From:  Geert Uytterhoeven <geert@linux-m68k.org>
+	
+	  Kill duplicate extern char _stext (already declared globally 14 lines before)
+
+<rusty@rustcorp.com.au>
+	[PATCH] namespace pollution in Dell SMM driver
+	
+	From:  Arnd Bergmann <arnd@bergmann-dalldorf.de>
+	
+	  The i8k driver has global variables named 'force' and 'power_status'
+	  that pollute the name space. This makes them static.
+
+<rusty@rustcorp.com.au>
+	[PATCH] namespace pollution in OSS_pas2 driver
+	
+	From:  Arnd Bergmann <arnd@bergmann-dalldorf.de>
+	
+	  The pas2 driver has a global variable named 'lock', which
+	  pollutes the global namespace. This patch adds a pas_
+	  prefix. The same is done for 'translate_code'.
+
+<rusty@rustcorp.com.au>
+	[PATCH] remove check_region from drivers_ide_legacy_umc8672.c
+	
+	From:  william stinson <wstinson@wanadoo.fr>
+	
+	  this patch for drivers/ide/legacy/umc8672.c ide driver for Linux
+	  removes one call to check_region using request_region instead
+	
+	  I don't have this hardware so patch is not tested.  This patch removes
+	  all references to check_region in this driver.
+	
+	  This is patch number 31 in a series of check_region patches I am doing as
+	   part of the kernel janitors project.
+
+<rusty@rustcorp.com.au>
+	[PATCH] driver_char_Kconfig bug (fwd)
+	
+	From: Rusty Lynch <rusty@stinkycat.com>
+	
+	  VT support requires drivers/char/keyboard.c which makes function
+	  calls implemented in drivers/input/, so that attempting to set
+	  CONFIG_INPUT=m or just not setting CONFIG_INPUT will result in a
+	  compile error if CONFIG_VT is on.
+
+<rusty@rustcorp.com.au>
+	[PATCH] remove check_region from drivers_scsi_cpqfcTSinit.c
+	
+	From:  william stinson <wstinson@wanadoo.fr>
+	
+	  this proposed patch for drivers/scsi/cpqfcTSinit.c scsi driver for
+	  Linux removes two calls to check_region using request_region instead
+	
+	  This is patch number 28 in a series of check_region patches I am doing as
+	  part of the kernel janitors project.
+
+<rusty@rustcorp.com.au>
+	[PATCH] Janitoring drivers_acorn_scsi_fas216.c
+	
+	From:  Pablo Menichini <pablo@menichini.com.ar>
+
+<rusty@rustcorp.com.au>
+	[PATCH] Correct kmalloc check: drivers_scsi_dpt_i2o.c
+	
+	From:  Pablo Menichini <pablo@menichini.com.ar>
+
+<rusty@rustcorp.com.au>
+	[PATCH] Remove compile warning from drivers_ide_pci_sc1200.c
+	
+	From:  Bob Miller <rem@osdl.org>
+	
+	  Deleted an unused stack variable from sc1200_suspend.
+
+<rusty@rustcorp.com.au>
+	[PATCH] namespace pollution in 'backpack' paride
+	
+	From:  Arnd Bergmann <arnd@bergmann-dalldorf.de>
+	
+	  A global variable should not be called 'verbose'. It can
+	  be made static since it is only used in one file.
+
+<rusty@rustcorp.com.au>
+	[PATCH] namespace pollution in cosa driver
+	
+	From:  Arnd Bergmann <arnd@bergmann-dalldorf.de>
+	
+	  Variables named 'io' and 'dma' should not be global
+
+<rusty@rustcorp.com.au>
+	[PATCH] namespace pollution in sunrpc
+	
+	From:  Arnd Bergmann <arnd@bergmann-dalldorf.de>
+	
+	  The strdup function in sunrpc should not be global
+
+<rusty@rustcorp.com.au>
+	[PATCH] namespace pollution in reiserfs
+	
+	From:  Arnd Bergmann <arnd@bergmann-dalldorf.de>
+	
+	  balloc[] and tails[] are used only in the file they are defined
+	  in, so they should be made static
+
+<rusty@rustcorp.com.au>
+	[PATCH] namespace pollution in ide-probe.c
+	
+	From:  Arnd Bergmann <arnd@bergmann-dalldorf.de>
+	
+	  The function init_irq is only used in ide-probe.c, so it should
+	  better be static.
+
+<rusty@rustcorp.com.au>
+	[PATCH] namespace pollution in netfilter_ebt_log
+	
+	From:  Arnd Bergmann <arnd@bergmann-dalldorf.de>
+	
+	  A global variable should not be called 'log', this makes it static
+
+<rusty@rustcorp.com.au>
+	[PATCH] Remove compile warning from drivers_ide_pci_generic.h
+	
+	From:  Bob Miller <rem@osdl.org>
+	
+	  Added and #if/#endif pair to "remove" the un-used unknown_chipset declaration.
+	
+	  Comments in generic.c indicate that unknow_chipset this will be used again
+	  in the future.
+
+<rusty@rustcorp.com.au>
+	[PATCH] namespace pollution in irda qos
+	
+	From:  Arnd Bergmann <arnd@bergmann-dalldorf.de>
+	
+	  net/irda/qos.c exports some variables that are not used
+	  in any other file. This makes them static to avoid
+	  namespace conflicts
+
+<rusty@rustcorp.com.au>
+	[PATCH] namespace pollution in tr.c
+	
+	From:  Arnd Bergmann <arnd@bergmann-dalldorf.de>
+	
+	  The variable rif_table should be neither global nor initialized to 0.
+
+<rusty@rustcorp.com.au>
+	[PATCH] namespace pollution in opti92x driver
+	
+	From:  Arnd Bergmann <arnd@bergmann-dalldorf.de>
+	
+	  The opti92x driver has global variables named 'rates' and 'bits'
+	  that pollute the namespace. This makes them static.
+
+<rusty@rustcorp.com.au>
+	[PATCH] namespace pollution in procfs
+	
+	From:  Arnd Bergmann <arnd@bergmann-dalldorf.de>
+	
+	  de_get and de_put are used only in the file they are
+	  defined in, so make them static
+
+<rusty@rustcorp.com.au>
+	[PATCH] MODULE_FORCE_UNLOAD must depend on MODULE_UNLOAD (fwd)
+	
+	From:  Adrian Bunk <bunk@fs.tum.de>
+
+<rusty@rustcorp.com.au>
+	[PATCH] Handle kmalloc fails: drivers_net_fec.c
+	
+	From:  Pablo Menichini <pablo@menichini.com.ar>
+
+<rusty@rustcorp.com.au>
+	[PATCH] Drain local pages to make swsusp work
+	
+	From:  Pavel Machek <pavel@ucw.cz>
+	
+	  With local pages present, swsusp's accounting goes wrong and you get
+	  nice BUG(). This fixes it, please apply.
+
+<rusty@rustcorp.com.au>
+	[PATCH] namespace pollution in Maxi Radio driver
+	
+	From:  Arnd Bergmann <arnd@bergmann-dalldorf.de>
+	
+	  The maxiradio driver defines a few variables that should be
+	  made static.
+
+<rusty@rustcorp.com.au>
+	[PATCH] namespace pollution in irda_irias
+	
+	From:  Arnd Bergmann <arnd@bergmann-dalldorf.de>
+	
+	  A global variable should not be named 'objects' like in
+	  irias_object.c. This patch puts it into the right
+	  namespace.
+	  Also, strndup() is made static.
+
+<rusty@rustcorp.com.au>
+	[PATCH] Memory leak in drivers_net_rruner.c
+	
+	From:  Pablo Menichini <pablo@menichini.com.ar>
+
+<rusty@rustcorp.com.au>
+	[PATCH] remove check_region from sound_oss_awe_wave.c
+	
+	From:  william stinson <wstinson@wanadoo.fr>
+	
+	  this patch for sound/oss/awe_wave.c sound driver for Linux removes
+	  three calls to check_region using request_region instead
+	
+	  This is patch number 33 in a series of check_region patches I am doing as
+	  part of the kernel janitors project.
+
+<rusty@rustcorp.com.au>
+	[PATCH] Handle kmalloc fails: drivers_isdn_i4l_isdn_ppp_ccp.c
+	
+	From:  Pablo Menichini <pablo@menichini.com.ar>
+
+<rusty@rustcorp.com.au>
+	[PATCH] namespace pollution in korg 1212 driver
+	
+	From:  Arnd Bergmann <arnd@bergmann-dalldorf.de>
+	
+	  The korg1212 driver has a global variable named 'rc' that pollutes
+	  the namespace. This makes it static.
+
+<gerg@snapgear.com>
+	[PATCH] use C99 initializers in m68knommu setup.c
+
+<gerg@snapgear.com>
+	[PATCH] add missing do_coredump() arg to m68knommu arch signal.c
+	
+	This patch adds the missing exit code argument to the do_coredump() call
+	in m68knommu arch signal.c.
+
+<gerg@snapgear.com>
+	[PATCH] use _etext in 68EZ328 ucsimm target start code
+	
+	This patch switches to using the _etext linker symbol instead of
+	__data_rom_start for the ucsimm 68EZ328 platform. I intend to
+	deprecate the __data_rom_start linker symbol in the future.
+
+<gerg@snapgear.com>
+	[PATCH] use _etext in 68VZ328 de2 target start code
+	
+	This patch switches to using the _etext linker symbol instead of
+	__data_rom_start for the ce2 68VZ328 platform. I intend to
+	deprecate the __data_rom_start linker symbol in the future.
+
+<gerg@snapgear.com>
+	[PATCH] use _etext in 68VZ328 ucdimm target start code
+	
+	This patch switches to using the _etext linker symbol instead of
+	__data_rom_start for the ucdimm 68VZ328 platform. I intend to
+	deprecate the __data_rom_start linker symbol in the future.
+
+<gerg@snapgear.com>
+	[PATCH] set default console baud rate in 68360serial.c
+	
+	This patch sets a default console baud rate in the 68360 serial
+	driver instead of just error'ing out if it is not set.
+
+<gerg@snapgear.com>
+	[PATCH] remove obsolete code from mcfserial.h
+	
+	This patch removes the old 2.0.x conditional code from the
+	mcfserial.h header.
+
+<gerg@snapgear.com>
+	[PATCH] add smp_read_barrier_depends() for m68knommu
+	
+	This patch adds a definition for smp_read_barrier_depends() for the
+	m68knommu architecture. This is now needed to compile net/ipv4/route.c.
+
+<gerg@snapgear.com>
+	[PATCH] remove obsolete code from comempci.c
+
+<gerg@snapgear.com>
+	[PATCH] combine all m68knommu arch linker scripts into one
+	
+	This pulls all of the m68knommu arch linker scripts into a single new
+	style linker script.  This patch specifically turns
+	arch/m68knommu/vmlinux.lds.S into a generic linker script that works
+	with all m68knommu targets.
+
+<venkatesh.pallipadi@intel.com>
+	[PATCH] Clustered APIC setup for >8 CPU systems
+	
+	Clustered APIC setup patch.  Needed to support generic systems with more
+	than 8 CPUs.
+	
+	Motivation:
+	
+	 The current APIC destination mode ("Flat Logical") used in linux kernel
+	 has an upper limit of 8 CPUs.  For more than 8 CPUs, either "Clustered
+	 Logical" or "Physical" mode has to be used.
+	
+	 The attached patch adds support such systems by organizing them into
+	 logical clusters, with each cluster having 4 CPUs.  This is activated by
+	 a new config option "Support for other sub-arch SMP systems with more
+	 than 8 CPUs", under Processor feature->Sub architecture.
+	
+	 The patch is made very simple and isolated, thanks to Martin J.
+	 Bligh's patchsets, which has moved all APIC related functions into
+	 sub-arch macros.  Has zero impact on standard systems.
+	
+	 This patch enables all 16 logical processors on a generic, non-quad
+	 based, system that we have here.  Also, by looking at SuSE source, I
+	 have also added a special switch, to specifically support Unisys
+	 (ES7000).  Just replacing #define SEQUENTIAL_APICID by CLUSTERED_APICID
+	 in the patch should make it work on ES7000(not tested).
+
+<zwane@holomorphy.com>
+	[PATCH] sound/oss/opl3sa2.c compile fix
+	
+	Fixes compile but card doesn't get detected, perhaps the id list?
+
+<miles@lsi.nec.co.jp>
+	[PATCH] Use `--unique=.gnu.linkonce.this_module' linker flag for modules on v850
+	
+	This prevents the linker from merging the .gnu.linkonce.this_module section
+	into the .text section, which is necessary for modules to load correctly.
+
+<miles@lsi.nec.co.jp>
+	[PATCH] Update v850 nb85e_uart serial driver to set baud min/max
+
+<miles@lsi.nec.co.jp>
+	[PATCH] Define smp_read_barrier_depends on v850
+
+<gerg@snapgear.com>
+	[PATCH] common m68knommu arch entry.S
+	
+	This patch is the first in a series that groups the common
+	m68knommu entry.S code into a common entry.S file (this is
+	instead of having several similar files in lower sub-architecture
+	directories). The whole idea is to reduce code duplication.
+
+<torvalds@home.transmeta.com>
+	reiserfs/hashes.c used to include <asm/page.h> in order to get the
+	definition of BUG().
+	
+	In the new (more logical) world order, that should be <asm/bug.h>
+
+<torvalds@home.transmeta.com>
+	Linux v2.5.58
+

@@ -1,0 +1,1036 @@
+
+	Release notes for v2.5.11
+
+
+
+Summary of changes from lia64-v2.5.10 to v2.5.11
+============================================
+
+<aia21@cam.ac.uk> (02/03/07 1.369.39.1)
+	Remove all traces of the old ntfs driver.
+
+<aia21@cam.ac.uk> (02/03/08 1.369.39.2)
+	Import changeset
+
+<aia21@cam.ac.uk> (02/03/09 1.369.39.3)
+	Integrate ntfs tng with kernel now that the old driver had been removed.
+
+<aia21@cam.ac.uk> (02/03/09 1.369.42.3)
+	Small cleanup.
+
+<aia21@cam.ac.uk> (02/03/09 1.369.42.4)
+	Minor cleanup.
+
+<aia21@cam.ac.uk> (02/03/13 1.369.60.2)
+	NTFS: Adapt to kill_sb() addition.
+
+<aia21@cam.ac.uk> (02/03/14 1.369.65.2)
+	Start TNG-0.0.9-WIP
+
+<aia21@cam.ac.uk> (02/03/17 1.369.1.115)
+	NTFS: Repeat some changes from tng-0.0.8 which somehow got lost on the way
+	from the CVS import into BitKeeper. In particular, use parent_ino() and
+	change run_list lock to read/write semaphore instead of a read/write
+	spin lock since we need to be able to sleep.
+
+<aia21@cam.ac.uk> (02/03/19 1.369.82.1)
+	end_buffer_read_index_async(): Implement proper handling for
+	initialized_size of data.
+
+<aia21@cam.ac.uk> (02/03/20 1.369.1.119)
+	load_attribute_list(): Lock run list while using it and take 
+	initialized size in consideration.
+	
+	Update defconfig files throughout kernel. Replacing CONFIG_NTFS_RW
+	with CONFIG_NTFS_DEBUG as the former no longer exists while the
+	latter now exists.
+
+<aia21@cam.ac.uk> (02/03/21 1.369.1.120)
+	- Fix memory leak in reading compressed data.
+	- Don't read the run list of file data and directory indexes in read_inode.
+	- Various cleanups.
+
+<aia21@cam.ac.uk> (02/03/22 1.369.1.121)
+	NTFS:
+	
+	- Rename, cleanup, and improve end_buffer_read_index_async, is now
+	end_buffer_read_mst_async.
+	
+	- Replace ntfs_dir_readpage by ntfs_mst_readpage which is a fusion of
+	ntfs_dir_readpage and mft.c::ntfs_mft_readpage with support for mapping
+	unmapped run lists within instead of calling ntfs_file_get_block.
+	
+	- Throw away ntfs_mft_readpage. This now becomes aops.c::ntfs_mst_readpage
+	merged together with aops.c::ntfs_dir_readpage.
+	
+	The effect of the above is that we have one readpage function less and that
+	this copes properly with the intricacies of initialized_size vs data_size vs
+	allocated size.
+	
+	- Various cleanups.
+
+<aia21@cam.ac.uk> (02/03/23 1.369.1.122)
+	Finish implementation of proper handling of allocated_size vs
+	initialized_size vs data_size (i.e. i_size) everywhere.
+	Now host of mftbmp address space mapping is set to the ntfs volume
+	so it can be retrieved in the async i/o completion handler.
+	Hopefully this will not cause problems. If it does need to use a fake inode.
+
+<aia21@cam.ac.uk> (02/03/25 1.369.1.123)
+	NTFS: Final tidyups of docs, a typo in a deprecated mount option and
+	version change to 2.0.0, removing the TNG from the name. We want to enter
+	the kernel now so no need for TNG in the name and the higher major version
+	number sets off the new driver clearly away from the old driver.
+
+<aia21@cam.ac.uk> (02/03/25 1.369.1.124)
+	NTFS: Fix to typos in the docs. Spell checkers are good for something after all. (-:
+
+<aia21@cam.ac.uk> (02/03/25 1.369.1.125)
+	NTFS:
+	Make all files executable by default, {u,f,d}mask mount options can be
+	used to take away executable bit if desired.
+	Also make default umask match the documentation (i.e. 0077).
+
+<aia21@cam.ac.uk> (02/03/25 1.369.1.126)
+	NTFS: Update version to 2.0.1 and update docs and changelog.
+
+<aia21@cam.ac.uk> (02/04/10 1.369.1.128)
+	NTFS: Change default fmask to 0177, small cleanups, update version to 2.0.2.
+
+<aia21@cam.ac.uk> (02/04/13 1.456.6.2)
+	NTFS: Change attrib.c::get_attr_search_ctx() to return the search context
+	directly instead of taking the address of a pointer. A return value
+	of NULL means the allocation failed. Updated all callers
+	appropriately.
+
+<kai@tp1.ruhr-uni-bochum.de> (02/04/14 1.456.10.4)
+	Add proper EXPORT_SYMBOL() to net/irda/ircomm/ircomm_core.c
+
+<aia21@cam.ac.uk> (02/04/15 1.489.3.2)
+	Typo fixes.
+
+<jsimmons@heisenberg.transvirtual.com> (02/04/16 1.532)
+	This is the new accel wrapper for the new api. It provides a bridge between the new api and the old. Eventually when all drivers are ported over to the new api this wrapper will become intergrated into fbcon.c itself.
+
+<jsimmons@heisenberg.transvirtual.com> (02/04/17 1.533)
+	I moved every framebuffer driver over to use the currcon in struct fb_info. This prevents clashes with global currcon when we have more than one framebuffer driver.
+
+<jsimmons@heisenberg.transvirtual.com> (02/04/17 1.534)
+	Added a macro to obtain the foreground color of the erase character. The new accel wrapper uses it.
+
+<jsimmons@heisenberg.transvirtual.com> (02/04/18 1.535)
+	Added a macro to obtain the foreground color of the erase character. The new accel wrapper uses it.
+
+<jsimmons@heisenberg.transvirtual.com> (02/04/18 1.536)
+	Moved all framebuffer drivers over to use set_colreg insid eof struct fb_info instead of passing around a funciton pointer. The old code was really brain dead. This will allow for enormous code reduction 
+
+<jsimmons@heisenberg.transvirtual.com> (02/04/18 1.537)
+	Moved screen_base from struct display to struct fb_info. The reason for this to eventually remove and even elimate struct display in every fbdev driver. 
+
+<jsimmons@heisenberg.transvirtual.com> (02/04/22 1.538)
+	With the use of currcon and the function pointer in struct fb_info we now have a generic do_install_cmap funciton. Nearly every driver had this function dulplicated. No more which now has led to good size code reduction. yeah!!!
+
+<jsimmons@heisenberg.transvirtual.com> (02/04/22 1.539)
+	Now that we have made the color map handling code more generic I have replaced alot of the xxxfb_set_cmap funcitons with the generic one in fbgen.c
+
+<kai@tp1.ruhr-uni-bochum.de> (02/04/22 1.531.12.1)
+	Make objects in $(export-objs) only depend on themselves
+	
+	Currently, if dependencies for one object file listed in $(export-objs)
+	change, we will rebuild all $(export-objs) files in the same subdirectory,
+	which may take a noticable amount of time and thus is annoying during
+	development, and, of course, unnecessary.
+	
+	The patch is originally from Russell King and has been tested in the ARM
+	kernel tree for a long time.
+
+<kanoj@vger.kernel.org> (02/04/23 1.531.14.1)
+	cachetlb.txt, locking, fork.c, mremap.c, mprotect.c, memory.c:
+	  Make sure that flush_tlb_range is called with PTL held.
+	  Also, make sure no new threads can start up in user mode
+	  while a tlb_gather_mmu is in progress.
+
+<greg@kroah.com> (02/04/23 1.531.15.1)
+	USB voyager driver
+	
+	changed the number of minor devices the braille voyager driver uses.
+
+<petkan@mastika.lnxw.com> (02/04/23 1.531.15.2)
+	[PATCH] SOHOware NUB110 addet to the support list
+	
+	USB pegasus driver
+	
+	  SOHOware NUB110 addet to the support list
+
+<aia21@cantab.net> (02/04/24 1.531.2.30)
+	NTFS: Various fixes and cleanups. Make it work with kernel 2.5.9.
+
+<aia21@cantab.net> (02/04/24 1.531.2.31)
+	NTFS: Release ntfs driver 2.0.2 and update documentation appropriately.
+
+<kai@tp1.ruhr-uni-bochum.de> (02/04/24 1.531.17.1)
+	Fix a typo in drivers/isdn/Config.in
+	
+	This one broke make xconfig ;-(
+
+<kai@tp1.ruhr-uni-bochum.de> (02/04/24 1.531.1.29)
+	Update drivers/isdn/capi/Config.in
+	
+	Don't ask question about CAPI support twice
+	
+	(Sebastian Droege)
+
+<kai@tp1.ruhr-uni-bochum.de> (02/04/24 1.531.18.2)
+	Cleanup aic7xxx build
+	
+	Forward port changes from 2.4.19-pre, originally by Keith Owens.
+	This driver used to build a module target called "aic7xxx_mod.o" and
+	introduced the MOD_TARGET variable to rename it to "aic7xxx.o" at
+	modules_install time.
+	    
+	Now, we just build "aic7xxx.o" directly, which becomes possible after
+	renaming aic7xxx.c to aic7xxx_core.c, as done in 2.4.19-pre.
+
+<kai@tp1.ruhr-uni-bochum.de> (02/04/24 1.531.18.3)
+	Remove the now unused MOD_TARGET hack
+
+<hannal@us.ibm.com> (02/04/24 1.531.18.5)
+	[PATCH] FastWalk Dcache
+	
+	Reduce cacheline bouncing when a dentry is in the cache.
+	
+	Specifically, the d_count reference counter is not incremented and
+	decremented for every dentry in a path during path walking if the dentry
+	is in the dcache.  Execcisve atomic inc/dec's are expensive on SMP
+	systems due to the cachline bouncing.
+
+<kai@tp1.ruhr-uni-bochum.de> (02/04/25 1.531.1.30)
+	Fix another typo in drivers/isdn/*/Config.in
+	
+	No idea why that didn't hit me during testing ;-(
+
+<kai@tp1.ruhr-uni-bochum.de> (02/04/25 1.531.1.31)
+	Small drivers/isdn/i4l/Makefile cleanup
+	
+	The ABC extensions are not in the official kernel, so remove references
+	to them.
+
+<david-b@pacbell.net> (02/04/25 1.531.15.3)
+	[PATCH] PATCH 2.5.10: set_bit() and friends now need a long paramater
+	
+	USB set_bit() and friends now need a long paramater
+	
+	Fixes the set_bit() warnings in the ehci and ohci driver
+
+<david-b@pacbell.net> (02/04/25 1.531.15.4)
+	[PATCH] PATCH 2.5.10 -- polling interval (hub + ...)
+	
+	This patch is the result of that discussion a short while back
+	to fix the "hub driver polls too quickly at high speed" bug.
+	
+	    - redefines "interval" of usb_fill_int_urb() to be what
+	      the endpoint descriptor returns, and transparently
+	      does the log-to-linear conversion if it's high speed
+	
+	    - (most of the patch by volume!!) moves declarations
+	      forward so testing dev->speed there will compile.
+	
+	No driver changes were needed -- most drivers pass the
+	endpoint bInterval value already, and those that don't are
+	not dealing with high speed device quirks.
+	
+	p.s. Includes an unrelated one-liner:  deletes export of
+	    usb_inc_dev_use() so it now shows up in kernel doc.
+	    Minor oversight in an earlier patch.
+
+<greg@kroah.com> (02/04/25 1.531.15.5)
+	added MODULE_LICENSE() to the auerswald USB driver.
+
+<kai@tp1.ruhr-uni-bochum.de> (02/04/25 1.531.22.1)
+	Rules.make cleanup
+	
+	Get rid of traces of the old-style ALL_MOBJS variable.
+	
+	This also fixes the following issue, which could cause a warning with
+	certain configs:
+	
+	Makefiles (legally) do:
+	
+	obj-$(CONFIG_SND_AD1848) += snd-pcm.o snd-timer.o snd.o
+	obj-$(CONFIG_SND_CS4231) += snd-pcm.o snd-timer.o snd.o snd-rawmidi.o
+	
+	so when the first option is set to y, the second to m, we have e.g.
+	snd-pcm.o on both $(obj-y) and $(obj-m). We correctly don't build
+	the modular version in this case.
+	
+	However, if snd-pcm.o was a multi-part object, we did automatically
+	generate a link rule for both the modular and the built-in version, 
+	which caused a warning - that's now fixed.
+
+<torvalds@penguin.transmeta.com> (02/04/25 1.531.18.6)
+	Clean up compiler warnings
+
+<dalecki@evision-ventures.com> (02/04/25 1.531.18.7)
+	[PATCH] 2.5.10 IDE 41
+	
+	 - Revoke the TCQ stuff. Well having it for some time showed just nicely what
+	   has to be done before it can be included cleanly. But it's just not ready
+	   yet.
+	
+	   For more explanations please simply track the usage of the special field of
+	   struct request - *both* in the generic request handling code and in overall
+	   driver code.
+
+<rddunlap@osdl.org> (02/04/25 1.531.18.8)
+	[PATCH] Update Randy Dunlap's CREDITS file entry
+	
+
+<hirofumi@mail.parknet.co.jp> (02/04/25 1.531.18.9)
+	[PATCH] Fix handling of wrong cluster chains (1/5)
+	
+	Currently fatfs disregards most wrong cluster chains, and only continues
+	processing. 
+	
+	This fixes it.  If a wrong cluster chain is detected, change filesystem
+	to the read only, and return the error code. 
+
+<hirofumi@mail.parknet.co.jp> (02/04/25 1.531.18.10)
+	[PATCH] Add validity check of first FAT entry (2/5)
+	
+	This patch makes detection of a FAT filesystem more exact by checking
+	the first FAT entry. 
+
+<hirofumi@mail.parknet.co.jp> (02/04/25 1.531.18.11)
+	[PATCH] misc cleanup of fatfs (3/5)
+	
+	This patch does misc cleanup.
+	
+	OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>
+
+<hirofumi@mail.parknet.co.jp> (02/04/25 1.531.18.12)
+	[PATCH] fat_clusters_flush() cleanup (4/5)
+	
+	This patch cleans up fat_clusters_flush().
+
+<hirofumi@mail.parknet.co.jp> (02/04/25 1.531.18.13)
+	[PATCH] remove linux/bitops.h (5/5)
+	
+	Remove unnecessary linux/bitops.h from fat/inode.c.
+
+<viro@math.psu.edu> (02/04/25 1.531.18.14)
+	[PATCH] (1/15) big struct block_device * push (first series)
+	
+	 - remove abuses of blksize_size[] and (late) hardsect_size[].  Mostly
+	   drivers/s390/char/*, BTW...
+
+<viro@math.psu.edu> (02/04/25 1.531.18.15)
+	[PATCH] (2/15) big struct block_device * push (first series)
+	
+	 - remove abuses of blksize_size[] and (late) hardsect_size[].  Mostly
+	   drivers/s390/char/*, BTW...
+
+<viro@math.psu.edu> (02/04/25 1.531.18.16)
+	[PATCH] (3/15) big struct block_device * push (first series)
+	
+	 - new helpers: queue_hardsect_size() and bdev_hardsect_size().  Analogous
+	   to get_hardsect_size() for queue and struct block_device * respectively
+	   Most of get_hardsect_size() callers converted to these.
+
+<viro@math.psu.edu> (02/04/25 1.531.18.17)
+	[PATCH] (4/15) big struct block_device * push (first series)
+	
+	 - switch block_ioctl() to struct block_device *
+
+<viro@math.psu.edu> (02/04/25 1.531.18.18)
+	[PATCH] (5/15) big struct block_device * push (first series)
+	
+	 - switch blk_{get,set}_readahead() to struct block_device *
+
+<viro@math.psu.edu> (02/04/25 1.531.18.19)
+	[PATCH] (6/15) big struct block_device * push (first series)
+	
+	 - switch loop_set_fd() to struct block_device
+
+<viro@math.psu.edu> (02/04/25 1.531.18.20)
+	[PATCH] (7/15) big struct block_device * push (first series)
+	
+	 - md/multipath.c convert to bio, compile fixes, bring struct
+	   block_device * into private data.
+
+<viro@math.psu.edu> (02/04/25 1.531.18.21)
+	[PATCH] (8/15) big struct block_device * push (first series)
+	
+	 - md/raid1.c - bring struct block_device * into private data.
+
+<viro@math.psu.edu> (02/04/25 1.531.18.22)
+	[PATCH] (9/15) big struct block_device * push (first series)
+	
+	 - this one is interesting and will play in the next series as well;
+	   affected place is fs/block_dev.c::do_open().  We check if bdev is
+	   a partition (same way it is done in generic_make_request()) and
+	   if it is - open entire disk and put pointer to its bdev into a
+	   new field bdev->bd_contains.  Otherwise (non-partition) we
+	   set bdev->bd_contains to bdev.  Corresponding cleanup done in
+	   blkdev_put() (and failure path in do_open()) - when the last opener
+	   goes away we close bdev->bd_contains if bdev is a partition (i.e.
+	   not equal to its ->bd_contains) and set it to NULL.
+	   Immediate effect is that we can get from bdev of partition to
+	   bdev of disk when submitting a bio, but it also opens a way
+	   to handle partition-parsing in a sane way.  That will be done
+	   in the next series.
+
+<viro@math.psu.edu> (02/04/25 1.531.18.23)
+	[PATCH] (10/15) big struct block_device * push (first series)
+	
+	 - md/linear.c - bring struct block_device * into private data.
+
+<viro@math.psu.edu> (02/04/25 1.531.18.24)
+	[PATCH] (11/15) big struct block_device * push (first series)
+	
+	 - (JFS) removes ->dev from struct jfs_log - it's duplicated by
+	   ->bdev.  Old users of ->dev updated.
+
+<viro@math.psu.edu> (02/04/25 1.531.18.25)
+	[PATCH] (12/15) big struct block_device * push (first series)
+	
+	 - block/loop.c - switch ->lo_device to struct block_device *.
+
+<viro@math.psu.edu> (02/04/25 1.531.18.26)
+	[PATCH] (13/15) big struct block_device * push (first series)
+	
+	 - *NOW* all places that (re)assign ->bi_dev have relevant struct
+	   block_device *.  ->bi_bdev (struct block_device * equivalent of
+	   ->bi_dev) introduced, ->bi_dev removed, users updated.
+
+<viro@math.psu.edu> (02/04/25 1.531.18.27)
+	[PATCH] (14/15) big struct block_device * push (first series)
+	
+	 - bdevname() switched to struct block_device *.  Old variant (taking
+	   kdev_t) renamed to __bdevname() (very few callers remain).  This
+	   allow to drop ->b_dev conveniently - it's duplicated by ->b_bdev
+	   and most of remaining users were bdevname(bh->b_dev) in various
+	   places.
+
+<viro@math.psu.edu> (02/04/25 1.531.18.28)
+	[PATCH] (15/15) big struct block_device * push (first series)
+	
+	 - switch md_error() to struct block_device * - just cleaning up
+	   after ->bi_dev switch.
+
+<torvalds@penguin.transmeta.com> (02/04/25 1.531.1.33)
+	Update kernel version to 2.5.11
+
+<jsimmons@heisenberg.transvirtual.com> (02/04/25 1.540)
+	Synced to the latest changes in Linus BK tree.
+
+<greg@kroah.com> (02/04/25 1.531.20.3)
+	added CONFIG_USB_DYNAMIC_MINORS support to the USB core
+	
+	Here's a patch that finishes off my previous patch that enabled us to
+	use less than 16 minor numbers per USB device that uses the USB major
+	number.  This patch allows all such devices to share all 256 minor
+	numbers at once, much like the usbserial core shares the USB serial
+	major with all usb-serial drivers.  This also solves Oliver's problem of
+	having 30 printers :)
+
+<greg@kroah.com> (02/04/25 1.531.20.4)
+	added CONFIG_USB_DYNAMIC_MINORS to the Config.in file :)
+
+<greg@kroah.com> (02/04/25 1.531.20.5)
+	added support for USB_DYNAMIC_MINORS to the usb drivers that can use it.
+
+<greg@kroah.com> (02/04/25 1.531.20.6)
+	USB keyspan driver patch that fixes lots of different problems.
+	
+		- Modified port open, port close, and send setup() logic to fix various data and endpoint
+		  synchronization bugs and device LED status bugs.
+		- Changed keyspan_write_room() to accurately return transmit buffer availability.
+		- Changed forwardingLength from 1 to 16 for all adapters.
+
+<aia21@cantab.net> (02/04/26 1.531.19.2)
+	NTFS 2.0.3: Small bug fixes, cleanups, and performance improvements.
+	- Remove some dead code from mft.c.
+	- Optimize readpage and read_block functions throughout aops.c so that
+	  only initialized blocks are read. Non-initialized ones have their
+	  buffer head mapped, zeroed, and set up to date, without scheduling
+	  any i/o. Thanks to Al Viro for advice on how to avoid the device i/o.
+	Thanks go to Andrew Morton for spotting the below:
+	- Fix buglet in allocate_compression_buffers() error code path.
+	- Call flush_dcache_page() after modifying page cache page contents in
+	  ntfs_file_readpage().
+	- Check for existence of page buffers throughout aops.c before calling
+	  create_empty_buffers(). This happens when an I/O error occurs and the
+	  read is retried. (It also happens once writing is implemented so that
+	  needed doing anyway but I had left it for later...)
+	- Don't BUG_ON() uptodate and/or mapped buffers throughout aops.c in
+	  readpage and read_block functions. Reasoning same as above (i.e. I/O
+	  error retries and future write code paths.)
+
+<jejb@mulgrave.(none)> (02/04/26 1.531.24.1)
+	Fix migration task boot hang for machines with different physical
+	and logical CPU numberings.
+
+<kai@tp1.ruhr-uni-bochum.de> (02/04/26 1.531.25.1)
+	Properly export drivers/usb/media video interface
+	
+	Mark the API functions accessed by other drivers with EXPORT_SYMBOL() and
+	make the remaining functions static.
+
+<davidm@wailua.hpl.hp.com> (02/04/26 1.531.23.2)
+	ia64: Another set of do_csum() cleanups by Ken Chen.
+
+<david-b@pacbell.net> (02/04/26 1.531.20.7)
+	[PATCH] PATCH 2.5.10 usbnet, check_connect updates
+	
+	USB usbnet driver update
+	
+	The patch cleans up the handling of connection checking to
+	match the truth that it's effectively tristate (connected, not,
+	and can't know) vs binary ("connected" and "can't know"
+	as the same value, since it was OK to ifup).  Since ethtool
+	supports the tristate semantics, it matters now.
+
+<david-b@pacbell.net> (02/04/26 1.531.20.8)
+	[PATCH] PATCH 2.5.10 ehci.txt
+	
+	USB ehci documentation update
+	
+	It mostly updates the description of the EHCI driver to point out
+	that several non-NEC implementations are now expected to work,
+	and that (high speed) ISO is supported.
+
+<akpm@zip.com.au> (02/04/26 1.531.1.34)
+	[PATCH] permit zero-length readahead, and tidy up readahead
+	
+	- Initialise the per-request_queue readahead parameter properly,
+	  rather than the dopey "if it's zero you get the deafult"
+	  approach.
+	
+	- Permit zero-length readahead.
+	
+	- 80-columnify mm/readahead.c
+
+<torvalds@penguin.transmeta.com> (02/04/26 1.531.1.35)
+	Use the correct inode for read-ahead trashing/
+
+<dalecki@evision-ventures.com> (02/04/26 1.531.1.36)
+	[PATCH] 2.5.10 IDE 42
+	
+	- Streamline the usage of sector_t over the strategy routines in question a
+	   bit. Streamline the do_request code in ide-disk.c.
+	
+	- Improve the readability of start_request in ide.c.
+	
+	- Remove obsolete/nowhere used stuff from hdreg.h.
+	
+	- Splitup special_t into classical flag field.
+	
+	- Use only a single field to determine the capacity of a drive.  Make this
+	   field and the code paths it follows as far as possible use the sector_t
+	   instead of a hard coded integer types.  This increases the chances that at
+	   some distant point in time we will indeed be able to use 64 bit wide sector_t
+	   entities. (Disks are getting huge those times now...)
+
+<vojtech@suse.cz> (02/04/26 1.531.20.10)
+	[PATCH] One more buggy KVM switch to be blacklisted.
+	
+	USB hid driver
+	
+	This adds a blacklist entry for another KVM switch
+	which chokes on get_request().
+
+<greg@kroah.com> (02/04/26 1.531.20.11)
+	USB core
+	
+	document the return value of usb_register_dev() better.
+
+<greg@kroah.com> (02/04/26 1.531.20.12)
+	USB core
+	
+	added check for num_minors at registration time to catch buggy drivers.
+
+<aia21@cantab.net> (02/04/27 1.531.1.38)
+	NTFS: 2.0.4 - Cleanups and updates for kernel 2.5.11.
+	
+	- Add documentation on how to use the MD driver to be able to use NTFS
+	stripe and volume sets in Linux and generally cleanup documentation
+	a bit.
+	
+	Remove all uses of kdev_t in favour of struct block_device *:
+	- Change compress.c::ntfs_file_read_compressed_block() to use sb_getblk()
+	instead of getblk().
+	- Change super.c::ntfs_fill_suoer() to use bdev_hardsect_size() instead
+	of get_hardsect_size().
+	- No need to get old blocksize in super.c::ntfs_fill_super() as
+	fs/super.c::get_sb_bdev() already does this.
+	- Set bh->b_bdev instead of bh->b_dev throughout aops.c.
+
+<dalecki@evision-ventures.com> (02/04/28 1.531.26.1)
+	[PATCH] 2.5.10 IDE 43
+	
+	Some of the following is a bit of sensitive... but anyway it has to be done.
+	
+	- Scarp "portability" macros ide_request_irq() and ide_free_irq().  What a
+	   great of a surprise in the face of a kernel nowadays ported to nearly any
+	   major CPU out there, but apparently no platform needs something special here.
+	   All of them are just using the normal request_irq() and free_irq(). If some
+	   unusual platform (read obsolete door blocker) I have overlooked intentionally
+	   needs something special - please just hack the platform specific
+	   request_irq() and free_irq()-  they are *far off* from being performance
+	   relevant. (Hint: You could use cooked default irq values to detect there
+	   whatever the caller was the ATA driver to decide what to do about it.)
+	
+	- Kill ide_check_region() ide_request_region() and ide_release_region()
+	   altogether. Add comments explaining the code there.  Same arguments as above
+	   apply. Additionally we want to be able at some time to do for example mmapped
+	   PCI address space access on IA32 instead of port IO.
+	
+	- Rewrite the initialization code to don't use check_region at all. Add some
+	   comments there, which explain what's actually happening.
+	
+	- Fix creeping in of a c99 construct.
+	
+	- Make the main interrupt handler take a channel as data instead of the
+	   hwgroup. This is the entity an interrupt is physically associated with. PCI
+	   interrupt sharing is handled in a generically anyway. Analogously the main
+	   data entity of a device request queue (q->queuedata) is the device and not
+	   the hwgroup.  However right now we are only able to push it down to the
+	   channel level. The intention is to advance the choose_drive() function to
+	   just check for equal interrupt values for serialization of request and
+	   thus to get rid of the hwgroup altogether.
+
+<dalecki@evision-ventures.com> (02/04/28 1.531.26.2)
+	[PATCH] 2.5.10 IDE 44
+	
+	Reduce the "rain forest" of pointers a bit.
+	
+	- Use the channel info from the drive instead of from hwgroup where possible.
+	   Since we have now a direct association between a channel and irq, we can fix
+	   the handler for unexpected interrupts to don't have to iterate over multiple
+	   possibilities.
+	
+	- Finally it was just possible to remove the circular list of channels
+	   associated with a hwif. The hwif member of struct hwgroup_s as well as
+	   next member if struct ata_channel are gone.
+	
+	- Unify ide_build_sglist() and raw_build_sglist() in to one function.  Use the
+	   queue associated with a request in the case of a CMD request there instead of
+	   referencing the device minor number. This will be pushed even further later.
+
+<perex@suse.cz> (02/04/28 1.531.26.3)
+	[PATCH] ALSA PATCH against ChangeSet 1.567
+	
+	Hello,
+	
+		this ALSA patch contains:
+	
+	- fixed sound_core.c - devfs names
+	- added ARM driver for H3x00 iPaq handhelds from Compaq
+	- added RME Digi32 driver
+	- increased number of RawMidi devices per card to 8
+	- removed unimplemented IPC definitions from asequencer.h
+	- compilation fixes for snd_printk/snd_printd
+	- added snd_midi_event_no_status() function to seq_midi_event.c
+	  - used in OSS emulation code to follow OSS/Lite behaviour
+	- fixed snd_pcm_playback_silence() function (possible memory leak)
+	- fixed endless loop in snd_pcm_playback_drain()
+	  - OSS applications using mmap() should end correctly now
+	- fixed autoloading of sequencer clients (oops)
+	- fixed virmidi code (emu10k1)
+	- improved OPL4 chip detection
+	- fixed deadlock in sound/i2c.h
+	- improved cs8427 chip support (proper initialization)
+	- improved CMI8330 detection
+	- improved S/PDIF detection in ENS1371 driver
+	- fixed possible NULL pointer dereference in FM801 driver
+	- added ICH4 to intel8x0 driver
+	- fixed port names allocation in intel8x0 driver
+	- fixed rate detection in intel8x0 driver
+	- AC97 code
+	  - better initialization for wolfson codecs
+	  - improved CS4205 support (special S/PDIF handling)
+	- emu10k1/audigy updates
+	
+							Jaroslav
+
+<dougg@torque.net> (02/04/28 1.531.26.4)
+	[PATCH] scsi generic (sg) driver 2.5.10
+	
+	    Changes since 3.5.24 (20020319)
+	        - use Scsi_Request::upper_private_data
+	        - zero buffers for non-root users
+	    Changes since 3.5.23 (20011231)
+	        - change EACCES to EPERM when O_RDONLY is insufficient
+	        - suppress newlines in host string
+	        - fix xfer direction, old interface, short reply_len [Travers Carter]
+
+<dougg@torque.net> (02/04/28 1.531.26.5)
+	[PATCH] Report Luns for scsi devices 2.5.10
+	
+	Here's a patch for SCSI REPORT LUN scanning, including Douglas Gilbert's
+	recent changes to support a short INQUIRY followed by a longer INQUIRY.
+	
+	Please apply, or let me know if you think it needs any modifications.
+	
+	It's against linux-2.5.4. It does _not_ change the size of the linux lun.
+	
+	A description of the 8 byte LUN layout can be found on page 35 of:
+	
+	ftp://ftp.t10.org/t10/drafts/scc2/scc2r04.pdf
+	
+	The above is a draft, but matches the layout seen on most disk arrays
+	(including EMC, IBM, LSI, and Hitachi). Later drafts (post SCSI-3) have
+	this information in the SCSI Architectural Model.
+	
+	Patch description:
+	
+	Adds REPORT LUN scanning.
+	
+	Adds Douglas Gilbert's INQUIRY modification so broken devices that cannot handlean INQUIRY
+	of more than 36 bytes can be black-listed, plus saving the INQUIRY
+	result in Scsi_Device.
+	
+	Adds scan_scsis_target function, replacing code in scan_scsis and parts
+	of scan_scsis_single. This cleans up the scanning code, and removes a
+	really ugly for loop. It would be difficult to add REPORT LUN scanning
+	without this change.
+	
+	Adds missing scsi_release_commandblocks().
+	
+	No longer sets max_dev_lun out of bounds for BLIST_FORCELUN devices.
+	
+	Fixes scanning past LUN 7 for SCSI-3 devices (the patch in 2.4.17
+	for that fix will not cleanly apply against this code).
+	
+	-- Patrick Mansfield
+
+<nathans@sgi.com> (02/04/28 1.531.26.6)
+	[PATCH] xattr locking
+	
+	This is a patch from Andreas Gruenbacher (the ext2/ext3 EA patch
+	maintainer) which converts the extended attribute VFS code from
+	using the BKL to instead use the inode semaphore; please apply.
+
+<davej@suse.de> (02/04/28 1.531.26.7)
+	[PATCH] A20 tweak for AMD Elan
+	
+	The A20 code needs a slight tweak to work on AMD Elans.
+	Original patch from Robert Schwebel
+
+<davej@suse.de> (02/04/28 1.531.26.8)
+	[PATCH] ALI 1644 AGP/DRM support.
+	
+
+<davej@suse.de> (02/04/28 1.531.26.9)
+	[PATCH] Recognise extra TV card
+	
+
+<davej@suse.de> (02/04/28 1.531.26.10)
+	[PATCH] bluesmoke update.
+	
+	o   P4 thermal throttling is now compile time option
+	o   ifdefs cleaned up due to above
+	o   Only poke the LVT if thermal throttling is enabled.
+	o   Remove bogus cache flushing as per previous discussion.
+	o   Replace hard coded timer values with MCE_RATE
+	o   Change default polling frequency from 5 to 15 seconds
+	o   SMP fixes. (Don't readd timer)
+	o   Compile time warning fixes.
+	o   Add config helptext
+
+<davej@suse.de> (02/04/28 1.531.26.11)
+	[PATCH] Jiffies wrap fixes.
+	
+
+<davej@suse.de> (02/04/28 1.531.26.12)
+	[PATCH] help texts for patch-kernel
+	
+
+<davej@suse.de> (02/04/28 1.531.26.13)
+	[PATCH] fix xconfig.
+	
+	We now have so many CONFIG_ options we overflow a buffer in xconfig.
+	Doubling the size should see us until someone either writes a replacement,
+	or can be bothered to make it dynamically allocate.
+
+<davej@suse.de> (02/04/28 1.531.26.14)
+	[PATCH] sonypi update.
+	
+	From Stelian, already in 2.4
+
+<davej@suse.de> (02/04/28 1.531.26.15)
+	[PATCH] PCI access method fallback.
+	
+	Some SiS boards won't boot without pci=bios forcing their method.
+	The reason for this is in the probe method, we try the BIOS method, and it
+	succeeds and we store the pci_ops. We then try the direct access, it fails
+	and we trash the old pci_ops.
+	The patch stores the pci_ops when BIOS method succeeds and restores it
+	if the direct hardware access method fails.
+
+<davej@suse.de> (02/04/28 1.531.26.16)
+	[PATCH] recognise P4 Xeon in mptable.
+	
+
+<davej@suse.de> (02/04/28 1.531.26.17)
+	[PATCH] Also look in /boot for .config
+	
+	Try to get config file distro placed in boot.
+
+<davej@suse.de> (02/04/28 1.531.26.18)
+	[PATCH] x86 pci-pc janitor work
+	
+	- printk loglevels
+	- request region checks.
+
+<davej@suse.de> (02/04/28 1.531.26.19)
+	[PATCH] NCR53c810 PCI quirk
+	
+	This device returns a wrong class code which we work around at boot up time.
+
+<davej@suse.de> (02/04/28 1.531.26.20)
+	[PATCH] sf16fmi card detect thinko
+	
+	Missing loop increment.
+
+<davej@suse.de> (02/04/28 1.531.26.21)
+	[PATCH] x86-64 bluesmoke update
+	
+	- Drop Intel P4 bits
+	- Update other parts in line with latest i386 bluesmoke.c
+
+<davej@suse.de> (02/04/28 1.531.26.22)
+	[PATCH] New synclink_cs driver.
+	
+	Posted multiple times to l-k by Paul Fulghum.
+
+<davej@suse.de> (02/04/28 1.531.26.23)
+	[PATCH] New synclink multiport driver.
+	
+	Posted multiple times to l-k by Paul Fulghum
+
+<davej@suse.de> (02/04/28 1.531.26.24)
+	[PATCH] MAINTAINERS update
+	
+	Various bits mostly from 2.4
+	Also fix indentation of various entries to match the rest of the file.
+
+<davej@suse.de> (02/04/28 1.531.26.25)
+	[PATCH] iphase bits
+	
+	- Nuke unnecessary include.
+	- More infortmational debug info
+
+<davej@suse.de> (02/04/28 1.531.26.26)
+	[PATCH] Dynamic LDT sizing.
+	
+	Originally from Manfred Spraul.
+	
+	* dynamically grow the LDT
+	Every app that's linked against libpthread right now allocates a full 64
+	kB LDT, without proper error handling, and always from the vmalloc area
+
+<davej@suse.de> (02/04/28 1.531.26.27)
+	[PATCH] broken comment in cris driver
+	
+
+<davej@suse.de> (02/04/28 1.531.26.28)
+	[PATCH] Missing include.
+	
+	Uses the error codes, but doesn't include err.h
+
+<davej@suse.de> (02/04/28 1.531.26.29)
+	[PATCH] missing cris config.help entries
+	
+	Some that got lost along the way...
+
+<davej@suse.de> (02/04/28 1.531.26.30)
+	[PATCH] get rid of some blk.h cruft
+	
+	Originally by Christoph Hellwig back in February.
+	It recieved no objections when posted to l-k & Jens.
+	
+	o remove DEVICE_REQUEST definitions - never used in blk.h itself.
+	o remove DEVICE_ON() - never used at all.
+	o define LOCAL_END_REQUEST when we do not want end_request() instead
+	  of other hacks.
+	o remove DEVICE_OFF() - only used in floppy driver, thus one now has
+	  a private end_request().
+	o use private end_request() functions for drivers not providing
+	  randomness.
+	o remove TIMEOUT_VALUE - only ever used in hd.c
+
+<bgerst@didntduck.org> (02/04/28 1.531.26.31)
+	[PATCH] Removing SYMBOL_NAME part 1
+	
+	The SYMBOL_NAME macro (and variations) have been obsolete since 2.1.0,
+	when the option to compile the kernel in a.out format was removed.  This
+	patch starts the process of removing these macros, starting with x86.
+
+<bgerst@didntduck.org> (02/04/28 1.531.26.32)
+	[PATCH] Removing SYMBOL_NAME part 2
+	
+	CRIS and x86-64 arches
+
+<bgerst@didntduck.org> (02/04/28 1.531.26.33)
+	[PATCH] Removing SYMBOL_NAME part 3
+	
+	SuperH arch
+
+<bgerst@didntduck.org> (02/04/28 1.531.26.34)
+	[PATCH] Removing SYMBOL_NAME part 4
+	
+	m68k arch
+
+<bgerst@didntduck.org> (02/04/28 1.531.26.35)
+	[PATCH] Removing SYMBOL_NAME part 5
+	
+	ARM arch
+
+<akpm@zip.com.au> (02/04/28 1.531.26.36)
+	[PATCH] Re: [patch] change mempool to not alter managed elements
+	
+	Here's an array-based implementation.
+
+<dougg@torque.net> (02/04/28 1.531.26.37)
+	[PATCH] scsi mid to lower level api documentation
+	
+	Here is some documentation to describe the interface of lower level
+	drivers (e.g.  aic7xxx) in the scsi subsystem.
+	
+	The patch is made up of a text file: drivers/scsi/scsi_mid_low_api.txt
+	and some Documentation/DocBook additions to enable html, ps and pdf
+	renderings.
+
+<haveblue@us.ibm.com> (02/04/28 1.531.26.38)
+	[PATCH] BKL documentation update change
+	
+	I added ->readdir(), and a new section referring to the sb_op BKL shift
+	as well.
+
+<rmk@arm.linux.org.uk> (02/04/28 1.531.1.40)
+	[PATCH] drop obsolete stat/waitpid/s(sg)etmask/signal from ARM build
+	
+	The following patch drops the above functions from the ARM port; we've
+	already removed them from the syscall table on ARM, so we can safely
+	remove these from the ARM build.
+
+<bcrl@redhat.com> (02/04/28 1.531.1.41)
+	[PATCH] vsnprintf returns incorrect length
+	
+	In conjunction with some of the earlier problems found in /proc code,
+	now it turns out that snprintf doesn't work correctly in the kernel...
+	Without the following patch, snprintf can return lengths greater than
+	the size argument passed.  The net effect is that code using the return
+	value from snprintf can still buffer overrun.  This is fixed by not
+	updating the pointer in the buffer unless there is actually space.
+
+<sebastian.droege@gmx.de> (02/04/28 1.531.1.42)
+	[PATCH] BTTV .text.exit link fix with newer binutils
+	
+	Here's a simple patch to allow the bttv driver to be build with newer
+	binutils...
+
+<chris@wirex.com> (02/04/28 1.531.1.43)
+	[PATCH] 2.5.10 BKL not always released in sem_exit()
+	
+	The patch below fixes sem_exit() so that the BKL is always released.
+
+<ink@jurassic.park.msu.ru> (02/04/28 1.531.1.45)
+	[PATCH] gdb/strace fix for 2.5.x
+	
+	Yes, gdb and strace are broken on alpha since 2.5.6, IIRC.
+	Some necessary 'thread_info' changes still are missing in ptrace.c.
+	
+	Fixed thus.
+
+<adilger@clusterfs.com> (02/04/28 1.544)
+	[PATCH] minor cleanup in ext3 code
+	
+	The following patch is a _very minor_ cleanup in the ext3 code for
+	ext3_prepare_write().  It simply removes the setting of "handle" from
+	the current transaction handle, because "handle" is actually set again
+	a couple of lines later, where it properly allocates a new transaction
+	handle for this write.  The code removed in this patch is probably left
+	over from some development version of ext3 where the transaction handle
+	was started before ext3_prepare_write was called.
+	
+	The only reason I saw this was because I was trying to find where the
+	handle was allocated for an ext3 file write, and at first glance it
+	didn't appear to be allocated anywhere...
+
+<torvalds@home.transmeta.com> (02/04/28 1.546)
+	Missing function declaration
+
+<torvalds@home.transmeta.com> (02/04/28 1.547)
+	Refix broken bitop target that got re-broken by the CVS merge
+
+
+Summary of changes from v2.5.10 to lia64-v2.5.10
+============================================
+
+<davidm@wailua.hpl.hp.com> (02/04/16 1.489.4.2)
+	ia64: Fix alloc_consistent() for zx1 platform to return <4GB memory as per
+	DMA-mapping.txt.  Patch by Alex Williamson.
+
+<steiner@sgi.com> (02/04/16 1.489.4.3)
+	[PATCH] ia64: Correct copyright message in shub_md.h.
+	
+
+<davidm@wailua.hpl.hp.com> (02/04/18 1.489.4.4)
+	ia64: Include config file for fusion driver in arch/ia64/config.in.
+
+<asit.k.mallick@intel.com> (02/04/19 1.489.4.5)
+	[PATCH] Don't prefetch beyond end of patch to avoid bringing in cache-lines needlessly.
+	
+
+<peter@chubb.wattle.id.au> (02/04/19 1.489.4.6)
+	[PATCH] The attached patch cleans up IA32 support a little.
+	As it's impossible at present to compile and use IA32 support as a
+	module, disallow that; and also provide dummy functions to remove
+	compilation warnings if CONFIG_IA32_SUPPORT is off.
+	
+
+<davidm@wailua.hpl.hp.com> (02/04/19 1.489.4.7)
+	ia64: Fix ACPI/IOSAPIC breakage introduced by big ACPI update.
+
+<davidm@wailua.hpl.hp.com> (02/04/23 1.489.4.8)
+	ia64: Send SIGILL for break operands in range 0x3f000 to 0x3ffff to
+	simplify dynamic bundle patching.
+
+<davidm@wailua.hpl.hp.com> (02/04/24 1.531.16.2)
+	ia64: Correct unwind info for signal trampoline.
+
+<davidm@wailua.hpl.hp.com> (02/04/24 1.531.16.3)
+	ia64: Update comments for E2BIG and TCSETS like for x86.
+
+<davidm@wailua.hpl.hp.com> (02/04/25 1.531.16.4)
+	ia64: Make default behavior of SIGURG to ignore the signal, as per SUS.
+
+<elenstev@mesatop.com> (02/04/25 1.531.16.5)
+	[PATCH] This patch adds a help text for CONFIG_IA64_GRANULE_16MB.
+	
+
+<davidm@wailua.hpl.hp.com> (02/04/25 1.531.16.6)
+	ia64: Add optimized ip_fast_csum() by Ken Chen and merge his cleanups
+		to do_csum.S.
+
+<davidm@wailua.hpl.hp.com> (02/04/25 1.531.16.7)
+	ia64: Change "McKinley" to "Itanium 2" for user-visible strings.
+
+<davidm@wailua.hpl.hp.com> (02/04/25 1.531.16.8)
+	ia64: Treat lfetch.fault like speculative loads as is required by the
+		architecture definition.  Patch by Ken Chen.
+
+<davidm@wailua.hpl.hp.com> (02/04/25 1.531.16.9)
+	ia64: Add IA64_ISR_CODE_* macros from Ken's patch.
+
+<davidm@wailua.hpl.hp.com> (02/04/25 1.531.16.10)
+	ia64: Add missing .prologue directive to ip_fast_csum().
+
+<davidm@wailua.hpl.hp.com> (02/04/25 1.531.16.11)
+	ia64: Revert compile-time optimization for bzero().
+
+<davidm@wailua.hpl.hp.com> (02/04/25 1.531.16.12)
+	ia64: Fix merge errors in do_csum().
+

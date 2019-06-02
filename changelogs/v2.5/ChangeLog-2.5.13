@@ -1,0 +1,899 @@
+
+Summary of changes from v2.5.12 to v2.5.13
+============================================
+
+<k.kasprzak@box43.pl> (02/04/05 1.369.119.4)
+	dgrs net driver janitor fixes:
+		o check return code of request_region function
+		o let free irq, if something was wrong during driver 
+		  initialization.
+		o litle printk cleanup
+	
+
+<santiago@newphoenix.net> (02/04/05 1.369.120.1)
+	Update old OSS ac97_codec driver to give AD1886 codecs a
+	special set of initialization and control operations.
+	Needed to get sound working on some Presario notebooks, at least.
+
+<davej@suse.de> (02/04/05 1.369.119.5)
+	Merge bug fixes and cleanups for sun3lance net driver
+	from 2.4.x kernel series.
+
+<davej@suse.de> (02/04/05 1.369.119.6)
+	Small janitor fixes from net drivers rrunner and sgiseeq.
+
+<davej@suse.de> (02/04/05 1.369.119.7)
+	Merge apne net driver update from 2.4.x:
+	* switch from MMIO to PIO as primary means of NIC access
+	* remove now-unneeded offsets from some constants
+
+<davej@suse.de> (02/04/05 1.369.119.8)
+	Cosmetic cleanups to 8139cp net driver.
+
+<zwane@commfireservices.com> (02/04/05 1.369.119.9)
+	Add power management support to 3c509 net driver.
+
+<davem@nuts.ninka.net> (02/04/08 1.369.106.5)
+	In math-emu/op-common.h:FP_FROM_INT, correct handling of
+	normalizing too-big fraction parts.
+
+<davem@nuts.ninka.net> (02/04/08 1.369.106.6)
+	Sparc64 math-emu fix:
+	- UltraSPARC-III can generate unfinished FPops for F{I,X}TO{S,D}
+	  so handle it.
+
+<kanoj@vger.kernel.org> (02/04/08 1.369.106.7)
+	get_cycles() needs to be defined
+	as volatile instruction set, else compiler
+	code moves it out of loops.
+
+<anton@samba.org> (02/04/09 1.448)
+	ppc64: search module exception tables
+
+<davem@nuts.ninka.net> (02/04/09 1.369.106.8)
+	Sparc64: Move cache+tlb flushes into new asm/{cache,tlb}flush.h
+
+<davem@nuts.ninka.net> (02/04/09 1.369.106.9)
+	Sparc64 updates for recent preemption fixes.
+
+<davem@nuts.ninka.net> (02/04/09 1.369.106.10)
+	Sparc64 fix: Move flush_tlb_pgtables to tlbflush.h
+
+<davem@nuts.ninka.net> (02/04/09 1.369.106.11)
+	Sparc64 fixes:
+	- Include asm/{cache,tlb}flush.h as needed.
+	- Fix botched merge of Ultra-III mathemu fixes.
+
+<davem@nuts.ninka.net> (02/04/09 1.369.106.12)
+	Sparc64: Fix typo in previous asm/{cache,tlb}flush.h changes.
+
+<davem@nuts.ninka.net> (02/04/09 1.369.106.13)
+	Sparc64: Fix typo in previous asm/{cache,tlb}flush.h changes.
+
+<davem@nuts.ninka.net> (02/04/09 1.369.106.14)
+	Sparc64: Include errno.h in arch/sparc64/math-emu/math.c
+
+<davem@nuts.ninka.net> (02/04/09 1.369.106.15)
+	Sparc64: Fix typo in arch/sparc64/math-emu/math.c
+	current_thread_info --> current_thread_info().
+
+<davem@nuts.ninka.net> (02/04/09 1.369.106.16)
+	Sparc64: Add dummy default_idle.
+
+<davem@nuts.ninka.net> (02/04/09 1.369.132.1)
+	Ipv6 build fix: Use named struct initializers for ipip6_fb_tunnel_dev
+
+<davem@nuts.ninka.net> (02/04/09 1.369.106.17)
+	Sparc64: Include linux/errno.h in arch/sparc64/solaris/signal.c
+
+<davem@nuts.ninka.net> (02/04/09 1.369.106.18)
+	Sparc64: Add dummy flush_tlb_kernel_range for now
+
+<davem@nuts.ninka.net> (02/04/09 1.369.106.19)
+	Sparc64: Real mans flush_tlb_kernel_range
+
+<bcrl@redhat.com> (02/04/10 1.369.132.2)
+	Rearrange some int members of
+	tcp_opt.ucopy to save space on 64-bit platforms.
+
+<trini@kernel.crashing.org> (02/04/10 1.369.132.3)
+	CONFIG_APPLETALK and
+	CONFIG_DEV_APPLETALK are meant for the same thing.  Rename
+	all uses to CONFIG_DEV_APPLETALK, use consistently inside
+	drivers/net/appletalk/Config.in and update documentation
+	to match.
+
+<rddunlap@osdl.org> (02/04/10 1.369.132.4)
+	Remove bogus networking stats
+	from struct kernel_stat.  They are unused and not visible
+	in any way to userspace.
+
+<laforge@gnumonks.org> (02/04/10 1.369.132.5)
+	IPv6 netfilter fixes:
+	- SMP TABLE_OFFSET fix - ordered CPUs
+	- Set /proc entry owner
+	- Fix ip6tables layer4 protocol header calculation
+	- MAC match: register for FORWARD hook, add MODULE_LICENSE
+
+<trond.myklebust@fys.uio.no> (02/04/10 1.369.132.6)
+	Add tcp_read_sock which allows one to
+	read directly, sendfile style, from a TCP socket.  RPC layer patches
+	to take advantage of this are pending to improve TCP NFS support.
+
+<davem@nuts.ninka.net> (02/04/10 1.369.132.7)
+	Tigon3: Fix DRV_MODULE_{VERSION,RELDATA}
+
+<anton@samba.org> (02/04/12 1.451)
+	ppc64: remove ppc_md.post_irq, clean up do_IRQ
+
+<anton@samba.org> (02/04/12 1.452)
+	ppc64: add percpu.h
+
+<anton@samba.org> (02/04/12 1.453)
+	ppc64: formatting cleanups
+
+<anton@samba.org> (02/04/12 1.454)
+	ppc64: Paca -> paca, Naca -> naca from Dave Engebretsen
+
+<anton@samba.org> (02/04/12 1.455)
+	ppc64: EEH updates and FWNMI handler from Todd Inglett
+
+<anton@samba.org> (02/04/16 1.457)
+	ppc64: remove mem_map_check_hash(), it doesnt work with the radix
+	pagecache changes.
+
+<anton@samba.org> (02/04/16 1.458)
+	ppc64: store trap into exception frame, make DSISR 32bit and create
+	CCR field - from Dave Engebretsen
+
+<anton@samba.org> (02/04/16 1.459)
+	ppc64: signal fix from 2.4 branch
+
+<trond.myklebust@fys.uio.no> (02/04/16 1.369.132.8)
+	tcp.c:
+	  Fix tcp_read_sock() so that it advances tp->copied_seq.
+
+<davem@nuts.ninka.net> (02/04/16 1.369.106.20)
+	Sparc64: Fix elf_gregset_t layout for native 64-bit binaries.
+
+<davem@nuts.ninka.net> (02/04/16 1.369.106.21)
+	Sparc{,64}: On PTRACEd processes, do the syscall restart before
+	we notify the parent.
+
+<davem@nuts.ninka.net> (02/04/16 1.369.106.22)
+	Add asm-sparc{,64}/percpu.h
+
+<davem@nuts.ninka.net> (02/04/16 1.369.106.23)
+	Sparc64: Fix flush_tlb_kernel_range to always flush using
+	Nucleus context.
+
+<davem@nuts.ninka.net> (02/04/16 1.369.106.24)
+	Sparc{,64}: seg/get affinity syscalls
+
+<davem@nuts.ninka.net> (02/04/16 1.369.106.25)
+	arch/sparc64/kernel/sys_sparc32.c: Fix typo.
+
+<davem@nuts.ninka.net> (02/04/18 1.369.106.26)
+	Sparc64: CONFIG_DEBUG_SPINLOCK typo in asm/system.h
+
+<buytenh@gnu.org> (02/04/18 1.369.132.9)
+	Bridging fix:
+	- Output netfilter hook does not care about input dev so
+	do not even pass it in
+
+<davem@nuts.ninka.net> (02/04/18 1.369.106.27)
+	Sparc64:
+	- Propagate xattr syscall numbers from asm-sparc/unistd.h
+
+<anton@samba.org> (02/04/23 1.463)
+	ppc64: wrap iseries specific stuff in set_dec with ifdef
+
+<anton@samba.org> (02/04/23 1.464)
+	ppc64: put machine type into naca from Don Reed
+
+<anton@samba.org> (02/04/23 1.465)
+	ppc64: remove HDIO_[GS]ET_KEEPSETTINGS
+
+<anton@samba.org> (02/04/23 1.466)
+	ppc64: add missing memory barriers in cpu bringup code,
+	from Colin Devilbiss
+
+<davem@nuts.ninka.net> (02/04/23 1.369.106.28)
+	SunGEM bug fix:
+	- Fix MAC address pointer calculation when using random
+	MAC addresses
+
+<kuznet@ms2.inr.ac.ru> (02/04/23 1.369.132.10)
+	Net fixes:
+	- Handle downing of multicast routes properly, since they
+	refer potentially to multiple devices.
+	- IPv6 raw had missing sk->filter handling and rawv6_rcv
+	missing some checksum processing.
+	- IPV6 udp needs to use skb_checksum not csum_partial on
+	skb->h.raw
+	- Ingress packet scheduler fixes from Jamal
+	- Addrconf bug discoverd by Petr Baudis, ipv6_ifa_notify should
+	pass NULL second arg to ipv6_chk_addr in RTM_DELADDR
+	handling.
+
+<buytenh@gnu.org> (02/04/23 1.369.132.11)
+	Bridging fix:
+	- In br_handle_frame, dont forget to drop br->lock for
+	handle_special_frame code path
+
+<davem@nuts.ninka.net> (02/04/24 1.369.106.29)
+	Dont const objects put into initdata.
+
+<davem@nuts.ninka.net> (02/04/24 1.369.132.12)
+	Kill in_ntoa from the tree.
+
+<davem@nuts.ninka.net> (02/04/24 1.369.106.30)
+	Fix sparc printk levels in arch/sparc/mm/init.c
+	From Alan
+
+<ebrower@usa.net> (02/04/24 1.369.106.31)
+	Add Sparc Voyager power management support.
+
+<davem@nuts.ninka.net> (02/04/24 1.369.106.32)
+	Sparc:
+	- Delete ID strings added files from Sparc power management changes
+	This aint CVS no more.
+
+<davem@nuts.ninka.net> (02/04/24 1.369.132.13)
+	Tigon3: Handle posted writes correctly.
+
+<kaber@trash.net> (02/04/24 1.369.132.14)
+	In pfifo packet scheduler use qdisc->dev
+	instead of skb->dev for consistency
+
+<trini@kernel.crashing.org> (02/04/24 1.369.132.15)
+	Do not ask about ECONET suboptions
+	if INET==n
+
+<anton@samba.org> (02/04/25 1.470)
+	ppc64: Remove WANT_PAGE_VIRTUAL now the compiler bug is fixed
+
+<anton@samba.org> (02/04/25 1.471)
+	ppc64: remove some old xmon debug code which broke with page->virtual
+	removal
+
+<anton@samba.org> (02/04/25 1.472)
+	ppc64: merge in some iSeries fixes from 2.4
+
+<anton@samba.org> (02/04/25 1.473)
+	ppc64: pci_dma updates - remove excess syncs and general cleanup, from
+	Mike Corrigan
+
+<anton@samba.org> (02/04/25 1.474)
+	ppc64: pci write return code fix, from Don Reed
+
+<anton@samba.org> (02/04/25 1.475)
+	ppc64: error in set_dec introduced by me, fixed by Milton Miller
+
+<anton@samba.org> (02/04/25 1.476)
+	ppc64: change bitops to take unsigned long *
+
+<anton@samba.org> (02/04/25 1.477)
+	ppc64: fix compiler warnings
+
+<anton@samba.org> (02/04/25 1.478)
+	ppc64: fix compiler warnings
+
+<anton@samba.org> (02/04/25 1.479)
+	ppc64: dont kill init in do_page_fault and remove some old debug
+
+<tetapi@utu.fi> (02/04/25 1.369.106.33)
+	SunGEM:
+	- Call gem_init_pause_thresholds before gem_init_dma so
+	that rx_pause_{on,off} are ready in time.
+
+<davem@nuts.ninka.net> (02/04/25 1.369.132.16)
+	Avoid use of __FUNCTION__ cpp pasting.
+
+<anton@samba.org> (02/04/26 1.480)
+	ppc64: ioctl32 updates
+	add missing dev_put in dev_ifname32
+	fix usbdevfs (from sparc64)
+	add SG_IO (from sparc64)
+	add tun, vlan and random device ioctls
+
+<anton@samba.org> (02/04/25 1.369.106.34)
+	Sparc64 ioctl32 updates:
+	- Include linux/lp.h
+	- Add COMPATIBLE_IOCTL lines for TIOCSTART, TIOCSLTC,
+	SCSI_IOCTL_PROBE_HOST, SCSI_IOCTL_GET_PCI, and LPGETSTATUS.
+	- Remove spurious semicolons.
+
+<anton@samba.org> (02/04/26 1.481)
+	ppc64: fixes for iseries
+
+<davem@nuts.ninka.net> (02/04/26 1.369.106.35)
+	Sparc64:
+	- sed s/__TIOC{START,STOP}/TIOC{START,STOP}/, kill SunOS specific comment
+	- Make ioctl32 recognize TIOCSTOP too.
+
+<anton@samba.org> (02/04/28 1.482)
+	ppc64: extern inline -> static inline
+
+<kai@tp1.ruhr-uni-bochum.de> (02/04/28 1.447.52.3)
+	Switch remaining users of autoirq_*() API to probe_irq_{on,off}
+	
+	autoirq_*() has been replaced by probe_irq_{on,off} a long time ago, so
+	it's about time to have it go away.
+
+<jsimmons@heisenberg.transvirtual.com> (02/04/29 1.447.58.1)
+	Some how not all the files with the screen_base change got merged. Here are the rest,
+
+<jsimmons@heisenberg.transvirtual.com> (02/04/29 1.447.58.2)
+	Another change that didn't make it. Now fixed. 
+
+<davem@nuts.ninka.net> (02/04/29 1.369.106.36)
+	Sparc64 pagetable leak fix:
+	- Defer changing personality until flush_old_exec has freed
+	up all the pagetables.
+
+<jsimmons@heisenberg.transvirtual.com> (02/04/30 1.447.58.3)
+	A bunch of fixes needed.
+
+<kai@tp1.ruhr-uni-bochum.de> (02/04/30 1.447.61.4)
+	ISDN: b1dma introduce b1dma_queue_tx() wrapper
+
+<kai@tp1.ruhr-uni-bochum.de> (02/04/30 1.447.61.5)
+	ISDN: b1dma tx path cleanup
+
+<kai@tp1.ruhr-uni-bochum.de> (02/04/30 1.447.61.6)
+	ISDN: B1 DMA drivers: Replace cli() by proper spin_lock.
+
+<kai@tp1.ruhr-uni-bochum.de> (02/04/30 1.447.61.7)
+	ISDN: b1dma cleanup: Use readl/writel directly
+
+<davem@nuts.ninka.net> (02/04/30 1.369.106.37)
+	Sparc64: Remove HDIO_{SET,GET}_KEEPSETTINGS references, as they
+	no longer exist.
+
+<davem@nuts.ninka.net> (02/04/30 1.369.106.38)
+	drivers/video/sbusfb.c (sbusfbcon_blank): Return zero if operation
+	not supported.
+
+<jgarzik@mandrakesoft.com> (02/04/30 1.447.55.18)
+	Add new PC300 WAN driver (courtesy Cyclades), and my own changes:
+	* patch added stuff to include/linux.  move these three new headers
+	  to drivers/net/wan.
+	* change the code to support these changes
+	* slightly better Config.in entry. needs more work, though.
+
+<jt@hpl.hp.com> (02/04/30 1.447.64.1)
+	irda update 1/7:
+	        o [FEATURE] Reduce LAP Tx queue to 2 packets (from 10)
+	                Improve latency, reduce buffer usage
+	        o [FEATURE] LAP Tx queue not full notification (flow start)
+	                Poll higher layer to fill synchronously LAP window (7 packets)
+	        o [FEATURE] LMP LSAP scheduler
+	                Ensure Tx fairness between LSAPs (sockets, IrCOMM, IrNET...)
+
+<jt@hpl.hp.com> (02/04/30 1.447.64.2)
+	irda update 2/7:
+	        o [CORRECT] Fix race condition when starting todo timer
+	        o [CORRECT] Fix race condition when stopping higher layer
+	                Higher layer would think it is stopped and us it is started
+	        o [CORRECT] Give credit even if packets in Tx queue
+	                If Tx queue was stopped, could starve peer and deadlock
+	        o [CORRECT] Protect Rx credit update with spinlock
+	        o [CORRECT] Calculate properly self->avail_credit
+	                Didn't take into account queued Rx fragments
+	                Incremented even if Rx frame not delivered to higher layer
+	                -> would never stop the peer (i.e. not flow control)
+	                -> could become infinite
+	        o [CORRECT] Send credit when higher layer reenable receive
+	                Peer wouldn't restart Tx to us if flow stopped
+	        o [FEATURE] Implement LAP queue not full notification
+	                Lower latency, ...
+	        o [FEATURE] Reduce Tx queue to 8 packets (from 10)
+	                But make sure we can always send a full LAP window (7)
+	        o [FEATURE] Fix and optimise TTP flow control
+	                Make sure peer can always send a full LAP window (7)
+	                Minimise explicit credit updates (give_credit)
+	        o [FEATURE] Remove need for todo timer in Tx/Rx paths
+	                Less potential races, lower latency, lower context switches
+	                Could not use tasklet because broken API, better anyway ;-)
+
+<jt@hpl.hp.com> (02/04/30 1.447.64.3)
+	irda update 3/7:
+	        o [FEATURE] Replace interruptible_sleep_on() with wait_event().
+	                Most races were taken care off, but cleaner anyway
+
+<jt@hpl.hp.com> (02/04/30 1.447.64.4)
+	irda update 4/7:
+	o [FEATURE] Dongle driver for mcp2120/crystal hardware
+	
+
+<jt@hpl.hp.com> (02/04/30 1.447.64.5)
+	irda update 5/7:
+	o [CORRECT] Load dongle module with irq disabled in irtty
+
+<jt@hpl.hp.com> (02/04/30 1.447.64.6)
+	irda update 6/7:
+	        o [CORRECT] Cancel LSAP watchdog when putting socket back to listen
+	        o [CORRECT] Try to close LAP when closing LSAP still active
+	                <Following patch from Felix Tang>
+	        o [CORRECT] Header fix for compile on Alpha architecture
+
+<jt@hpl.hp.com> (02/04/30 1.447.64.7)
+	irda update 7/7:
+	        o [CORRECT] Prevent dealock on simultaneous peer IrNET connections
+	                Only the primary peer will accept the IrNET connection
+
+<david-b@pacbell.net> (02/04/30 1.447.66.1)
+	[PATCH] PATCH 2.5.10 -- pegasus ethtool support
+	
+	This resends the "usb_make_path()" update (my net-0408 patch)
+	to pegasus, so it reports the same bus info the other usb network
+	drivers now return, and fixes a couple other bugs in ethtool support I
+	happened to notice:
+	
+	    - driver info wasn't providing the "driver short name".
+	    - settings weren't correctly initting data (returned garbage)
+	
+	The first bug caused one text fields to overflow into the next in
+	"ethtool -i eth1" output.  The second caused a 10/100 device
+	to report itself with "ethtool eth1" as having gigabit support ... :)
+
+<david-b@pacbell.net> (02/04/30 1.447.66.2)
+	[PATCH] Re: ohci-hcd and that NCR implementation ...
+	
+	The attached patch makes the one SiS controller behave
+	like the other... the key fix being wmb() to make sure that
+	no writes are still in CPU caches before telling the HC it's
+	OK to fetch the data.  (And a minor tweak to access PCI
+	less often through the hub driver.)
+	
+	But the OPTi problem seems to be different.  Could you
+	try this patch to see if it affects the problem your seeing
+	with that NCR implementation?  And in any case, please
+	integrate it to Linus' latest.  (Against 2.5.10, might be
+	some fuzz on the pci tweak due to that warning fix.)
+	
+	Those missing wmb() statements have likely been the root
+	cause of various usb-ohci flakes reported over time, too.
+	The drivers are still almost identical in those areas.  (Though
+	something made ohci-hcd consistently lose that cache flush
+	race; maybe it's a bit faster.)
+
+<ganesh@vxindia.veritas.com> (02/04/30 1.447.66.3)
+	[PATCH] usb ipaq driver update
+	
+	USB ipaq driver
+	
+	Added support for the Casio EM500. Completely untested. Thanks to
+	info from Nathan <wfilardo@fuse.net>
+
+<wstinson@infonie.fr> (02/05/01 1.447.55.20)
+	request_region janitor updates for sealevel wan driver
+
+<erik_habbinga@hp.com> (02/05/01 1.447.55.21)
+	ifenslave sample program updates:
+	* ifr2.ifr_flags was not initialized in the hwaddr_notset case,
+	* SIOCGIFFLAGS now called before hwaddr_notset test
+
+<davej@suse.de> (02/05/01 1.447.55.22)
+	Fix typo in bonding network device documentation.
+
+<jdr@farfalle.com> (02/05/01 1.447.55.23)
+	Add docs for 3c509 network driver.
+
+<chessman@tux.org> (02/05/01 1.447.55.24)
+	AUI fixes for TLAN net driver.
+	Also, mention new maintainer.
+
+<davej@suse.de> (02/05/01 1.447.55.25)
+	Comment out misplaced } in dscc4 wan driver.
+	Spotted by Keith Owens.
+
+<davej@suse.de> (02/05/01 1.447.55.26)
+	s/strtok/strsep/ in gt96100 net driver
+
+<davej@suse.de> (02/05/01 1.447.55.27)
+	e100 net driver update:
+	e100_phy_reset is called from non-init functions,
+	so remove __devexit marker from that function.
+
+<davej@suse.de> (02/05/01 1.447.55.28)
+	Merge 2.4 update to ariadne net driver:
+	remove unneeded asm/io.h include
+
+<davej@suse.de> (02/05/01 1.447.55.29)
+	net driver's Space.c was missing {'s.  Weird.
+
+<wstinson@infonie.fr> (02/05/01 1.447.55.30)
+	request_region janitor update for sdla wan driver
+
+<wstinson@infonie.fr> (02/05/01 1.447.55.31)
+	baycom_ser_fdx hamradio driver request_region janitor updates:
+		1) remove call to check_region
+		2) test result of request_region
+		3) call release_region in case of driver intialisation error later on
+	 
+
+<elenstev@mesatop.com> (02/05/01 1.447.63.2)
+	Fix typos in BK kernel howto.
+
+<wstinson@infonie.fr> (02/05/01 1.447.63.3)
+	request_region janitor updates for BusLogic SCSI driver.
+
+<wstinson@infonie.fr> (02/05/01 1.447.63.4)
+	request_region janitor updates for megaraid scsi driver:
+	1) removes calls to check_region 
+	2) checks the result of request_region 
+
+<wstinson@infonie.fr> (02/05/01 1.447.63.5)
+	request_region janitor updates for ultrastor scsi driver:
+	1) removes calls to check_region 
+	2) checks the result of request_region calls
+	3) calls release_region where necessary in case of driver initialisation error 
+	
+
+<tony@cantech.net.au> (02/05/01 1.447.63.6)
+	s/Efoo/-Efoo/ cleanup for drivers:
+	etherh acorn net driver, mtdblock_ro mtd driver, and
+	sym 2 scsi driver.
+
+<elenstev@mesatop.com> (02/05/01 1.447.55.32)
+	Add four new help texts to wan driver Config.help.
+
+<anton@samba.org> (02/05/01 1.487)
+	ppc64: sort exception table
+
+<anton@samba.org> (02/05/01 1.488)
+	ppc64: Add write memory barriers before atomics that return values
+
+<anton@samba.org> (02/05/01 1.489)
+	ppc64: Only implement thread priority macros on HMT or iSeries kernels
+	Drop back to eieio in spinlocks for the moment due to performance
+	issues of sync on power3
+
+<mufasa@sis.com.tw> (02/05/01 1.447.55.33)
+	Add support for SiS962 phy to sis900 net driver.
+	Also introduce new maintainer.
+
+<jgarzik@mandrakesoft.com> (02/05/01 1.447.55.34)
+	Fix lance net driver build, after recent autoirq -> probe_irq_x changes
+
+<davem@nuts.ninka.net> (02/05/01 1.369.106.39)
+	Sparc64:
+	- Fix cache_decay_ticks calculation.
+	- Mark some trap initialization funcs __init.
+
+<davem@nuts.ninka.net> (02/05/01 1.369.132.17)
+	Netfilter trivial fixes:
+	- net/core/netfilter.c (overlap): Overlap calculation error.
+	- net/ipv6/netfilter/ip6_tables.c: Misplaced parentheses leads
+	to pointer calculation error on SMP.
+
+<kai@tp1.ruhr-uni-bochum.de> (02/05/01 1.447.67.1)
+	Small Rules.make cleanup
+	
+	Get rid of long obsolete (and unused) MOD_IN_SUBDIRS and unnecessary
+	MOD_DIRS variable.
+
+<kai@tp1.ruhr-uni-bochum.de> (02/05/01 1.447.67.2)
+	Documentation/kbuild/makefiles.txt update
+	
+	Remove description of long obsolete (pre-2.4) Makefiles and describe the
+	current system.
+
+<kai@tp1.ruhr-uni-bochum.de> (02/05/01 1.447.67.3)
+	ALSA: Fix link error
+	
+	If snd-pcm.o is selected built-in, snd-timer.o needs to be get built-in
+	as well, since snd-pcm.o needs snd-timer.o's symbols.
+
+<viro@math.psu.edu> (02/05/01 1.447.69.1)
+	[PATCH] (1/6) blksize_size[] removal
+	
+	 - preliminary cleanups: make sure that swapoff restores original block
+	   size, kill set_blocksize() (and use of __bread()) in multipath.c,
+	   reorder opening device and finding its block size in mtdblock.c.
+
+<viro@math.psu.edu> (02/05/01 1.447.69.2)
+	[PATCH] (2/6) blksize_size[] removal
+	
+	 - switch set_blocksize() to struct block_device *.
+
+<viro@math.psu.edu> (02/05/01 1.447.69.3)
+	[PATCH] (3/6) blksize_size[] removal
+	
+	 - switch block_size() to struct block_device *.
+
+<viro@math.psu.edu> (02/05/01 1.447.69.4)
+	[PATCH] (4/6) blksize_size[] removal
+	
+	 - put block size in bdev->bd_block_size, make do_open() and
+	   check_partition() to set it (see above), switch set_blocksize() and
+	   block_size() to use of ->bd_block_size.  Remove manipulations with
+	   blksize_size[] from drivers, remove blksize_size[] itself.
+
+<viro@math.psu.edu> (02/05/01 1.447.69.5)
+	[PATCH] (5/6) blksize_size[] removal
+	
+	 - kill bread()/getblk()/get_hash_table() (kdev_t-using wrappers; struct
+	   block_device * counterparts are obviously still alive).
+
+<viro@math.psu.edu> (02/05/01 1.447.69.6)
+	[PATCH] (6/6) blksize_size[] removal
+	
+	 - switch blk_get_ra_pages() to struct block_device *, move its use
+	   from bdget() to do_open().
+
+<viro@math.psu.edu> (02/05/01 1.447.69.7)
+	[PATCH] missing checks in exec_permission_light()
+	
+		Missing checks added...
+
+<dougg@torque.net> (02/05/01 1.447.69.8)
+	[PATCH] scsi_error 2.5.12
+	
+	The attachment is part of a patch from Justin Gibbs
+	described in:
+	http://marc.theaimsgroup.com/?l=linux-scsi&m=101200279101550&w=2
+	
+	The original patch was targeted at lk 2.4 and Dave forwarded
+	ported it into 2.5. Other bits (e.g. sr) have already found
+	there way into your tree. One bit in the sd driver will be
+	included in my following patch.
+
+<dougg@torque.net> (02/05/01 1.447.70.1)
+	[PATCH] scsi disk (sd) driver 2.5.12
+	
+	This patch has the last bit of Justin Gibb's patch
+	described in:
+	http://marc.theaimsgroup.com/?l=linux-scsi&m=101200279101550&w=2
+	[this bit for the sd driver]
+	
+	There is also a major code cleanup of the sd driver with
+	documentation headers added and a few obvious bugs fixed
+	described in:
+	http://marc.theaimsgroup.com/?l=linux-scsi&m=101798201714399&w=2
+	I did this cleanup.
+	
+	Justin's patch has been in Dave's tree for several months while
+	my code cleanup patch has been there since 2.5.9-dj1 .
+
+<pmenage@ensim.com> (02/05/01 1.447.69.10)
+	[PATCH] Export path_lookup()
+	
+	path_lookup() is no longer an inline function, and needs to be exported
+	for jffs2, nfsd and af_unix to load as modules.
+
+<akpm@zip.com.au> (02/05/01 1.447.69.11)
+	[PATCH] Unresolved symbol block_flushpage
+	
+	block_flushpage() used to be a macro which pointed at the
+	exported discard_bh_page().  I turned block_flushpage() into
+	a real function but forgot the export.
+
+<john@larvalstage.com> (02/05/01 1.447.55.38)
+	[PATCH] four compile fixes for 2.5.12
+	
+	Pretty boring stuff.  Four compile fixes for 2.5.12.
+
+<fischer@linux-buechse.de> (02/05/01 1.493)
+	[PATCH] aha152x driver
+	
+	Patch to the aha152x driver, which makes it work under 2.5.
+
+<rem@osdl.org> (02/05/01 1.494)
+	[PATCH] bad BUG_ON from acct.c
+	
+	Remove bogus BUG_ON().  On UP kernels spinlocks become NOPs so it is
+	not possible to test the state of a lock.
+
+<torvalds@home.transmeta.com> (02/05/01 1.495)
+	Missed one-liner in the manual merge between Al and Douglas
+
+<Andries.Brouwer@cwi.nl> (02/05/01 1.447.66.4)
+	[PATCH] sddr09 write capability
+	
+	USB sddr09
+	
+	The main purpose of the patch is to add write capability.
+
+<akpm@zip.com.au> (02/05/01 1.496)
+	[PATCH] Tweak VM dirty thresholds
+	
+	The below patch on 2.5.12 takes the 'dbench 32' throughput on a
+	1024 megabyte machine from 35 megs/sec up to 125 megs/sec.
+	That's on the second run.  The first run is much slower because
+	the ext2 bitmaps aren't in cache.
+	
+	Presumably, s/60/80/ will take it even higher.
+
+<viro@math.psu.edu> (02/05/01 1.497)
+	[PATCH] ATTR_MODE breakage
+	
+	(originally caught by Paul Larson <plars@austin.ibm.com>)
+	
+		Patch fixes a couple of idiotic bugs in notify_change() (my
+	fault).  Unary operations have higher priority than binary ones, so
+	if (!valid & ATTR_MODE) doesn't do the right thing.  I plead temporary
+	braindamage...
+
+<aia21@cantab.net> (02/05/01 1.447.1.102)
+	NTFS: Minor cleanups, contact details updates, remove superfluous
+	set_blocksize.
+
+<viro@math.psu.edu> (02/05/01 1.499)
+	[PATCH] UFS sanity checks
+	
+	The real rule is not "block size is at most 32Kb", it's "block size is
+	at most 8 times the fragment size".
+
+<hirofumi@mail.parknet.co.jp> (02/05/01 1.500)
+	[PATCH] Fix the set_bit()'s warnings
+	
+	Fix some set_bit() warnings.
+
+<torvalds@penguin.transmeta.com> (02/05/01 1.501)
+	Manual merge from Andrew Morton: don't assume read-ahead for md
+
+<kai@tp1.ruhr-uni-bochum.de> (02/05/01 1.447.65.2)
+	ISDN: AVM drivers: Get rid of ->interrupt
+	
+	Interrupt handlers won't be reentered anyway.
+
+<kai@tp1.ruhr-uni-bochum.de> (02/05/01 1.447.65.3)
+	ISDN: cleanup AVM drivers
+	
+	Remove unnecessary wrappers around irq handlers.
+
+<kai@tp1.ruhr-uni-bochum.de> (02/05/01 1.447.65.4)
+	ISDN: cleanup AVM drivers
+	
+	Allocate and free the avmcard structure using a shared function.
+
+<davem@nuts.ninka.net> (02/05/01 1.447.71.1)
+	fs/autofs/inode.c:parse_options
+	- Fix bug in strsep/strchr changes, dereference *this_char
+	not *value at top of while loop.  This matches how the same
+	code in fs/autofs4/inode.c looks right now.
+	Withtout this autofs loading causes an OOPS as the first
+	time through the loop *value is dereferencing a NULL pointer.
+
+<davem@nuts.ninka.net> (02/05/01 1.447.71.2)
+	fs/exportfs/expfs.c:dprintk
+	- Fix macro varargs usage, you need to specify a variable name
+	before the triple dot or else most current compilers complain.
+	See include/linux/ext2_fs.h:ext2_debug for another example where
+	it is done correctly.
+
+<aia21@cantab.net> (02/05/02 1.447.1.104)
+	NTFS: 2.0.5 release. Major buffer overflow fix in extent inode handling.
+	Upgrade is imperative!
+
+<oliver@neukum.name> (02/05/02 1.447.66.5)
+	[PATCH] tiny race with devfs in printer
+	
+	USB printer bugfix
+	
+	looking through printer.c in preparation for shifting devfs
+	support to usbcore I noticed that printer advertises a device
+	through devfs before it can be opened.
+	As devfs, or more precisely devfsd can be used to trigger actions
+	this matters and is wrong.
+
+<wolfgang.fritz@gmx.net> (02/05/02 1.447.66.6)
+	[PATCH] pl2303.c: do not reset termios settings in each open()
+	
+	USB pl2303 driver
+	
+	This is a patch which avoids resetting the termios settings to default
+	values (9600 Baud etc.) in each call to pl2303_open (). It does this
+	only on the first call to pl2303_set_termios. After that it sets the
+	termios to the last stored values.
+	
+	 This way commands like
+	 stty -F /dev/ttyUSB0 115200
+	 work the same way as with other serial ttys.
+
+<greg@kroah.com> (02/05/02 1.447.66.7)
+	USB io_edgeport driver
+	
+	added Black Box OEM device ids to the io_edgeport driver.
+
+<greg@kroah.com> (02/05/02 1.447.66.8)
+	USB
+	
+	cleaned up checking the return value of usb_register_dev()
+
+<spse@secret.org.uk> (02/05/02 1.447.66.9)
+	[PATCH] 2.5.12 - make usbvideo.c use USBVIDEO_NUMFRAMES correctly
+	
+	This patch makes usbvideo.c use the correct value of USBVIDEO_NUMFRAMES.
+	A few places in the code assumed it was 2. This patch was tested with
+	USBVIDEO_NUMFRAMES = 2,3,4,8,11,32
+
+<spse@secret.org.uk> (02/05/02 1.447.66.10)
+	[PATCH] 2.5.12 - make usbvideo_register take a usb_device_id table
+	
+	This patch makes usbvideo_register take a usb_device_id argument which it
+	can then pass to usb_register via the struct usb_device. Currently it passes
+	NULL.
+
+<axboe@suse.de> (02/05/02 1.503)
+	[PATCH] bio tagged command support
+	
+	Add support for request tagging of the block queue.
+
+<dalecki@evision-ventures.com> (02/05/02 1.504)
+	[PATCH] 2.5.12 IDE 49
+	
+	- Fix compilation of piix.c
+	
+	- Remove the PADAM_ prefix from sleep hwgroup member.
+	
+	- Fix Pacific Digital host chip driver API.
+	
+	- Fix Tekram host chip driver API.
+	
+	- Fold hwif_unregister() directly in to channel code.
+
+<akpm@zip.com.au> (02/05/02 1.505)
+	[PATCH] unneeded readpage in block_symlink
+	
+	The new consistency checks in buffer.c are complaining about
+	block_symlink's ->readpage against an already uptodate
+	page.
+
+<akpm@zip.com.au> (02/05/02 1.447.72.1)
+	[PATCH] VM dirty page balancing
+	
+	- The balance_dirty_pages() logic is simply wrong.  It goes:
+	
+		if (value > threshold)
+			go_and_write(value - threshold);
+	
+	  which is just fine for a single process writing data.  But
+	  for many processes, they *all* go and bring things back into
+	  balance, and too much data gets written out.
+	
+	- The
+	
+		go_and_write(this much)
+	
+	  logic is inoperative, because I turned off the ->writeback_mapping()
+	  function in ext2.  So a call to writeback_unlocked_inodes(this_much)
+	  doesn't actually decrement and test *this_much.  It will walk every
+	  inode, all the time.  Silly.
+	
+	So quickly fixing the above things, the amount of dirty+writeback
+	memory in the machine nicely stabilises at 500 megabytes across
+	the run.
+
+<torvalds@penguin.transmeta.com> (02/05/02 1.447.72.2)
+	Remove left-over debug printk from Andrew
+
+<torvalds@penguin.transmeta.com> (02/05/02 1.507)
+	Update kernel version
+
+<dougg@torque.net> (02/05/02 1.508)
+	[PATCH] scsi_merge.c 2.5.12
+	
+	Fix oopses on ISA scsi adapters.
+	
+	[ This is a transfer from Dave's tree ]
+
+<dougg@torque.net> (02/05/02 1.509)
+	[PATCH] scsi tape (st) 2.5.12
+	
+	Documentation enhancement from Kai.Makisara@metla.fi.
+	
+	[ This is a transfer from Dave's tree ]
+
+<dougg@torque.net> (02/05/02 1.510)
+	[PATCH] cpqfc compaq FC controller 2.5.12
+	
+	Minor cleanups to a scsi fibre channel HBA driver that was broken by the
+	introduction of SCSI_REPORT_LUNS to scsi.h in a patch that went into
+	2.5.11 .
+	
+	[ Another transfer from Dave's tree ]
+

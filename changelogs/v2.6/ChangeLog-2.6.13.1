@@ -1,0 +1,220 @@
+commit 05dbb1e557b392c8cef3675b4ba6497794ad4124
+Author: Chris Wright <chrisw@osdl.org>
+Date:   Fri Sep 9 19:42:58 2005 -0700
+
+    Linux 2.6.13.1
+
+commit 0721a681c617fdd498f2f0f40e69895354baf099
+Author: Al Viro <aviro@redhat.com>
+Date:   Wed Aug 31 10:55:12 2005 +0100
+
+    [PATCH] raw_sendmsg DoS (CAN-2005-2492)
+    
+    Fix unchecked __get_user that could be tricked into generating a
+    memory read on an arbitrary address.  The result of the read is not
+    returned directly but you may be able to divine some information about
+    it, or use the read to cause a crash on some architectures by reading
+    hardware state.  CAN-2005-2492.
+    
+    Fix from Al Viro, ack from Dave Miller.
+    
+    Signed-off-by: Chris Wright <chrisw@osdl.org>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
+
+commit c255cda2af84db91d19944c092baf5a61c633181
+Author: David Woodhouse <dwmw2@infradead.org>
+Date:   Tue Sep 6 09:30:10 2005 +0100
+
+    [PATCH] 32bit sendmsg() flaw (CAN-2005-2490)
+    
+    When we copy 32bit ->msg_control contents to kernel, we walk the same
+    userland data twice without sanity checks on the second pass.
+    
+    Second version of this patch: the original broke with 64-bit arches
+    running 32-bit-compat-mode executables doing sendmsg() syscalls with
+    unaligned CMSG data areas
+    
+    Another thing is that we use kmalloc() to allocate and sock_kfree_s()
+    to free afterwards; less serious, but also needs fixing.
+    
+    Patch by Al Viro, David Miller, David Woodhouse
+    (sparc64 clean compile fix from David Miller)
+    
+    Signed-off-by: Al Viro <viro@zeniv.linux.org.uk>
+    Signed-off-by: David Woodhouse <dwmw2@infradead.org>
+    Signed-off-by: Chris Wright <chrisw@osdl.org>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
+
+commit cf43ea034180996242226eac042889c5b06c7df7
+Author: Stephen Hemminger <shemminger@osdl.org>
+Date:   Tue Sep 6 15:52:34 2005 -0700
+
+    [PATCH] Reassembly trim not clearing CHECKSUM_HW
+    
+    [IPV4]: Reassembly trim not clearing CHECKSUM_HW
+    
+    This was found by inspection while looking for checksum problems
+    with the skge driver that sets CHECKSUM_HW. It did not fix the
+    problem, but it looks like it is needed.
+    
+    If IP reassembly is trimming an overlapping fragment, it
+    should reset (or adjust) the hardware checksum flag on the skb.
+    
+    Signed-off-by: Stephen Hemminger <shemminger@osdl.org>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+    Signed-off-by: Chris Wright <chrisw@osdl.org>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
+
+commit 76739be851b4fd112f28dd7c2aaff136def09d64
+Author: David S. Miller <davem@davemloft.net>
+Date:   Tue Sep 6 15:03:39 2005 -0700
+
+    [PATCH] Use SA_SHIRQ in sparc specific code.
+    
+    Based upon a report from Jason Wever.
+    
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+    Signed-off-by: Chris Wright <chrisw@osdl.org>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
+
+commit e381a0a1169713ef4494d22693896e781b83fcbd
+Author: Herbert Xu <herbert@gondor.apana.org.au>
+Date:   Fri Sep 9 19:42:51 2005 -0700
+
+    [PATCH] Fix boundary check in standard multi-block cipher processors
+    
+    [CRYPTO] Fix boundary check in standard multi-block cipher processors
+    
+    Fixes Bug 5194 (IPSec related Oops in 2.6.13).
+    
+    The boundary check in the standard multi-block cipher processors are
+    broken when nbytes is not a multiple of bsize.  In those cases it will
+    always process an extra block.
+    
+    This patch corrects the check so that it processes at most nbytes of data.
+    
+    Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+    Signed-off-by: Chris Wright <chrisw@osdl.org>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
+
+commit a49567a4dbfd414f19e5bf828a4b2c540f164ea8
+Author: Herbert Xu <herbert@gondor.apana.org.au>
+Date:   Mon Sep 5 18:47:10 2005 -0700
+
+    [PATCH] 2.6.13 breaks libpcap (and tcpdump)
+    
+    [NET]: 2.6.13 breaks libpcap (and tcpdump)
+    
+    Patrick McHardy says:
+    
+      Never mind, I got it, we never fall through to the second switch
+      statement anymore. I think we could simply break when load_pointer
+      returns NULL. The switch statement will fall through to the default
+      case and return 0 for all cases but 0 > k >= SKF_AD_OFF.
+    
+    Here's a patch to do just that.
+    
+    I left BPF_MSH alone because it's really a hack to calculate the IP
+    header length, which makes no sense when applied to the special data.
+    
+    Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+    Signed-off-by: Chris Wright <chrisw@osdl.org>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
+
+commit 2811d271ee67f4de6c6d7e2c731698f6f9f7746a
+Author: Ivan Kokshaysky <ink@jurassic.park.msu.ru>
+Date:   Mon Sep 5 07:12:21 2005 -0700
+
+    [PATCH] x86: pci_assign_unassigned_resources() update
+    
+    I had some time to think about PCI assign issues in 2.6.13-rc series.
+    
+    The major problem here is that we call pci_assign_unassigned_resources()
+    way too early - at subsys_initcall level. Therefore we give no chances
+    to ACPI and PnP routines (called at fs_initcall level) to reserve their
+    respective resources properly, as the comments in drivers/pnp/system.c
+    and drivers/acpi/motherboard.c suggest:
+    
+     /**
+      * Reserve motherboard resources after PCI claim BARs,
+      * but before PCI assign resources for uninitialized PCI devices
+      */
+    
+    So I moved the pci_assign_unassigned_resources() call to
+    pcibios_assign_resources() (fs_initcall), which should hopefully fix a
+    lot of problems and make PCIBIOS_MIN_IO tweaks unnecessary.
+    
+    Other changes:
+    - remove resource assignment code from pcibios_assign_resources(), since
+      it duplicates pci_assign_unassigned_resources() functionality and
+      actually does nothing in 2.6.13;
+    - modify ROM assignment code as per Ben's suggestion: try to use firmware
+      settings by default (if PCI_ASSIGN_ROMS is not set);
+    - set CARDBUS_IO_SIZE back to 4K as it's a wonderful stress test for
+      various setups.
+    
+    Confirmed by Tero Roponen <teanropo@cc.jyu.fi> (who had problems with
+    the 4kB CardBus IO size previously).
+    
+    Signed-off-by: Linus Torvalds <torvalds@osdl.org>
+    Signed-off-by: Chris Wright <chrisw@osdl.org>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
+
+commit 5163b0a323cf51f1bb322a37fd86d3433ffc9d4a
+Author: Benjamin Herrenschmidt <benh@kernel.crashing.org>
+Date:   Sun Sep 4 08:28:05 2005 +1000
+
+    [PATCH] Fix PCI ROM mapping
+    
+    This fixes a problem with pci_map_rom() which doesn't properly
+    update the ROM BAR value with the address thas allocated for it by the
+    PCI code. This problem, among other, breaks boot on Mac laptops.
+    
+    It'ss a new version based on Linus latest one with better error
+    checking.
+    
+    Signed-off-by: Benjamin Herrenschmidt <benh@kernel.crashing.org>
+    Signed-off-by: Linus Torvalds <torvalds@osdl.org>
+    Signed-off-by: Chris Wright <chrisw@osdl.org>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
+
+commit 7a8ad840d817bda420f89963d9650a6f053eeea1
+Author: Mark Haverkamp <markh@osdl.org>
+Date:   Thu Sep 1 08:19:23 2005 -0700
+
+    [PATCH] aacraid: 2.6.13 aacraid bad BUG_ON fix
+    
+    This was noticed by Doug Bazamic and the fix found by Mark Salyzyn at
+    Adaptec.
+    
+    There was an error in the BUG_ON() statement that validated the
+    calculated fib size which can cause the driver to panic.
+    
+    Signed-off-by: Mark Haverkamp <markh@osdl.org>
+    Acked-by: James Bottomley <James.Bottomley@SteelEye.com>
+    Signed-off-by: Chris Wright <chrisw@osdl.org>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
+
+commit 6532533a281e5113d74cb403c256be1c6b446f1a
+Author: Michael Krufky <mkrufky@m1k.net>
+Date:   Tue Aug 30 15:47:14 2005 -0400
+
+    [PATCH] Kconfig: saa7134-dvb must select tda1004x
+    
+    I wish I had seen this before 2.6.13 was released... I guess this only
+    goes to show that there haven't been any testers using saa7134-hybrid
+    dvb/v4l boards that depend on the tda1004x module, during the 2.6.13-rc
+    series :-(
+    
+    Please apply this to 2.6.14, and also to 2.6.13.1 -stable.  Without this
+    patch, users will have to EXPLICITLY select tda1004x in Kconfig.  This
+    SHOULD be done automatically when saa7134-dvb is selected.  This patch
+    corrects this problem.
+    
+    saa7134-dvb must select tda1004x
+    
+    Signed-off-by: Michael Krufky <mkrufky@m1k.net>
+    Signed-off-by: Chris Wright <chrisw@osdl.org>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
+

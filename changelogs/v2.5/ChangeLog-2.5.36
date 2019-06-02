@@ -1,0 +1,740 @@
+
+Summary of changes from v2.5.35 to v2.5.36
+============================================
+
+<aia21@cantab.net>
+	NTFS: Pages are no longer kmapped around calls to
+	->{prepare,commit}_write, adapt NTFS appropriately.
+
+<dwmw2@infradead.org>
+	Add three functions for rbtree manipulation -- rb_next(), rb_prev() and rb_replace_node()
+	    
+	rb_next() and rb_prev() return the next and previous nodes in the tree, respectively.
+	
+	rb_replace_node() allows fast replacement of a single node without having to remove the 
+	victim, rebalance the tree, insert the replacement and then rebalance again to the original
+	topology.
+
+<dwmw2@infradead.org>
+	Remove bogus rb_root_t and rb_node_t typedefs in favour of 'struct rb_node' and 'struct rb_root'
+	Remove duplicate implementation of rb_next() in net/sched/sch_htb.c while we're at it.
+
+<hch@dhcp212.munich.sgi.com>
+	Import XFS CVS from 10092002
+
+<sandeen@sgi.com>
+	XFS: teach icmn_err about CE_WARN
+	
+	Date:  Tue Sep 10 09:56:09 PDT 2002
+	Workarea:  jen.americas.sgi.com:/src/lord/xfs-merge.2.5
+	Author:  sandeen
+	Merged by:  lord
+	Merged mods:  2.4.x-xfs:slinx:127029a
+	
+	The following file(s) were checked into:
+	  bonnie.engr.sgi.com:/isms/slinx/2.5.x-xfs
+	
+	
+	Modid:  2.5.x-xfs:slinx:127029a
+	linux/fs/xfs/support/debug.c - 1.9
+		- Merge of 2.4.x-xfs:slinx:127029a by lord.
+
+<sandeen@sgi.com>
+	XFS: change symlink perms to 777
+	
+	Date:  Tue Sep 10 14:07:19 PDT 2002
+	Workarea:  jen.americas.sgi.com:/src/lord/xfs-merge.2.5
+	Author:  sandeen
+	Merged by:  lord
+	Merged mods:  2.4.x-xfs:slinx:127049a
+	
+	The following file(s) were checked into:
+	  bonnie.engr.sgi.com:/isms/slinx/2.5.x-xfs
+	
+	
+	Modid:  2.5.x-xfs:slinx:127049a
+	linux/fs/xfs/linux/xfs_iops.c - 1.179
+		- Merge of 2.4.x-xfs:slinx:127049a by lord.
+	
+	
+
+<sandeen@sgi.com>
+	XFS: add error checks to linvfs_direct_IO
+	
+	Date:  Wed Sep 11 12:12:31 PDT 2002
+	Workarea:  stout.americas.sgi.com:/localhome/src/sandeen/2.5.x-xfs/workarea
+	Merged by:  sandeen
+	Merged mods:  
+	2.4.x-xfs:slinx:127120a
+	2.4.x-xfs:slinx:127147a
+	Author:  sandeen
+	
+	The following file(s) were checked into:
+	  bonnie.engr.sgi.com:/isms/slinx/2.5.x-xfs
+	
+	
+	Modid:  2.5.x-xfs:slinx:127150a
+	linux/fs/xfs/linux/xfs_iops.c - 1.180
+		- Merge of 2.4.x-xfs:slinx:127120a originally by sandeen on 09/11/02
+	
+	linux/fs/xfs/linux/xfs_aops.c - 1.4
+		- Merge of 2.4.x-xfs:slinx:127147a originally by sandeen on 09/11/02
+		  add error checks to linvfs_direct_IO
+	
+	
+
+<nathans@sgi.com>
+	XFS: code cleanup
+	
+	Date:  Thu Sep 12 20:10:49 PDT 2002
+	Workarea:  snort.melbourne.sgi.com:/home/nathans/2.5.x-xfs
+	Author:  nathans
+	Merged by:  nathans
+	Merged mods:  2.4.x-xfs:slinx:127321a
+	
+	The following file(s) were checked into:
+	  bonnie.engr.sgi.com:/isms/slinx/2.5.x-xfs
+	
+	
+	Modid:  2.5.x-xfs:slinx:127321a
+	linux/fs/xfs/linux/xfs_super.c - 1.227
+		- Merge of 2.4.x-xfs:slinx:127321a by nathans.
+		  tidy up code consistency - same argument formatting throughout and make
+		  consistent use of STATIC.
+	
+	
+
+<hch@sgi.com>
+	XFS: update pagebuf comments
+	
+	Date:  Fri Sep 13 06:24:23 PDT 2002
+	Workarea:  dhcp212.munich.sgi.com:/home/hch/repo/ptools/linux-2.5-xfs
+	Author:  hch
+	Merged by:  hch
+	Merged mods:  2.4.x-xfs:slinx:127345a
+	
+	The following file(s) were checked into:
+	  bonnie.engr.sgi.com:/isms/slinx/2.5.x-xfs
+	
+	
+	Modid:  2.5.x-xfs:slinx:127345a
+	linux/fs/xfs/pagebuf/page_buf_locking.c - 1.28
+	linux/fs/xfs/pagebuf/page_buf.c - 1.58
+		- Merge of 2.4.x-xfs:slinx:127345a by hch.
+		  Fix up comments:  Pagebuf is only used for metadata nowdays
+	
+	
+
+<hch@sgi.com>
+	XFS: Return -ENOMEM on vmap failure in _pagebuf_lookup_pages
+	
+	Date:  Fri Sep 13 07:05:57 PDT 2002
+	Workarea:  dhcp212.munich.sgi.com:/home/hch/repo/ptools/linux-2.5-xfs
+	Author:  hch
+	Merged by:  hch
+	Merged mods:  2.4.x-xfs:slinx:127349a
+	
+	The following file(s) were checked into:
+	  bonnie.engr.sgi.com:/isms/slinx/2.5.x-xfs
+	
+	
+	Modid:  2.5.x-xfs:slinx:127349a
+	linux/fs/xfs/pagebuf/page_buf.c - 1.59
+		- Merge of 2.4.x-xfs:slinx:127349a by hch.
+		  Return -ENOMEM on vmap failure in _pagebuf_lookup_pages
+	
+	
+
+<lord@sgi.com>
+	XFS: remove dead code paths from create/mkdir/link/symlink
+	
+	Date:  Fri Sep 13 11:30:31 PDT 2002
+	Workarea:  jen.americas.sgi.com:/src/lord/xfs-merge.2.5
+	Author:  lord
+	Merged by:  lord
+	Merged mods:  2.4.x-xfs:slinx:127368a
+	
+	The following file(s) were checked into:
+	  bonnie.engr.sgi.com:/isms/slinx/2.5.x-xfs
+	
+	
+	Modid:  2.5.x-xfs:slinx:127368a
+	linux/fs/xfs/xfs_vnodeops.c - 1.564
+		- Merge of 2.4.x-xfs:slinx:127368a by lord.
+	
+	
+
+<akpm@digeo.com>
+	[PATCH] low-latency zap_page_range
+	
+	zap_page_range and truncate are the two main latency problems
+	in the VM/VFS.  The radix-tree-based truncate grinds that into
+	the dust, but no algorithmic fixes for pagetable takedown have
+	presented themselves...
+	
+	Patch from Robert Love.
+	
+	Attached patch implements a low latency version of "zap_page_range()".
+	
+	Calls with even moderately large page ranges result in very long lock
+	held times and consequently very long periods of non-preemptibility.
+	This function is in my list of the top 3 worst offenders.  It is gross.
+	
+	This new version reimplements zap_page_range() as a loop over
+	ZAP_BLOCK_SIZE chunks.  After each iteration, if a reschedule is
+	pending, we drop page_table_lock and automagically preempt.  Note we can
+	not blindly drop the locks and reschedule (e.g. for the non-preempt
+	case) since there is a possibility to enter this codepath holding other
+	locks.
+	
+	... I am sure you are familar with all this, its the same deal as your
+	low-latency work.  This patch implements the "cond_resched_lock()" as we
+	discussed sometime back.  I think this solution should be acceptable to
+	you and Linus.
+	
+	There are other misc. cleanups, too.
+	
+	This new zap_page_range() yields latency too-low-to-benchmark: <<1ms.
+
+<akpm@digeo.com>
+	[PATCH] resurrect /proc/meminfo:Buffers
+	
+	The /proc/meminfo:Buffers statistic is quite useful - it tells us
+	how effective we are being at caching filesystem metadata.
+	
+	For example, increases in this figure are a measure of success of the
+	slablru and buffer_head-limitation patches.
+	
+	The patch resurrects buffermem accounting.  The metric is calculated
+	on-demand, via a walk of the blockdev hashtable.
+
+<akpm@digeo.com>
+	[PATCH] hugetlb pages
+	
+	Rohit Seth's ia32 huge tlb pages patch.
+	
+	Anton Blanchard took a look at this today; he seemed happy
+	with it and said he could borrow bits.
+
+<akpm@digeo.com>
+	[PATCH] fix reverse map accounting leak
+	
+	From Hugh Dickins.  Fix a leak in the /proc/meminfo:ReverseMaps
+	accounting.
+
+<akpm@digeo.com>
+	[PATCH] add /proc/meminfo:Mapped
+	
+	The patch adds a "Mapped" field to /proc/meminfo - tha amount of memory
+	which is mapped into pagetables.
+	
+	This is a useful statistic to monitor when testing and observing the
+	vitual memory system.
+
+<akpm@digeo.com>
+	[PATCH] ext3 ceanup: use EXT3_SB
+	
+	Patch from Jani Monoses <jani@iv.ro>
+	
+	"This turns the remaining parts of ext3 to EXT3_SB and turns the
+	 latter from a macro to inline function which returns the generic_sbp
+	 field of u.
+	
+	 linux/fs.h is not touched by this patch though.
+	
+	 Intermezzo's three uses of ext3_sb are also not changed."
+
+<akpm@digeo.com>
+	[PATCH] hold the page ref across ->readpage
+	
+	read_pages() is dropping the page refcount before running ->readpage().
+	Which just happens to work, because the page is in pagecache and
+	locked.
+	
+	But it breaks under some unconventional things which reiser4 is doing,
+	and it's better/safer/saner this way anyway.
+
+<akpm@digeo.com>
+	[PATCH] fix a bogus OOM condition for __GFP_NOFS allocations
+	
+	If a GFP_NOFS allocation is made when the ZONE_NORMAL inactive list is
+	full of dirty or under-writeback pages, there is nothing the caller can
+	do to force some page reclaim.  The caller ends up getting oom-killed.
+	
+	- In mempool_alloc(), don't try to perform page reclaim again.  Just
+	  go to sleep and wait for some elements to be returned to the pool.
+	
+	- In try_to_free_pages(): perform a single, short scan of the LRU and
+	  if that doesn't work, fail the allocation.  GFP_NOFS allocators know
+	  how to handle that.
+
+<akpm@digeo.com>
+	[PATCH] clean up the TLB takedown code, remove debug
+	
+	- Remove the temp /proc/meminfo stats
+	
+	- Make the mmu_gather_t be 2048 bytes again
+	
+	- Removed unused variable (Oleg Nesterov)
+
+<akpm@digeo.com>
+	[PATCH] add dump_stack(): cross-arch backtrace
+	
+	From Christoph Hellwig, also present in 2.4.
+	
+	Create an arch-independent `dump_stack()' function.  So we don't need to do
+	
+	#ifdef CONFIG_X86
+		show_stack(0);		/* No prototype in scope! */
+	#endif
+	
+	any more.
+	
+	The whole dump_stack() implementation is delegated to the architecture.
+	If it doesn't provide one, there is a default do-nothing library
+	function.
+
+<akpm@digeo.com>
+	[PATCH] various small cleanups
+	
+	- Remove defunct active_list/inactive_list declarations (wli)
+	
+	- Update an obsolete comment (wli)
+	
+	- "mm/slab.c contains one leftover from the initial version with
+	  'unsigned short' bufctl entries.  The attached patch replaces '2'
+	  with the correct sizeof [which is now 4]" - Manfred Spraul
+	
+	- BUG checks for vfree/vunmap being called in interrupt context
+	  (because they take irq-unsafe spinlocks, I guess?) - davej
+	
+	- Simplify some coding in one_highpage_init() (Christoph Hellwig).
+
+<david@gibson.dropbear.id.au>
+	[PATCH] Remove CONFIG_SMP around wait_task_inactive()
+	
+	Linus, please apply.  This defines wait_task_inactive() to be a no-op
+	on UP machines, and removes the #ifdef CONFIG_SMP which surrounds
+	current calls.
+	
+	This also fixes compile on UP which was broken by the addition of a
+	call to wait_task_inactive in fs/exec.c which was not protected by an
+	#ifdef.
+
+<axboe@burns.home.kernel.dk>
+	Cleanup Config.in, and remove unused options
+
+<axboe@burns.home.kernel.dk>
+	Make sure ide init happens in the right order
+
+<axboe@burns.home.kernel.dk>
+	Missing exports
+
+<axboe@burns.home.kernel.dk>
+	Move pio setup and blacklists to ide-lib
+
+<axboe@burns.home.kernel.dk>
+	Missing module_init()
+
+<axboe@burns.home.kernel.dk>
+	New IDE pci low level driver setup scheme
+
+<axboe@burns.home.kernel.dk>
+	Update promise drivers to new ide pci init scheme, remove now unused
+	old pdc202xx.c
+
+<axboe@burns.home.kernel.dk>
+	Mistakenly enabled ide-tape, disable it again (update of it is broken)
+
+<axboe@burns.home.kernel.dk>
+	piix_pci_info() needs to be __initdata, not __devinit
+
+<axboe@burns.home.kernel.dk>
+	ide.h needs to include pci.h
+
+<axboe@suse.de>
+	[PATCH] limit size of bio_vec pools
+	
+	We are currently wasting ~2MiB on the bio pools. This is ok on systems
+	with plenty of ram, but it's too much for a 16mb system for instance.
+	
+	This patch scales the bio_vec mempool sizes a bit. The logic is mainly:
+	
+	+       megabytes = nr_free_pages() >> (20 - PAGE_SHIFT);
+	+       if (megabytes <= 16)
+	+               scale = 0;
+	+       else if (megabytes <= 32)
+	+               scale = 1;
+	+       else if (megabytes <= 64)
+	+               scale = 2;
+	+       else if (megabytes <= 96)
+	+               scale = 3;
+	+       else if (megabytes <= 128)
+	+               scale = 4;
+	
+	and then for mempool setup:
+	
+	+               if (i >= scale)
+	+                       pool_entries >>= 1;
+	+
+	+               bp->pool = mempool_create(pool_entries, slab_pool_alloc,
+	                                        slab_pool_free, bp->slab);
+	
+	So we allocate less and less entries for the bigger sized pools. It
+	doesn't make too much sense to fill the memory with sg tables for 256
+	page entries on a 16mb system.
+	
+	In addition, we select a starting nr_pool_entries point, based on amount
+	of ram as well:
+	
+	+       pool_entries = megabytes * 2;
+	+       if (pool_entries > 256)
+	+               pool_entries = 256;
+	
+	The end-result is that on a 128mb system, it looks like:
+	
+	BIO: pool of 256 setup, 14Kb (56 bytes/bio)
+	biovec pool[0]:   1 bvecs: 244 entries (12 bytes)
+	biovec pool[1]:   4 bvecs: 244 entries (48 bytes)
+	biovec pool[2]:  16 bvecs: 244 entries (192 bytes)
+	biovec pool[3]:  64 bvecs: 244 entries (768 bytes)
+	biovec pool[4]: 128 bvecs: 122 entries (1536 bytes)
+	biovec pool[5]: 256 bvecs:  61 entries (3072 bytes)
+	
+	ie a total of ~620KiB used. Booting with mem=32m gives us:
+	
+	BIO: pool of 256 setup, 14Kb (56 bytes/bio)
+	biovec pool[0]:   1 bvecs:  56 entries (12 bytes)
+	biovec pool[1]:   4 bvecs:  28 entries (48 bytes)
+	biovec pool[2]:  16 bvecs:  14 entries (192 bytes)
+	biovec pool[3]:  64 bvecs:   7 entries (768 bytes)
+	biovec pool[4]: 128 bvecs:   3 entries (1536 bytes)
+	biovec pool[5]: 256 bvecs:   1 entries (3072 bytes)
+	
+	ie a total of ~31KiB. Booting with 512mb makes it:
+	
+	BIO: pool of 256 setup, 14Kb (56 bytes/bio)
+	biovec pool[0]:   1 bvecs: 256 entries (12 bytes)
+	biovec pool[1]:   4 bvecs: 256 entries (48 bytes)
+	biovec pool[2]:  16 bvecs: 256 entries (192 bytes)
+	biovec pool[3]:  64 bvecs: 256 entries (768 bytes)
+	biovec pool[4]: 128 bvecs: 256 entries (1536 bytes)
+	biovec pool[5]: 256 bvecs: 256 entries (3072 bytes)
+	
+	which is the same as before. The cut-off point is somewhere a bit over
+	256mb. Andrew suggested we may want to 'cheat' a bit here, and leave the
+	busy pools alone. We know that mpage is going to be heavy on the 16
+	entry pool, so it migh make sense to make such a pool and not scale
+	that. We can deal with that later, though.
+
+<axboe@suse.de>
+	[PATCH] fix elevator_linus accounting
+	
+	elevator_linus is seriously broken wrt accounting. Marcelo recently took
+	the patch to fix it in 2.4.20-pre, here's the 2.5 equiv.
+	
+	Right now, we account merges as costly and seeks as not. Only thing that
+	prevents seek starvation is the aging scan. That is broken, very much
+	so. This patch fixes that to account merges and inserts differently. A
+	seek is ELV_LINUS_SEEK_COST more costly than a merge, currently that
+	define is at '16'. Doing the math on a disk, this sort of makes sense.
+	
+	Defaults are read latency of 1024, which means 1024 merges or 64 seeks.
+	Writes are double that.
+
+<axboe@suse.de>
+	[PATCH] ide irq problem
+	
+	Attribution goes to Petr Vandrovec for finding and solving this one. You
+	probably read the mail you were cc'ed on, so I'll just mention that this
+	patch makes sure that the irq disabling and enabling is perfectly
+	balanced in the probing path. I've also looked at the multiple irq chain
+	problem you mentioned, and as far as I can see we are never touching the
+	2nd chain from within the first one. So should be ok.
+	
+	I'm also including the unexpected interrupt prinkt removal.
+
+<bcollins@debian.org>
+	[PATCH] IEEE-1394 updates
+	
+	Syncronizes with our SVN repo. Merged in all changes from your tree.
+
+<mingo@elte.hu>
+	[PATCH] thread-exec-fix-2.5.35-A5, BK-curr
+	
+	This fixes a number of sys_execve() problems:
+	
+	 - ptrace of thread groups over exec works again.
+	
+	 - if the exec() is done in a non-leader thread then we must inherit the
+	   parent links properly - otherwise the shell will see an early
+	   child-exit notification.
+	
+	 - if the exec()-ing thread is detached then make it use SIGCHLD like the
+	   leader thread.
+	
+	 - wait for the leader thread to become TASK_ZOMBIE properly -
+	   wait_task_inactive() alone was not enough. This should be a rare
+	   codepath.
+	
+	now sys_execve() from thread groups works as expected in every combination
+	i could test: standalone, from the leader thread, from one of the child
+	threads, ptraced, non-ptraced, SMP and UP.
+
+<pdelaney@lsil.com>
+	[PATCH] Fusion-MPT driver update
+	
+	This updates the Fusion-MPT driver to the latest stable version.
+	Changes affect the driver source only.
+	
+	Major Changes:
+	Reworked the calls save_flags, cli, restore_flags to 2.5 format.
+	Modified DV  invocation and to handle illegal bus configuration
+	Negotiation settings honor NVRAM
+	
+	Bug Fix: Pushing F/W onto part during driver unload.
+	Bug Fix: Force F/W reset for 1030 on driver load.
+	Bug Fix: F/W download algorithm.
+	Bug Fix: Found a memory leak in mptctl.c
+	Bug Fix: Forcing data direction for reads and writes (sg issue)
+	Bug Fix: Wrong mask in Inquiry data ANSI version
+	
+	Minor Changes:
+	Modified the debug and logging statements of the driver
+	Upgraded the MPI include files (lsi/)
+
+<stern@rowland.harvard.edu>
+	[PATCH] USB storage:  Merging raw_bulk.c with transport.c
+	
+	Here's a very simple patch that can go into the source tree right away.
+	It just fixes some occurrences of the scsi result code GOOD to GOOD << 1
+	in isd200.c.
+
+<mdharm-usb@one-eyed-alien.net>
+	[PATCH] USB storage: remove tests against EINPROGRESS
+	
+	This patch removes tests of urb->status for EINPROGRESS.  As was pointed
+	out, that's not such a good idea, for a variety of reasons.
+	
+	In the process, a semaphore became useless.
+
+<mdharm-usb@one-eyed-alien.net>
+	[PATCH] USB storage: macro-ize address manipulation
+	
+	This patch converts all uses of page_addres() to the sg_address() macro.
+	This will make backporting to 2.4 easier, as well as eliminate lots of
+	redundant code.
+
+<mdharm-usb@one-eyed-alien.net>
+	[PATCH] USB storage: minor compilation fixes
+	
+	This patch fixes up some minor compilation problems.
+
+<mdharm-usb@one-eyed-alien.net>
+	[PATCH] USB storage: add error checks, remove useless code
+	
+	This patch removes attempts to clear halts on a control endpoint (think
+	about it for a minute if you don't see why this is pointless....) and also
+	adds return-code checks for all places where halts are cleared.
+	
+	This _should_ be just redundant code, but recent tests suggest that this
+	is, in fact, not the case.  People should _heavily_ test this patch.  I'm
+	going to pause here for a while (in the patch stream) until we've got this
+	sorted out -- initial results on my test setup seem to show some problems
+	still remain.  Where those problems are (HCD or usb-storage) remains to be
+	seen.
+
+<cattelan@sgi.com>
+	XFS: "AutoVersion"
+	
+	Date:  Fri Sep 13 14:59:34 PDT 2002
+	Workarea:  chuckle.americas.sgi.com:/build/lxfs-cvs/2.5.x-xfs-VER
+	Author:  cattelan
+	
+	The following file(s) were checked into:
+	  bonnie.engr.sgi.com:/isms/slinx/2.5.x-xfs
+	
+	
+	Modid:  2.5.x-xfs:slinx:127397a
+	linux/fs/xfs/linux/xfs_version.h - 1.2
+	
+
+<lord@sgi.com>
+	merge xfs up to 2.5.35
+	
+	Date:  Mon Sep 16 09:10:25 PDT 2002
+	Workarea:  jen.americas.sgi.com:/src/lord/xfs-merge.2.5
+	Author:  lord
+	
+	The following file(s) were checked into:
+	  bonnie.engr.sgi.com:/isms/slinx/2.5.x-xfs
+	
+	
+	Modid:  2.5.x-xfs:slinx:127481a
+	linux/fs/xfs/linux/xfs_lrw.c - 1.166
+	linux/fs/xfs/support/time.h - 1.7
+	linux/fs/xfs/linux/xfs_aops.c - 1.5
+	
+
+<hpa@zytor.com>
+	[PATCH] CPU detection fixes...
+	
+	I noticed a kluge had been put into 2.5.35, to cover up *one* of the
+	errors caused by a particular bug that was introduced when Patrick
+	Mochel split up arch/i386/kernel/setup.c: he incorrectly thought the
+	AMD-defined CPUID levels were AMD-specific; they're not -- every other
+	x86 vendors *including* Intel uses them as well.
+	
+	This also adds the "i686" hack for TM5xxx that was added in 2.4 recently.
+
+<torvalds@home.transmeta.com>
+	Make "in_atomic()" work right with preempt enabled
+
+<mark@alpha.dyndns.org>
+	[PATCH] ov511 1.62 for 2.5.34
+	
+	 Update the ov511 driver to version 1.62:
+	 o Update email address
+	 o Remove some dead code and fix some harmless typos
+	 o New device: Alpha Vision Tech. AlphaCam SE
+	 o Fix assignment of ov->proc_button->owner to not cause
+	   NULL pointer deref (credit: Oleg K.)
+	 o Support I2C read/write ioctl()s via V4L (credit: Oleg K.)
+	 o Add OV518-specific register dump code
+	 o New snapshot reset sequence; old one was causing
+	   erroneous I2C writes (credit: Oleg K.)
+	 o OV6630 needs different register 0x14 settings than OV6620
+	 o Don't print palette errors by default
+	 o Detect OV518 cameras that have packet numbering enabled
+	   by default and set ov->packet_numbering accordingly. This
+	   should fix the problems some users were having with babble
+	   (USB error -75) and cameras not working at all.
+
+<greg@kroah.com>
+	USB: change the contact email address for the omninet driver
+
+<greg@kroah.com>
+	Driver Model: add dev_get_drvdata() and dev_set_drvdata() functions
+
+<greg@kroah.com>
+	Driver Model: fix oops when device is removed from system
+
+<greg@kroah.com>
+	USB: Convert the core code to use struct device_driver.
+
+<greg@kroah.com>
+	USB: convert usb-serial drivers to new driver model.
+	
+	This adds the requirement that the usb-serial drivers call 
+	usb_register() and usb_unregister() themselves, instead of having
+	the usbserial.c file do it.  Step one in moving the usbserial.c 
+	code to being a "class"  :)
+
+<greg@kroah.com>
+	USB: convert the drivers/usb/class files to the new USB driver model.
+
+<greg@kroah.com>
+	USB: convert the drivers/usb/image files to the new USB driver model.
+
+<greg@kroah.com>
+	USB: convert the drivers/usb/input files to the new USB driver model.
+
+<greg@kroah.com>
+	USB: convert the drivers/usb/media files to the new USB driver model.
+
+<greg@kroah.com>
+	USB: convert the drivers/usb/misc files to the new USB driver model.
+
+<greg@kroah.com>
+	USB: convert the drivers/usb/net files to the new USB driver model.
+	
+	Note the cdc-ether.c driver does NOT work properly now, someone who 
+	understands the interface mess in that driver needs to fix it up.
+
+<greg@kroah.com>
+	USB: convert the drivers/usb/storage files to the new USB driver model.
+
+<greg@kroah.com>
+	USB: convert the USB drivers that live outside of drivers/usb to the new USB driver model.
+
+<axboe@suse.de>
+	[PATCH] hpt366 pci_tbl booboo
+	
+	hpt366 pci_tbl has a cut-n-paste error, last entry should be '4' and not
+	15. fixes a bug where hpt366_init_one() gets passed bogus
+	id->driver_data and thus goes way beyond hpt366_chipsets[]
+
+<jsimmons@maxwell.earthlink.net>
+	These files missed the handle_sysrq change.
+
+<jsimmons@maxwell.earthlink.net>
+	Removed selection.h header. It is not needed and in the future selections will be a pure userland solution. Use set_current_state instead in tty_ioctl.c.
+
+<jsimmons@maxwell.earthlink.net>
+	Renames console.c and vt.c. The idea is to break these massive files into smaller ones. The main goal is to move all the high end tterminal emulation into one file. This way we can have a light weight printk without the extra weight. nice for embedded systems.
+
+<torvalds@home.transmeta.com>
+	Remove IDE "panic on controller remove" code, since it does nothing,
+	but makes it impossible to shut down cleanly.
+
+<axboe@suse.de>
+	[PATCH] remove pdc202xx.h
+	
+	remove unused pdc202xx.h
+
+<kai@tp1.ruhr-uni-bochum.de>
+	kbuild: vmlinux.lds.s needs dependency on scripts/fixdep
+	
+	Sam Ravnborg:
+	
+	Yep, "if_changed_dep" uses fixdep, so a dependency to scripts is needed.
+	Added echo_target as well, so the result file is printed as well.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	kbuild: Preprocess vmlinux.lds.S on all archs
+	
+	For consistency reasons, generate 
+	
+		arch/$(ARCH)/vmlinux.lds.s
+	
+	from 
+	
+	 	arch/$(ARCH)/vmlinux.lds.S
+	
+	on all archs, even those which do not need preprocessing (yet).
+
+<kai@tp1.ruhr-uni-bochum.de>
+	kbuild: Convert arm vmlinux.lds generation
+	
+	This is an untested attempt to convert ARM to preprocessing vmlinux.lds.S
+	instead of running sed on it - This probably allows for further cleanup,
+	but I'll leave that to _rmk_.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	kbuild: Fix up CRIS vmlinux.lds.S
+	
+	Untested, but at least it should show how to adapt the cris arch.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	kbuild: Fix up MIPS vmlinux.lds.S
+	
+	Untested, but at least it should show how to adapt the mips arch.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	kbuild: Handle vmlinux linkscript from common code
+	
+	Now that all archs use the same way to generate the link script, we can
+	handle it from the common top-level Makefile instead of the individual
+	arch/*/Makefile's.
+
+<davem@redhat.com>
+	[PATCH] sparc64 2.5.x file corruptions found
+	
+	Andrew removed a flush_dcache_page in his kmap_atomic generic_file_*
+	changes.
+	
+	Doing that sort of corrupts data on some platforms.
+
+<torvalds@home.transmeta.com>
+	Linux v2.5.36
+

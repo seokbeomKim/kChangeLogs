@@ -1,0 +1,701 @@
+
+Summary of changes from v2.5.11 to v2.5.12
+============================================
+
+<hch@sb.bsdonline.org> (02/04/03 1.369.97.1)
+	Access sysvfs superblock fields through SYSV_SB() abstraction.
+
+<hch@sb.bsdonline.org> (02/04/03 1.369.97.2)
+	Make sysvfs use sb->u.generic_sbp.
+
+<hch@sb.bsdonline.org> (02/04/03 1.369.97.3)
+	Move sysvfs incore data from include/linux/sysv_fs.h to fs/sysv/sysv.h.
+
+<hch@sb.bsdonline.org> (02/04/03 1.369.97.4)
+	Sanitize definition of sysvfs dinode.
+
+<hch@sb.bsdonline.org> (02/04/03 1.369.97.5)
+	Replace BKL for chain locking with sysvfs-private rwlock. 
+
+<hch@sb.bsdonline.org> (02/04/19 1.531.7.2)
+	sysvfs: V7 uses 512 byte blocks, not 1Kb.
+
+<vojtech@twilight.ucw.cz> (02/04/28 1.531.27.1)
+	This patch adds support for the new Intel C-ICH and ICH4 IDE controllers.
+
+<vojtech@twilight.ucw.cz> (02/04/28 1.531.27.2)
+	Add a missing "UDMA100" entry in udma name table.
+
+<vojtech@twilight.ucw.cz> (02/04/28 1.531.27.3)
+	This patch adds experimental support for enabling UDMA133 modes even on
+	ICH2, ICH2-M, ICH3, ICH3-M, ICH3-S and C-ICH chips, which can support the 133 MB/sec
+	mode, even though the specs deny it. It's marked experimental, because it's beyond
+	the specs, and also not really tested yet. 
+
+<kai@tp1.ruhr-uni-bochum.de> (02/04/29 1.547.1.1)
+	drivers/block/paride: Export symbols explicitly
+	
+	Before this changed we relied on the fact that due to missing
+	EXPORT_SYMBOL() all symbols would be exported.
+
+<kai@tp1.ruhr-uni-bochum.de> (02/04/29 1.547.1.2)
+	drivers/net/wan/dlci: Export symbols explicitly
+
+<kai@tp1.ruhr-uni-bochum.de> (02/04/29 1.547.1.3)
+	drivers/char/ip2main: Export symbols explicitly
+
+<kai@tp1.ruhr-uni-bochum.de> (02/04/29 1.547.2.1)
+	Add drivers/video/fbgen.o to export-objs.
+	
+	fbgen.o was changed to explicitly export symbols but not added to
+	export-objs.
+
+<dalecki@evision-ventures.com> (02/04/29 1.547.3.1)
+	[PATCH] 2.5.10 IDE 45
+	
+	- Fix bogus set_multimode() change. I tough I had reverted it before diff-ing.
+	   This was causing hangs of /dev/hdparm -m8 /dev/hda and similar commands.
+
+<viro@math.psu.edu> (02/04/29 1.547.3.2)
+	[PATCH] Re: 2.5.11 breakage
+	
+		OK, here comes.  Patch below is an attempt to do the fastwalk
+	stuff in right way and so far it seems to be working.
+	
+	 - dentry leak is plugged
+	 - locked/unlocked state of nameidata doesn't depend on history - it
+	   depends only on point in code.
+	 - LOOKUP_LOCKED is gone.
+	 - following mounts and .. doesn't drop dcache_lock
+	 - light-weight permission check distinguishes between "don't know" and
+	   "permission denied", so we don't call full-blown permission() unless
+	   we have to.
+	 - code that changes root/pwd holds dcache_lock _and_ write lock on
+	   current->fs->lock.  I.e. if we hold dcache_lock we can safely
+	   access our ->fs->{root,pwd}{,mnt}
+	 - __d_lookup() does not increment refcount; callers do dget_locked()
+	   if they need it (behaviour of d_lookup() didn't change, obviously).
+	 - link_path_walk() logics had been (somewhat) cleaned up.
+
+<kai@tp1.ruhr-uni-bochum.de> (02/04/30 1.547.4.1)
+	ALSA Makefile cleanup: use $(mod-subdirs)
+	
+	Some places were doing:
+	
+	        subdir-$(CONFIG_FOO) += foo
+	        ifeq ($(CONFIG_FOO),y)
+	          subdir-m += foo
+	        fi
+	
+	That can be expressed more easily as
+	
+	        mod-subdirs := foo
+	        subdir-$(CONFIG_FOO) += foo
+
+<kai@tp1.ruhr-uni-bochum.de> (02/04/30 1.547.4.2)
+	ALSA Makefile cleanup: Link subdirs from direct parent
+	
+	Group decision whether to build objects in subdirectories and whether to
+	link them together in the direct parent Makefile.
+
+<kai@tp1.ruhr-uni-bochum.de> (02/04/30 1.547.4.3)
+	ALSA Makefile cleanup: Consistent O_TARGET naming
+	
+	ALSA was using _<subdir>.o as O_TARGET in most places already, so let's
+	do it everywhere.
+
+<kai@tp1.ruhr-uni-bochum.de> (02/04/30 1.531.29.1)
+	ISDN cleanup: drivers/isdn/capi s/__u{32,16,8}/u{32,16,8}/
+
+<kai@tp1.ruhr-uni-bochum.de> (02/04/30 1.531.29.2)
+	ISDN cleanup: drivers/isdn/hardware/avm s/__u{32,16,8}/u{32,16,8}/
+
+<kai@tp1.ruhr-uni-bochum.de> (02/04/30 1.531.29.3)
+	ISDN: Make capiutil.o integral part of kernelcapi.o
+	
+	No need for it being a standalone module.
+
+<shaggy@kleikamp.austin.ibm.com> (02/04/30 1.547.5.1)
+	JFS: log->bdev must be initialized for inline log
+	
+	log->bdev was not being initialized.  It had not been used until
+	Al Viro's recent change from using bio->b_dev to bio->b_bdev.
+
+<akpm@zip.com.au> (02/04/30 1.547.3.3)
+	[PATCH] page_alloc failure printk
+	
+	Emit a printk when a page allocation fails.  Considered useful for
+	diagnosing crashes.
+
+<akpm@zip.com.au> (02/04/30 1.547.3.4)
+	[PATCH] ext2 directory handling
+	
+	Convert ext2 directory handling to not rely on the contents of pages
+	outside i_size.
+	
+	This is because block_write_full_page (which is used for all writeback)
+	zaps the page outside i_size.
+
+<akpm@zip.com.au> (02/04/30 1.547.3.5)
+	[PATCH] page accounting
+	
+	This patch provides global accounting of locked and dirty pages.  It
+	does this via lightweight per-CPU data structures.  The page_cache_size
+	accounting has been changed to use this facility as well.
+	
+	Locked and dirty page accounting is needed for making writeback and
+	throttling decisions.
+	
+	The patch also starts to move code which is related to page->flags
+	out of linux/mm.h and into linux/page-flags.h
+
+<akpm@zip.com.au> (02/04/30 1.547.3.6)
+	[PATCH] readahead fix
+	
+	Changes the way in which the readahead code locates the readahead
+	setting for the underlying device.
+	
+	- struct block_device and struct address_space gain a *pointer* to the
+	  current readahead tunable.
+	
+	- The tunable lives in the request queue and is altered with the
+	  traditional ioctl.
+	
+	- The value gets *copied* into the struct file at open() time.  So a
+	  fcntl() mode to modify it per-fd is simple.
+	
+	- Filesystems which are not request_queue-backed get the address of the
+	  global `default_ra_pages'.  If we want, this can become a tunable.
+	
+	- Filesystems are at liberty to alter address_space.ra_pages to point
+	  at some other fs-private default at new_inode/read_inode/alloc_inode
+	  time.
+	
+	- The ra_pages pointer can become a structure pointer if, at some time
+	  in the future, high-level code needs more detailed information about
+	  device characteristics.
+	
+	  In fact, it'll need to become a struct pointer for use by
+	  writeback: my current writeback code has the problem that multiple
+	  pdflush threads can get stuck on the same request queue.  That's a
+	  waste of resources.  I currently have a silly flag in the superblock
+	  to try to avoid this.
+	
+	  The proper way to get this exclusion is for the high-level
+	  writeback code to be able to do a test-and-set against a
+	  per-request_queue flag.  That flag can live in a structure alongside
+	  ra_pages, conveniently accessible at the pagemap level.
+	
+	One thing still to-be-done is going into all callers of blk_init_queue
+	and blk_queue_make_request and making sure that they're setting up a
+	sensible default.  ATA wants 248 sectors, and floppy drives don't want
+	128kbytes, I suspect.  Later.
+
+<akpm@zip.com.au> (02/04/30 1.547.3.7)
+	[PATCH] writeback from address spaces
+	
+	[ I reversed the order in which writeback walks the superblock's
+	  dirty inodes.  It sped up dbench's unlink phase greatly.  I'm
+	  such a sleaze ]
+	
+	The core writeback patch.  Switches file writeback from the dirty
+	buffer LRU over to address_space.dirty_pages.
+	
+	- The buffer LRU is removed
+	
+	- The buffer hash is removed (uses blockdev pagecache lookups)
+	
+	- The bdflush and kupdate functions are implemented against
+	  address_spaces, via pdflush.
+	
+	- The relationship between pages and buffers is changed.
+	
+	  - If a page has dirty buffers, it is marked dirty
+	  - If a page is marked dirty, it *may* have dirty buffers.
+	  - A dirty page may be "partially dirty".  block_write_full_page
+	    discovers this.
+	
+	- A bunch of consistency checks of the form
+	
+		if (!something_which_should_be_true())
+			buffer_error();
+	
+	  have been introduced.  These fog the code up but are important for
+	  ensuring that the new buffer/page code is working correctly.
+	
+	- New locking (inode.i_bufferlist_lock) is introduced for exclusion
+	  from try_to_free_buffers().  This is needed because set_page_dirty
+	  is called under spinlock, so it cannot lock the page.  But it
+	  needs access to page->buffers to set them all dirty.
+	
+	  i_bufferlist_lock is also used to protect inode.i_dirty_buffers.
+	
+	- fs/inode.c has been split: all the code related to file data writeback
+	  has been moved into fs/fs-writeback.c
+	
+	- Code related to file data writeback at the address_space level is in
+	  the new mm/page-writeback.c
+	
+	- try_to_free_buffers() is now non-blocking
+	
+	- Switches vmscan.c over to understand that all pages with dirty data
+	  are now marked dirty.
+	
+	- Introduces a new a_op for VM writeback:
+	
+		->vm_writeback(struct page *page, int *nr_to_write)
+	
+	  this is a bit half-baked at present.  The intent is that the address_space
+	  is given the opportunity to perform clustered writeback.  To allow it to
+	  opportunistically write out disk-contiguous dirty data which may be in other zones.
+	  To allow delayed-allocate filesystems to get good disk layout.
+	
+	- Added address_space.io_pages.  Pages which are being prepared for
+	  writeback.  This is here for two reasons:
+	
+	  1: It will be needed later, when BIOs are assembled direct
+	     against pagecache, bypassing the buffer layer.  It avoids a
+	     deadlock which would occur if someone moved the page back onto the
+	     dirty_pages list after it was added to the BIO, but before it was
+	     submitted.  (hmm.  This may not be a problem with PG_writeback logic).
+	
+	  2: Avoids a livelock which would occur if some other thread is continually
+	     redirtying pages.
+	
+	- There are two known performance problems in this code:
+	
+	  1: Pages which are locked for writeback cause undesirable
+	     blocking when they are being overwritten.  A patch which leaves
+	     pages unlocked during writeback comes later in the series.
+	
+	  2: While inodes are under writeback, they are locked.  This
+	     causes namespace lookups against the file to get unnecessarily
+	     blocked in wait_on_inode().  This is a fairly minor problem.
+	
+	     I don't have a fix for this at present - I'll fix this when I
+	     attach dirty address_spaces direct to super_blocks.
+	
+	- The patch vastly increases the amount of dirty data which the
+	  kernel permits highmem machines to maintain.  This is because the
+	  balancing decisions are made against the amount of memory in the
+	  machine, not against the amount of buffercache-allocatable memory.
+	
+	  This may be very wrong, although it works fine for me (2.5 gigs).
+	
+	  We can trivially go back to the old-style throttling with
+	  s/nr_free_pagecache_pages/nr_free_buffer_pages/ in
+	  balance_dirty_pages().  But better would be to allow blockdev
+	  mappings to use highmem (I'm thinking about this one, slowly).  And
+	  to move writer-throttling and writeback decisions into the VM (modulo
+	  the file-overwriting problem).
+	
+	- Drops 24 bytes from struct buffer_head.  More to come.
+	
+	- There's some gunk like super_block.flags:MS_FLUSHING which needs to
+	  be killed.  Need a better way of providing collision avoidance
+	  between pdflush threads, to prevent more than one pdflush thread
+	  working a disk at the same time.
+	
+	  The correct way to do that is to put a flag in the request queue to
+	  say "there's a pdlfush thread working this disk".  This is easy to
+	  do: just generalise the "ra_pages" pointer to point at a struct which
+	  includes ra_pages and the new collision-avoidance flag.
+
+<akpm@zip.com.au> (02/04/30 1.547.3.8)
+	[PATCH] remove buffer unused_list
+	
+	Removes the buffer_head unused list.  Use a mempool instead.
+	
+	The reduced lock contention provided about a 10% boost on ANton's
+	12-way.
+
+<akpm@zip.com.au> (02/04/30 1.547.3.9)
+	[PATCH] minix directory handling
+	
+	Convert minixfs directory code to not rely on the state of data outside
+	i_size.
+
+<akpm@zip.com.au> (02/04/30 1.547.3.10)
+	[PATCH] cleanup page flags
+	
+	page->flags cleanup.
+	
+	Moves the definitions of the page->flags bits and all the PageFoo
+	macros into linux/page-flags.h.  That file is currently included from
+	mm.h, but the stage is set to remove that and include page-flags.h
+	direct in all .c files which require that.  (120 of them).
+	
+	The patch also makes all the page flag macros and functions consistent:
+	
+	For PG_foo, the following functions are defined:
+	
+		SetPageFoo
+		ClearPageFoo
+		TestSetPageFoo
+		TestClearPageFoo
+		PageFoo
+	
+	and that's it.
+	
+	- Page_Uptodate is renamed to PageUptodate
+	
+	- LockPage is removed.  All users updated to use SetPageLocked
+	
+	- UnlockPage is removed.  All callers updated to use unlock_page().
+	  it's a real function - there's no need to hide that fact.
+	
+	- PageTestandClearReferenced renamed to TestClearPageReferenced
+	
+	- PageSetSlab renamed to SetPageSlab
+	
+	- __SetPageReserved is removed.  It's an infinitesimally small
+	   microoptimisation, and is inconsistent.
+	
+	- TryLockPage is renamed to TestSetPageLocked
+	
+	- PageSwapCache() is renamed to page_swap_cache(), so it doesn't
+	  pretend to be a page->flags bit test.
+
+<akpm@zip.com.au> (02/04/30 1.547.3.11)
+	[PATCH] cleanup page_swap_cache
+	
+	Removes some redundant BUG checks - trueness of PageSwapCache() implies
+	that page->mapping is non-NULL, and we've already checked that.
+
+<akpm@zip.com.au> (02/04/30 1.547.3.12)
+	[PATCH] cleanup write_one_page
+	
+	Remove writeout_one_page(), waitfor_one_page() and the now-unused
+	generic_buffer_fdatasync().
+	
+	Add new
+	
+		write_one_page(struct page *page, int wait)
+	
+	which is exported to modules.  Update callers to use that.  It's only
+	used for IS_SYNC operations.
+
+<akpm@zip.com.au> (02/04/30 1.547.3.13)
+	[PATCH] remove buffer head b_inode
+	
+	Removal of buffer_head.b_inode.  The list_emptiness of b_inode_buffers
+	is used to indicate whether the buffer is on an inode's
+	i_dirty_buffers.
+
+<akpm@zip.com.au> (02/04/30 1.547.3.14)
+	[PATCH] remove i_dirty_data_buffers
+	
+	Removes inode.i_dirty_data_buffers.  It's no longer used - all dirty
+	buffers have their pages marked dirty and filemap_fdatasync() /
+	filemap_fdatawait() catches it all.
+	
+	Updates all callers.
+	
+	This required a change in JFS - it has "metapages" which
+	are a container around a page which holds metadata.  They
+	were holding these pages locked and were relying on fsync_inode_data_buffers
+	for writing them out.  So fdatasync() deadlocked.
+	
+	I've changed JFS to not lock those pages.  Change was acked
+	by Dave Kleikamp <shaggy@austin.ibm.com> as the right
+	thing to do, but may not be complete.  Probably igrab()
+	against ->host is needed to pin the address_space down.
+
+<akpm@zip.com.au> (02/04/30 1.547.3.15)
+	[PATCH] remove PG_skip
+	
+	Remove PG_skip.  Nothing is using it (the change was acked by rmk a
+	while back)
+
+<akpm@zip.com.au> (02/04/30 1.547.3.16)
+	[PATCH] remove show_buffers()
+	
+	Remove show_buffers().  It really has nothing to show any more.  just
+	buffermem_pages() - move that out into the callers.
+	
+	There's a lot of duplication in this code.  better approach would be to
+	remove all the duplicated code out in the architectures and implement
+	generic show_memory_state().  Later.
+
+<akpm@zip.com.au> (02/04/30 1.547.3.17)
+	[PATCH] cleanup of bh->flags
+	
+	Moves all buffer_head-related stuff out of linux/fs.h and into
+	linux/buffer_head.h.  buffer_head.h is currently included at the very
+	end of fs.h.  So it is possible to include buffer_head directly from
+	all .c files and remove this nested include.
+	
+	Also rationalises all the set_buffer_foo() and mark_buffer_bar()
+	functions.  We have:
+	
+		set_buffer_foo(bh)
+		clear_buffer_foo(bh)
+		buffer_foo(bh)
+	
+	and, in some cases, where needed:
+	
+		test_set_buffer_foo(bh)
+		test_clear_buffer_foo(bh)
+	
+	And that's it.
+	
+	BUFFER_FNS() and TAS_BUFFER_FNS() macros generate all the above real
+	inline functions.  Normally not a big fan of cpp abuse, but in this
+	case it fits.  These function-generating macros are available to
+	filesystems to expand their own b_state functions.  JBD uses this in
+	one case.
+
+<akpm@zip.com.au> (02/04/30 1.547.3.18)
+	[PATCH] hashed b_wait
+	
+	Implements hashed waitqueues for buffer_heads.  Drops twelve bytes from
+	struct buffer_head.
+
+<akpm@zip.com.au> (02/04/30 1.547.3.19)
+	[PATCH] page writeback locking update
+	
+	- Fixes a performance problem - callers of
+	  prepare_write/commit_write, etc are locking pages, which synchronises
+	  them behind writeback, which also locks these pages.  Significant
+	  slowdowns for some workloads.
+	
+	- So pages are no longer locked while under writeout.  Introduce a
+	  new PG_writeback and associated infrastructure to support this design
+	  change.
+	
+	- Pages which are under read I/O still use PageLocked.  Pages which
+	  are under write I/O have PageWriteback() true.
+	
+	  I considered creating Page_IO instead of PageWriteback, and marking
+	  both readin and writeout pages as PageIO().  So pages are unlocked
+	  during both read and write.  There just doesn't seem a need to do
+	  this - nobody ever needs unblocking access to a page which is under
+	  read I/O.
+	
+	- Pages under swapout (brw_page) are PageLocked, not PageWriteback.
+	  So their treatment is unchangeded.
+	
+	  It's not obvious that pages which are under swapout actually need
+	  the more asynchronous behaviour of PageWriteback.
+	
+	  I was setting the swapout pages PageWriteback and unlocking them
+	  prior to submitting the buffers in brw_page().  This led to deadlocks
+	  on the exit_mmap->zap_page_range->free_swap_and_cache path.  These
+	  functions call block_flushpage under spinlock.  If the page is
+	  unlocked but has locked buffers, block_flushpage->discard_buffer()
+	  sleeps.  Under spinlock.  So that will need fixing if for some reason
+	  we want swapout to use PageWriteback.
+	
+	  Kernel has called block_flushpage() under spinlock for a long time.
+	   It is assuming that a locked page will never have locked buffers.
+	  This appears to be true, but it's ugly.
+	
+	- Adds new function wait_on_page_writeback().  Renames wait_on_page()
+	  to wait_on_page_locked() to remind people that they need to call the
+	  appropriate one.
+	
+	- Renames filemap_fdatasync() to filemap_fdatawrite().  It's more
+	  accurate - "sync" implies, if anything, writeout and wait.  (fsync,
+	  msync) Or writeout.  it's not clear.
+	
+	- Subtly changes the filemap_fdatawrite() internals - this function
+	  used to do a lock_page() - it waited for any other user of the page
+	  to let go before submitting new I/O against a page.  It has been
+	  changed to simply skip over any pages which are currently under
+	  writeback.
+	
+	  This is the right thing to do for memory-cleansing reasons.
+	
+	  But it's the wrong thing to do for data consistency operations (eg,
+	  fsync()).  For those operations we must ensure that all data which
+	  was dirty *at the time of the system call* are tight on disk before
+	  the call returns.
+	
+	  So all places which care about this have been converted to do:
+	
+		filemap_fdatawait(mapping);	/* Wait for current writeback */
+		filemap_fdatawrite(mapping);	/* Write all dirty pages */
+		filemap_fdatawait(mapping);	/* Wait for I/O to complete */
+	
+	- Fixes a truncate_inode_pages problem - truncate currently will
+	  block when it hits a locked page, so it ends up getting into lockstep
+	  behind writeback and all of the file is pointlessly written back.
+	
+	  One fix for this is for truncate to simply walk the page list in the
+	  opposite direction from writeback.
+	
+	  I chose to use a separate cleansing pass.  It is more
+	  CPU-intensive, but it is surer and clearer.  This is because there is
+	  no reason why the per-address_space ->vm_writeback and
+	  ->writeback_mapping functions *have* to perform writeout in
+	  ->dirty_pages order.  They may choose to do something totally
+	  different.
+	
+	  (set_page_dirty() is an a_op now, so address_spaces could almost
+	  privatise the whole dirty-page handling thing.  Except
+	  truncate_inode_pages and invalidate_inode_pages assume that the pages
+	  are on the address_space lists.  hmm.  So making truncate_inode_pages
+	  and invalidate_inode_pages a_ops would make some sense).
+
+<akpm@zip.com.au> (02/04/30 1.547.3.20)
+	[PATCH] cleanup sync_buffers()
+	
+	Renames sync_buffers() to sync_blockdev() and removes its (never used)
+	second argument.
+	
+	Removes fsync_no_super() in favour of direct calls to sync_blockdev().
+
+<dalecki@evision-ventures.com> (02/04/30 1.547.3.21)
+	[PATCH] 2.5.11 IDE 46
+	
+	- Remove the specific CONFIG_IDEDMA_PCI_WIP in favor of using the generic
+	   CONFIG_EXPERIMENTAL tag. (Pointed out by Vojtech Pavlik).
+	
+	- Change the signature of the IRQ handler to take the request directly as a
+	   parameter. This doesn't blow the code up but makes it much more obvious and
+	   finally it's reducing the number of side effects of the hwgroup->rq field.
+	
+	- A second sharp look after the above change allowed us to remove the wrq field
+	   from the hwgroup struct. It's just not used at all.
+	
+	- Change the signature of the end_request member of struct ata_operations to
+	   take the request as a second argument. Similar for __ide_end_request()
+	   and ide_end_request().
+	
+	- Remove BUG_ON() items just before ide_set_handler(). The check in
+	   ide_set_handler is clever enough now.
+	
+	- Remove the rq subfield from ide-scsi packet structure. We have now the
+	   request context always in place. Same for floppy.
+	
+	- Let the timer expiry function take the request as a direct argument.
+	
+	Yes I know those changes are extensive. But they are a necessary step
+	in between for the following purposes:
+	
+	- Consolidate the whole ATA/ATAPI stuff on passing a single unified request
+	   handling object. Because after eliminating those side effects it's far easier
+	   to see what's passed where.
+	
+	- Minimizing the amount of side effects in the overall code. That's a good
+	   thing anyway and it *doesn't* cost us neither performance nor space, since
+	   the stack depths are small anyway here.
+	
+	- Minimizing the usage of hwgroup - which should go away if possible.
+
+<dalecki@evision-ventures.com> (02/04/30 1.547.3.22)
+	[PATCH] 2.5.11 IDE 47
+	
+	- Rewrite choose_drive() to iterate explicitely over the channels and devices
+	    on them. It is not performance critical to iterate over this typically quite
+	    small array of disks and allows us to let them act on the natural entity,
+	    namely the channel as well as to remove the drive->next field from struct
+	    ata_device.  Make the device eviction code in ide_do_request() more
+	    intelliglible.  Add some comments explaining the reasoning behind the code
+	    there.
+	
+	- Now finally since the code for choosing the drive which will be serviced next
+	    is intelliglibly it became obvious that the attempt to choose the next drive
+	    based on the duration of the last request was entierly bogous. (Because for
+	    example wakeups can take a long time, but this doesn't indicate that the
+	    drive is slow.) Remove this criterium and the corresponding accounting
+	    therefore. Threat all drives fairly right now.
+	
+	Surprise surprise the overall system throughput increased :-).
+
+<dalecki@evision-ventures.com> (02/04/30 1.547.3.23)
+	[PATCH] 2.5.11 IDE 48
+	
+	Tue Apr 30 13:23:13 CEST 2002 ide-clean-48
+	
+	This fixes the "performance" degradation partially, becouse we don't
+	miss that many jiffies in choose_urgent_device() anymore.  However
+	choose_urgent_device has to be fixed for the off by one error to don't
+	loop for a whole 1/100 second before submitting the next request.
+	
+	- Include small declaration bits for Jens. (WIN_NOP fix in esp.)
+	
+	- Fix ide-pmac to conform to the recent API changes.
+	
+	- Prepare and improve the handling of the request queue. It sucks now as many
+	   request as possible. This is improving the performance.
+
+<torvalds@penguin.transmeta.com> (02/04/30 1.547.3.24)
+	Update kernel version
+
+<haveblue@us.ibm.com> (02/04/30 1.547.3.25)
+	[PATCH] shift BKL out of vfs_readdir
+	
+	This patch takes the BKL out of vfs_readdir() and moves it into the
+	individual filesystems, all 35 of them.  I have the feeling that this
+	wasn't done before because there are a lot of these to change and it was
+	a pain to find them all.  I definitely got all of those that were
+	defined in the in the structure declaration like this "readdir:
+	fs_readdir;" vxfs_readdir was assigned strangely, but I found it anyway.
+	I also left devfs out of this one.  Richard seems confident that devfs
+	has no need for the BKL.
+
+<torvalds@penguin.transmeta.com> (02/04/30 1.547.3.26)
+	Move BKL into readdir for ntfs-tng
+
+<torvalds@penguin.transmeta.com> (02/04/30 1.547.3.27)
+	update x86 defconfig
+
+<torvalds@penguin.transmeta.com> (02/04/30 1.547.3.28)
+	Fix broken sound print macros
+
+<perex@suse.cz> (02/04/30 1.547.3.29)
+	[PATCH] Re: ALSA patch..
+	
+	I overlooked these single line changes.  Here are next corrections
+	against ChangeSet 1.547:
+
+<bgerst@didntduck.org> (02/04/30 1.550)
+	[PATCH] Removing SYMBOL_NAME part 6
+	
+	Last remaining instances removed.
+
+<paulkf@microgate.com> (02/04/30 1.551)
+	[PATCH] 2.5.11 synclink.h
+	
+	This patch to synclink.h against 2.5.11 is required
+	for the synclink_cs.c driver to compile.
+
+<rml@tech9.net> (02/04/30 1.552)
+	[PATCH] sched cleanup, comments, separate max prios
+	
+	Attached patch is a resync of previous patches sent by Ingo and I.
+	Specifically:
+	
+		- create new MAX_USER_RT_PRIO value
+		- separate uses of MAX_RT_PRIO vs MAX_USER_RT_PRIO
+		- replace use of magic numbers by above
+		- additional comments
+
+<fdavis@si.rr.com> (02/04/30 1.554)
+	[PATCH] 2.5.11 : drivers/net/ppp_generic.c
+	
+	Linus,
+	  During a 'make bzImage', I received a warning on ppp_generic.c that ret
+	wasn't initialized (also for 2.5.10). I have attached a patch that sets
+	ret = count, thus removing the warning. Please review for inclusion.
+	
+	Regards,
+	Frank
+
+<david@gibson.dropbear.id.au> (02/04/30 1.555)
+	[PATCH] orinoco driver update
+	
+	The following patch against 2.5.11 updates the orinoco driver.  As well
+	as miscellaneous updates to the driver core it adds a new module
+	supporting Prism 2.5 based PCI wireless cards, and adds a MAINTAINERS
+	entry for the driver.
+
+<maxk@qualcomm.com> (02/04/30 1.562)
+	[PATCH] 2.5.x TUN/TAP driver readv/writev support
+	
+	This adds proper support for readv/writev in the TUN/TAP driver.
+
+<torvalds@penguin.transmeta.com> (02/04/30 1.563)
+	Fix PIIX bugs from merge
+

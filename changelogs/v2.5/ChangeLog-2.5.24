@@ -1,0 +1,967 @@
+
+Summary of changes from v2.5.23 to v2.5.24
+============================================
+
+<shaggy@kleikamp.austin.ibm.com>
+	Fix races in JFS threads.
+	
+	Timing window between JFS threads dropping a lock and going to sleep
+	allowed a waker to send wake_up_process right before wakee slept.
+	This resulted in the thread going to sleep indefinately.
+
+<shaggy@kleikamp.austin.ibm.com>
+	JFS: Yet another truncation fix.
+	
+	In the case where a large truncate requires multiple transactions,
+	we were setting the COMMIT_Nolink flag too early, causing an
+	assert to fire during the next transaction in the sequence.
+
+<jgarzik@mandrakesoft.com>
+	Update 8139cp net driver to support NIC-specific statistic dumps
+
+<edward_peng@dlink.com.tw>
+	dl2k gige net driver update:
+	* lock tx_coalesce==1 in 10/100 modes
+	* switch driver to default to PIO (instead of MMIO)
+
+<kai@tp1.ruhr-uni-bochum.de>
+	kbuild: Link netfilter from parent dirs
+	
+	No reason to link the netfilter subdirs from net/ instead of
+	net/ipv[46], the result looks just cleaner ;)
+
+<kai@tp1.ruhr-uni-bochum.de>
+	kbuild: clean up net/802/Makefile
+
+<kai@tp1.ruhr-uni-bochum.de>
+	kbuild: clean up generated files in net/802
+	
+	net/802/ contained some generated files + partially working
+	rules on how to rebuild them.
+	
+	Fix the rules how to rebuild them and remove the generated files
+	from the tree.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	kbuild: improve net/khttpd file generation
+	
+	Make the helper make_times_h output the code to stdout, so
+	we can redirect it into the file we want easily.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	Make net_dev_init() an __initcall
+	
+	If you were looking to find where net_dev_init() is called, you wouldn't
+	have guessed it's in drivers/block/genhd.c, would you?
+	
+	Nothing should break if the __initcall net_dev_init is called too late
+	now, since register_netdevice() will call it for us in that case.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	kbuild: clean up drivers/scsi firmware generation, part 1
+	
+	Teach the perl script to accept output filenames on the command
+	lines, so we don't have to move the generated files afterwards 
+	(which isn't parallel make safe)
+
+<kai@tp1.ruhr-uni-bochum.de>
+	kbuild: cleanup drivers/scsi firmware generation, part 2
+	
+	Preprocess the input files directly instead of first copying
+	them to a different name.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	kbuild: cleanup drivers/scsi firmware generation, part 3
+	
+	Rename the shipped 53c.. firmware files to <name>_shipped.
+	
+	Add a default rule for shipped files, which will just
+	call <name>_shipped to <name> if no specific rule to generate
+	the target exists.
+	
+	Rename the aic7xxx firmware to fit into this naming scheme.
+	
+	For now 53c... defaults to just using the shipped firmware.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	kbuild: Introduce $(obj), $(src)
+	
+	For separate source and object directories, Rules.make needs
+	to know where the files live.
+	
+	For all the normal variables, $(obj-[ymn]) etc, it can figure that
+	out by itself, but for explicit rules to generate files it needs
+	help. 
+	
+	So there $(obj)/target.o indicates that this file lives in the 
+	object directory, as opposed to $(src)/target.c, which lives in
+	the source dir.
+	
+	For now $(obj) = $(src) = ., but convert some Makefiles to it
+	already.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	kbuild: Shipped file fixes
+	
+	To generate the module versions for 53c700.o, we need the included
+	generated header already.
+	
+	Improve the rule to copy shipped files into place.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	kbuild: Revert automatically building modules
+	
+	People are confused by "make vmlinux/bzImage/..." building modules at
+	the same time. So revert to the old behavior.
+	
+	"make bzImage modules" builds bzImage and modules, using only one pass
+	of descending into subdirs.
+	
+	"make" or "make all" builds a standard target of "vmlinux modules". On
+	i386 this is extended to do "bzImage modules", which seems to be the most
+	sensible default.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	ISDN: Make ISA-only drivers depend on CONFIG_ISA
+
+<shaggy@kleikamp.austin.ibm.com>
+	JFS does not need to set i_version.  It is never used.
+	
+	Submitted by Manfred Spraul.
+
+<jt@hpl.hp.com>
+	IrDA update 1/2: cache-wait-data fixes
+	
+	        o [CRITICA] Fix one instance were we forgot to clear LSAP cache
+	        o [CORRECT] Fix a bogus conversion to wait_event()
+	                The socket closure would never propagate to the app
+
+<jt@hpl.hp.com>
+	IrDA update 2/2: big header and initcall cleanup
+	
+	        o [FEATURE] Use new kernel init/exit style, should fix static builds
+	        o [FEATURE] Reduce header dependancies
+	                                                Before  After
+	                net/irda/.depend                14917   13617 B
+	                drivers/net/irda/.depend        16134   14293 B
+	                irda full recompile             3'13    3'10
+
+<kai@tp1.ruhr-uni-bochum.de>
+	kbuild: Fix net/llc/Makefile
+	
+	This wasn't quite merged up to the current kbuild.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	kbuild: Add $(obj), $(src) for generated files
+	
+	I suppose one can argue whether that is ugly or rather nice for
+	documentary purposes, but make on its own cannot figure out where a file
+	is supposed to live, so we have to help it.
+	
+	(For the targets handled by Rules.make the situation is different, there
+	 Rules.make knows what's source and what's object and can add prefixes
+	 as necessary, so the most of the Makefiles are actually not affected by
+	 this kind of change)
+	
+	For now, as $(obj) = $(src) = ., we only add "./", so the potential for
+	breakage is rather small.
+
+<bcrl@redhat.com>
+	[PATCH] export default_wake_function
+	
+	akpm pointed out that an EXPORT_SYMBOL is missing for default_wake_function.
+
+<torvalds@home.transmeta.com>
+	Fix UP compile by having the trivial cpu_online_map
+
+<torvalds@home.transmeta.com>
+	Don't remove zero-sized files. Some of them might be real.
+
+<mingo@elte.hu>
+	- this patch fixes the migration init to correctly work with the
+	  new hot-pluggable CPU enumeration method, and the possibility
+	  to not boot on CPU#0.
+	
+	(btw., i find RR's comment offensive. How can any code be called 'crap' just
+	because the author of a new patch has not converted the code to the new
+	assumptions yet? The original code was perfectly valid.)
+
+<aia21@cantab.net>
+	NTFS: 2.0.9 release. Decompression engine now uses a single buffer and other cleanups.
+	- Remove unused variables left over after Rusty's patch to the decompression
+	  engine.
+	- Change buffer size in ntfs_readdir()/ntfs_filldir() to use
+	  NLS_MAX_CHARSET_SIZE.
+	- Miscellaneous minor cleanups to comments.
+
+<aia21@cantab.net>
+	NTFS: Fix typo.
+
+<shaggy@kleikamp.austin.ibm.com>
+	Exclusive access to JFS journal devices
+	
+	Use bd_claim/bd_release to guarentee exclusive access to the external
+	log device.  I also fixed a struct block_device leak once I touched
+	that code (missing bdput() both in lmLogClose and the lmLogOpen
+	error path) and sanitized the failure path labels.
+	
+	Submitted by Christoph Hellwig
+
+<shaggy@kleikamp.austin.ibm.com>
+	JFS: recalc_sigpending has no argument
+	
+	I've got to keep my 2.4 and 2.5 patches straight!
+
+<shaggy@kleikamp.austin.ibm.com>
+	JFS: fix fsync
+	
+	fsync is allowed to return early if datasync is set and the I_DIRTY_DATASYNC
+	flags is cleared, not if either of those is true.
+	
+	Submitted by Christoph Hellwig
+
+<shaggy@kleikamp.austin.ibm.com>
+	JFS: Use new list_move function
+	
+	Submitted by Thunder
+
+<jgarzik@mandrakesoft.com>
+	Update 8139 net drivers for the following fixes:
+	* fix big endia multi-cast filtering
+	* fix 8139too ethtool media interface
+
+<kai@tp1.ruhr-uni-bochum.de>
+	ISDN: Small fixes from -dj
+
+<kai@tp1.ruhr-uni-bochum.de>
+	ISDN: Add #include <linux/tqueue.h>
+
+<kai@tp1.ruhr-uni-bochum.de>
+	ISDN: Add drivers/isdn/hisax/avma1_cs.c from 2.4
+	
+	This patch adds the PCMCIA client driver for the AVM A1/Fritz!PCMCIA
+	ISDN cards, which has been in 2.4 for some time already.
+
+<stelian.pop@fr.alcove.com>
+	[PATCH] include <linux/tqueue.h> in pcmcia drivers...
+	
+	The pcmcia drivers haven't been updated to include the new
+	tqueue.h header when using tq_structs.
+	
+	I noticed the breakage when compiling i82365.c for my laptop, and
+	took the time to modify all the drivers in that directory.
+
+<bunk@fs.tum.de>
+	[PATCH] Patch to fix all known linux/tqueue.h compile errors
+	
+	This fixes linux/tqueue.h compile errors in 2.5.23 that were
+	found by Andy Pfiffer, Matthew Harrell and me.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	ISDN: Add #include <linux/init.h> to drivers/isdn/hisax/avma1_cs.c
+
+<kai@tp1.ruhr-uni-bochum.de>
+	ISDN: s/ioremap_nocache/ioremap/g
+	
+	So the missing EXPORT_SYMBOL() for ioremap_nocache at least found
+	some ISDN drivers which shouldn't have been using it in the first
+	place.
+
+<aia21@cantab.net>
+	NTFS: 2.0.10 - There can only be 2^32 - 1 inodes on an NTFS volume.
+	- Add check at mount time to verify that the number of inodes on the
+	  volume does not exceed 2^32 - 1, which is the maximum allowed for
+	  NTFS according to Microsoft.
+	- Change mft_no member of ntfs_inode structure to be unsigned long.
+	  Update all users. This makes ntfs_inode->mft_no just a copy of struct
+	  inode->i_ino. But we can't just always use struct inode->i_ino and
+	  remove mft_no because extent inodes do not have an attached struct
+	  inode.
+
+<davem@nuts.ninka.net>
+	Sparc64: Update for CPU hotplugging changes.
+
+<davem@nuts.ninka.net>
+	drivers/net/sungem.c: Include linux/tqueue.h
+
+<davem@nuts.ninka.net>
+	drivers/md/md.c: Fix typo, struct dname --> dev_name_t
+
+<lm@work.bitmover.com>
+	Make the find command ignore BitKeeper files throughout.
+	This fixes the tags/TAGS/clean/etc targets.
+
+<jgarzik@mandrakesoft.com>
+	Add extended attribute syscall numbers to alpha port
+
+<jgarzik@mandrakesoft.com>
+	Add NIC-specific stats and register dumping to 8139too net driver.
+
+<mingo@elte.hu>
+	- small UP optimisation from Mikael Pettersson and James Bottomley, modified.
+
+<dalecki@evision-ventures.com>
+	[PATCH] IDE 93
+	
+	 - Revert patch number 92. It turned out to be broken behind hope.  Personally I
+	   attribute this to the recent heat wave over here and apologize for the
+	   problems this may have caused. Turned out that my note about the change
+	   beeing dnagerous in the last change log was more then true...
+	
+	 - Locking issues for ioctl handling.
+	
+	 - Remove waiting_for_dma bit field. Use IDE_DMA bit flag instead.
+	   Apply this bit globally and not in the corresponding implementation
+	   functions.
+
+<willy@debian.org>
+	[PATCH] Convert cm206 to a tasklet
+	
+	Removes CM206_BH (patch approved by maintainer).
+	Deletes the no-longer-used BH entries from the enum.  Explicit numbers
+	added so as not to destroy binary compatibility needlessly.
+
+<pdelaney@lsil.com>
+	[PATCH] Fusion driver update
+	
+	This upgrades the fusion driver
+	
+	 - Provides support for the Ultra320 1030/1020 parts
+	 - Provides support for the PCI-X FC parts (919X/929X)
+	 - Provides proper support for high memory cases
+	 - Provides IA64 support
+	 - Adds kernels calls (pci_enable_device, pci_set_dma_mask,
+	   scsi_set_pci_device) for proper registration of PCI devics.
+	 - Adds New Error Handling support
+
+<davej@suse.de>
+	[PATCH] udpated 3ware driver from vendor.
+	
+
+<greg@kroah.com>
+	[PATCH] drivers/hotplug/cpqphp.h must include tqueue.h
+	
+
+<neilb@cse.unsw.edu.au>
+	[PATCH] Don't lock array for START_ARRAY
+	
+	... as autostart_array does it's own locking.
+	
+	
+	 ----------- Diffstat output ------------
+	 ./drivers/md/md.c |   26 ++++++++++++++------------
+	 1 files changed, 14 insertions(+), 12 deletions(-)
+
+<neilb@cse.unsw.edu.au>
+	[PATCH] Md sync: Remove compiler warning that revealed a bug.
+	
+	When we abort a resync before we even started (because we were
+	interrupted while waiting for a conflicting resync to finish)
+	we should not wait or, particularly, do the closing sync_request
+	(as we haven't even calculated max_sectors yet).
+
+<neilb@cse.unsw.edu.au>
+	[PATCH] Make ITERATE_MDDEV work on non-SMP
+	
+	For an SMP kernel, spin_lock() et.al. are functions.
+	For a UP kernel, they are statements that must be terminated
+	by a ';'.  This is not quite the same thing, and hence spin_lock()
+	cannot be using inside a parenthesised expession.
+	
+	This patch changes ITERATE_MDDEV to use gcc's "statement expressions"
+	instead which has the benefit of making the conditionals
+	more readable.
+
+<davidm@napali.hpl.hp.com>
+	[PATCH] nasty bug in free_pgtables() (for ia64)
+	
+	Strictly speaking, this patch is needed only for arches which use
+	discontiguous virtual address bits for the PGD index.
+	
+	When we originally worked on this code (~ 2 years ago or so, in
+	response to a bug report & patch from an Intel guy), I had myself
+	convinced that the code is correct, but of course I missed the fact
+	that:
+	
+		pgd_index(first) < pgd_index(last)
+	
+	does NOT imply that:
+	
+		first < last
+	
+	For example, with a 16KB page size on ia64, we might end up with:
+	
+	   first = 6000100f80003fff => first_idx = 0x300
+	   last  = 60000fffffff8000 =>  last_idx = 0x3ff
+	
+	Note here that first_idx < last_idx even though first > last.  This is
+	because pgd_index() ignores bits 44..60.
+	
+	I suppose we could put the extra check inside #ifdef __ia64__, but
+	that would be rather ugly and would really mean that Linux does not
+	support discontiguous PGD indices.
+
+<sfr@canb.auug.org.au>
+	[PATCH] make kstack_depth_to_print and some APM stuff static
+	
+	Tridge has written a little utility
+	(http://samba.org/ftp/unpacked/junkcode/findstatic.pl) that (given a set of
+	object files) works out a list of candidate finctions and variables that
+	may be able to be made static.  Obviously some hand checking is needed
+	(different configs and/or architectures etc), but it seems useful.
+	
+	Here is my first patch using its outout.
+	
+	kstack_depth_to_print is used in many architectures, but only in one
+	file in each.  In some architectures it is declared and not used.  It
+	is not even clear why kstack_depth_to_print is not a #define.  Tridge
+	suggested that maybe you could change its value with a debugger ...
+	
+	The APM code has a function and a struct that can be static.
+
+<sfr@canb.auug.org.au>
+	[PATCH] dup_task_struct can be static
+	
+	dup_task_struct is defined and used only in kernel/fork.c.
+
+<sfr@canb.auug.org.au>
+	[PATCH] ext2 statics
+	
+	This patch just changes some things in ext2 to be static.
+
+<cananian@lesser-magoo.lcs.mit.edu>
+	[PATCH] 2.5.23: missing tqueue.h in cpia_pp.c
+	
+	There seems to be another missing tqueue.h, this time in the CPIA video
+	driver.
+
+<ac9410@bellsouth.net>
+	[PATCH] 2.5.23 i2c updates 1/4
+	
+
+<ac9410@bellsouth.net>
+	[PATCH] 2.5.23 i2c updates 2/4
+	
+	i2c-core.c:Leave LINUX_VERSION in kernel.  Leave i2c_debug=1.  Leave
+	  CONFIG names as in the kernel.  Remove #ifdef MODULE_LICENSE around
+	  MODULE_LICENSE.
+	i2c-dev.c:Remove #ifdef MODULE_LICENSE around MODULE_LICENSE.
+	  Remove compatibality code for < 2.4.0
+	i2c-proc.c: Print message on kmalloc failure.  Leave ENOMEM as in kernel.
+	  Remove #ifdef MODULE_LICENSE around MODULE_LICENSE.  Remove 2.2.19 compat
+	  code.
+
+<ac9410@bellsouth.net>
+	[PATCH] 2.5.23 i2c updates 3/4
+	
+	i2c-algo-bit.c: Leave kernel time_before/after_eq
+	  Remove #ifdef MODULE_LICENSE around MODULE_LICENSE.
+	  Remove #include <linux/sched.h> since i2c.h has it now.
+	i2c-algo-pcf.c: Remove #include <linux/sched.h> since i2c.h has it now.
+	  Remove #ifdef MODULE_LICENSE around MODULE_LICENSE.
+	  Remove #include <linux/sched.h> since i2c.h has it now.
+	i2c/i2c-elektor.c: Leave kernel __exit pcf_isa_exit(void)
+	  Remove #ifdef MODULE_LICENSE around MODULE_LICENSE.
+	i2c-elv.c: Leave kernel __exit bit_elv_exit(void)
+	  Remove #ifdef MODULE_LICENSE around MODULE_LICENSE.
+	i2c-philips-par.c: Remove #ifdef MODULE_LICENSE around MODULE_LICENSE.
+	i2c/i2c-velleman.c: Leave kernel __exit bit_velle_exit(void)
+	  Remove #ifdef MODULE_LICENSE around MODULE_LICENSE.
+	Drop i2c-algo-8xx.[ch] deltas
+	Drop i2c-algo-ppc405.[ch] deltas
+	Drop i2c-pcf-epp.c deltas
+	Drop i2c-ppc405.[ch] deltas
+	Drop i2c-ppc405adap.h deltas
+	Drop i2c-pport.c deltas
+	Drop i2c-rpx.c deltas
+
+<ac9410@bellsouth.net>
+	[PATCH] 2.5.23 i2c updates 4/4
+	
+	i2c-elektor.c:Adding call to pcf_isa_init to i2c_pcfisa_init causes:
+	i2c-elektor.o: In function `i2c_pcfisa_init':
+	i2c-elektor.o(.text.init+0x95): undefined reference to `local symbol
+	i2c-elektor.c: fix by removing __exit for inline compiling.
+
+<rusty@rustcorp.com.au>
+	[PATCH] Futex bugfixes.
+	
+	This uses page_cache_release() instead of put_page(), as it might
+	be a pagecache page.
+
+<rusty@rustcorp.com.au>
+	[PATCH] Async Futex
+	
+	This patch adds a FUTEX_FD call, for opening a file descriptor
+	attached to a futex, which can be used with poll, select or SIGIO.
+	Rewritten so that closing fd unpins page, as per Linus's suggestion,
+	and fixed not to call poll_wait with a spinlock as per Martin Wirth's
+	sharp eyes.
+
+<sfr@canb.auug.org.au>
+	[PATCH] ipv6 statics
+	
+	This makes some more things in the ipv6 code static.  Some of them may
+	be wrong (or for futures) bu it looks pretty OK to me (and it builds).
+
+<manik@cisco.com>
+	[PATCH] More __builtin_expect() cleanup in favour
+	
+	Changed files in the include/asm-ia64 directory to get rid of
+	__builtin_expect() in favour of likely/unlikely.
+
+<perex@suse.cz>
+	[PATCH] ALSA update
+	
+	this ALSA update contains
+	
+	 - fixed dependencies for OSS Sequencer emulation code
+	 - fixed wrong verbose printk output
+	 - fixed possible oops in OSS PCM emulation code (silence)
+	 - added snd_timer_del() function
+	 - added integer64 support to control interface
+	 - AC'97 - cleanups for Cirrus Logic codecs (S/PDIF)
+	 - added PCM device for SB AWE synthesizer
+	 - added RME Hammerfall DSP Audio driver by Paul Davis
+	 - renamed rme9652_mem.o module to hammerfall_mem.o
+	 - device naming cleanups in snd-intel8x0
+	 - RME32 driver updates
+	 - VIA8233 driver updates for VIA8233A
+	 - CS4281 code updated to support dual codecs
+	 - Korg1212 driver update (debugging)
+	 - YMFPCI - changed support for rear channel
+	 - improved PPC drivers - AWACS, KEYWEST, TUMBLER
+
+<stelian.pop@fr.alcove.com>
+	[PATCH] export ioremap_nocache to modules
+	
+	This patch exports ioremap_nocache to modules, used by at least
+	some of the sound drivers....
+
+<rml@tech9.net>
+	[PATCH] preempt-safe do_softirq
+	
+	Attached patch makes do_softirq preempt-safe simply by moving the
+	current CPU assignment a couple lines down below the interrupt disable.
+
+<rml@tech9.net>
+	[PATCH] mark 3 variables as __initdata
+	
+	The attached patch marks the following variables with __initdata:
+	
+	        arch/i386/kernel/mpparse.c :: static unsigned int num_processors
+	        arch/i386/kernel/smpboot.c :: static int smp_b_stepping
+	        arch/i386/kernel/smpboot.c :: static int max_cpus
+	
+	The data is static and only used by __init functions so can successfully
+	be jettisoned after boot.  Compiled and booted successfully on an SMP
+	machine.
+	
+	I also set max_cpus to NR_CPUS instead of -1.  Besides being the
+	logically correct value and simplifying a loop elsewhere, this change
+	allows NR_CPUS to be set to various values other than the normal 32
+	which is growing in utility with the hotplug CPU changes now in
+	mainline.
+
+<bombe@informatik.tu-muenchen.de>
+	[PATCH] Fix bashisms in scripts_patch-kernel
+	
+	  The following trivial patch makes the patch-kernel script executable by
+	  a bare bone POSIX shell like ash.  Either that, or the interpreter line
+	  has to be changed to /bin/bash.
+	
+	  The same patch applies to 2.4 (with some line offset).
+
+<adilger@clusterfs.com>
+	[PATCH] TRIVIAL EPERM -> EACCESS
+	
+	the following micro-patch changes ext[23]_ioctl to return EACCES
+	(permission denied) instead of EPERM (operation not permitted) if
+	the caller is not authorized to change the flags on a file.
+
+<pazke@orbita1.ru>
+	[PATCH] add unlikely() into add_timer()
+	
+	This micropatch adds unlikely() macro into add_timer() bug check code.
+	Without this path gcc 3.1 makes bad thing reordering printk() into
+	the middle of function body.
+
+<asl@launay.org>
+	[PATCH] ACPI warning fix
+	
+
+<asl@launay.org>
+	[PATCH] Re: nbd.c warning fix
+	
+
+<arnd@bergmann-dalldorf.de>
+	[PATCH] fix lots of warnings about 'struct tty_driver'
+	
+	When compiling 2.5.20 (and ealier, likely) without procfs, the declaration
+	for struct tty_driver is missing in proc_fs.h, causing many compiler warnings
+	that are fixed by this patch.
+
+<rusty@rustcorp.com.au>
+	[PATCH] Fix SMP compilation with 'multiquad' driver
+	
+	The 2.4.18pre10 kernel, like many if its predecessors, can't compile
+	the multiquad driver in an SMP kernel (maybe only as a module; it's
+	been a long time since I wrote this fix).  Here's a patch.
+
+<gnb@alphalink.com.au>
+	[PATCH] PATCH 2.5: kconfig EXPERIMENTAL misformed
+	
+	Symbol CONFIG_INTERMEZZO_FS depends on CONFIG_EXPERIMENTAL but does
+	not say so in its banner in the usual way.
+
+<gnb@alphalink.com.au>
+	[PATCH] PATCH 2.5: kconfig OBSOLETE not EXPERIMENTAL
+	
+	Symbol CONFIG_ZNET depends on CONFIG_OBSOLETE, but its banner says it
+	depends on CONFIG_EXPERIMENTAL.
+
+<gnb@alphalink.com.au>
+	[PATCH] PATCH 2.5: kconfig choice default value
+	
+	The default value specified as the last word of the "choice" statement
+	should be a unique abbreviation of one of the sub-prompts, not some
+	random string never seen before.
+
+<gnb@alphalink.com.au>
+	[PATCH] PATCH 2.5: kconfig lowercase EXPERIMENTAL tag
+	
+	The convention is that symbols that depend on $CONFIG_EXPERIMENTAL are
+	marked in the banner with the string (EXPERIMENTAL).  There are 4 cases
+	where that string is correctly used but is lowercase instead of uppercase.
+
+<gnb@alphalink.com.au>
+	[PATCH] PATCH 2.5: kconfig missing EXPERIMENTAL (11_14)
+	
+	Two symbols CONFIG_ROADRUNNER and CONFIG_ROADRUNNER_LARGE_RINGS depend
+	on CONFIG_EXPERIMENTAL but do not say so in their banners.
+
+<gnb@alphalink.com.au>
+	[PATCH] PATCH 2.5: kconfig missing EXPERIMENTAL (10_14)
+	
+	Symbol CONFIG_MIDI_EMU10K1 depends on CONFIG_EXPERIMENTAL but does
+	not say so in its banner.
+
+<gnb@alphalink.com.au>
+	[PATCH] PATCH 2.5: kconfig missing EXPERIMENTAL (12_14)
+	
+	Symbol CONFIG_SONYPI depends on CONFIG_EXPERIMENTAL but does
+	not say so in its banner.
+
+<gnb@alphalink.com.au>
+	[PATCH] PATCH 2.5: kconfig missing EXPERIMENTAL (14_14)
+	
+	Symbol CONFIG_VIDEO_MEYE depends on CONFIG_EXPERIMENTAL but does
+	not say so in its banner.
+
+<gnb@alphalink.com.au>
+	[PATCH] PATCH 2.5: kconfig missing EXPERIMENTAL (13_14)
+	
+	Symbol CONFIG_SOUND_RME96XX depends on CONFIG_EXPERIMENTAL but does
+	not say so in its banner.
+
+<gnb@alphalink.com.au>
+	[PATCH] PATCH 2.5: kconfig missing EXPERIMENTAL (1_14)
+	
+	Symbol CONFIG_ADFS_FS depends on CONFIG_EXPERIMENTAL but does
+	not say so in its banner.
+
+<gnb@alphalink.com.au>
+	[PATCH] PATCH 2.5: kconfig missing EXPERIMENTAL (2_14)
+	
+	Four symbols CONFIG_ATM_CLIP, CONFIG_ATM_CLIP_NO_ICMP, CONFIG_ATM_LANE,
+	and CONFIG_ATM_MPOA depend on CONFIG_EXPERIMENTAL but do not say so
+	in their banners.
+
+<gnb@alphalink.com.au>
+	[PATCH] PATCH 2.5: kconfig missing EXPERIMENTAL (3_14)
+	
+	Symbol CONFIG_BLK_DEV_UMEM depends on CONFIG_EXPERIMENTAL but does
+	not say so in its banner.
+
+<gnb@alphalink.com.au>
+	[PATCH] PATCH 2.5: kconfig missing EXPERIMENTAL (4_14)
+	
+	Symbol CONFIG_CYCLOMX_X25 depends on CONFIG_EXPERIMENTAL but does
+	not say so in its banner.
+
+<gnb@alphalink.com.au>
+	[PATCH] PATCH 2.5: kconfig missing EXPERIMENTAL (5_14)
+	
+	Two symbols CONFIG_PLX_HERMES and CONFIG_PCI_HERMES depend on
+	CONFIG_EXPERIMENTAL but do not say so in their banners.
+
+<gnb@alphalink.com.au>
+	[PATCH] PATCH 2.5: kconfig missing EXPERIMENTAL (6_14)
+	
+	Three symbols CONFIG_BLK_DEV_ATARAID, CONFIG_BLK_DEV_ATARAID_PDC, and
+	CONFIG_BLK_DEV_ATARAID_HPT depend on CONFIG_EXPERIMENTAL but do
+	not say so in their banners.
+
+<gnb@alphalink.com.au>
+	[PATCH] PATCH 2.5: kconfig missing EXPERIMENTAL (7_14)
+	
+	Symbol CONFIG_ISDN_DRV_TPAM depends on CONFIG_EXPERIMENTAL but does
+	not say so in its banner.
+
+<gnb@alphalink.com.au>
+	[PATCH] PATCH 2.5: kconfig missing EXPERIMENTAL (8_14)
+	
+	Symbol CONFIG_JFFS2_FS_NAND depends on CONFIG_EXPERIMENTAL but does
+	not say so in its banner.
+
+<gnb@alphalink.com.au>
+	[PATCH] PATCH 2.5: kconfig missing EXPERIMENTAL (9_14)
+	
+	Symbol CONFIG_LDM_PARTITION depends on CONFIG_EXPERIMENTAL but does
+	not say so in its banner.
+
+<gnb@alphalink.com.au>
+	[PATCH] PATCH 2.5: kconfig missing OBSOLETE (1_3)
+	
+	Symbol CONFIG_FMV18X depends on CONFIG_OBSOLETE but does
+	not say so in its banner.
+
+<gnb@alphalink.com.au>
+	[PATCH] PATCH 2.5: kconfig missing OBSOLETE (2_3) again
+	
+	Symbol CONFIG_H8 depends on CONFIG_OBSOLETE but does
+	not say so in its banner.
+
+<gnb@alphalink.com.au>
+	[PATCH] PATCH 2.5: kconfig missing OBSOLETE (3_3)
+	
+	Symbol CONFIG_SK_G16 depends on CONFIG_OBSOLETE but does
+	not say so in its banner.
+
+<gnb@alphalink.com.au>
+	[PATCH] PATCH 2.5: kconfig sychronise banners (12_16)
+	
+	1/5 definitions of CONFIG_PREEMPT have trivially different banners.
+
+<gnb@alphalink.com.au>
+	[PATCH] PATCH 2.5: kconfig sychronise banners (2_16)
+	
+	2/5 definitions of CONFIG_BLK_DEV_SR have trivially different banners.
+
+<gnb@alphalink.com.au>
+	[PATCH] PATCH 2.5: kconfig synchronise banners (10_16)
+	
+	2/6 definitions of CONFIG_PCI have trivially different banners.
+
+<gnb@alphalink.com.au>
+	[PATCH] PATCH 2.5: kconfig synchronise banners (11_16)
+	
+	1/3 definitions of CONFIG_PPP have trivially different banners.
+
+<gnb@alphalink.com.au>
+	[PATCH] PATCH 2.5: kconfig synchronise banners (13_16)
+	
+	1/3 definitions of CONFIG_PSMOUSE have trivially different banners.
+
+<gnb@alphalink.com.au>
+	[PATCH] PATCH 2.5: kconfig synchronise banners (15_16)
+	
+	2/4 definitions of CONFIG_SOFT_WATCHDOG have trivially different banners.
+
+<gnb@alphalink.com.au>
+	[PATCH] PATCH 2.5: kconfig synchronise banners (16_16)
+	
+	1/14 definitions of CONFIG_SOUND have trivially different banners.
+
+<gnb@alphalink.com.au>
+	[PATCH] PATCH 2.5: kconfig synchronise banners (14_16)
+	
+	1/17 definitions of CONFIG_SCSI have trivially different banners.
+
+<gnb@alphalink.com.au>
+	[PATCH] PATCH 2.5: kconfig synchronise banners (1_16)
+	
+	1/3 definitions of 64-bit CONFIG_BINFMT_ELF have trivially different banners.
+	1/3 definitions of CONFIG_BINFMT_ELF32 have trivially different banners.
+
+<gnb@alphalink.com.au>
+	[PATCH] PATCH 2.5: kconfig synchronise banners (3_16)
+	
+	2/10 definitions of CONFIG_CD_NO_IDESCSI have trivially different banners.
+
+<gnb@alphalink.com.au>
+	[PATCH] PATCH 2.5: kconfig synchronise banners (4_16)
+	
+	1/11 definitions of CONFIG_HOTPLUG have trivially different banners.
+
+<gnb@alphalink.com.au>
+	[PATCH] PATCH 2.5: kconfig synchronise banners (5_16)
+	
+	1/3 definitions of CONFIG_MODVERSIONS have trivially different banners.
+
+<gnb@alphalink.com.au>
+	[PATCH] PATCH 2.5: kconfig synchronise banners (6_16)
+	
+	1/16 definitions of CONFIG_NETDEVICES have trivially different banners.
+
+<gnb@alphalink.com.au>
+	[PATCH] PATCH 2.5: kconfig synchronise banners (7_16)
+	
+	1/2 definitions of CONFIG_NUMA have trivially different banners.
+
+<gnb@alphalink.com.au>
+	[PATCH] PATCH 2.5: kconfig synchronise banners (8_16)
+	
+	1/3 definitions of CONFIG_PARPORT_1284 have trivially different banners.
+
+<gnb@alphalink.com.au>
+	[PATCH] PATCH 2.5: kconfig synchronise banners (9_16)
+	
+	1/2 definitions of CONFIG_PC_KEYB have trivially different banners.
+
+<gnb@alphalink.com.au>
+	[PATCH] PATCH: kconfig misspelled symbols
+	
+	Two symbols used in drivers/net/wan/Config.in are misspelled.
+	
+	CONFIG_PPP_MULTLINK should be CONFIG_PPP_MULTILINK
+	CONFIG_PPP_SYNCTTY should be CONFIG_PPP_SYNC_TTY
+
+<gnb@alphalink.com.au>
+	[PATCH] PATCH: kconfig choice defaults (2_2)
+	
+	The format for the "choice" statement is:
+	
+	  choice 'prompt' "{sub-prompt sub-symbol}*" default-value
+	
+	and the following is *not* legal config language (note the
+	positioning of the closing double quote):
+	
+	  choice 'prompt' "{sub-prompt sub-symbol}* default-value"
+	
+	It only happens to work because of a combination of accidental
+	side effects of the current parsers:
+	
+	  *   unpaired sub-words inside the 2nd word are silently ignored
+	  *   the missing last word is silently treated as if empty
+
+<gnb@alphalink.com.au>
+	[PATCH] PATCH: kconfig spurious shell metacharacters (1_2)
+	
+	The config language is *not* shell.  The construct "[ foo ] || [ bar ]"
+	is legal in shell but not in the config language, where we should use
+	the equivalent "[ foo -o bar ]"
+
+<gnb@alphalink.com.au>
+	[PATCH] PATCH: kconfig unbalanced menu end
+	
+	Removed an "endmenu" for which there was no opening "mainmenu_option".
+
+<gnb@alphalink.com.au>
+	[PATCH] PATCH: kconfig unbalanced menu start
+	
+	Removed a spurious menu definition which was both a duplicate and
+	had no matching "endmenu".
+
+<gnb@alphalink.com.au>
+	[PATCH] PATCH: kconfig wrong arch symbols
+	
+	Three arch-determining symbols in drivers/mtd/maps/Config.in are wrong.
+	They have apparently been generated using the sensible pattern "CONFIG_FOO"
+	for an architecture "foo"; unfortunately the architectures are not sensible.
+	
+	  CONFIG_SPARC should be CONFIG_SPARC32
+	  CONFIG_I386 should be CONFIG_X86
+	  CONFIG_SH should be CONFIG_SUPERH
+
+<james@cobaltmountain.com>
+	[PATCH] typo in jazz_esp.c
+	
+
+<james@cobaltmountain.com>
+	[PATCH] typo in smt.h
+	
+
+<james@cobaltmountain.com>
+	[PATCH] Typo in radeonfb.c printk()
+	
+
+<rusty@rustcorp.com.au>
+	[PATCH] trivial: reiserfs whitespace
+	
+
+<rusty@rustcorp.com.au>
+	[PATCH] Trivial TAP_TUN patch to remove minmax macros
+	
+	In favour of those now in kernel.h..
+
+<sfr@canb.auug.org.au>
+	[PATCH] Consolidate sys_pause
+	
+	14 of our 17 architectures define sys_pause exactly the same
+	way.  The other three don't define it at all.  I assume glibc
+	translates pause() into sigsuspend() or something.
+
+<wli@holomorphy.com>
+	[PATCH] Re: TRIVIAL: William Lee Irwin III: buddy system comment
+	
+
+<wli@holomorphy.com>
+	[PATCH] Re: convert BAD_RANGE() to an inline function
+	
+
+<wli@holomorphy.com>
+	[PATCH] beautify nr_free_pages()
+	
+	nr_free_pages() is overly verbose. The following is perhaps clearer and
+	gets to the point with fewer lines of code and inside of 80 columns.
+
+<wli@holomorphy.com>
+	[PATCH] remove unnecessary headers from mm_page_alloc.c
+	
+	page_alloc.c does not use either slab.h or swapctl.h. This removes the
+	inclusion of those headers from page_alloc.c
+
+<wli@holomorphy.com>
+	[PATCH] remove unnecessary parentheses from expand()
+	
+	Not sure why I forgot to do this, but here is a small bit of tidying up
+	of some leftover parentheses from the memlist macro removal. The
+	parentheses are just noise and should go.
+
+<kuebelr@email.uc.edu>
+	[PATCH] 3c509.c - 2_2
+	
+	This patch makes sure the 3c509 module license is always GPL.  Currently
+	the MODULE_LICENSE() marco is only used when CONFIG_ISAPNP or
+	CONFIG_ISAPNP_MODULE is defined.  I have moved MODULE_LICENSE() to the
+	#ifdef MODULE section at the bottom of 3c509.c.
+	
+	Same is true for the MODULE_DEVICE_TABLE() macro.
+
+<kuebelr@email.uc.edu>
+	[PATCH] namespace.c - compiler warning
+	
+	init_rootfs() (from ramfs) doesn't appear in any header file.  I didn't
+	see any that looked like a good home, so lets put a prototype at the top
+	of fs/namespace.c.  This only use of this function is in namespace.c.
+
+<axboe@suse.de>
+	[PATCH] uninline elv_next_request()
+	
+	Uninline elv_next_request() and move it to elevator.c, where it belongs.
+	Because of CURRENT declaration, this actually saves lots of space.  From
+	Andrew.
+
+<ak@muc.de>
+	[PATCH] Another RAID-5 XOR assembly fix
+	
+	The last changes did trigger another latent bug in the inline assembly.
+	akpm noticed it because he compiles his kernels with frame pointers.
+
+<torvalds@home.transmeta.com>
+	Fix up various odds and ends after big merges..
+
+<torvalds@home.transmeta.com>
+	Linux version 2.5.24
+

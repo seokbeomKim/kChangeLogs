@@ -1,0 +1,200 @@
+commit ab1e03b731781609a550360f295061ff57ca3dbb
+Author: Chris Wright <chrisw@osdl.org>
+Date:   Sun Aug 14 17:20:18 2005 -0700
+
+    Linux 2.6.12.5
+
+commit 24eda4e69d4f0a4d5a66c8b5a8fa9b895d832368
+Author: Rusty Russell <rusty@rustcorp.com.au>
+Date:   Wed Aug 10 13:52:38 2005 +0100
+
+    [PATCH] Module per-cpu alignment cannot always be met
+    
+    Fwd from Daniel Drake <dsd@gentoo.org>.
+    
+    The module code assumes noone will ever ask for a per-cpu area more than
+    SMP_CACHE_BYTES aligned.  However, as these cases show, gcc asks sometimes
+    asks for 32-byte alignment for the per-cpu section on a module, and if
+    CONFIG_X86_L1_CACHE_SHIFT is 4, we hit that BUG_ON().  This is obviously an
+    unusual combination, as there have been few reports, but better to warn
+    than die.
+    
+    See:
+    	http://www.ussg.iu.edu/hypermail/linux/kernel/0409.0/0768.html
+    
+    And more recently:
+    	http://bugs.gentoo.org/show_bug.cgi?id=97006
+    
+    Signed-off-by: Rusty Russell <rusty@rustcorp.com.au>
+    Signed-off-by: Andrew Morton <akpm@osdl.org>
+    Signed-off-by: Linus Torvalds <torvalds@osdl.org>
+    Signed-off-by: Chris Wright <chrisw@osdl.org>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
+
+commit a3692f99ef19cfb7fe0420837852108450dd8124
+Author: David Howells <dhowells@redhat.com>
+Date:   Wed Aug 3 13:19:07 2005 +0100
+
+    [PATCH] CAN-2005-2099 Destruction of failed keyring oopses
+    
+    The attached patch makes sure that a keyring that failed to instantiate
+    properly is destroyed without oopsing [CAN-2005-2099].
+    
+    The problem occurs in three stages:
+    
+     (1) The key allocator initialises the type-specific data to all zeroes. In
+         the case of a keyring, this will become a link in the keyring name list
+         when the keyring is instantiated.
+    
+     (2) If a user (any user) attempts to add a keyring with anything other than
+         an empty payload, the keyring instantiation function will fail with an
+         error and won't add the keyring to the name list.
+    
+     (3) The keyring's destructor then sees that the keyring has a description
+         (name) and tries to remove the keyring from the name list, which oopses
+         because the link pointers are both zero.
+    
+    This bug permits any user to take down a box trivially.
+    
+    Signed-off-by: David Howells <dhowells@redhat.com>
+    Signed-off-by: Chris Wright <chrisw@osdl.org>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
+
+commit 1cc2029def8e8b279c050b517a3d635b8a8ad351
+Author: David Howells <dhowells@redhat.com>
+Date:   Wed Aug 3 13:19:03 2005 +0100
+
+    [PATCH] CAN-2005-2098 Error during attempt to join key management session can leave semaphore pinned
+    
+    The attached patch prevents an error during the key session joining operation
+    from hanging future joins in the D state [CAN-2005-2098].
+    
+    The problem is that the error handling path for the KEYCTL_JOIN_SESSION_KEYRING
+    operation has one error path that doesn't release the session management
+    semaphore. Further attempts to get the semaphore will then sleep for ever in
+    the D state.
+    
+    This can happen in four situations, all involving an attempt to allocate a new
+    session keyring:
+    
+     (1) ENOMEM.
+    
+     (2) The users key quota being reached.
+    
+     (3) A keyring name that is an empty string.
+    
+     (4) A keyring name that is too long.
+    
+    Any user may attempt this operation, and so any user can cause the problem to
+    occur.
+    
+    Signed-off-by: David Howells <dhowells@redhat.com>
+    Signed-off-by: Chris Wright <chrisw@osdl.org>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
+
+commit 49f8907fb9de31d3a0a099fef0f42ccdcdc9c7e7
+Author: Linus Torvalds <torvalds@osdl.org>
+Date:   Sat Aug 6 11:33:11 2005 -0700
+
+    [PATCH] Check input buffer size in zisofs
+    
+    Add fakey 'deflateBound()' function to the in-kernel zlib routines
+    
+    It's not the real deflateBound() in newer zlib libraries, partly because
+    the upcoming usage of it won't have the "stream" available, so we can't
+    have the same interfaces anyway.
+    
+    This uses the new deflateBound() thing to sanity-check the input to the
+    zlib decompressor before we even bother to start reading in the blocks.
+    
+    Problem noted by Tim Yamin <plasmaroo@gentoo.org>
+    
+    Signed-off-by: Chris Wright <chrisw@osdl.org>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
+    Signed-off-by: H. Peter Anvin <hpa@zytor.com>
+
+commit 885605316d76c3fdce23dffe9c59e20539287c6b
+Author: Tim Yamin <plasmaroo@gentoo.org>
+Date:   Mon Jul 25 23:16:13 2005 +0100
+
+    [PATCH] Update in-kernel zlib routines (CAN-2005-2458, CAN-2005-2459)
+    
+    Fix outstanding security bugs in the Linux zlib implementations. See:
+    
+    a) http://sources.redhat.com/ml/bug-gnu-utils/1999-06/msg00183.html
+    CAN-2005-2458
+    
+    b) http://bugs.gentoo.org/show_bug.cgi?id=94584
+    CAN-2005-2459
+    
+    Signed-off-by: Tim Yamin <plasmaroo@gentoo.org>
+    Signed-off-by: Tavis Ormandy <taviso@gentoo.org>
+    Signed-off-by: Chris Wright <chrisw@osdl.org>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
+
+commit 8f5a9b18ec1b8af04a8d9e1fcce04cf8dbb08019
+Author: Andi Kleen <ak@suse.de>
+Date:   Wed Aug 10 03:40:42 2005 +0200
+
+    [PATCH] x86_64: Fixing smpboot timing problem
+    
+    This patch fixes the SMP boot timing problem that hit various people and was
+    introduced in 2.6.12. Please apply to stable.
+    
+    >From Eric Biederman
+    
+    sync_tsc was using smp_call_function to ask the boot processor
+    to report it's tsc value.  smp_call_function performs an IPI_send_allbutself
+    which is a broadcast ipi.  There is a window during processor startup during
+    which the target cpu has started and before it has initialized it's interrupt
+    vectors so it can properly process an interrupt.  Receveing an interrupt
+    during that window will triple fault the cpu and do other nasty things.
+    
+    Why cli does not protect us from that is beyond me.
+    
+    The simple fix is to match ia64 and provide a smp_call_function_single.
+    Which avoids the broadcast and is more efficient.
+    
+    This certainly fixes the problem of getting stuck on boot which was
+    very easy to trigger on my SMP Hyperthreaded Xeon, and I think
+    it fixes it for the right reasons.
+    
+    Signed-off-by: "Eric W. Biederman" <ebiederm@xmission.com>
+    Signed-off-by: Andi Kleen <ak@suse.de>
+    Signed-off-by: Chris Wright <chrisw@osdl.org>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
+
+commit 4491f6fe1c32fc8de79ceb3b57e90647aaca8cdb
+Author: Andi Kleen <ak@suse.de>
+Date:   Mon Aug 8 18:47:19 2005 +0200
+
+    [PATCH] Fix SRAT for non dual core AMD systems
+    
+    Patch for 2.6.12-STABLE
+    
+    This fixes a bug in SRAT handling on AMD systems that was introduced
+    with the dual core support. It would be disabled on CPUs without dual core.
+    Just drop the bogus check.
+    
+    Signed-off-by: Andi Kleen <ak@suse.de>
+    Signed-off-by: Chris Wright <chrisw@osdl.org>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
+
+commit 9becc8e36ec9561fde0fbc17d09d707e36277d0a
+Author: Eric Dumazet <dada1@cosmosbay.com>
+Date:   Wed Aug 3 18:43:22 2005 -0700
+
+    [PATCH] sys_set_mempolicy() doesnt check if mode < 0
+    
+    A kernel BUG() is triggered by a call to set_mempolicy() with a negative
+    first argument.  This is because the mode is declared as an int, and the
+    validity check doesnt check < 0 values.  Alternatively, mode could be
+    declared as unsigned int or unsigned long.
+    
+    Signed-off-by: Eric Dumazet <dada1@cosmosbay.com>
+    Cc: Andi Kleen <ak@suse.de>
+    Signed-off-by: Andrew Morton <akpm@osdl.org>
+    Signed-off-by: Linus Torvalds <torvalds@osdl.org>
+    Signed-off-by: Chris Wright <chrisw@osdl.org>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
+

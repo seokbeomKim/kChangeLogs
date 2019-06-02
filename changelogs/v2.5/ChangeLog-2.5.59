@@ -1,0 +1,1444 @@
+
+Summary of changes from v2.5.58 to v2.5.59
+============================================
+
+<jsimmons@maxwell.earthlink.net>
+	I810 fbdev updates. Cursor fix for ati mach 64 cards on big endian machines. Buffer over flow fix for fbcon putcs function. C99 initializers for the STI console drivers.Voodoo 1/2 and NVIDIA driver updates.
+
+<jsimmons@maxwell.earthlink.net>
+	Added resize support for the framebuffer console. Now you can change the console size via stty. Also support for color palette changing on VC switch is supported.
+
+<jsimmons@maxwell.earthlink.net>
+	[RIVA FBDEV] Driver now uses its own fb_open and fb_release function again. It has no ill effects. The drivers uses strickly hardware acceleration so we don't need cfb_fillrect and cfb_copyarea.
+	Cleaned up font.h. Geerts orignal pacth broke them up into a font.h in video and one in  linux. Now I put them back together again in include/linux. The m68k platform has been updated for this change.
+	
+
+<jsimmons@maxwell.earthlink.net>
+	Updates from Helge Deller for the console/fbdev drivers for the PARISC platform. Small fix for clearing the screen and a string typo for the Voodoo 1/2 driver.
+
+<jsimmons@maxwell.earthlink.net>
+	[MONITOR support] GTF support for VESA complaint monitors. Here we calculate the general timings needed so we don't over step the bounds for a monitor.
+	
+	[fbmem.c cleanup] Name change to make teh code easier to read.
+
+<jsimmons@kozmo.(none)>
+	[ATY] Somehow a merge mistake happened. We removed fb_set_var.
+
+<jsimmons@maxwell.earthlink.net>
+	Remove fb_set_var. Some how it was missed in a merge conflict.
+
+<jsimmons@maxwell.earthlink.net>
+	Final updtes to the GTF code. Now the code can gnerate GTF timings regardless of the validity of info->monospecs.
+	
+	[ATYFB] Updates to the aty driver.
+
+<jsimmons@maxwell.earthlink.net>
+	[TRIDENT FBDEV] Driver ported to the new api.
+
+<bjorn_helgaas@hp.com>
+	[AGP] factor device command updates
+
+<bjorn_helgaas@hp.com>
+	[AGP] fix old pci_find_capability merge botch
+
+<bjorn_helgaas@hp.com>
+	[AGP] Remove unused var
+
+<bjorn_helgaas@hp.com>
+	[AGP] Print AGP version & mode when programming devices.
+
+<bjorn_helgaas@hp.com>
+	[AGP] factor device capability collection
+
+<bjorn_helgaas@hp.com>
+	[AGP] use PCI_AGP_* constants
+
+<bjorn_helgaas@hp.com>
+	[AGP] use pci_find_capability in sworks-agp.c
+
+<falk.hueffner@student.uni-tuebingen.de>
+	[AGP] missing includes on Alpha
+
+<patmans@us.ibm.com>
+	[PATCH] USB storage sysfs fix
+	
+	It looks like there is a missing scsi_set_device() call in scsiglue.c,
+	(similiar to what happens if we handled NULL dev pointer in scis_add_host)
+	so all the usb scsi devices end up under /sysfs/devices.
+	
+	I don't have any usb mass storage devices, this patch against 2.5 bk
+	compiles but otherwise is not tested. It should put the usb-scsi mass
+	storage devices below the usb sysfs dev (I assume in your case under
+	/sysfs/devices/pci0/00:07.2/usb1/1-2/1-2.4/1-2.4.4).
+
+<greg@kroah.com>
+	[PATCH] USB: put the usb storage's SCSI device in the proper place in sysfs.
+	
+	Also makes usb_ifnum_to_if() a public function
+
+<davej@codemonkey.org.uk>
+	[WATCHDOG] clean up includes.
+
+<davej@codemonkey.org.uk>
+	[WATCHDOG] Final 2.4 bits for advantechwdt
+
+<davej@codemonkey.org.uk>
+	[WATCHDOG] Final 2.4 bits for eurotechwdt
+
+<davej@codemonkey.org.uk>
+	[WATCHDOG] Final 2.4 bits for ib700wdt
+
+<anton@samba.org>
+	pp64: move BUG into asm/bug.h
+
+<anton@samba.org>
+	ppc64: update comment, we now zero extend all 6 arguments in the 32bit syscall path, from Milton Miller
+
+<davem@nuts.ninka.net>
+	[SUNSAB]: Fix uart_get_baud_rate args.
+
+<anton@samba.org>
+	ppc64: 2.5 module support, from Rusty
+
+<anton@samba.org>
+	ppc64: fix build when CONFIG_MODULES=n
+
+<jmorris@intercode.com.au>
+	[CRYPTO]: Add support for SHA-386 and SHA-512
+	- Merged SHA-384 and SHA-512 code from Kyle McMartin
+	  <kyle@gondolin.debian.net>
+	- Added test vectors.
+	- Documentation and credits updates.
+
+<jmorris@intercode.com.au>
+	[CRYPTO] remove superfluous goto from des module init exception path
+
+<jmorris@intercode.com.au>
+	[CRYPTO] Add AES and MD4 to tcrypto crypto_alg_available() test.
+
+<davem@nuts.ninka.net>
+	[SPARC64]: Define PAGE_BUG in asm/bug.h
+
+<davem@nuts.ninka.net>
+	[SPARC64]: Add UltraSPARC-III cpu frequency driver.
+
+<mochel@osdl.org>
+	driver model: update documentation.
+	
+	From Art Haas.
+
+<mochel@osdl.org>
+	kobject: export kset_find_obj.
+	
+	From Louis Zhang.
+
+<mochel@osdl.org>
+	sysfs: fixup some remaining s390 files. 
+	
+	From Arnd Bergmann.
+
+<mochel@osdl.org>
+	sysfs: fixup NUMA file that was missed.
+	
+	- Remove count and off parameters from show() method.
+
+<davej@codemonkey.org.uk>
+	[WATCHDOG] Final 2.4 bits for softdog.c
+
+<sandeen@sgi.com>
+	[XFS] Make sure we don't walk off the end of the err_level array
+	
+	SGI Modid: 2.5.x-xfs:slinx:135827a
+
+<sandeen@sgi.com>
+	[XFS] Fix dyslexic definition of XFS_MAX_ERR_LEVEL...
+	
+	SGI Modid: 2.5.x-xfs:slinx:135847a
+
+<davej@codemonkey.org.uk>
+	[WATCHDOG] Final 2.4 changes for w83877f_wdt.c
+
+<sandeen@sgi.com>
+	[XFS] Merge max file offset fix - use standard Linux macros
+	
+	SGI Modid: 2.5.x-xfs:slinx:135881a
+
+<nathans@sgi.com>
+	[XFS] Fix up some comments, tidy up some macros - no functional changes.
+	
+	SGI Modid: 2.5.x-xfs:slinx:135917a
+
+<sandeen@sgi.com>
+	[XFS] Handle mode 0 inodes that find their way onto the unlinked list
+	These shouldn't be there, probably the result of corruption.
+	However, if we find one, handle it specially so that we don't
+	deadlock during unlinked list processing in recovery.  Without
+	xfs_iput_new, we'd be waiting on an inode lock we already hold.
+	
+	SGI Modid: 2.5.x-xfs:slinx:136535a
+
+<davej@codemonkey.org.uk>
+	[WATCHDOG] final 2.4 fixes for wdt.c
+
+<hch@sgi.com>
+	[XFS] remove superlous MAXNAMELEN checks
+	
+	SGI Modid: 2.5.x-xfs:slinx:135168a
+
+<hch@sgi.com>
+	[XFS] some more rename cleanups
+	
+	SGI Modid: 2.5.x-xfs:slinx:135919a
+
+<hch@sgi.com>
+	[XFS] xfs_getattr should be static
+	
+	SGI Modid: 2.5.x-xfs:slinx:135920a
+
+<cattelan@sgi.com>
+	[XFS] Fix the cmn_err stuff to mask the error level before it checks for max value
+	
+	SGI Modid: 2.5.x-xfs:slinx:135869a
+
+<davej@codemonkey.org.uk>
+	[WATCHDOG] Final 2.4 changes for wdt285.c
+
+<cattelan@sgi.com>
+	[XFS] make *cmn_err interrupt safe
+	
+	SGI Modid: 2.5.x-xfs:slinx:136126a
+
+<cattelan@sgi.com>
+	[XFS] Revisit the remount read only code again.
+	apparently the root file system are not being synced 
+	correctly during system shutdown
+	
+	SGI Modid: 2.5.x-xfs:slinx:136269a
+
+<hch@sgi.com>
+	[XFS] remount r/o fixes
+	
+	SGI Modid: 2.5.x-xfs:slinx:136795a
+
+<davej@codemonkey.org.uk>
+	[WATCHDOG] Final 2.4 changes for wdt_pci.c
+
+<hch@sgi.com>
+	[XFS] update xattr.h copyright date
+
+<hch@sgi.com>
+	[XFS] add dmapi miscdevice minor number
+	
+	This doesn't mean dmapi is scheduled for inclusion, just adding
+	the reserved minor number to miscdevice.h for documentation purposes.
+
+<hch@sgi.com>
+	[XFS] fix namespace pullution
+	
+	SGI Modid: 2.5.x-xfs:slinx:136827a
+
+<mochel@osdl.org>
+	sysfs: minor documentation update.
+
+<willy@debian.org>
+	[PATCH] acpi_bus_register_driver patch
+	
+	The current ACPI code searches for a _HID of PNP0A03.  This is wrong,
+	it needs to check _CID too.  But we already have generic code for doing
+	that, so this patch converts the ACPI pcihp code to do this.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	Module Sanity Check
+	
+	This patch, based on Rusty's implementation, adds a special section
+	to vmlinux and all modules, which contain the kernel version
+	string, values of some particularly important config options
+	(SMP,preempt,proc family) and the gcc version.
+	
+	When inserting a module, the version string is checked against the
+	kernel version string and loading is rejected if they don't match.
+	
+	The version string is actually added to the modules during the
+	final .ko generation, so that a changed version string does only
+	cause relinking, not recompilation, which is a major performance
+	improvement over the old 2.4 way of doing things.
+
+<mochel@osdl.org>
+	sysfs: fixup SCSI debug driver files. 
+
+<jsimmons@maxwell.earthlink.net>
+	[GENERIC IMAGEBLIT ACCEL] 
+	
+	a) Fix for cfb_imagblit so it can handle monochrome bitmaps with widths not multiples of 8.
+	
+	b) Further optiminzation of fast_imageblit by removing unnecessary steps from its main loop.
+	
+	c) fast_imageblit show now work for bitmaps widths which are least divisible by 4. 4x6 and 12x22 shoudl use fast_imageblit now.
+	
+	d) Use hadrware syncing method of hardware if present.
+	
+	e) trivial: wrap text at 80 columns. 
+	
+	[RIVA and 3DFX] imageblit functions busted for large images. Use generic functions for now.
+	
+	Several syncing issues fixed between the accel engine and access to the framebuffer is several files.
+
+<mochel@osdl.org>
+	deadline iosched: make sure queue is valid before unregistering it. 
+	
+	- Fixes oops on boot when freeing initrd in 2.5.58.
+
+<rmk@flint.arm.linux.org.uk>
+	[ARM] Add new system call entries
+	
+	Add entries for sendfile64, futex, async io, etc system calls to
+	both unistd.h and the system call handler table.
+
+<rmk@flint.arm.linux.org.uk>
+	[ARM] Remove redundant definitions from ide.h
+	
+	Remove ide_release_lock and ide_get_lock definitions from asm-arm/ide.h;
+	they're defined in include/linux/ide.h.
+
+<rmk@flint.arm.linux.org.uk>
+	[ARM] Fix CPUFREQ initialisation oops
+	
+	The CPUFREQ initialisation now registers an interface with the device
+	model, and thus needs to initialise after postcore.  We use the
+	arch level for this.  This does, however, impose the restriction
+	that cpufreq may not be available for other architecture
+	initialisated code.
+
+<akpm@digeo.com>
+	[PATCH] ext3 ino_t removal
+	
+	Patch from Andreas Dilger <adilger@clusterfs.com>
+	
+	This patch against 2.5.53 removes my erronous use of ino_t in a couple of
+	places in the ext3 code.  This has been replaced with unsigned long (the same
+	as is used for inode->i_ino).  This patch matches the fix submitted to 2.4
+	for fixing 64-bit compiler warnings, and also replaces a couple of %ld with
+	%lu to forestall output wierdness with filesystems with a few billion inodes.
+
+<akpm@digeo.com>
+	[PATCH] factor free memory into max_sane_readahead()
+	
+	max_sane_readahead() permits the user to readahead up to
+	half-the-inactive-list's worth of pages.  Which is totally wrong if most of
+	memory is free.
+	
+	So make the limit be
+	
+		(nr_inactive + nr_free) / 2
+
+<akpm@digeo.com>
+	[PATCH] fix ext3 memory leak
+	
+	This is the leak which Con found.  Long story...
+	
+	- If a dirty page is fed into ext3_writepage() during truncate,
+	  block_write_full_page() will reutrn -EIO (it's outside i_size) and will
+	  leave the buffers dirty.  In the expectation that discard_buffer() will
+	  clean them.
+	
+	- ext3_writepage() then adds the still-dirty buffers to the journal's
+	  "async data list".  These are buffers which are known to have had IO
+	  started.  All we need to do is to wait on them in commit.
+	
+	- meanwhile, truncate will chop the pages off the address_space.  But
+	  truncate cannot invalidate the buffers (in journal_unmap_buffer()) because
+	  the buffers are attached to the committing transaction.  (hm.  This
+	  behaviour in journal_unmap_buffer() is bogus.  We just never need to write
+	  these buffers.)
+	
+	- ext3 commit will "wait on writeout" of these writepage buffers (even
+	  though it was never started) and will then release them from the
+	  journalling system.
+	
+	So we end up with pages which are attached to no mapping, which are clean and
+	which have dirty buffers.  These are unreclaimable.
+	
+	
+	Aside:
+	
+	  ext3-ordered has two buffer lists: the "sync data list" and the "async
+	  data list".
+	
+	  The sync list consists of probably-dirty buffers which were dirtied in
+	  commit_write().  Transaction commit must write all thee out and wait on
+	  them.
+	
+	  The async list supposedly consists of clean buffers which were attached
+	  to the journal in ->writepage.  These have had IO started (by writepage) so
+	  commit merely needs to wait on them.
+	
+	  This is all designed for the 2.4 VM really.  In 2.5, tons of writeback
+	  goes via writepage (instead of the buffer lru) and these buffers end up
+	  madly hpooing between the async and sync lists.
+	
+	  Plus it's arguably incorrect to just wait on the writes in commit - if
+	  the buffers were set dirty again (say, by zap_pte_range()) then perhaps we
+	  should write them again before committing.
+	
+	
+	So what the patch does is to remove the async list.  All ordered-data buffers
+	are now attached to the single "sync data list".  So when we come to commit,
+	those buffers which are dirty will have IO started and all buffers are waited
+	upon.
+	
+	This means that the dirty buffers against a clean page which came about from
+	block_write_full_page()'s -EIO will be written to disk in commit - this
+	cleans them, and the page is now reclaimable.  No leak.
+	
+	It seems bogus to write these buffers in commit, and indeed it is.  But ext3
+	will not allow those blocks to be reused until the commit has ended so there
+	is no corruption risk.  And the amount of data involved is low - it only
+	comes about as a race between truncate and writepage().
+
+<akpm@digeo.com>
+	[PATCH] hugetlbfs: don't implement read/write file_ops
+	
+	From Rohit Seth.
+	
+	We're currently disabling read() and write() against hugetlbfs files via the
+	address_space ops.  But that's a bit awkward, and results in reads and writes
+	instantiating useless, non-uptodate 4k pagecache against the inodes.
+	
+	The patch removes the read, write and sendfile file_operations entries.  So
+	the caller will get their -EINVAL without us ever having to go to the
+	pagecache layer.
+
+<akpm@digeo.com>
+	[PATCH] Use for_each_task_pid() in do_SAK()
+	
+	Patch from Bill Irwin.
+	
+	__do_SAK() simply wants to kill off processes using a given tty.  This
+	converts it to use for_each_task_pid().
+
+<akpm@digeo.com>
+	[PATCH] Create a per-cpu proces counter for /proc reporting
+	
+	proc_fill_super() simply wants a count of processes, not threads.
+	This creates a per-cpu counter for it to use to determine that.
+
+<akpm@digeo.com>
+	[PATCH] remove has_stopped_jobs()
+	
+	patch from Bill Irwin
+	
+	has_stopped_jobs() is completely unused. This patch removes
+	has_stopped_jobs() and renames __has_stopped_jobs() to has_stopped_jobs().
+
+<greg@kroah.com>
+	TTY: add module reference counting for tty drivers.
+	
+	Note, there are still races with unloading modules, this patch
+	does not fix that...
+
+<drepper@redhat.com>
+	[PATCH] new CPUID bit
+	
+	Northwood P4's have one more bit in the CPUID processor info set: bit
+	31.  Intel calls the feature PBE (Pending Break Enable).
+	
+	The attached patch adds the necessary entry.
+
+<alex@ssi.bg>
+	[PATCH] missing break in amd 486 cpu case
+	
+		An old AMD 486DX4-SE(as reported by bios) here crashes on boot in
+	amd_init, doing rdmsr in k6 case. Elan fixes added case 4 there but
+	without break. This break allows it to boot.
+
+<cloos@jhcloos.com>
+	[PATCH] i8k driver update to i8k-1.13
+	
+	In addition to the diff from the 1.7 i8kutils release to the 1.13
+	release, I made the new globals static as per Rusty's namespace
+	pollution patch yesterday, and removed the reference to an include no
+	longer in 2.5.
+
+<jsimmons@maxwell.earthlink.net>
+	[STI] Updates to latest PARISC changes. Use the latest PCI ids.
+
+<rl@hellgate.ch>
+	[PATCH] export skb_pad symbol
+	
+	Actually exporting the symbol introduced in 2.5.57 makes module users
+	happy.
+
+<rl@hellgate.ch>
+	[PATCH] Fix via-rhine using skb_padto
+	
+	This patch has already made it into 2.4.21pre3-ac4. Please apply.
+
+<greg@kroah.com>
+	[PATCH] USB: add dev attribute for usb-serial devices in sysfs
+
+<gerg@snapgear.com>
+	[PATCH] bug.h for m68knommu arch
+	
+	This adds the new bug.h file for the m68knommu arch.
+	It is basically a copy of asm-cris/bug.h.
+
+<gerg@snapgear.com>
+	[PATCH] remove BUG from m68knommu arch page.h
+	
+	This removes the BUG and PAGE_BUG macros from asm-m68knommu/page.h.
+	All this is now moved into asm-m68knommu/bug.h.
+
+<gerg@snapgear.com>
+	[PATCH] remove obsolete himem.ld from m68knommu sub-arch
+	
+	This removes the last remaining obsolete m68knommu sub-architecture
+	linker script. No longer needed with the new merge script.
+
+<gerg@snapgear.com>
+	[PATCH] clean up linker symbols in 68EZ328 ucsimm target
+	
+	This cleans up the linker symbols used in the 68EZ328 ucsimm
+	target assembler head file. Removed some unused (and not defined)
+	names. Also changes a couple of names to be consistent with all
+	other m68knommu targets.
+
+<gerg@snapgear.com>
+	[PATCH] clean up linker symbols in 68EZ328 ucdimm target
+	
+	This cleans up the linker symbols used in the 68EZ328 ucdimm
+	target assembler head file. Removed some unused (and not defined)
+	names. Also changes a couple of names to be consistent with all
+	other m68knommu targets.
+
+<gerg@snapgear.com>
+	[PATCH] move common macros into m68knommu entry.h
+	
+	This overhauls asm-m68knommu/entry.h. It contains much cruft,
+	and is out of date relative to the underlying entry.S code.
+	
+	More specifically this brings the SAVE_ALL and RESTORE_ALL macros
+	from the various m68knommu entry.S files into this header.
+
+<gerg@snapgear.com>
+	[PATCH] remove common code from m68knommu/5307 entry.S
+	
+	This converts the current m68knommu/5307 entry.S file to use the new
+	entry.h, and also removes all the common entry.S code that is now in the
+	common m68knommu/kernel/entry.S.
+
+<gerg@snapgear.com>
+	[PATCH] remove common code from m68knommu/68328 entry.S
+	
+	This converts the current m68knommu/68328 entry.S file to use the new
+	entry.h, and also removes all the common entry.S code that is now in the
+	common m68knommu/kernel/entry.S.
+
+<gerg@snapgear.com>
+	[PATCH] remove common code from m68knommu/68360 entry.S
+	
+	This converts the current m68knommu/68360 entry.S file to use the new
+	entry.h, and also removes all the common entry.S code that is now in the
+	common m68knommu/kernel/entry.S.
+
+<gerg@snapgear.com>
+	[PATCH] build common m68knommu entry.S
+	
+	This adds the new common m68knommu entry.S into the build list.
+
+<anton@samba.org>
+	ppc64: move BUG_ILLEGAL_INSTR into asm/bug.h, noted by Milton Miller
+
+<anton@samba.org>
+	ppc64: remove old strace hack
+
+<davej@codemonkey.org.uk>
+	[AGPGART] warning fixes from Bjorn's last patches.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	ISDN/HiSax: Fix typo in drivers/isdn/hisax/config.c
+
+<kai@tp1.ruhr-uni-bochum.de>
+	ISDN/HiSax: Fix PnP merge
+	
+	Now it actually even compiles.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	ISDN: Fix the janitor fix
+	
+	Adding a check for allocation failure was a good idea, it just needs
+	checking the right variable...
+
+<hch@lst.de>
+	[PATCH] more procfs bits for !CONFIG_MMU
+	
+	New version with all ifdef CONFIG_MMU gone from procfs.
+	
+	Instead, the conditional code is in either task_mmu.c/task_nommu.c, and
+	the Makefile will select the proper file for inclusion depending on
+	CONFIG_MMU.
+
+<davej@codemonkey.org.uk>
+	[AGPGART] implement module locking that works.
+	
+
+<davej@codemonkey.org.uk>
+	[AGPGART] Remove ancient unused bits from headers.
+
+<paubert@iram.es>
+	[PATCH] Cleanup of the lcall7/lcall27 entry path.
+	
+	I have more carefully tested the proposed removal of the NT flag
+	clearing on lcall entry.
+	
+	The question I wanted to answer is: is it necessary to clear NT in the
+	sysenter entry path as implemented for lcall7/lcall27 or is it possible
+	to remove the flag manipulation from do_lcall?
+	
+	Doing it only for one and not the other looks wrong since several return
+	paths are shared, especially the ones which end up in iret, the only
+	instruction which is affected by the NT flag.
+	
+	The conclusion is that 2.5 is NT safe (had to dig out an old P5-133 which
+	I could crash without fear of data loss, so I have only tested on 1
+	machine). The reason this cleanup works is that now (since Jan 5th) flags
+	are saved and restored in switch_to() to keep IOPL private to a process
+	even when using sysenter/sysexit.
+	
+	The side effect of that patch is that NT becomes also process-private
+	instead of infecting all processes and triggering a killfest of all user
+	mode processes, including init (AFAICT kernel threads survived, but I
+	did not have any debug tools enabled in the kernel).
+	
+	The only addition to the preceding version is that interrupts are
+	reenabled in the iret fixup path because it seems that do_exit() might
+	otherwise spend quite some time with interrupts disabled.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	Consolidate read-only sections in arch/*/vmlinux.lds.S
+	
+	It's annoying having to touch 20+ arch vmlinux.lds.S file for every
+	new section introduced, just because they all duplicate the same
+	statements. Since we preprocess vmlinux.lds.S anyway, let's
+	#include <asm-generic/vmlinux.lds.h> and share the common statements.
+	
+	This is a first step in consolidating most of the read-only sections.
+
+<trond.myklebust@fys.uio.no>
+	[PATCH] Fix RPC client warning in 2.5.58...
+	
+	The warning
+	
+		/lockd/clntXxXxXxXx RPC: Couldn't create pipefs entry
+	
+	is due to the lockd process starting RPC clients as an unprivileged
+	user, causing path_walk() to fail.  The following patch fixes it.
+
+<trond.myklebust@fys.uio.no>
+	[PATCH] Fix NFS root mount handling
+
+<ink@jurassic.park.msu.ru>
+	[PATCH] alpha ksyms
+	From Jeff.Wiedemeier@hp.com:
+	
+	Export proper functions when debugging is enabled.
+
+<ink@jurassic.park.msu.ru>
+	[PATCH] alpha bootp target
+	From Jeff.Wiedemeier@hp.com:
+	
+	Fix alpha Makefiles for bootpfile target.
+
+<ink@jurassic.park.msu.ru>
+	[PATCH] alpha ipi timeout
+	From Jeff.Wiedemeier@hp.com:
+	
+	Two stage timeout in alpha call_function_on_cpu. If the
+	primary timeout expires with no response, log a message and
+	start secondary timeout. If reponse is received log how
+	far into secondary timeout. If no response is received,
+	crash.
+
+<ink@jurassic.park.msu.ru>
+	[PATCH] alpha HARDIRQ_BITS
+	From Jeff.Wiedemeier@hp.com:
+	
+	Adjust Alpha HARDIRQ_BITS check to make sure there is enough
+	room for each IPL, not each interrupt (Marvel can have
+	too many unique device interrupts for that, and it really
+	only needs to cover potential nesting of interrupts, which covering
+	the IPLs does)
+
+<ink@jurassic.park.msu.ru>
+	[PATCH] alpha kernel layout
+	From Jeff.Wiedemeier@hp.com:
+	
+	Adjust kernel layout format to match other architectures and
+	prevent reording of the first entry in a section with the
+	section start label.
+
+<ink@jurassic.park.msu.ru>
+	[PATCH] alpha osf_shmat lock
+	From Jeff.Wiedemeier@hp.com:
+	
+	Remove redundant lock in osf_shmat (sys_shmat locks already);
+	redundant lock has been seen to cause livelock in some workloads.
+
+<ink@jurassic.park.msu.ru>
+	[PATCH] alpha ev6/ev7 virt_to_phys
+	From Jeff.Wiedemeier@hp.com:
+	
+	Adjust virt_to_phys / phys_to_virt functions to follow
+	EV6/7 PA sign extension to properly convert between 43-bit
+	superpage I/O addresses and physical addresses.
+	This change is backwards compatible with all previous Alphas
+	as they implemented fewer than 41 bits of physical address.
+
+<rth@are.twiddle.net>
+	[ALPHA] Expose shifts in virt_to_phys to the compiler.
+
+<ink@jurassic.park.msu.ru>
+	[PATCH] alpha console callbacks
+	From Jeff.Wiedemeier@hp.com:
+	
+	Add open_console / close_console callback definitions.
+
+<ink@jurassic.park.msu.ru>
+	[PATCH] alpha ide hwifs
+	From Jeff.Wiedemeier@hp.com:
+	
+	Make the max IDE HWIFS configurable on alpha (default to
+	previous hardwired value of 4).
+
+<ink@jurassic.park.msu.ru>
+	[PATCH] alpha mem_size_limit
+	From Jeff.Wiedemeier@hp.com:
+	
+	This adds the 32GB limit to setup.c.  (It actually hits the first
+	2 nodes on Marvel, but that's ok, where we really run into a big
+	problem is if we go past 4, then we hit a much larger hole.)
+
+<ink@jurassic.park.msu.ru>
+	[PATCH] alpha numa iommu
+	From Jeff.Wiedemeier@hp.com:
+	
+	On NUMA alpha systems, attempt to allocate scatter-gather
+	tables local to IO processor.  If that doesn't work, then
+	allocate anywhere in the system.
+
+<hch@lst.de>
+	[PATCH] remove more junk from i2c headers
+
+<hch@lst.de>
+	[PATCH] remove some junk from fs/devfs/Makefile
+
+<hch@lst.de>
+	[PATCH] remove obsolete kern_umount alias for mntput
+
+<ink@jurassic.park.msu.ru>
+	[PATCH] alpha numa update
+	From Jeff.Wiedemeier@hp.com:
+	
+	numa mm update including moving alpha numa support into 
+	machine vector so a generic numa kernel can be used.
+
+<mbligh@aracnet.com>
+	[PATCH] Fix interrupt dest mode / delivery mode confusion
+	
+	Patch from James Cleverdon & John Stultz
+	
+	Currently the naming for the IO-APIC fields is very confused, we assign
+	dest_LowestPrio to delivery_mode, and INT_DELIVERY_MODE to dest_mode.
+	The values are correct, but the naming is wrong - this patch corrects
+	that confusion. It also moves the definitions of those settings into
+	subarch, where they belong (we have to use fixed delivery mode for Summit
+	due to what seems to be an Intel IO-APIC bug with P4 clustered mode).
+
+<ink@jurassic.park.msu.ru>
+	[PATCH] alpha smp fixes
+	From Jeff.Wiedemeier@hp.com:
+	
+	Misc alpha smp updates for 2.5 tree.
+
+<mbligh@aracnet.com>
+	[PATCH] Add ACPI hook, rename raw_phys_apicid to bios_cpu_apicid
+	
+	Patch from James Cleverdon & John Stultz
+	
+	This adds machine a type detection hook to the acpi code, and renames
+	raw_phys_apicid to bios_cpu_apicid (it's an array of apicid's to boot,
+	indexed by the bios' cpu numbering), and I other large machines will
+	need to use it later ... not necessarily using physical interrupts.
+
+<mbligh@aracnet.com>
+	[PATCH] Make IRQ balancing work with clustered APICs
+	
+	Patch from James Cleverdon & John Stultz
+	
+	The IRQ balancing code currently assumes that the logical apicid is
+	always '1 << cpu', which is not true for the larger platforms.
+	We express this as an abstracted macro instead, and move the
+	cpu_to_logical_apicid definition to subarch, so we can make it exactly
+	"1 << cpu" for normal machines - maximum speed, minimum change risk.
+	
+	A couple of things are abstracted from the smp_boot_cpus loop in order
+	to enable us to use the bios_cpu_apicid array to boot cpus from without
+	disturbing the code path of current machines.
+
+<mbligh@aracnet.com>
+	[PATCH] Fix APIC header defines for Summit
+	
+	Patch from James Cleverdon & John Stultz
+	
+	Changes IO_APIC_MAX_ID to depend on the APIC type we're using.
+	The Summit machines have to use a larger set of bits in the apic registers,
+	we enlarge under ifdef for Summit only. We enlarge MAX_APICS for summit
+	as well as NUMA-Q (it would be nice to move this to subarch, but it creates
+	circular dependency problems ... I'll fix this up later).
+	
+	Adds a check for the newer Summit boxes with a different name.
+
+<mbligh@aracnet.com>
+	[PATCH] Enable Summit in makefile, update summit subarch code
+	
+	Adds the summit subarch hook to the config file, and updates various things
+	all inside the summit subarch directories (ie this can't possibly break
+	anyone else ;-)). The Summit's subarch had got out of sync in a few places.
+
+<ink@jurassic.park.msu.ru>
+	[PATCH] alpha kernel start address
+	From Jeff.Wiedemeier@hp.com:
+	
+	Bump non-legacy start addr to 16mb to accomodate new larger
+	SRM console footprint.
+
+<linux@brodo.de>
+	[PATCH] cpufreq: fix compilation, name of gx-suspmod driver
+	
+	- fix cpufreq drivers compilation on not-bleeding-edge-gcc's (Adrian Bunk)
+	- gx-suspmod.c hasn't had a name yet
+
+<hch@lst.de>
+	[PATCH] fix intermezzo compilation
+	
+	Have I already mentioned that the intermezzo code isn't exactly nicely
+	readable? ..
+
+<hch@lst.de>
+	[PATCH] don't include coda_fs_i.h in fs.h
+	
+	It's simply not needed anymore in 2.5
+
+<henning@meier-geinitz.de>
+	[PATCH] Change maintainership of USB scanner driver
+
+<hch@lst.de>
+	[PATCH] umode_t changes from Adam's mini-devfs
+	
+	The use of umode_t instead of devfs-specific char vs block #defines
+	in Adam's mini-devfs patch makes sense independant of whether his patch
+	should get merged.  While reviewing his changes I also notices that
+	most of the number allocation functionality in devfs has no business
+	beeing exported.  In addition I cleaned up devfs_alloc_devnum/
+	devfs_dealloc_devnum a bit.
+
+<hch@sgi.com>
+	[PATCH] stale bdev reference in quotactl
+	
+	sys_quotacl tries to do a get_super on a struct block_device * to which
+	it doesn't hold a reference (nor does it actually have to be non-NULL).
+	
+	As lookup bdev by name is a rather common operation I splitted out a new
+	helper, lookup_bdev() that does this out of open_bdev_excl and switched
+	quota.c to use it.  lookup_bdev() holds a proper reference that needs
+	to be dropped by bdput(), and it's well documented.
+
+<david-b@pacbell.net>
+	[PATCH] maintain hcd_dev queue in FIFO order
+	
+	Current uses of the urb_list have all been to make
+	sure we have some list of pending urbs, so we can
+	clean them all up after HCs die, and avoid trying
+	to unlink something that's not actually linked.
+	So order hasn't mattered.
+	
+	This makes the order be FIFO, which is more useful
+	for other purposes.  Like being the HCD's internal
+	schedule, or dumping for debug.
+
+<baldrick@wanadoo.fr>
+	[PATCH] USB: kill speedtouch tasklet when shutdown
+	
+	  speedtouch: kill receive queue tasklet on shutdown (race pointed
+	out by Oliver Neukum).
+
+<baldrick@wanadoo.fr>
+	[PATCH] USB: make more speedtouch functions static
+	
+	  speedtouch: make more functions static.
+
+<baldrick@wanadoo.fr>
+	[PATCH] USB: SpeedTouch not Speed Touch
+	
+	  speedtouch: use SpeedTouch everywhere (was sometimes Speed Touch).
+
+<greg@kroah.com>
+	USB: added .owner for USB drivers that have a struct tty_driver
+
+<Nick.Holloway@pyrites.org.uk>
+	[PATCH] cpia driver update
+	
+	Here are some minor fixes and cleanups to the cpia (Creative WebCam II et
+	al) driver.  These have been extracted from the sourceforge CVS archive,
+	and I'd like to get these in before a larger change to the parallel port
+	code to support more transfer modes.
+	
+	This patch contains:
+	  * cpia: use the <linux/list.h> list implementation, instead of cpia specific
+	    version.
+	  * cpia_pp: don't clear camera list after cameras have been registered (as
+	    this prevents them being deregistered, and oops after module
+	    unload).
+	  * hold cpia_pp list spinlock while walking list, not just during the
+	    element removal.
+
+<ya@slamail.org>
+	[PATCH] fix cardbus/hotplugging
+	
+	The pci_enable_device() function will fail at least on i386 (see
+	arch/i386/pci/i386.c: pcibios_enable_resource (line 260)) if the
+	resources have not been assigned previously.  Hence the ostensible
+	resource collisions.
+	
+	I added a small comment (and modified another) so future janitors won't
+	move pci_enable above pci_assign_resource again.
+
+<torvalds@penguin.transmeta.com>
+	Fix backslash at end of file
+
+<mochel@osdl.org>
+	driver model: fix bogus driver binding error reporting and handling. 
+	
+	Some error checking was added ca. 2.5.58 that would remove a device from 
+	its bus's list of devices if device_attach() returned an error. This 
+	included errors returned from drv->probe(), and the -ENODEV error returned
+	if the device wasn't bound to any driver.
+	
+	This was BAD since it was perfectly fine for a device not to bind to a 
+	driver immediately, and for drivers to return an error on probe() if the 
+	device doesn't exactly qualify as one it supports. 
+	
+	This changes device_attach() and driver_attach() to both return void, 
+	instead of an error, since they really can never fail hard enough to cause
+	the device or driver to be removed from the bus. 
+
+<torvalds@penguin.transmeta.com>
+	Fix page_address() to not re-evaluate its arguments
+	multiple times under certain circumstances.
+	
+	This fixes svc_tcp_recvfrom().
+	
+	Found by Ted Phelps <phelps@dstc.edu.au>
+
+<trini@kernel.crashing.org>
+	PPC32: Change the MontaVista copyright / GPL boilerplate to
+	a condensed version.
+
+<torvalds@home.transmeta.com>
+	We need to assign resources to cardbus cards _regardless_ of whether
+	probing tells us they already have a range. The old information is
+	stale.
+
+<anton@samba.org>
+	ppc64: remove old signal code, unused on 64bit userspace
+
+<rth@dorothy.sfbay.redhat.com>
+	[ALPHA] Corrections to recent vmlinux.lds.S changes.
+	
+	Fix merge conflicts with asm-generic/vmlinux.lds.h change.
+	Fix ordering of large alignment data sections.
+
+<anton@samba.org>
+	ppc64: Remove code which zero/sign extends arguments 5 and 6, its done unconditionally now
+
+<paulus@samba.org>
+	PPC32: Add support for PPC 4xx on-chip devices using the generic
+	device model.
+
+<davem@nuts.ninka.net>
+	[SPARC64]: Move topology_init to setup.c, it is not SMP specific.
+
+<paulus@samba.org>
+	PPC32: Page-align the data section of the boot wrapper.
+	
+	This is needed for Open Firmware on older powermacs to be able to
+	load the wrapper.  Without this OF gives a "CLAIM failed" error.
+
+<paulus@samba.org>
+	PPC32: Better support for PPC 4xx debug facilities.
+	
+	This provides for separate global and per-thread debug control
+	register value(s), which are switched as appropriate.  This allows
+	us to use both an external JTAG debugger for debugging the kernel
+	as well as using gdb to debug user programs.
+
+<paulus@samba.org>
+	PPC32: Use a per-cpu variable for prof_counter and prof_multiplier.
+
+<anton@samba.org>
+	ppc64: fix exception handling in socket multiplexer
+
+<davem@nuts.ninka.net>
+	[SPARC64]: Use init/exit facility of cpufreq infrastructure.
+
+<randy.dunlap@verizon.net>
+	[PATCH] update LOG BUF SIZE config.
+	
+	The current LOG_BUF size is a bit confusing the first
+	time that "make oldconfig" is used.  It's difficult to
+	select anything other than the default value.
+	
+	Also, you (Linus) expressed a desire to have this
+	configurable only if DEBUG_KERNEL or "kernel hacking"
+	was enabled, so I've changed it to accomplish that.
+	
+	This patch also uses Kconfig in a way that Roman intended
+	since a patch in 2.5.52 which enables default values if
+	a prompt is not enabled, but lets values be chosen when
+	the prompt is enabled.  You also asked for this in setting
+	this config option.
+
+<davem@nuts.ninka.net>
+	[SPARC64]: Update defconfig.
+
+<valko@linux.karinthy.hu>
+	[SPARC64]: Handle SO_TIMESTAMP properly in compat recvmsg.
+
+<roland@topspin.com>
+	[NET]: Fix up RTM_SETLINK handling.
+
+<anton@samba.org>
+	ppc64: Temporary workaround for oops during coredump.
+
+<rmk@flint.arm.linux.org.uk>
+	[ARM] Update sa1100fb
+	
+	Add cfbfillrect / cfbcopyarea / cfbimgblt objects for SA1100fb.
+	Remove redundant "pm" member.
+
+<rmk@flint.arm.linux.org.uk>
+	[ARM] Update acornfb for new fbcon layer.
+
+<rmk@flint.arm.linux.org.uk>
+	[ARM] Use new asm/bug.h for arch/arm/kernel/bios32.c
+
+<rmk@flint.arm.linux.org.uk>
+	[ARM] Prevent "scheduling while atomic" in cpu_idle()
+
+<rmk@flint.arm.linux.org.uk>
+	[ARM] Update mach-types; add 8 new machine types, fix karo entry.
+
+<rmk@flint.arm.linux.org.uk>
+	[ARM] Fix failure paths in fd1772.c initialisation
+	
+	Ensure that we clean up properly after initialisation error,
+	releasing all claimed resources in an orderly manner and
+	returning the correct error code.
+
+<rmk@flint.arm.linux.org.uk>
+	[ARM/IDE] Fix BLK_DEV_IDEDMA setting on non-Acorn ARM systems
+	
+	Only default BLK_DEV_IDEDMA on BLK_DEV_IDEDMA_ICS if ARCH_ACORN is
+	set, not if ARM is set.  There are PCI ARM systems out there!
+
+<rmk@flint.arm.linux.org.uk>
+	[ARM] Fix Integrator __virt_to_bus/__bus_to_virt
+	
+	__virt_to_bus/__bus_to_virt depended on INTEGRATOR_HDR0_SDRAM_BASE
+	Unfortunately, this is defined in arch-integrator/platform.h, and
+	we really don't want to include it in memory.h.
+	
+	We instead use BUS_OFFSET, which will eventually depend on the CPU
+	number in the system.
+
+<mzyngier@freesurf.fr>
+	sysfs EISA support
+	
+	Base patch adding sysfs support for the EISA bus
+
+<mzyngier@freesurf.fr>
+	EISA naming database
+	
+	Please note that the naming DB is now completely optional. If there is
+	no eisa.ids in the drivers/eisa/ directory, build will behave as if
+	CONFIG_EISA_NAMES is disabled. So this patch can be left out if there
+	is any objection.
+
+<mzyngier@freesurf.fr>
+	EISA sysfs updates to 3c509 and 3c59x drivers
+
+<mzyngier@freesurf.fr>
+	EISA sysfs AIP update
+	
+	Without it, unloading a module
+	leads to some unpleasant oops...
+
+<sfr@canb.auug.org.au>
+	[PATCH] compat_{old_}sigset_t generic part
+	
+	This creates compat_sigset_t and compat_old_sigset_t i.e.  just the
+	types.  This is just the generic part, the architecture specific parts
+	will be sent to respective maintainers.
+
+<sfr@canb.auug.org.au>
+	[PATCH] compat_{old_}sigset_t s390x part
+	
+	With Martin's continuing approval, here is the s390x part of the patch.
+
+<sfr@canb.auug.org.au>
+	[PATCH] compat_sys_sigpending and compat_sys_sigprocmask
+	
+	This creates compat_sys_sigpending and compat_sys_sigprocmask and
+	patches sent to maintainers remove all the arch specific versions.
+
+<sfr@canb.auug.org.au>
+	[PATCH] compat_sys_sigpending and compat_sys_sigprocmask
+	
+	Here is the s390x patch to use the new generic compatibility functions.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	kbuild: fix broken kallsyms on non-x86 archs
+	
+	From: James Bottomley <James.Bottomley@steeleye.com>
+	  
+	kallsyms is broken in parisc on 2.5.56 again because of assembler syntax
+	subtleties.  This is the offending line:
+	  
+	printf("\t.byte 0x%02x ; .asciz\t\"%s\"\n"
+	  
+	Note the `;' separating the two statements.  On some platforms `;' is a
+	comment in assembly code, and thus the following .asciz is ignored.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	kbuild/modules: Save space on symbol list
+	
+	The current code reserves 60 bytes for the symbol string of every
+	exported symbol, unnecessarily wasting kernel memory since most symbols
+	are much shorter. We revert to the 2.4 solution where the actual strings
+	are saved out of line and only the pointers are kept.
+	
+	The latest module-init-tools already handle this case, people who are
+	using older versions need to update to make sure depmod works
+	properly.
+	
+	Saves 80 KB in vmlinux with my .config.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	kbuild: Make asm-generic/vmlinux.lds.h usable for IA-64
+	
+	  Allow for different LMA vs VMA (logical/virtual memory address).
+	  IA-64 uses the LMA to tell the bootloader the physical location
+	  of the image, whereas the VMA as always represents the address the
+	  image gets mapped to.
+	  
+	  The default (used for non IA-64) is LMA == VMA, which is what
+	  the linker previously assumed anyway.
+	  
+	Also:
+	o remove duplicate .rodata1 section
+	o __vermagic doesn't need its own section in vmlinux, it can
+	  just go into .rodata
+	o .kstrtab hasn't been used since the introduction of the new
+	  module loader, so it should be deleted from the linker scripts
+	  as well (except for arch/um, which does not seem up to date
+	  w.r.t the new module loader yet)
+	o The kallsyms mechanism has changed to not need its own section,
+	  so again the references in the linker scripts can go away
+
+<mbligh@aracnet.com>
+	[PATCH] make vm_enough_memory more efficient
+	
+	vm_enough_memory seems to call si_meminfo just to get the total
+	RAM, which seems far too expensive. This replaces the comment
+	saying "this is crap" with some code that's less crap.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	kbuild: kallsyms cleanup
+	
+	There's no need to alias the kallsyms-related symbols to a dummy
+	variable, we can as well just do the sanity check against NULL.
+
+<geert@linux-m68k.org>
+	[PATCH] Amiga keyboard fix
+	
+	Amiga keyboard: the release bit indicates a key release, not a key press.
+
+<geert@linux-m68k.org>
+	[PATCH] Q40/Q60 IRQ updates from 2.4.x
+	
+	Q40/Q60 IRQ updates from 2.4.x
+
+<geert@linux-m68k.org>
+	[PATCH] M68k exception table updates
+	
+	M68k exception table updates to compensate for changes in 2.5.55
+
+<geert@linux-m68k.org>
+	[PATCH] Sun-3: Add missing deactivate_mm()
+	
+	Sun-3: Add missing deactivate_mm() (yes, there should be two of them in
+	include/asm-m68k/mmu_context.h: one for Motorola MMUs and one for Sun-3 MMUs)
+
+<geert@linux-m68k.org>
+	[PATCH] M68k generic RTC driver updates
+	
+	M68k generic RTC driver updates:
+	  - Revive help text for CONFIG_GEN_RTC
+	  - Re-add lost config option for CONFIG_GEN_RTC_X
+	  - Re-add lost mach_get_ss()
+	  - Export mach_[gs]et_rtc_pll()
+	  - Add implementation of mach_get_ss() and mach_[gs]et_rtc_pll() for Q40/Q60
+	  - Add missing include
+	  - Add implementation of get_rtc_ss()
+
+<geert@linux-m68k.org>
+	[PATCH] Atari ST-RAM swap update
+	
+	Jeff removed the swap_device member from struct swap_info_struct
+	(http://www.uwsg.iu.edu/hypermail/linux/kernel/0202.1/0258.html)
+	but it is still used in the m68k arch for the ST-RAM. The below
+	should remove it.
+	
+	Frankly, I didn't try compiling... My original intent was to move the
+	swap_list definition from swap.h to mm/swapfile.c, but m68k still
+	uses it here :( so perhaps this isn't possible. And I just happened to
+	stumble upon this.
+	
+	(from Marcus Alanen <maalanen@ra.abo.fi> through Rusty Trivial Russell)
+
+<geert@linux-m68k.org>
+	[PATCH] Q40/Q60 keyboard fixes
+	
+	Q40/Q60 keyboard fixes:
+	  - IRQ definitions were prepended with Q40_
+	  - <asm/keyboard.h> no longer exists
+	  - Let q40kbd_init() fails if not running on a Q40/Q60
+	  - q40kbd_init() must return an error code
+	  - Make q40kbd_{init,exit}() static
+
+<geert@linux-m68k.org>
+	[PATCH] Generic RTC driver documentation
+	
+	Generic RTC driver: fix spelling in documentation (from Geoffrey Lee
+	<glee@gnupilgrims.org>)
+
+<geert@linux-m68k.org>
+	[PATCH] Mac/m68k NCR5380 SCSI updates
+	
+	Mac/m68k NCR5380 SCSI updates (forward port of Ray Knight's changes in 2.4.x):
+	  - Forward port of pseudo-DMA from 2.2.20
+	  - Move SCSI host template definition from mac_scsi.h to mac_scsi.c
+
+<cloos@jhcloos.com>
+	[PATCH] i8k driver cleanups
+	
+	  The input system in 2.5 is able to see the volume keys on inspiron
+	  notebooks w/o help from i8k.c.  This patch therefore removes the
+	  new code from i8kutils-1.17 for feeding those keypresses to the
+	  keyboard driver.
+	
+	  This leaves only MODULE_PARM(restricted, "i") as the useful addition
+	  to what was in 2.5.58's i8k.c.  This module parm restricts control of
+	  the system fans to processes with CAP_SYS_ADMIN set.
+
+<cloos@jhcloos.com>
+	[PATCH] alsa before oss in Kconfig
+	
+	  Move ALSA before OSS
+
+<hch@sgi.com>
+	[PATCH] fix signed/unsigned issue in SGI partitioning code
+	
+	The Linux code for SGI partitions uses an int instead of an unsigned int
+	in the ondisk structure in two places, which breaks > TB partitions.
+	
+	While porting the code over from an internal 2.4-based tree I've also
+	switched it to use the explicit uXX/sXX types everywhere and moved the
+	struct defintions above sgi_partition().
+
+<hch@sgi.com>
+	[PATCH] remove GET_USE_COUNT
+	
+	This is a left-over from the old modules code, Rusty stubbed it out
+	to always return 0.  Three scsi pcmcia driver check it for beeing non-NULL,
+	trying to work around their unload races.  I've added #warnings there
+	and stubbed out the GET_USE_COUNT so we can remove it from the core.
+
+<ink@jurassic.park.msu.ru>
+	[PATCH] alpha PCI setup update
+	
+	Until now, we were configuring all PCI resources from scratch.
+	This patch allows to use unchanged PCI setup on platforms
+	where the firmware does it reasonably well (titan and marvel).
+	
+	[The patch to setup-bus.c that removes "FIXME" from here (ie makes
+	pci_assign_unassigned_resources to match its name) exists at least
+	for two months, but I've yet to convince Linus that it does the
+	right thing...]
+	
+	Ivan.
+
+<ink@jurassic.park.msu.ru>
+	[PATCH] alpha_remap_area_pages
+	From Jeff.Wiedemeier@hp.com:
+	
+	Add arch/alpha/mm/remap.c (__alpha_remap_area_pages).
+
+<ink@jurassic.park.msu.ru>
+	[PATCH] alpha titan update
+	From Jeff.Wiedemeier@hp.com:
+	
+	Update titan system support include AlphaServer DS25, AGP,
+	enhanced machine check handling.
+
+<rth@kanga.twiddle.net>
+	[ALPHA] Use direct calls to titan_ioremap/unmap when building
+	a titan specific kernel.
+
+<ink@jurassic.park.msu.ru>
+	[PATCH] alpha irq proc update
+	From Jeff.Wiedemeier@hp.com:
+	
+	- Only create smp_affinity /proc nodes if a set_affinity handler
+	  is provided.
+	- Limit the number of irq nodes that will be created in /proc
+	  to avoid overfilling the /proc inode space.
+
+<ink@jurassic.park.msu.ru>
+	[PATCH] alpha smp callin
+	From Jeff.Wiedemeier@hp.com:
+	
+	Add platform-specific callin for SMP.
+
+<ak@muc.de>
+	[PATCH] x86_64 update
+	
+	x86-64 updates for 2.5.58. Changes only x86-64 specific files.
+	
+	 - Rewrote module allocation. Lots of bugs fixed. Module loading
+	   should work now again.
+	 - Kconfig help fixes from Randy Dunlap
+	 - Makefile cleanups from Pavel Machek and Sam Ravnborg
+	 - Assembly cleanups from Pavel
+	 - defconfig update
+	 - Better strlen_user/strnlen_user
+	 - Merge with i386: new ptrace commands, 32bit vsyscall signal trampolines
+			new deactivate_mm, add asm/bug.h
+	 - Make sure initramfs is freed after booting (thanks to Kai for the hint)
+	 - User per cpu data for profile counters (Ravikiran Thirumalai)
+	 - 32bit compat_* updates from Stephen Rothwell
+	 - Fix race in context switch. The exception handler for bogus segment
+	   loads in __switch_to needs to keep interrupts disabled, otherwise an
+	   interrupt can deadlock on scheduler locks.  Also make sure they don't
+	   printk or set oops_in_progress during printk because printk does a
+	   wake_up too.
+	 - Disable 64bit GS base changes for processes.  I cannot get it to work
+	   reliably.
+	 - Clear IOPL on kernel entry
+
+<hch@sgi.com>
+	[PATCH] remove MOD_IN_USE
+	
+	Another left-over from ancient module code, it was supposed to return
+	non-zero if the module has a use count, but currently it always
+	evaluates to 0.
+	
+	There are a few users of different types:
+	(1)  ioctl that perform a while(MOD_IN_USE) MOD_DEC_USE_COUNT loop.
+	     Just rip them out, we now have forced module unloading.
+	(2)  printk's that moan if the use-count in not zero in the exitfunc.
+	     Just rip them out, this can't happen.
+	(3)  if(MOD_IN_USE) MOD_DEC_USE_COUNT constructs in ->close of a few
+	     serial drivers.  Just remove the conditional, we did a
+	     MOD_INC_USE_COUNT in ->open.
+	(4)  This one is interesting:  drivers/sbus/char/display7seg.c uses
+	     the module use count to track openers.  Replace this with an
+	     atomic_t.
+	
+	In addition remove tons of stale comments in network driver that aren't
+	understandable for anyone who doesn't know ancient Linux module semantics.
+
+<mbligh@aracnet.com>
+	[PATCH] (1/3) Minimal NUMA scheduler
+	
+	Patch from Martin J. Bligh
+	
+	This adds a small hook to the find_busiest_queue routine to allow us to
+	specify a mask of which CPUs to search over. In the NUMA case, it will
+	only balance inside the node (much cheaper to search, and stops tasks
+	from bouncing across nodes, which is very costly). The cpus_to_balance
+	routine is conditionally defined to ensure no impact to non-NUMA machines.
+	
+	This is a tiny NUMA scheduler, but it needs the assistance of the second
+	and third patches in order to spread tasks across nodes.
+
+<mbligh@aracnet.com>
+	[PATCH] (2/3) Initial load balancing
+	
+	Patch from Michael Hohnbaum
+	
+	This adds a hook, sched_balance_exec(), to the exec code, to make it
+	place the exec'ed task on the least loaded queue. We have less state
+	to move at exec time than fork time, so this is the cheapest point
+	to cross-node migrate. Experience in Dynix/PTX and testing on Linux
+	has confirmed that this is the cheapest time to move tasks between nodes.
+	
+	It also macro-wraps changes to nr_running, to allow us to keep track of
+	per-node nr_running as well. Again, no impact on non-NUMA machines.
+
+<mbligh@aracnet.com>
+	[PATCH] (3/3) NUMA rebalancer
+	
+	Patch from Erich Focht
+	
+	This adds a hook to rebalance globally across nodes every NODE_BALANCE_RATE
+	iterations of the rebalancer. This allows us to easily tune on an architecture
+	specific basis how often we wish to rebalance - machines with higher NUMA
+	ratios (more expensive off-node access) will want to do this less often.
+	It's currently set to 100 for NUMA-Q and 10 for other machines. If the
+	imbalance between nodes is > 125%, we'll rebalance them. The hook for this
+	is added to the NUMA definition of cpus_to_balance, so again, no impact
+	on non-NUMA machines.
+
+<rth@kanga.twiddle.net>
+	[ALPHA] AGP infrastructure for AGP implemented in Alpha corelogic
+	(Titan / Marvel), Kconfig and headers.
+	
+	From Jeff Wiedemeier.
+
+<rth@kanga.twiddle.net>
+	[ALPHA] Marvel (AlphaServer ES47, ES80, GS1280) support.
+	From Jeff.Wiedemeier@hp.com.
+
+<rth@kanga.twiddle.net>
+	[ALPHA] Fixups to Marvel and Titan for incomplete merging
+	of AGP and SRMCONS patches.
+
+<rth@kanga.twiddle.net>
+	[ALPHA] Formatting cleanup, warning removal, move declarations
+	to header files where they belong.
+
+<rth@kanga.twiddle.net>
+	[ALPHA] Correct io.h exports and inlining for marvel and titan.
+
+<Jeff.Wiedemeier@hp.com>
+	[PATCH] Fix marvel irq count computation.
+	
+	Found a buglet in the marvel code -- doesn't change the number of IRQS
+	just the logic to get there.. This applies on top of the other marvel
+	code.
+	
+	/jeff
+
+<torvalds@penguin.transmeta.com>
+	Linux v2.5.59
+

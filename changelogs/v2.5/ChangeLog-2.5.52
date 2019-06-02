@@ -1,0 +1,1211 @@
+
+Summary of changes from v2.5.51 to v2.5.52
+============================================
+
+<shaggy@shaggy.austin.ibm.com>
+	JFS: Fix off-by one error when symlink size == 256 bytes
+
+<shaggy@shaggy.austin.ibm.com>
+	Add more statistics to /prod/fs/jfs/ to help performance tuning
+
+<shaggy@shaggy.austin.ibm.com>
+	JFS: Move index table out of directory inode's address space
+	
+	The metadata representing the directory entries' persistent index has been
+	mapped to the directory inode's address space.  This was the cause of much
+	ugliness in the code to avoid the inode being released from the inode cache
+	while there was still dirty metadata mapped to the inode.
+	
+	This patch moves this metadata to the block device inode's address space,
+	which allows us to clean up the code somewhat.
+
+<shaggy@shaggy.austin.ibm.com>
+	JFS: Avoid writing partial log pages for lazy transactions
+	
+	JFS currently writes a journal page as any transaction is committed, as
+	long as there is no current journal I/O.  This results in a lot of partial
+	journal pages being written, even if no threads are waiting for the commit
+	to complete.  This patch avoids these partial page writes if the transaction
+	being committed is asynchronous (lazy).  It a couple places, we need to
+	make sure that the group commit is performed to flush all transactions to
+	disk.
+
+<shaggy@shaggy.austin.ibm.com>
+	jfs_truncate needs to call block_truncate_page.
+	Moved the function from file.c to inode.c since block_truncate_page uses
+	jfs_get_block which is static.
+
+<green@angband.namesys.com>
+	reiserfs: Take into account file information even when not doing preallocation. Fixes a bug with displacing_large_files option.
+
+<green@angband.namesys.com>
+	reiserfs: Fix a problem with delayed unlinks and remounting RW filesystem RW.
+
+<green@angband.namesys.com>
+	reiserfs: lock_kernel is replaced with its reiserfs variant
+
+<green@angband.namesys.com>
+	reiserfs: C99 designated initializers, by Art Haas
+
+<green@angband.namesys.com>
+	reiserfs: Fixed annoying warnings in fs/reiserfs/procfs.c
+
+<jgarzik@redhat.com>
+	[NET] support IPv6 over token ring
+	(from lkml)
+
+<jgarzik@redhat.com>
+	[netdrvr tg3] a fix, a cleanup, and an optimization:
+	* 5704-A0 chip-specific patch. fixes PXE issue.
+	* the existence of the mini ring is an urban legend.
+	  (no production board has it; it requires external SRAM)
+	* re-arrange driver-private struct to be cacheline-friendly.
+
+<agrover@groveronline.com>
+	ACPI: Get rid of progress dots if not in debug mode
+
+<shaggy@shaggy.austin.ibm.com>
+	JFS: Fix accounting of active allocation groups
+	
+	jfs_destroy_inode was assuming that active_ag should never be set coming into
+	this routine.  Since it's possible for file to be extended after the file
+	descriptor has been closed, we need to allow the possibility.  (Dirty pages
+	of memory mapped files can be written after the file has been closed.)
+
+<zaitcev@redhat.com>
+	[PATCH] Patch for debounce in 2.5
+	
+	I was getting annoyed that nobody fixed the obviously broken
+	debounce loop, so I had to go ahead and fix that.
+
+<shaggy@shaggy.austin.ibm.com>
+	JFS: Remove COMMIT_Holdlock
+	
+	The logic surrounding COMMIT_Holdlock was well-intentioned to reduce
+	latency when deleting files, but it can also result in a hang that I don't
+	have good fix for.  I don't think removing this will hurt our overall
+	performance very much.
+
+<marekm@amelek.gda.pl>
+	[PATCH] Datafab KECF-USB / Sagatek DCS-CF / Simpletech UCF-100
+	
+	sorry to bother you again - now that 2.4.20 is out, is there any
+	chance to include this in 2.4.21?  I've been trying since 2.4.19,
+	a few other UNUSUAL_DEV entries were added, but not this one...
+	
+	The device works fine with the patch (and doesn't work at all without
+	it) for me and a few other people (devices with different "marketing"
+	names, the same vendor:device id), no one has reported any problems.
+	The patch has been in the 2.4-ac tree for a while, too.
+
+<greg@kroah.com>
+	[PATCH] USB: Added usb-serial driver core bus support.
+	
+	This means that all individual usb-serial ports show up as their
+	own devices in the driver model tree.
+
+<marcel@holtmann.org>
+	[PATCH] Disable bluetty.o if Bluetooth subsystem is used
+	
+	This patch disables the USB Bluetooth TTY driver (bluetty.o) from
+	the drivers/usb/class directory if the Linux Bluetooth subsystem
+	is selected.
+
+<hch@sgi.com>
+	[XFS] final sendfile bits
+	
+	SGI Modid: 2.5.x-xfs:slinx:134450a
+
+<hch@sgi.com>
+	[XFS] fix small typo in rtdev mount code
+	
+	SGI Modid: 2.5.x-xfs:slinx:134254a
+
+<hch@sgi.com>
+	[XFS] don't include root_dev.h
+	
+	SGI Modid: 2.5.x-xfs:slinx:134480a
+
+<hch@sgi.com>
+	[XFS] remove linvfs_put_inode
+	
+	SGI Modid: 2.5.x-xfs:slinx:134630a
+
+<hch@sgi.com>
+	[XFS] rationalize pagebuf_iomove
+	
+	SGI Modid: 2.5.x-xfs:slinx:134775a
+
+<hch@sgi.com>
+	[XFS] add a new xfs_mount parameter to xfs_blkdev_get
+	
+	SGI Modid: 2.5.x-xfs:slinx:134788a
+
+<hch@sgi.com>
+	[XFS] get rid of pb_daemon/pagebuf_daemon_t
+	
+	SGI Modid: 2.5.x-xfs:slinx:134787a
+
+<hch@sgi.com>
+	[XFS] merge page_buf_private_t into page_buf_t
+	
+	SGI Modid: 2.5.x-xfs:slinx:134949a
+
+<hch@sgi.com>
+	[XFS] remove some dead code from pagebuf
+	
+	SGI Modid: 2.5.x-xfs:slinx:134960a
+
+<hch@sgi.com>
+	share some code between get_sb_bdev and xfs log/rtdev handling
+
+<greg@kroah.com>
+	[PATCH] Driver core: Fix class leak in class_hotplug.
+	
+	Thanks to Pat Mochel for pointing this out to me.
+
+<greg@kroah.com>
+	[PATCH] USB: Moved usb-serial bus specific code to a separate file.
+	
+
+<greg@kroah.com>
+	[PATCH] usbaudio.c: fix for urb callback function change
+	
+
+<khaho@koti.soon.fi>
+	[PATCH] USB: start to remove static minor based arrays in drivers
+	
+	Here are minimal usb_find_interface() patches for the core, usblp and
+	scanner.
+	
+	Basic design is:
+	- device major (USB_MAJOR for now) and minor are stored in probe()
+	   function to struct usb_interface as kdev_t
+	- open() can use new core function usb_find_interface() to find matching
+	  device in drivers device list
+	- disconnect() will set kdev_t struct usb_interface to NODEV, so open
+	  wont open it anymore without new probe()
+	
+	I tested these patches and they work for me. I will work on small patches
+	of other work in these drivers (like removal of lock_kernel/unlock_kernel
+	in usblp, fixing the disconnect problems in both drivers etc.). Those
+	patches would be very small too, but there will be quite many.
+
+<nobita@t-online.de>
+	[PATCH] support for Sony Cybershot F717 digital camera / usb-storage
+	
+	here is an id-patch to get the Sony Cybershot F717 6meg pixel digital
+	camera working with the standard usb-storage device driver.
+
+<greg@kroah.com>
+	[PATCH] USB: Fix compile errors with usb-skeleton driver.
+	
+
+<greg@kroah.com>
+	[PATCH] USB: usb-skeleton: removed static array of devices.
+	
+	This allowed a lock to be removed.
+	Also removed the MOD_* functions, and some remove logic was cleaned
+	up by Oliver Neukum.
+
+<agrover@groveronline.com>
+	ACPI: update to 20021212
+	 - remove NATIVE_CHAR typedef
+	 - remove ACPI_{GET,VALID}_ADDRESS macros
+	 - fix memory corruption in deletion of a static AML buffer
+	 - fix fault caused by 0-length AML
+	 - fix user-buffer overwrite/corruption of buffer is too small
+	 - fix buffer-to-string conversion
+
+<rth@are.twiddle.net>
+	Revert bogus include workaround.
+	Cset exclude: rth@dorothy.sfbay.redhat.com|ChangeSet|20021207231352|30637
+
+<petkan@users.sourceforge.net>
+	[PATCH] USB: pegasus kmalloc/kfree stuff
+	
+	I made the changes to the set/get_registers code.
+
+<agrover@groveronline.com>
+	ACPI: Fix write-related /proc entry functionality
+
+<torvalds@home.transmeta.com>
+	Fix nanosleep() behaviour with NULL "remaining" argument.
+
+<braam@clusterfs.com>
+	[PATCH] intermezzo update
+	
+	Relatively straightforward fixes for intermezzo problems in 2.5.50.  I
+	think all of them related to:
+	 - two missing headers
+	 - use of timespec instead of time_t.
+
+<torvalds@home.transmeta.com>
+	Move intermezzo header files to its own private directory
+
+<rusty@rustcorp.com.au>
+	[PATCH] Revert depmod and hierarchy changes
+	
+	module-init-tools 0.9 and newer supply a replacement depmod, so
+	it's safe to run again.
+	
+	Also, some external programs like PCMCIA and mkinitrd really want the
+	directory hierarchy in /lib/modules back again: it makes no difference
+	to the tools (since 0.9), so revert it.
+
+<rusty@rustcorp.com.au>
+	[PATCH] Module init reentry fix
+	
+	In some configurations, parport and bttv request a module inside their
+	module_init function.  Drop the lock around mod->init(), change
+	module->live to module->state so we can detect modules which are in
+	init.
+
+<rml@tech9.net>
+	[PATCH] remove error message on illegal ioctl
+	
+	This error message is uber annoying and needs to go.  Non-root can flood
+	the console with this junk on invalid SCSI CD-ROM ioctl(), and that is
+	exactly what gnome-cd does.
+	
+	An illegal ioctl() returns an error to the program.  That is sufficient
+	- we do not need KERN_ERROR warnings all over the place.  Especially
+	when any user can cause them at any rate.
+
+<rml@tech9.net>
+	[PATCH] printks in drivers/scsi/hosts.c missing return
+	
+	Trivial but annoying: two printk() calls in drivers/scsi/hosts.c are
+	missing '\n'
+	
+	Also, for some reason I have not yet investigated, shost_tp->name is
+	NULL here.  This should not be, eh?  If it can be, we should do
+	something to tidy up the printing of it.
+
+<willy@debian.org>
+	[PATCH] Remove test/set_bit from dl2k
+	
+	This driver does not need to use atomic operations on local variables.
+
+<anton@samba.org>
+	[PATCH] 2.5 fix for > 25 disks
+	
+	2.5 currently tries to register disk sda twice. Not nice and now we use
+	sysfs to do name to dev_t mapping, I couldnt mount my root filesystem.
+
+<jsimmons@infradead.org>
+	[PATCH] VT scrolling fix
+	
+	scrup is using memcpy even when the memory areas src, dest overlap.  The
+	key is to use memmove which handles overlapping memory gracefully.
+
+<romieu@fr.zoreil.com>
+	[PATCH] missing piece of Iphase atm driver update
+	
+	This removes calls to function which disappeared during last Iphase
+	driver update.  Since this update, Iphase driver has been using plain
+	modern pci style init.
+	
+	Problem wasn't noticed until Adrian Bunk tried to build non-modular kernel
+	(I only tested the modularized driver). Everybody else seemed happy :o)
+
+<akpm@digeo.com>
+	[PATCH] Avoid recursion in the page allocator
+	
+	The PF_MEMALLOC handling got broken somewhere, and it is now possible
+	for a PF_MEMALLOC process to reenter page reclaim.
+	
+	Change it to fail the allocation if we're PF_MEMALLOC and there are
+	zero pages free.
+
+<akpm@digeo.com>
+	[PATCH] deprecate use of bdflush()
+	
+	Patch from Robert Love <rml@tech9.net>
+	
+	We can never get rid of it if we do not deprecate it - so do so and
+	print a stern warning to those who still run bdflush daemons.
+
+<akpm@digeo.com>
+	[PATCH] create /proc/kmsg, remove sys_syslog()-based
+	
+	Back out the sys_syslog()-based printk-from-userspace and replace
+	it with Ben's /proc/kmsg version.
+	
+	Requires a `mknod /dev/kmsg c 1 11'.
+
+<akpm@digeo.com>
+	[PATCH] speed up read_zero() for !CONFIG_MMU
+	
+	The read_zero() implementation for !CONFIG_MMU was very inefficient.
+	This sped-up version has been tested and acked by Greg Ungerer.
+
+<akpm@digeo.com>
+	[PATCH] Fix rmap locking for CONFIG_SWAP=n
+	
+	The pte_chain_unlock() needs to be outside the ifdef.
+
+<akpm@digeo.com>
+	[PATCH] semtimedop - semop() with a timeout
+	
+	Patch from Mark Fasheh <mark.fasheh@oracle.com> (plus a few cleanups
+	and a speedup from yours truly)
+	
+	Adds the semtimedop() function - semop with a timeout.  Solaris has
+	this.  It's apparently worth a couple of percent to Oracle throughput
+	and given the simplicity, that is sufficient benefit for inclusion IMO.
+	
+	This patch hooks up semtimedop() only for ia64 and ia32.
+
+<akpm@digeo.com>
+	[PATCH] skip memory-backed filesystems in writeback
+	
+	There's nopoint in walking through a lot of tmpfs or ramdisk pages when
+	we're trying to clean memory.  So if a memory-backed inode is
+	discovered during writeback, skip the entire superblock.
+
+<akpm@digeo.com>
+	[PATCH] Remove fail_writepage, redux
+	
+	fail_writepage() does not work.  Its activate_page() call cannot
+	activate the page because it is not on the LRU.
+	
+	So perform that function (more efficiently) in the VM.  Remove
+	fail_writepage() and, if the filesystem does not implement
+	->writepage() then activate the page from shrink_list().
+	
+	A special case is tmpfs, which does have a writepage, but which
+	sometimes wants to activate the pages anyway.  The most important case
+	is when there is no swap online and we don't want to keep all those
+	pages on the inactive list.  So just as a tmpfs special-case, allow
+	writepage() to return WRITEPAGE_ACTIVATE, and handle that in the VM.
+	
+	Also, the whole idea of allowing ->writepage() to return -EAGAIN, and
+	handling that in the caller has been reverted.  If a writepage()
+	implementation wants to back out and not write the page, it must
+	redirty the page, unlock it and return zero.  (This is Hugh's preferred
+	way).
+	
+	And remove the now-unneeded shmem_writepages() - shmem inodes are
+	marked as `memory backed' so it will not be called.
+	
+	And remove the test for non-null ->writepage() in generic_file_mmap().
+	Memory-backed files _are_ mmappable, and they do not have a
+	writepage().  It just isn't called.
+	
+	So the locking rules for writepage() are unchanged.  They are:
+	
+	- Called with the page locked
+	- Returns with the page unlocked
+	- Must redirty the page itself if it wasn't all written.
+	
+	But there is a new, special, hidden, undocumented, secret hack for
+	tmpfs: writepage may return WRITEPAGE_ACTIVATE to tell the VM to move
+	the page to the active list.  The page must be kept locked in this one
+	case.
+
+<akpm@digeo.com>
+	[PATCH] show_free_areas extensions
+	
+	Ancient patch From Bill Irwin
+	
+	The patch is intended to show improved information about where the
+	memory went during OOM-killing events.
+	
+	- when the OOM killer fails and the system panics, calls
+	  show_free_areas()
+	
+	- reorganize show_free_areas() to use for_each_zone()
+	
+	- add per-cpu stats to show_free_areas()
+	
+	- tags output from show_free_areas() with node and zone information
+
+<akpm@digeo.com>
+	[PATCH] make sure all PMDs are allocated under PAE mode
+	
+	Patch from Martin Bligh and Dave Hansen
+	
+	If a PAE machine has 1G of memory and you set PAGE_OFFSET to 2G, the
+	kernel will only instantiate a PMD to cover the 2G-3G region.  But
+	another PMD is needed for the 3G-4G region for the APIC and possibly an
+	extended vmalloc region.
+	
+	So the patch changes the code to instantiate PMDs out to the end of
+	physical memory.
+	
+	It's a no-op for PAGE_OFFSET=3G, and _could_ be part of the
+	CONFIG_PAGE_OFFSET patch.  But it seems a reasonable generalisation
+	anyway.
+
+<akpm@digeo.com>
+	[PATCH] handle overflows in radix_tree_gang_lookup()
+	
+	Fix a radix-tree bug spotted by Vladimir Saveliev <vs@namesys.com>.
+	
+	Each step in the radix tree spans six address bits.  So a height=6 tree
+	spans 36-bits worth of nodes.
+	
+	On 32-bit machines radix_tree_gang_lookup() doesn't handle this right -
+	at the 12TB mark it wraps back to zero, and returns pages at quite
+	wrong indices.
+	
+	The patch fixes all that up, and tidies a couple of things.
+	
+	A user-space test harness was developed so that the code can be sanely
+	tested.  It is at
+	
+		http://www.zip.com.au/~akpm/linux/patches/stuff/rtth.tar.gz
+
+<akpm@digeo.com>
+	[PATCH] Add a sync_fs super_block operation
+	
+	This is infrastructure for fixing the journalled-data ext3 unmount data
+	loss problem. It was sent for comment to linux-fsdevel a week ago; there
+	was none.
+	
+	Add a `sync_fs' superblock operation whose mandate is to perform
+	filesystem-specific operations to ensure a successful sync.
+	
+	It is called in two places:
+	
+	1: fsync_super() - for umount.
+	
+	2: sys_sync() - for global sync.
+	
+	In the sys_sync() case we call all the ->write_super() methods first.
+	write_super() is an async flushing operation.  It should not block.
+	
+	After that, we call all the ->sync_fs functions.  This is independent
+	of the state of s_dirt!  That was all confused up before, and in this
+	patch ->write_super() and ->sync_fs() are quite separate.
+	
+	With ext3 as an example, the initial ->write_super() will start a
+	transaction, but will not wait on it.  (But only if s_dirt was set!)
+	
+	The first ->sync_fs() call will get the IO underway.
+	
+	The second ->sync_fs() call will wait on the IO.
+	
+	And we really do need to be this elaborate, because all the testing of
+	s_dirt in there makes ->write_super() an unreliable way of detecting
+	when the VFS is trying to sync the filesystem.
+
+<akpm@digeo.com>
+	[PATCH] implement ext3_sync_fs
+	
+	ext3_sync_fs will start a commit and will wait on that commit.  This
+	means that on its return, all journalled file data has been dirtied and
+	exposed to sync_inodes_sb().  Which is sufficient to fix the umount
+	data loss problem.
+
+<akpm@digeo.com>
+	[PATCH] copy_user checks in filldir()
+	
+	Check for usercopy faults in filldir().
+
+<akpm@digeo.com>
+	[PATCH] vm accounting fixes and addition
+	
+	- /proc/vmstat:pageoutrun and /proc/vmstat:allocstall are always
+	  identical.  Rework this so that
+	
+	  - "allocstall" is the number of times a page allocator ran diect reclaim
+	
+	  - "pageoutrun" is the number of times kswapd ran page reclaim
+	
+	- Add a new stat: "pgrotated".  The number of pages which were
+	  rotated to the tail of the LRU for immediate reclaim by
+	  rotate_reclaimable_page().
+	
+	- Document things a bit.
+
+<akpm@digeo.com>
+	[PATCH] hugetlb fixes
+	
+	From Rohit
+	
+	1) hugetlbfs_zero_setup returns ENOMEM in case the request size can
+	   not be easily handleed.
+	
+	2) Preference is given to LOW_MEM while freeing the pages from
+	   hugetlbpage free list.
+
+<akpm@digeo.com>
+	[PATCH] fs-writeback rework.
+	
+	I've revisited all the superblock->inode->page writeback paths.  There
+	were several silly things in there, and things were not as clear as they
+	could be.
+	
+	scenario 1: create and dirty a MAP_SHARED segment over a sparse file,
+	then exit.
+	
+	  All the memory turns into dirty pagecache, but the kupdate function
+	  only writes it out at a trickle - 4 megabytes every thirty seconds.
+	  We should sync it all within 30 seconds.
+	
+	  What's happening is that when writeback tries to write those pages,
+	  the filesystem needs to instantiate new blocks for them (they're over
+	  holes).  The filesystem runs mark_inode_dirty() within the writeback
+	  function.
+	
+	  This redirtying of the inode while we're writing it out triggers
+	  some livelock avoidance code in __sync_single_inode().  That function
+	  says "ah, someone redirtied the file while I was writing it.  Let's
+	  move the file to the new end of the superblock dirty list and write
+	  it out later." Problem is, writeback dirtied the inode itself.
+	
+	  (It is rather silly that mark_inode_dirty() sets I_DIRTY_PAGES when
+	  clearly no pages have been dirtied.  Fixing that up would be a
+	  largish work, so work around it here).
+	
+	  So this patch just removes the livelock avoidance from
+	  __sync_single_inode().  It is no longer needed anyway - writeback
+	  livelock is now avoided (in all writeback paths) by writing a finite
+	  number of pages.
+	
+	scenario 2: an application is continuously dirtying a 200 megabyte
+	file, and your disk has a bandwidth of less than 40 megabytes/sec.
+	
+	  What happens is that once 30 seconds passes, pdflush starts writing
+	  out the file.  And because that writeout will take more than five
+	  seconds (a `kupdate' interval), pdflush just keeps writing it out
+	  forever - continuous I/O.
+	
+	  What we _want_ to happen is that the 200 megabytes gets written,
+	  and then IO stops for thirty seconds (minus the writeout period).  So
+	  the file is fully synced every thirty seconds.
+	
+	The patch solves this by using mapping->io_pages more intelligently.
+	When the time comes to write the file out, move all the dirty pages
+	onto io_pages.  That is a "batch of pages for this kupdate round".
+	When io_pages is empty, we know we're done.
+	
+	The address_space_operations.writepages() API is changed!  It now only
+	needs to write the pages which the caller placed on mapping->io_pages.
+	
+	This conceptually cleans things up a bit, by more clearly defining the
+	role of ->io_pages, and the motion between the various mapping lists.
+	
+	The treatment of sb->s_dirty and sb->s_io is now conceptually identical
+	to mapping->dirty_pages and mapping->io_pages: move the items-to-be
+	written onto ->s_io/io_pages, alk walk that list.  As inodes (or pages)
+	are written, move them over to the clean/locked/dirty lists.
+	
+	Oh, scenario 3: start an app whcih continuously overwrites a 5 meg
+	file.  Wait five seconds, start another, wait 5 seconds, start another.
+	 What we _should_ see is three 5-meg writes, five seconds apart, every
+	thirty seconds.  That did all sorts of odd things.  It now does the
+	right thing.
+
+<akpm@digeo.com>
+	[PATCH] Add /proc/sys/vm/lower_zone_protection
+	
+	This allows us to control the aggressiveness of the lower-zone defense
+	algorithm.  The `incremental min'.  For workloads which are using a
+	serious amount of mlocked memory, a few megabytes is not enough.
+	
+	So the `lower_zone_protection' tunable allows the administrator to
+	increase the amount of protection which lower zones receive against
+	allocations which _could_ use higher zones.
+	
+	The default value of lower_zone_protection is zero, giving unchanged
+	behaviour.  We should not normally make large amounts of memory
+	unavailable for pagecache just in case someone mlocks many hundreds of
+	megabytes.
+
+<akpm@digeo.com>
+	[PATCH] Set a minimum hash table size for wait_on_page()
+	
+	Fixes the problem identified by Miles Bader on extremely small zones:
+	calling hash_long with `bits = 0' is treated as `bits = 32'.
+	
+	So don't permit the zone to have a one-slot waitqueue hashtable.
+
+<akpm@digeo.com>
+	[PATCH] Reserve an additional transaction block in
+	
+	Under rare conditions (filesystem corruption, really) it is possible
+	for ext3_dirty_inode() to require _two_ blocks for the transaction: one
+	for the inode and one to update the superblock - to set
+	EXT3_FEATURE_RO_COMPAT_LARGE_FILE.  This causes the filesystem to go
+	BUG.
+	
+	So reserve an additional block for that eventuality.
+
+<akpm@digeo.com>
+	[PATCH] remove PF_SYNC
+	
+	current->flags:PF_SYNC was a hack I added because I didn't want to
+	change all ->writepage implementations.
+	
+	It's foul.  And it means that if someone happens to run direct page
+	reclaim within the context of (say) sys_sync, the writepage invokations
+	from the VM will be treated as "data integrity" operations, not "memory
+	cleansing" operations, which would cause latency.
+	
+	So the patch removes PF_SYNC and adds an extra arg to a_ops->writepage.
+	 It is the `writeback_control' structure which contains the full context
+	information about why writepage was called.
+	
+	The initial version of this patch just passed in a bare `int sync', but
+	the XFS team need more info so they can perform writearound from within
+	page reclaim.
+	
+	The patch also adds writeback_control.for_reclaim, so writepage
+	implementations can inspect that to work out the call context rather
+	than peeking at current->flags:PF_MEMALLOC.
+
+<akpm@digeo.com>
+	[PATCH] Don't inherit mm->def_flags across forks
+	
+	Prevents children from inheriting mlockall(MCL_FUTURE).
+	Standards-friendly, and 2.4 has it.
+
+<akpm@digeo.com>
+	[PATCH] bootmem allocator merging fix
+	
+	Patch from "Juan M. de la Torre" <jmtorre@gmx.net>
+	
+	If the requested align is PAGE_SIZE, it is impossible to merge with the
+	previous allocation request, because the allocated area must begin in a
+	page boundary.
+
+<akpm@digeo.com>
+	[PATCH] ext2/ext3_free_blocks() extra check
+	
+	From Andreas Dilger.
+	
+	Additional sanity checks in the ext2 and ext3 block allocators: if
+	someone tries to free a negative number of blocks, detect and handle
+	that rather than wrecking the fs.
+
+<akpm@digeo.com>
+	[PATCH] don't apply file size rlimits to blockdevs
+	
+	generic_file_write()'s rlimit checks are preventing writes to large
+	offsets into blockdevs:
+	
+	# ulimit -f 10000
+	# dd if=/dev/zero of=/dev/sde5 bs=1k count=1 seek=1000000
+	zsh: file size limit exceeded
+	
+	So don't apply that check if it's a blockdev.
+	
+	The patch also caches the S_ISBLK result in a local.
+
+<akpm@digeo.com>
+	[PATCH] limit pinned memory due to readahead
+	
+	readahead allocates all the pages before starting I/O.  Potentially bad
+	if someone is performing huge reads with madvise or sys_readahead().
+	
+	So the patch just busts that up into two-megabyte units.
+
+<akpm@digeo.com>
+	[PATCH] remove a vm debug check
+	
+	This ad-hoc assertion is no longer true.  If all zones are in the `all
+	unreclaimable' state it can trigger.  When testing with a tiny amount
+	of physical memory.
+
+<akpm@digeo.com>
+	[PATCH] madvise_willneed() maximum readahead checking
+	
+	madvise_willneed() currently has a very strange check on how much readahead
+	it is prepared to do.
+	
+	  It is based on the user's rss limit.  But this is usually enormous, and
+	  the user isn't necessarily going to map all that memory at the same time
+	  anyway.
+	
+	  And the logic is wrong - it is comparing rss (which is in bytes) with
+	  `end - start', which is in pages.
+	
+	  And it returns -EIO on error, which is not mentioned in the Open Group
+	  spec and doesn't make sense.
+	
+	
+	This patch takes it all out and applies the same upper limit as is used in
+	sys_readahead() - half the inactive list.
+
+<akpm@digeo.com>
+	[PATCH] provide a default super_block_operations
+	
+	A little cleanup suggested by Chris Mason or Al Viro.
+	
+	Quite a number of codepaths are testing whether a superblock has a
+	non-null ->s_op pointer.  We can remove all those by making sure that
+	all superblocks have a valid ->s_op.
+
+<akpm@digeo.com>
+	[PATCH] tidier atomic check in mempool_alloc()
+	
+	From Hugh.
+	
+	Be more explicit in the "can we sleep" test.  It doesn't change
+	anything unless someone is performing __GFP_IO && !__GFP_WAIT
+	allocations, which is nonsensical.
+
+<akpm@digeo.com>
+	[PATCH] Fix off-by-one in the page allocator
+	
+	From Hugh.
+	
+	Be consistent in deciding when we are below the zone allocation
+	thresholds.
+
+<akpm@digeo.com>
+	[PATCH] pad pte_chains out to a cacheline
+	
+	In PAE mode there is a 4-byte gap and they're not aligning correctly.
+
+<akpm@digeo.com>
+	[PATCH] ext2 synchronous mount fix
+	
+	The optimisation for synchronous mounts was only correct for S_ISREG
+	files.  Directories do not pass through generic_osync_inode() and we
+	still need to synchronously write out their indirect blocks.
+
+<akpm@digeo.com>
+	[PATCH] Add prefetching to get_page_state()
+	
+	Fetch the next cacheline as we're counting up the fields in this one.
+
+<akpm@digeo.com>
+	[PATCH] ext3: fix error-path bh leak
+	
+	It is missing a brelse() on an error path.
+
+<akpm@digeo.com>
+	[PATCH] remove vm_area_struct.vm_raend
+	
+	Remove the unused vm_area_struct.vm_raend.
+	
+	If someone wants to tune per-VMA readaround then they can alter
+	vma->vm_file->f_ra.ra_pages.
+
+<Kai.Makisara@kolumbus.fi>
+	[PATCH] SCSI tape driver fixes for 2.5.51
+	
+	This contains the following changes for the SCSI tape driver in 2.5.51:
+	- fix module bugs that prevent finding any devices
+	- allow opening a device with O_NONBLOCK | O_RDWR even if the tape in drive
+	  is write protected
+
+<bgerst@didntduck.org>
+	[PATCH] Remove Rules.make from Makefiles (1/3)
+	
+	Makefiles no longer need to include Rules.make, which is currently an
+	empty file.  This patch removes it from the arch tree Makefiles.
+
+<bgerst@didntduck.org>
+	[PATCH] Remove Rules.make from Makefiles (2/3)
+	
+	Makefiles no longer need to include Rules.make, which is currently an
+	empty file.  This patch removes it from the drivers tree Makefiles.
+
+<bgerst@didntduck.org>
+	[PATCH] Remove Rules.make from Makefiles (3/3)
+	
+	Makefiles no longer need to include Rules.make, which is currently an
+	empty file.  This patch removes it from the remaining Makefiles, and
+	removes the empty Rules.make file.
+
+<rddunlap@osdl.org>
+	[PATCH] move console_loglevel scalars to array (resend)
+	
+	Moves console_loglevel & friends to an array, as sysctl expects.
+
+<mingo@elte.hu>
+	[PATCH] threaded coredumps, tcore-fixes-2.5.51-A0
+	
+	This fixes one more threaded-coredumps detail reported by the glibc
+	people: all threads taken down by the coredump code should report the
+	proper exit code.  We can do this rather easily via the group_exit
+	mechanism.  'Other' threads used to report SIGKILL, which was highly
+	confusing as the shell often displayed the 'Killed' message instead of a
+	'Segmentation fault' message.
+	
+	Another missing bit was the 0x80 bit set in the exit status for all
+	threads, if the coredump was successful.  (it's safe to set this bit in
+	->sig->group_exit_code in an unlocked way because all threads are
+	artificially descheduled by the coredump code.)
+
+<rth@twiddle.net>
+	[PATCH] sr_ioctl fix
+	
+	sr_ioctl.c uses virt_to_phys, which is defined in asm/io.h.
+	On x86, this accidentally works, due to other indirect includes,
+	but on Alpha results in a link error.
+
+<pavel@ucw.cz>
+	[PATCH] ACPI/S3: fix gcc3.2 compatibility
+	
+	gcc3.2 is a bit more pedantic...
+
+<pavel@ucw.cz>
+	[PATCH] ACPI/S3: simplify assembly code a bit
+	
+	Kill unused variable and simplify assembly portion a bit...
+
+<linux@brodo.de>
+	[PATCH] cpufreq: clean up CPU information
+	
+	This patch moves some basic per-CPU static information (minimum frequency,
+	maximum frequency and maximum transition latency) into a struct
+	cpufreq_cpuinfo. This offers a much cleaner struct cpufreq_driver and
+	struct cpufreq_policy.
+
+<linux@brodo.de>
+	[PATCH] cpufreq: move x86 configuration to "Power Management"
+	
+	This patch moves the Kconfig entries for CPUfreq from "Processor type and
+	features" to "Power management options".
+
+<hch@sgi.com>
+	[PATCH] CREDITS update
+	
+	hch moved around to work for SGI..
+
+<schwidefsky@de.ibm.com>
+	[PATCH] s390: Makefiles.
+	
+	Makefile changes by Sam Ravnborg. Summary of changes:
+	o Added FORCE prerequisite in boot/Makefile
+	o Do not use shorthand targets when calling the boot/Makefile
+	o No longer use BOOT_IMAGE, not needed now
+	o Use kbuild clean infrastructure when cleaning up in boot
+	o Offset generation shrinked with one rule
+	o removed inclusion of Rules.make in all Makefiles
+	o no longer use the descend macro, use $(Q)$(MAKE) as replacement
+
+<schwidefsky@de.ibm.com>
+	[PATCH] s390: nanosleep restarting.
+	
+	sys_restart_syscall for nanosleep restarting.
+
+<schwidefsky@de.ibm.com>
+	[PATCH] s390: io fixes.
+	
+	Start of chsc interface cleanup. Fix for a race condition in do_IRQ.
+	Fix device reference counting.
+
+<schwidefsky@de.ibm.com>
+	[PATCH] s390: uaccess bug.
+	
+	Fix return value of __put_user_asm_8.
+
+<schwidefsky@de.ibm.com>
+	[PATCH] s390: old tape file.
+	
+	Remove last remaining file of the old tape driver.
+
+<schwidefsky@de.ibm.com>
+	[PATCH] s390: staticification.
+	
+	Make some functions and variables static.
+
+<schwidefsky@de.ibm.com>
+	[PATCH] s390: warnings.
+	
+	Warning fixes: remove an unused variable and make bitops complain if the
+	pointer isn't of type long. Make 31 bit BUG() emit 4 0-bytes instead of 2.
+	This improves the readability of the listing.
+
+<schwidefsky@de.ibm.com>
+	[PATCH] s390: export sys_wait4.
+	
+	Add sys_wait4 to the list of exported functions.
+
+<sfr@canb.auug.org.au>
+	[PATCH] nanosleep compatibility layer fix
+	
+	Fix for the compatibility layer for NULL 'remaining time' pointer.
+
+<zwane@holomorphy.com>
+	[PATCH] OSS ad1848 initialisation order
+	
+	I need to initialise the ad1848 driver before attempting attach/probe
+	from dependent drivers (e.g.  opl3sa2)
+
+<rusty@rustcorp.com.au>
+	[PATCH] Module Parameter Core Patch
+	
+	This patch is a rewrite of the insmod and boot parameter handling,
+	to unify them.
+	
+	The new format is fairly simple: built on top of __module_param_call there
+	are several helpers, eg "module_param(foo, int, 000)".  The final argument
+	is the permissions bits, for exposing parameters in sysfs (if
+	non-zero) at a later stage.
+
+<rusty@rustcorp.com.au>
+	[PATCH] Parameter implementation for modules
+	
+	This activates parameter parsing for module_param() declarations in modules.
+
+<rusty@rustcorp.com.au>
+	[PATCH] MODULE_PARM support for older modules
+	
+	This is the backwards compatibility code for MODULE_PARM, and moves
+	__MODULE_STRING() down to the graveyard at the bottom of module.h.
+	
+	It's complicated by the fact that many modules place MODULE_PARM()
+	before the declaration (some do MODULE_PARM() for non-existant
+	variables, too).  To avoid breaking them, we have to do the name
+	lookups at load time, rather than just storing a pointer 8(
+	
+	CONFIG_OBSOLETE_MODPARM is set to y without prompting: it's a useful
+	marker for deprecating in 2.7.
+
+<sfr@canb.auug.org.au>
+	[PATCH] consolidate sys32_times - architecture independent
+	
+	This patch creates compat_sys_times and a few more compability types.
+
+<sfr@canb.auug.org.au>
+	[PATCH] mips64 compatibility syscall layer
+	
+	Given Ralf's blessing, here is the mips64 part of the initial compatibility
+	syscall layer.
+
+<sfr@canb.auug.org.au>
+	[PATCH] consolidate sys32_new[lf]stat - architecture independent
+	
+	This renames more types and moves them into asm/compat.h and also
+	consolidates sys32_new{stat,fstat,lstat}.
+
+<colpatch@us.ibm.com>
+	[PATCH] NUMA topology sysfs panic fix
+	
+	This (from wli & myself) was overlooked for 2.5.51.  Without this fix,
+	sysfs panics when registering topology for NUMA boxen.
+
+<davidel@xmailserver.org>
+	[PATCH] epoll bits forgot a nasty printk() ...
+	
+	Robert made me notice that I forgot an explicit debugging printk()
+	inside the epoll module.
+	
+	o Make the printk() to be debugging
+
+<mingo@elte.hu>
+	[PATCH] ptrace-sigfix-2.5.51-A1
+	
+	This fixes a threading/ptrace bug noticed by the gdb people: when a
+	thread is ptraced but other threads in the thread group are not then a
+	SIGTRAP (via int3 or any of the other debug traps) causes the child
+	thread(s) to die unexpectedly.  This is because the default behavior for
+	a no-handler SIGTRAP is to broadcast it.
+	
+	The solution is to make all such signals specific, then the ptracer (gdb)
+	can filter the signal and upon continuation it's being handled properly
+	(or put on the shared signal queue). SIGKILL and SIGSTOP are an exception.
+	The patch only affects threaded and ptrace-d processes.
+
+<zippel@linux-m68k.org>
+	[PATCH] kconfig: qt installation workaround
+	
+	Work around broken mandrake qt installation, which doesn't have a $QTDIR/bin/moc.
+
+<zippel@linux-m68k.org>
+	[PATCH] kconfig: off-by-one error
+	
+	Use all of choice input and don't ignore last character.
+
+<zippel@linux-m68k.org>
+	[PATCH] kconfig: config file parse update
+	
+	- search for config files under $srctree (by Sam Ravnborg & me)
+	- allow to break long lines with \
+
+<zippel@linux-m68k.org>
+	[PATCH] kconfig: dependencies for choices
+	
+	Enable dependencies for choice defaults.
+
+<zippel@linux-m68k.org>
+	[PATCH] kconfig: symbol change notification
+	
+	Add a changed flag to properties, which can be used by front ends to check
+	for changed symbols/properties.
+
+<zippel@linux-m68k.org>
+	[PATCH] kconfig: geometry defaults
+	
+	Set geometry defaults, if TIOCGWINSZ fails.
+
+<zippel@linux-m68k.org>
+	[PATCH] kconfig: updates
+	
+	- allow double click to start edit of string symbols
+	- help text by Rod.VanMeter@nokia.com
+	- small reorganiztion to prepare for new features
+
+<zippel@linux-m68k.org>
+	[PATCH] kconfig: fix T_STRING usage
+	
+	T_STRING token was used twice, so quoted strings use now T_WORD_QUOTE.
+
+<trond.myklebust@fys.uio.no>
+	[PATCH] Fix buffer reservations in nfs4xdr.c
+	
+	This fixes a couple of incorrect XDR buffer reservations.  The values
+	passed to RESERVE_SPACE() must reflect precisely the number of bytes
+	that we wish to send down the wire.
+
+<trond.myklebust@fys.uio.no>
+	[PATCH] NFSv4 cleanups
+	
+	 - Move the encoding/decoding of the actual COMPOUND XDR header out of
+	   encode_compound()/decode_compound().
+	
+	 - Make each NFSv4 operation 'decode_' routine also take care of
+	   decoding its own header, and checking it for correctness.
+	   Also allows us to get rid of the 'nfserr' parameter...
+
+<trond.myklebust@fys.uio.no>
+	[PATCH] Add helper routines for fixing up page alignment on xdr_buf
+	
+	In order to speed up NFS reads, we attempt to copy directly from
+	skbuffs into the pagecache pages. As we cannot do XDR decoding in the
+	soft interrupts, we attempt to estimate the size of the RPC header (+
+	attributes,...) that will precede the actual data that goes in the
+	pagecache. If we get the estimate wrong, the XDR decode routines
+	perform a realignment of the data into the pagecache.
+	
+	In the existing code, we do a multi-page kmap() from the xdr_buf into
+	an iovec array, in order to do the shift.
+	
+	The following patch adds tools for doing the realigment without going
+	through the iovec array (and without having to do the deadlock-prone
+	multi-page kmap()).
+	
+	It also adds the 2 helper routines xdr_read_pages()/xdr_write_pages()
+	which will be needed for NFSv4 reads/writes in order to add pre/post
+	operation GETATTR calls.
+
+<hch@hera.kernel.org>
+	Cset exclude: hch@hera.kernel.org|ChangeSet|20021215220743|56906
+
+<ahaas@airmail.net>
+	[PATCH] C99 initializer for drivers/base/class.c
+
+<ahaas@airmail.net>
+	[PATCH] C99 initializers for drivers/char
+
+<ahaas@airmail.net>
+	[PATCH] C99 initializers for drivers/net
+
+<ahaas@airmail.net>
+	[PATCH] C99 initializers for net/irda/irnet/irnet_ppp.h
+
+<ahaas@airmail.net>
+	[PATCH] C99 initializers for drivers/ide/pci
+
+<ahaas@airmail.net>
+	[PATCH] C99 initializers for drivers/scsi (1 of 4)
+
+<ahaas@airmail.net>
+	[PATCH] C99 initializers for drivers/scsi (2 of 4)
+
+<ahaas@airmail.net>
+	[PATCH] C99 initializers for drivers/scsi (3 of 4)
+
+<ahaas@airmail.net>
+	[PATCH] C99 initializers for drivers/scsi (4 of 4)
+
+<bcollins@debian.org>
+	[PATCH] IEEE-1394/Firewire update
+	
+	This covers a lot of ground in the Linux1394 SVN tree.  I haven't had
+	time to keep in sync with you in a more granular way, so here's a
+	bohemoth patch.  However, consider it well tested.
+
+<Ballabio_Dario@emc.com>
+	[PATCH] PATCH: eata driver update
+	
+	The enclosed patch fix compile problems and adds all the diffs which
+	were still missing from 2.5.51.
+
+<stelian@popies.net>
+	[PATCH] sonypi driver update
+	
+	This little patch changes the way button release events are reported
+	by the sonypi driver to the application: previously, separate
+	release events were detected for each button. However, many buttons
+	(example: the jogdial, the capture button, the back button etc) share
+	the same release event.
+	
+	The attached patch propagates a single 'ANYBUTTON_RELEASED' event
+	to the userspace, leaving all state machine intelligence to the
+	application.
+	
+	Kunihiko IMAI should be credited for his ideas and tests.
+
+<gerg@snapgear.com>
+	[PATCH] m68knommu fix kstat_cpu usage int ints.c
+	
+	This fixes the use kstat_cpu in m68knommu arch ints.c Replcae obsolete
+	use of kstat.irqs.
+
+<gerg@snapgear.com>
+	[PATCH] m68knommu add missing do_fork arg
+	
+	This adds the missing argument to do_fork() calls in m68knommu arch
+	process.c
+
+<gerg@snapgear.com>
+	[PATCH] m68knommu spinlocks around signal api calls
+	
+	This adds spinlocks around calls to generic kernel signal routine calls.
+
+<gerg@snapgear.com>
+	[PATCH] m68knommu remove sys_security
+	
+	This removes use of the depricated sys_security system call entry for
+	the m68knommu architectures.
+
+<gerg@snapgear.com>
+	[PATCH] m68knommu fix ELF_CORE_COPY_REGS macro
+	
+	This fixes the broken ELF_CORE_COPY_REGS macro for m68knommu arch.  It
+	is missing a ";" after the pr_reg[16] setting, and attempts to set the
+	non-existant a2 field.
+
+<gerg@snapgear.com>
+	[PATCH] m68knommu current include thread_info.h
+	
+	This changes m68knommu current.h to include the linux/thread_info.h
+	instead of asm/thread_info.h.  This is needed to get the restart_block
+	definition from linux/thread_info.h first.
+
+<gerg@snapgear.com>
+	[PATCH] m68knommu hardirq.h include cache.h
+	
+	The patch include cache.h in m68knommu hardirq.h.
+	
+	Cleans up compile problems, and make its consistent with
+	all other architecture hardirq.h files.
+
+<gerg@snapgear.com>
+	[PATCH] m68knommu definition of TASK_UNMAPPED_BASE
+	
+	This patch adds a definition for TASK_UNMAPPED_BASE in m68knommu
+	process.h.  Recent changes need a definition for this, although its
+	value is unsed for nommu targets.
+
+<gerg@snapgear.com>
+	[PATCH] m68knommu support restart_block
+	
+	This patch addes the new restart_block field support to m68knommu
+	thread_info.h.
+
+<torvalds@home.transmeta.com>
+	Remove bogus checkin file from xfs.
+
+<torvalds@home.transmeta.com>
+	Linux v2.5.52
+

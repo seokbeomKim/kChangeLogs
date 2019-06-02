@@ -1,0 +1,2778 @@
+
+Summary of changes from v2.5.63 to v2.5.64
+============================================
+
+<mochel@osdl.org>
+	sysfs: add sysfs_update_file()
+	
+	- Updates the timestamp on an attribute file (so userspace can know when
+	  an attribute changed).
+	- From Greg K-H.
+
+<mochel@osdl.org>
+	sysfs: split up inode.c into different files for different purposes.
+	
+	- new files file.c, dir.c, symlink.c, mount.c.
+	
+	- Purely cosmetic (for now). Should make it easier to add new filetypes.
+
+<mochel@osdl.org>
+	sysfs: further localize file creation.
+	
+	- reanme sysfs_get_inode() to sysfs_create().
+	- Assume we're using the single sysfs superblock when creating something.
+	- move file object-specific init commands to callbacks.
+	- streamline file and directory creation to remove duplicate checks.
+	- clean up sysfs_fill_super() a bit. 
+
+<mochel@osdl.org>
+	sysfs: add initial support for binary files.
+	
+	Yes, binary files. But before you scream in angst, please realize that they
+	do have a marked purpose for exporting certain types of data from the kernel.
+	
+	Basically, they are for exporting blobs of data that likely have some structure,
+	but that the kernel has no control over. This includes VPD data from device
+	headers, EDD data, or CPU microcode. Instead of parsing the data, then
+	formatting in a certain way, only so userspace can parse the data again, we
+	just shove it out in a binary blob to userspace, and let them deal with it.
+	
+	Anyway, it defines a struct bin_attribute, with read() and write() methods
+	for the data. A read call should set the pointer in the sysfs_bin_buffer
+	object that is passed in. 
+	
+	A write call receives a buffer ptr, too, and must obey the count/offset 
+	fields for correct data. 
+
+<jgrimm@touki.austin.ibm.com>
+	[SCTP]  Minor surgery on ulpevent & related cleanups.
+	
+	sndrcvinfo.sinfo_cumtsn is new field added by the latest (05) API I-D.
+	Remove unused fields in ulpevent, minimally to make room for for
+	storing this new field.   But I'll clear out even more so I can
+	make room for impending partial data delivery work.
+	
+	See changes in comments for ulpqueue.c.
+	Many naming and typedef removal cleanups. 
+
+<jgrimm@touki.austin.ibm.com>
+	[SCTP]  SET_DEFAULT_SEND_PARAM sockopt.   (ardelle.fan)
+	
+	Supports setting the default send params.  Still needs a 'get' though.
+
+<jgrimm@touki.austin.ibm.com>
+	[SCTP] Partial Data Delivery
+	
+	Support pushing a partial record up to the application if we 
+	are receiving pressure on rwnd.  The most common case is that
+	the sender is sending a record larger than our rwnd.  We send 
+	as much up the receive queue in hopes that a read will occur 
+	up room in rwnd. 
+	
+	Other associations on the socket need held off until the partial 
+	delivery condition is finally fufilled (or ABORTed).  Additionally, 
+	one must be careful to "do the right thing" with regards to 
+	associations peeled off to new sockets, properly preserving or 
+	clearing the partial delivery state.
+
+<jgrimm@touki.austin.ibm.com>
+	[SCTP] MSG_ADDR_OVER support.  (ardelle.fan)
+	
+	Allow the primary destination address to be overridden on a per 
+	message basis. 
+
+<sri@us.ibm.com>
+	[SCTP] sctp mib statistics update/display support.
+
+<jgrimm@touki.austin.ibm.com>
+	[SCTP]  Minor cleanup on tsnmap.
+	
+	Move duplicate TSN tracking into tsnmap.  Remove typdefs for 
+	sctp_tsnmap_t and sctp_tsnamp_iter_t. 
+
+<jgrimm@touki.austin.ibm.com>
+	[SCTP] C99 Initializer cleanup  (Art Haas)
+
+<dwmw2@dwmw2.baythorne.internal>
+	Allow uart drivers to calculate divisors differently.
+	
+	In order to deal with the weird and wonderful ways of obtaining a uart clock
+	which a lot of the high-speed hacks for 16550-based chips seem to have, we need
+	to make uart_update_timeout() and uart_get_divisor() take the desired baud rate
+	as their arguments, instead of termios or divisor as before. The main reason for the
+	change to uart_get_divisor(), requiring a call to uart_get_baud_rate() before it, is
+	so that the drivers actually _have_ the baud rate in order that they can pass it to
+	uart_update_timeout().
+	
+
+<dwmw2@dwmw2.baythorne.internal>
+	Support high-speed serial modes of National Semiconductor and SMSC Super-IO chips.
+
+<dwmw2@dwmw2.baythorne.internal>
+	Complain about setting custom speed or divisor on serial ports.
+
+<sri@us.ibm.com>
+	[SCTP] Update retransmission path in a round-robin fashion when a
+	       retransmission timer expires instead of using the same path
+	       until the path error count reaches its threshold value.
+
+<jgrimm@touki.austin.ibm.com>
+	[SCTP] Renege to make room for CTSN+1 chunk. 
+	
+	If our receive buffer is full, but this is the most important TSN 
+	to receive, make room by reneging less important TSNs.  Only renege
+	if there is a gap and this is the next TSN to fit in the gap.  
+
+<jgrimm@touki.austin.ibm.com>
+	Add getsockopt for DEFAULT_SEND_PARAM.  (ardelle.fan)
+
+<jgarzik@redhat.com>
+	[netdrvr] Update Doc/networking/netdevices.txt with more locking rules
+
+<kai@tp1.ruhr-uni-bochum.de>
+	kbuild: Remove scripts/elfconfig.h with "make clean"
+	
+	We have a bit of a mess with build-targets, EXTRA_TARGETS, targets,
+	which needs cleaning up some time. Anyway, we just add $(targets) to the
+	files which get deleted with "make clean" for now.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	kbuild: Fix a race with module postprocessing
+	
+	For the modversions case, we need vmlinux to be built before postprocessing
+	modules can start, since we need to extract the checksums from it.
+	
+	For the non-modversions case, we use vmlinux if it's available (so we can
+	sensibly give warnings about unresolved symbols), but otherwise not. 
+	However, this could race with vmlinux being built at the exact same time as 
+	being processed.
+	
+	Fixed by waiting until vmlinux is finished before starting module
+	postprocessing.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	kbuild: Handle MODULE_SYMBOL_PREFIX in module postprocessing
+	
+	Loosely based on a patch by Miles Bader, have modpost deal with
+	weird archs (v850) which prefix their symbols with '_'.
+	
+	Modpost does not yet handle ppc64 "prefix function symbols with '.'"
+	correctly, btw.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	kbuild: typo fix
+	
+	Patch from Rolf Eike Beer:
+	
+	> Linus asked for typo fixes, so here is one...
+
+<kai@tp1.ruhr-uni-bochum.de>
+	kbuild: [PATCH] eliminate warnings in generated module files
+	
+	From Richard Henderson:
+	
+	> The compiler.h fragment should describe the problem well enough.
+	
+	(I tested egcs 2.91.66, even there no problem)
+
+<kai@tp1.ruhr-uni-bochum.de>
+	kbuild: [PATCH] Remove checkhelp.pl and header.tk
+	
+	From Brian Gerst:
+	
+	> Changes in the config system have obsoleted these files.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	kbuild: [PATCH] put genksyms in scripts dir
+	
+	This puts genksyms into scripts/genksyms/.
+	
+	genksyms used to be maintained externally, though the only possible user
+	was the kernel build. Moving it into the kernel sources makes it easier to
+	keep it uptodate, like for example updating it to generate linker scripts
+	directly instead of postprocessing the generated header file fragments 
+	with sed, as we do currently.
+	
+	Also, genksyms does not handle __typeof__, which needs to be fixed since
+	some of the exported symbol in the kernel are defined using __typeof__. 
+	
+	(Rusty Russell/me)
+
+<kai@tp1.ruhr-uni-bochum.de>
+	kbuild: [PATCH] adapt genksyms for current kbuild
+	
+	By Rusty Russell.
+	
+	o generate output in a form feasible as linker script instead of 
+	  munging it with sed during the build
+	o remove checksum version 1 support
+	o remove prefix support
+	
+
+<kai@tp1.ruhr-uni-bochum.de>
+	kbuild: Fix genksyms __typeof__ handling
+	
+	genksyms used to fail generating a checksum for a symbol which was
+	defined using __typeof__.
+	
+	This minimal patch fixes it to recognize the case which occurs in the
+	kernel, it's not a complete correct typeof handling, but it serves our
+	needs.
+
+<agrover@groveronline.com>
+	ACPI: Do not count processor objects for non-present CPUs
+	(Thanks to Dominik Brodowski)
+
+<agrover@groveronline.com>
+	ACPI: Revert a change that allowed P_BLK lengths to be 4 or 5. This is causing
+	us to think that some systems support C2 when they really don't.
+
+<david-b@pacbell.net>
+	[PATCH] USB: sync with some 2.4 ohci fixes, prepare for backport
+	
+	The 2.5 version branched from 2.4.5 or so, and since then
+	a couple hardware-specific tweaks were merged to 2.4; this
+	teaches 2.5 about NatSemi SUPERIO and PA-RISC quirks.
+	
+	This also uses os/version neutral HCD calls to register the root
+	hub and find the HCD's bus.  It also adds os/version neutral
+	macros for its diagnostic macros.  Most of those changes have
+	been split out separately, but the macros and a few uses of them
+	weren't naturally splittable.
+	
+	Also a couple minor cleanups, like removing CVS ids, having
+	only one copy of a routine used with the debug files, and
+	getting rid of some inline #ifdefs.
+
+<david-b@pacbell.net>
+	[PATCH] USB: ohci-hcd, more portable diagnostics
+	
+	This is the rest of the work to make the driver not care which
+	version of the OS it's using, so the difference between the 2.5
+	and 2.5 versions can just be a small patch with stuff that has
+	a real need to be different.
+
+<david-b@pacbell.net>
+	[PATCH] USB: ohci-hcd fewer diagnostics
+	
+	This gets rid of some potentially scarey messages I've recently
+	seen on disconnect, "bad hash" for a TD ... it's really a "no hash"
+	case, and this prevents the message in some cases where that's
+	not an issue.  Likely this is what Gary Gorgen noticed, but even
+	he had a different problem, this message shouldn't always appear.
+	
+	It also slims down one other message, preventing it from appearing
+	in the routine "protocol stall" case (and cluttering logfiles).
+
+<david-b@pacbell.net>
+	[PATCH] USB: usbtest checks for in-order completions
+	
+	This makes "test 10" verify that completions are returned in-order,
+	resolving a FIXME.  OHCI and EHCI do, but UHCI doesn't. (*)  That
+	simplified a cleanup of the queue fault tests to make it easier
+	to handle optional faults (with one or more failure modes).
+	
+	It also returns a "lost subcase" that accidentally was not getting
+	run.  And in a case of pure paranoia, the unlink tests handle the
+	EBUSY return from an async urb unlink ... if that ever shows up I'd
+	expect it to be on an SMP box.
+	
+	
+	(*) I'd suspected as much given the first round of tests with UHCI;
+	     the diagnostics from "usbtest" made no sense otherwise.  This
+	     is just repeatable confirmation of the earlier bug report.  This
+	     could cause trouble in the usb_sg_*() I/O calls.
+	
+	     In this case, "testusb -at10 -g4" reported that subcase 1 completed
+	     out of order (before subcase 0) ... without looking at details, I'd
+	     guess a list_add() vs list_add_tail() issue.
+	
+	     Then after trying the queue cleanup code, I got diagnostics from
+	     uhci_destroy_urb_priv; then a kmalloc poisoning oops in uhci_irq,
+	     or "uhci_remove_pending_qhs+0x7c/0x1b0" in more detail.  Those
+	     looks to be the same "can't unlink from completions" errors that
+	     was also reported before in that code.
+	
+	     Note that "testusb -at10" (like "testusb -at9") can be made to
+	     work with any USB device, using "usbtest" module options.
+
+<baldrick@wanadoo.fr>
+	[PATCH] USB speedtouch: take ref to USB device
+	
+	udsl_atm_proc_read may be called after USB disconnect.
+
+<zaitcev@redhat.com>
+	[PATCH] USB: Yet another unusual_devs.h member.
+	
+	Also note that SL11R was duplicated, so I removed it.
+
+<ganesh@vxindia.veritas.com>
+	[PATCH] USB ipaq.c: add ids for fujitsu loox
+	
+	 Added ids for the Fujitsu-Siemens Loox. Thanks to Michael Brausen.
+
+<baldrick@wanadoo.fr>
+	[PATCH] USB speedtouch: use USB dbg macro
+
+<andrew.wood@ivarch.com>
+	[PATCH] USB: USB-MIDI support for Roland SC8820
+
+<davej@codemonkey.org.uk>
+	[AGPGART] compile fix for alpha.
+	Spotted by Jeff Wiedemeier
+
+<greg@kroah.com>
+	[PATCH] USB visor: fixed the driver_info cast to the proper type.
+
+<greg@kroah.com>
+	[PATCH] USB visor: cleanup the close() logic
+
+<greg@kroah.com>
+	[PATCH] USB pl2303: add locking now that the usb-serial core doesn't protect us.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	do_mounts: Move devfs into own file.
+	
+	Get rid of a couple scattered #ifdef CONFIG_DEVFS_FS in init/do_mounts.c
+	by moving the devfs code into its own file and using stubs when it's
+	not selected.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	do_mounts: __init* cleanup
+	
+	o prepare_namespace() is called before free_initmem(), so it can
+	  be __init.
+	o all static data in do_mounts.c can be __initdata for the same reason.
+	o move the __init into its standard location between return value
+	  and function name.
+	o root_device_name can be a char *.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	do_mounts: move early MD setup into own file
+	
+	Again, just get rid of some #ifdefs by moving MD setup into
+	its own file which is only compiled when CONFIG_BLK_DEV_MD is set.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	do_mounts: fix device name recognition for md= command line option
+	
+	As we all know, strncmp() returns 0 for match...
+	Obviously nobody uses this codepath since it never worked, but let's fix
+	it anyway.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	do_mounts: Remove unneeded check for initrd_start
+	
+	If initrd_start is 0, initrd_load() -> rd_load_image() -> open("dev/initrd")
+	will fail anyway, so no need for the explicit check here.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	do_mounts: initrd_load() is never called w/o CONFIG_BLK_DEV_INITRD
+	
+	When CONFIG_BLK_DEV_INITRD is not set, mount_initrd will always be
+	0, so initrd_load() won't be called. However, we need a stub to make
+	the compiler happy.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	do_mount: Move more of the initrd load logic into initrd_load()
+	
+	This just moves a bit of logic out of prepare_namespace() into
+	initrd_load(), which means that we now don't reference handle_initrd()
+	anymore if CONFIG_BLK_DEV_INITRD is not set (we wouldn't call it anyway),
+	so we can put some bits of code under a common #ifdef CONFIG_BLK_DEV_INITRD.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	do_mounts: Simplify logic for ramdisk from floppy.
+	
+	Currently, we would try to read in a ramdisk image from floppy, if
+	o root device is /dev/fd*
+	o "load_ramdisk=1" on the command line
+	o CONFIG_BLK_DEV_INITRD is not set, or "noinitrd" on the command line.
+	
+	Relax the last restriction, which only makes things more complicated for
+	no reason, and changes behavior depending on an unrelated config option.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	do_mounts: mount_initrd is now only needed w/CONFIG_BLK_DEV_INITRD
+	
+	The mount_initrd check can be moved into initrd_load(), so that we
+	have all initrd code consolidated in one #ifdef'd section now.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	do_mounts: Move CONFIG_BLK_DEV_RAM stuff into own file
+	
+	There's still an #ifdef in there for CONFIG_BLK_DEV_INITRD, but at
+	some point it just gets too many files, so accept that for now.
+	There's also a #define BUILD_CRAMDISK in there, which should be either
+	made a config option or removed...
+
+<rmk@flint.arm.linux.org.uk>
+	[SERIAL] 64bit warning in serial/core.c
+	
+	Patch from Andi Kleen.
+	
+	Just avoid a warning from converting 64bit pointers to 32bit int.
+	For 2.5.59.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	do_mounts: Separate out common root mounting code into do_mount_root()
+	
+	Small savings, but somewhat nicer anyway.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	do_mounts: create_dev() before mounting
+	
+	The only path where the /dev/root created by prepare_namespace() wouldn't
+	be overwritten by a later create_dev() call is mount_nfs_root(), so move
+	it there, so that all the create_dev() calls are now next to the
+	actual mount. Also simplify mount_root() a little.
+
+<hch@lst.de>
+	[PATCH] wd33c93 updates
+	
+	The PC98 folks have some updates in their tree to make the generic
+	wd33c93 driver usable in PIO mode, but unfortunately the way they do it
+	(include a header specific to their lowlevel driver in wd33c93.c
+	conditionally) is rather ugly.
+	
+	I reworked it to provide different implementations of the access method
+	inside wd33c93.c independent of the lowlevel driver.  In addition the
+	patch contains various patches to actually get the driver compile in 2.5
+	and a reindent to follow kernel codingstyle (sorry, but the maintainer
+	hasn't touched it for four years and it made my eyes bleed..)
+
+<hch@lst.de>
+	[PATCH] fix some Kconfig typos
+	
+	spotted by Matthew Jacob
+
+<hch@lst.de>
+	[PATCH] some scsi_scan.c restructuring for ieee1394 hotplugging
+	
+	I had some discussion with Ben Collins on ow to properly allow
+	hotplugging of ieee1394 storage device (sbp2).  While the scsi_add_host/
+	scsi_remove_host interface allows hotpluging of ieee1394 adapters we
+	need a way to register the actual devices with the scsi layer when
+	they're plugged in.  I've restructured the code to handle the
+	/proc/scsi/scsi code to add/remove devices a bit to have an interface
+	the ieee1394 driver can use, and created the following new interface:
+	
+		struct scsi_device *scsi_add_device(struct Scsi_Host *shost,
+				uint channel, uint id, uint lun)
+		int scsi_remove_device(struct scsi_device *sdev)
+	
+	in addition scsi_probe_and_add_lun() got some overhaul to become
+	readable and can now return the struct scsi_device it probed as an
+	optional argument.
+
+<jejb@mulgrave.(none)>
+	clean up wd33c93 data direction code
+	
+	Data direction is now provided by the SCSI mid-layer
+
+<hch@infradead.org>
+	[PATCH] Add PC-9800 bios parameter support in SCSI
+	
+	James' scsi tree already contains an big update to wd33c93 that will make
+	integrating pc980155 a lot easier - it will hopefully appear in 2.5.63.
+	
+	I've done some more work on the bios parameter stuff, this is the patch
+	I came up with, James can you merge it into the linux-scsi tree?  It just
+	adds a new file for pc98-style bios geometry to the scsi core.
+
+<davej@codemonkey.org.uk>
+	[WATCHDOG] SuperH 5 support for SH watchdog driver.
+	From patch in 2.4 by Paul Mundt
+
+<pavel@ucw.cz>
+	[PATCH] swsusp and S3 fixes
+	
+	These are minor fixes for swsusp and S3 sleep.
+	
+	 - #ifdef mess in acpi_save_state_mem() is simplified
+	 - better error handling in reserving bootmem
+	 - handle video bioses that play with segment registers
+	 - automagic support for S3 on toshiba notebook
+	 - don't try to sync() when pdflush is already stopped
+	 - reorder actions to make pdflush not complain
+
+<sam@ravnborg.org>
+	[PATCH] fix make rpm
+	
+	make rpm has been broken in several kernel versions, fix it.  Solves
+	http://bugme.osdl.org/show_bug.cgi?id=373 which Paolo Ciarrocchi pushed
+	me to fix.
+	
+	1) Moved make rpm to the noconfig section, thus allowing it to see
+	   the clean target.
+	2) Fixed the commandline for find
+	3) Use rpmbuild if present
+	4) In mkspec use the generic all target, and drop the dep target
+	   This made the build command arch independent
+
+<torvalds@penguin.transmeta.com>
+	Make ACPI dmi fixup properly depend on CONFIG_ACPI_SLEEP
+
+<joel.buckley@sun.com>
+	Sun StorEdge[tm] array SparseLUN support
+	
+	Hello, I work on the Sun StorEdge[tm] arrays for Sun Microsystems, Inc.
+	As part of my testing of Linux, the attached changes are needed to enable
+	Sparse LUN support for Sun StorEdge[tm] arrays.
+
+<greg@kroah.com>
+	[PATCH] IBM PCI Hotplug: Clean up the error handling logic for a number of functions, and fix a locking mess.
+
+<greg@kroah.com>
+	[PATCH] IBM PCI Hotplug: fix typo in previous patch.
+
+<greg@kroah.com>
+	[PATCH] IBM PCI Hotplug: get rid of unneeded ops structure and surrounding logic.
+
+<greg@kroah.com>
+	[PATCH] PCI Hotplug: remove the list_lock, as we rely on sysfs to detect any duplicate slot names.
+
+<greg@kroah.com>
+	[PATCH] Compaq PCI Hotplug: move /proc files to sysfs
+
+<greg@kroah.com>
+	[PATCH] Compaq PCI Hotplug: rename cpqphp_proc.c to cpqphp_sysfs.c
+
+<hch@lst.de>
+	[PATCH] PCI: remove check_region abuse (and code duplication) from pci hp code
+	
+	We have a function pci_dev_driver() to check whether a pci_dev has an
+	driver attached to it.  It's handling of legacy devices is a bit simpler
+	than what the hotplug code did (duplicated in various places), but if
+	that stuff is really needed the generic code should be updated.
+
+<rmk@arm.linux.org.uk>
+	[PATCH] PCI: Make hot unplugging of PCI buses work
+	
+	Here's the updated patch:
+	
+	- Scott spotted a leak my handling of procfs wrt buses.
+	- I've also killed pci_remove_device() entirely - it is now inlined.
+	- After one of Alan's mails, I decided that pci_remove_behind_bridge()
+	  is a much better name than pci_remove_all_bus_devices()
+
+<greg@kroah.com>
+	[PATCH] Compaq PCI Hotplug: convert to use pci_remove_bus_device instead of custom code.
+
+<greg@kroah.com>
+	[PATCH] Compaq PCI Hotplug: remove unused walk of the device on insertion.
+
+<greg@kroah.com>
+	[PATCH] ACPI PCI hotplug: convert to use pci_remove_bus_device()
+	
+	Also got rid of some unneeded bus walking on device init and shutdown.
+
+<greg@kroah.com>
+	[PATCH] IBM PCI Hotplug: convert driver to use pci_bus_remove_device()
+	
+	Also cleaned up a lot of unnecessary bus walking on device startup
+	and shutdown.
+
+<greg@kroah.com>
+	[PATCH] PCI: export pci_scan_bus_parented which is needed by the IBM pci hotplug driver.
+
+<greg@kroah.com>
+	[PATCH] CPCI core: remove unneeded visit device on unconfigure.
+	
+	The driver now links properly, but this is untested due to my
+	lack of cPCI hardware.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	kbuild: make -j race fix, cosmetics
+	
+	Yet another "make -j" race fixed, and
+	print the right number of spaces for consisting output
+
+<mike@aiinc.ca>
+	[PATCH] Spelling fixes - occurrence
+	
+	This fixes:
+	    occurence -> occurrence
+	    occurences -> occurrences
+	
+	Fixes 13 occurrences (literally!) in all.
+
+<mike@aiinc.ca>
+	[PATCH] Spelling fixes - receive
+	
+	This fixes:
+	    recieve -> receive
+	    recieved -> received
+	    reciever -> receiver
+	
+	Fixes 14 occurrences in all.
+
+<mike@aiinc.ca>
+	[PATCH] Spelling fixes - occurring
+	
+	This fixes:
+	    occuring -> occurring
+	
+	Fixes 29 occurrences in all.
+
+<mike@aiinc.ca>
+	[PATCH] Spelling fixes - occurred
+	
+	This fixes:
+	    occured -> occurred
+	
+	Fixes 135 occurrences in all.
+
+<mike@aiinc.ca>
+	[PATCH] Spelling fixes - transceiver
+	
+	This fixes:
+	    tranceiver -> transceiver
+	
+	Some function names had this misspelling (e.g. e100_reset_tranceiver)
+	and I changed them, but I haven't tested it.
+	
+	Fixes 34 occurrences in all.
+
+<mike@aiinc.ca>
+	[PATCH] Spelling fixes - initial
+	
+	This fixes:
+	    intial -> initial
+	    intially -> initially
+	    intiali[sz]e -> initiali[sz]e
+	    intiali[sz]ed -> initiali[sz]ed
+	    intiali[sz]es -> initiali[sz]es
+	    intiali[sz]ation -> initiali[sz]ation
+	
+	Fixes 32 occurrences in all.
+
+<mike@aiinc.ca>
+	[PATCH] Spelling fixes - necessary
+	
+	This fixes:
+	    neccessary -> necessary
+	    unneccessary -> unnecessary
+	
+	Fixes 46 occurrences in all.
+
+<mike@aiinc.ca>
+	[PATCH] Spelling fixes - privilege
+	
+	This fixes:
+	    priviledge -> privilege
+	    priviledged -> privileged
+	    unpriviledged -> unprivileged
+	    nonpriviledged -> nonprivileged
+	
+	Fixes 7 occurrences in all.
+
+<elenstev@mesatop.com>
+	[PATCH] Spelling fixes handel -> handle
+	
+	This patch provides the following spelling fixes:
+	
+	handel      -> handle
+	handeling   -> handling
+	handeled    -> handled
+	handeler    -> handler
+
+<elenstev@mesatop.com>
+	[PATCH] 2.5.63 loose pedantry; loose -> lose where appropriate.
+	
+	This patch replaces "loose" with "lose" where appropriate.
+	There remain 56 correct uses of "loose" in the 2.5 kernel source.
+
+<elenstev@mesatop.com>
+	[PATCH] Spelling fixes for relevent -> relevant
+	
+	This patch provides spelling fixes for the following:
+	
+	relevent    -> relevant
+	irrelevent  -> irrelevant
+
+<elenstev@mesatop.com>
+	[PATCH] Spelling fixes for negotation -> negotiation and others.
+	
+	This patch provides the following spelling fixes:
+	
+	negotation   -> negotiation
+	stabelized   -> stabilized
+	labled       -> labeled
+	availible     -> available
+	tabel         -> table
+
+<elenstev@mesatop.com>
+	[PATCH] Spelling fixes for shold -> should and others
+	
+	This patch provides spelling fixes for the following:
+	
+	shold      -> should
+	Docement   -> Document
+	docomented -> documented
+	whic       -> which
+	thresold   -> threshold
+	asociation -> association
+
+<elenstev@mesatop.com>
+	[PATCH] Spelling fixes for paticular -> particular and others.
+	
+	This patch provides the following spelling fixes:
+	
+	paticular   -> particular
+	usefull     -> useful
+	occurance   -> occurrence
+	occurances  -> occurrences
+	successfull -> successful
+
+<sandeen@sgi.com>
+	[XFS] Allow the pagebuf daemon to suspend.
+	
+	SGI Modid: 2.5.x-xfs:slinx:140015a
+
+<nathans@sgi.com>
+	[XFS] Remove some off_t abuse in pagebuf_offset and the page_io routine,
+	after some careful analysis.
+	
+	SGI Modid: 2.5.x-xfs:slinx:140039a
+
+<nathans@sgi.com>
+	[XFS] Fix some comments, remove an unused variable from the stack, fix missing
+	clear of pb_locking field if IO completion handled in pagebuf_iorequest.
+	
+	SGI Modid: 2.5.x-xfs:slinx:140047a
+
+<nathans@sgi.com>
+	[XFS] Revert the recent hashing change, performance seemed to go way down in
+	certain benchmarks.  This is reverted to how it was, except the number
+	of hash buckets is larger than previously to attempt to account for the
+	workload Steve was originally targetting with that change.
+	
+	SGI Modid: 2.5.x-xfs:slinx:140053a
+
+<hch@sgi.com>
+	[XFS] spin_lock_irqsave must take an ulong, not int.  Spotted by Anton Blanchard <anton@samba.org>
+	
+	SGI Modid: 2.5.x-xfs:slinx:140135a
+
+<hch@sgi.com>
+	[XFS] fix compilation with CONFIG_SYSCTL=n
+	
+	SGI Modid: 2.5.x-xfs:slinx:140173a
+
+<hch@sgi.com>
+	[XFS] shut up gcc warnings about _lsn_cmp
+	
+	SGI Modid: 2.5.x-xfs:slinx:140187a
+
+<nathans@sgi.com>
+	[XFS] Transition from xfsroot attribute namespace to the more generic trusted
+	namespace which other filesystems are also supporting.
+	
+	SGI Modid: 2.5.x-xfs:slinx:140237a
+
+<hch@sgi.com>
+	[XFS] Remove flags argument from xattr inode operations again
+	
+	SGI Modid: 2.5.x-xfs:slinx:140255a
+
+<akpm@digeo.com>
+	[PATCH] make jiffies wrap 5 min after boot
+	
+	From Tim Schmielau <tim@physik3.uni-rostock.de>
+	
+	Force jiffies to start out at five-minutes-before-wrap.  To find
+	jiffy-wrapping bugs.
+
+<akpm@digeo.com>
+	[PATCH] Fix user time accounting's handling of jiffies wrap
+	
+	Patch from Hugh Dickins <hugh@veritas.com>
+	
+	Userspace shows huge elapsed time across jiffies wrap: with USER_HZ less then
+	HZ, sys_times needs jiffies_64 to calculate its retval.
+
+<akpm@digeo.com>
+	[PATCH] hugetlb put_page speedup
+	
+	Rework this function so that we only make the indirect call to the
+	page-freeing function on the final put_page(), rather than on every
+	invokation.
+
+<akpm@digeo.com>
+	[PATCH] Fix slab batchcount limiting code
+	
+	Spotted by Anton Blanchard: Our attempt to limit the interrupts-off time in
+	slab wasn't very effective.  #ifndef DEBUG is never true.
+
+<akpm@digeo.com>
+	[PATCH] crc32 optimizations
+	
+	Patch from Joakim Tjernlund <joakim.tjernlund@lumentis.se>
+	
+	Here is another update(against BK curr) for crc32(). A kind soul pointed out
+	the optimizations below.
+	
+	lib/crc32defs.h:
+	 - Make it possible to define new values for CRC_LE_BITS/CRC_BE_BITS without
+	   modifying the source.
+	
+	lib/crc32.c:
+	 - Eliminate the need for ENDIAN_SHIFT. Saves a 24 bit shift in the byte
+	   loops.
+	
+	 - Swap the XOR expression in DO_CRC. gcc for x86 can not do that simple
+	   optimization itself(gcc 3.2.2 and RH gcc 2.96 tested). Will improve
+	   performance with 20-25% on x86.
+
+<akpm@digeo.com>
+	[PATCH] flush_tlb_all preempt safety for voyager
+	
+	Patch from Thomas Schlichter <schlicht@uni-mannheim.de>
+	
+	Make flush_tlb_all() preempt-safe.  Same as the ia32 fix.
+
+<akpm@digeo.com>
+	[PATCH] Early ioremap support for ia32
+	
+	Patch from Patricia Gaughen <gone@us.ibm.com>,
+			Dave Hansen <haveblue@us.ibm.com>
+	
+	It provides a very early sort of kmap-by-hand.
+	
+	The patch is used by the x440 discontigmem to map the srat tables into low
+	memory so that the memory can be setup.  This remap function is used very
+	early in the boot process...  at the start of setup_arch().
+	
+	This functionality is only available to Summit and NUMAQ.  It will work on
+	other platforms, but they do not need it.
+
+<akpm@digeo.com>
+	[PATCH] x440 SRAT parsing
+	
+	Use the early ioremap code to parse the Static Resource Affinity Table on
+	x440 machines.
+
+<akpm@digeo.com>
+	[PATCH] use find_get_page() in do_generic_mapping_read()
+	
+	do_generic_mapping_read() has an open-coded version of find_get_page() hidden
+	inside it.
+
+<akpm@digeo.com>
+	[PATCH] Make kIrDAd us interruptible sleep
+	
+	Use interruptible sleep rather than uninterruptible to avoid perturbing load
+	average.
+
+<akpm@digeo.com>
+	[PATCH] Check for zero d_count in dget()
+	
+	Patch from Maneesh Soni <maneesh@in.ibm.com>
+	
+	Turns out that sysfs is doing dget() on a zero-ref dentry.  That's a bug, but
+	dcache is no longer detecting it.
+	
+	The check was removed because with lockless d_lookup, there can be cases when
+	d_lookup and dput are going on concurrently, If d_lookup happens earlier then
+	it may do dget() on a dentry for which dput() has decremented the ref count
+	to zero.  This race is handled by taking the per dentry lock and checking the
+	DCACHE_UNHASHED flag.
+	
+	The patch open-codes that part of d_lookup(), and restores the BUG check in
+	dget().
+
+<akpm@digeo.com>
+	[PATCH] Remove redundant check in pte_alloc_map()
+	
+	This check is not needed - the PMD is known to be present.
+
+<akpm@digeo.com>
+	[PATCH] SARD accounting fix
+	
+	Patch from Rick Lindsley <ricklind@us.ibm.com>
+	
+	Fixes a couple of odd cases in which disk requests were not being accounted
+	for.
+
+<akpm@digeo.com>
+	[PATCH] Fix race between umount and inode pruning
+	
+	Patch from Hugh Dickins <hugh@veritas.com>
+	
+	When prune_icache coincides with unmounting, invalidate_inodes notices
+	the inode it's working on as busy but doesn't wait: Self-destruct in 5
+	seconds message, and later iput oopses on freed super_block.
+	
+	Neither end is a fast path, so the patch just adds iprune_sem for exclusion.
+	
+	The semaphore is held across dispose_list so that
+	dispose_list->clear_inode->destroy_inode cannot reference a destroyed
+	superblock.
+
+<akpm@digeo.com>
+	[PATCH] fix bug in slab.c debugging
+	
+	Patch from John Levon <levon@movementarian.org>
+	
+	Looked like this condition was previously always false ...
+
+<akpm@digeo.com>
+	[PATCH] ext3: fix htree memory leaks
+	
+	Patch from Alex Tomas <bzzz@tmi.comex.ru>
+	
+	Fixes a couple of memory leaks in the htree code.
+
+<akpm@digeo.com>
+	[PATCH] fix IRQ balancing disable controls
+	
+	Patch from "Martin J. Bligh" <mbligh@aracnet.com>
+	
+	Fixes up the logic and code which is used to suppress the IRQ balancing code.
+	
+	We now just have a single boolean, "irqbalance_disabled".  The initial value
+	comes from the per-platform "NO_BALANCE_IRQ" constant.
+	
+	If the platform defaults to "on", users can override this with the
+	"noirqbalance" kernel boot option.
+
+<akpm@digeo.com>
+	[PATCH] don't let OOM killer kill same process repeatedly
+	
+	Patch from Rik van Riel <riel@imladris.surriel.com>
+	
+	If a process cannot exit because it's stuck in eg.  a driver, it doesn't make
+	sense to have the OOM killer kill it repeatedly; that could lead to a hung
+	system.
+	
+	Instead, kill another process if the first process we tried to kill hasn't
+	made any move to exit within 5 seconds.  This way we have a much better
+	chance of recovering the system.
+
+<akpm@digeo.com>
+	[PATCH] add some missing gloabl_flush_tlb() calls
+	
+	Patch from Thomas Schlichter <schlicht@uni-mannheim.de>
+	
+	Adds some missing global_flush_tlb() calls, which are requried after a call
+	to change_page_attr().
+
+<akpm@digeo.com>
+	[PATCH] ext3: speed up O_SYNC writes
+	
+	This is a forward-port of a 2.4 change from Stephen.  The (old) 2.5 code is
+	forcing a commit on every write by artificially dirtying the inode.
+	
+	But generic_file_aio_write() has called generic_osync_inode() for us, which
+	has synced the file data.  There is no need to force the extra commit.
+
+<akpm@digeo.com>
+	[PATCH] remove MAX_BLKDEV from genhd.c
+	
+	Patch from Andries.Brouwer@cwi.nl
+	
+	A patch for genhd.c:
+	
+	- removed outdated comments
+	- removed MAX_BLKDEV
+	
+	In genhd.c the variable MAX_BLKDEV was only the size of a hash
+	table, so I made it MAX_PROBE_HASH. It can be 1, or 23, or 256, or
+	whatever one wants.
+	
+	Note that the current setup requires that every device number
+	in a given range is mapped by dev_to_index() to the same index
+	in the hash table, so this routine will have to be adapted in
+	case one wants to register multimajor ranges.
+	
+	Discussion is possible about whether struct blk_probe needs
+	a dev_t or a kdev_t, but I left things this time.
+	
+	If a range can end at precisely the end of [k]dev_t space,
+	the old code was wrong since (p->dev + p->range) would be 0.
+	That is why "p->dev + p->range <= dev" was replaced by
+	"p->dev + p->range - 1 < dev".
+
+<akpm@digeo.com>
+	[PATCH] fix md /proc oops
+	
+	It it is using a pointer to a ctl_table for its proc_handler function
+	pointer.  Goes oops.
+
+<greg@kroah.com>
+	[PATCH] USB: fix potential races in mct_u232 now that there's no locks in the usb-serial core.
+
+<greg@kroah.com>
+	USB: fixed potential races in belkin_sa.c now that there's no locks in the usb-serial core
+
+<david-b@pacbell.net>
+	[PATCH] USB ohci:  "registers" sysfs file
+	
+	This is a slightly cleaned up version of Kevin's patch to
+	add a "registers" sysfs debug file.  Minor style and whitespace
+	fixups, prints the other register, resolved config/build
+	issues (minor).
+	
+	It also has two minor tweaks: a fix for a potential assertion
+	violation on a "dead-hc" cleanup path (rare), and wasting less
+	time blocking irqs when they're already blocked.
+
+<david-b@pacbell.net>
+	[PATCH] USB: ehci-hcd, partial VIA workaround
+	
+	This patch resolves a FIXME, which happens to make many of
+	the VIA problems act significantly less severe.  The change
+	defers unlinking any QH that just became idle, since it's not
+	unlikely it'll be used again before many milliseconds pass.
+	
+	It reduces the number of unlink interrupts (IAA), and means
+	fewer re-activation issues.  Like: newly queued TDs being
+	all or partially processed before the QH gets de-activated.
+	The VIA hardware seems to have some problems in those cases.
+	(Which are extremely common on 2.4 kernels, and less so on
+	2.5 because usb-storage streams data much better now.)
+	
+	It also starts tracking the "lost IAA" errors that I see on
+	at least one VT8235 motherboard.  It shows in the "registers"
+	sysfs file.  It'd be good to know if it's just my hardware
+	that has this problem, or if other folk also see it.
+
+<henning@meier-geinitz.de>
+	[PATCH] USB: New vendor/product ids for scanner driver
+	
+	This patch adds vendor/product ids for Artec, Avision, Brother,
+	Medion, Primax, Prolink, Fujitsu, Plustek, and SYSCAN scanners.
+
+<henning@meier-geinitz.de>
+	[PATCH] USB: Fixed generation of devfs names in scanner driver
+	
+	This patch fixes the generation of devfs names if dynamic minors are disabled.
+
+<josh@joshisanerd.com>
+	[PATCH] USB: KB Gear USB Tablet Drivers
+	
+	Attached are drivers for the KB Gear JamStudio Tablet. There are two
+	files, one is against 2.4.20, the other against 2.5.62. I'm hoping this
+	isn't too late in the 2.4.21-pre stages to get included (or the 2.5, for
+	that matter =). This driver Works For Me, on both 2.4.20 and 2.5.62.
+	
+	Anyway, as usual, comments, complaints, and patches are more than
+	welcome.
+
+<greg@kroah.com>
+	[PATCH] USB: fixed potential races in kl5kusb105.c now that there's no locks in the usb-serial core
+
+<mdharm@one-eyed-alien.net>
+	[PATCH] USB: Small patch
+	
+	Here's a small patch to make your tree in sync with mine.  Somehow, a
+	line of comment got lost somewhere.
+
+<hch@sgi.com>
+	[PATCH] remove kdevname abuse from reiserfs
+	
+	dito
+
+<hch@sgi.com>
+	[PATCH] remove unused variables from the i2c core
+	
+	(from lm_sensors CVS)
+
+<hch@sgi.com>
+	[PATCH] remove an unused function from the i2c core
+	
+	(from lm_sensors CVS)
+
+<hch@sgi.com>
+	[PATCH] remove kdevname abuse from init/do_mount.c
+	
+	use bdevname() for block devices.
+
+<hch@sgi.com>
+	[PATCH] i2c-dev cleanup
+	
+	(based on lm_sensors CVS)
+
+<hch@sgi.com>
+	[PATCH] remove unused last argument to i2c_register_entry
+	
+	(from lm_sensors CVS)
+
+<hch@sgi.com>
+	[PATCH] small i2c-amd8111 updates
+	
+	(based on lm_sensors CVS)
+
+<davej@codemonkey.org.uk>
+	[PATCH] pnp_activate_dev API changes.
+	
+	Someone nuked the 2nd arg in 2.5.62, but didn't fix up
+	all the callers. Lazy.
+
+<bunk@fs.tum.de>
+	[PATCH] small drivers/atm/* cleanup
+	
+	The patch below does the following:
+	- remove #if'd kernel 2.2 code
+	- changes one MIN to min
+
+<mike@aiinc.ca>
+	[PATCH] Spelling fixes: can't
+	
+	    cant -> can't (28 occurrences)
+
+<mike@aiinc.ca>
+	[PATCH] Spelling fixes: couldn't
+	
+	    couldnt -> couldn't (4 occurrences)
+
+<mike@aiinc.ca>
+	[PATCH] Spelling fixes: doesn't
+	
+	    doesnt -> doesn't (35 occurrences)
+
+<mike@aiinc.ca>
+	[PATCH] Spelling fixes: won't
+	
+	    wont -> won't (21 occurrences)
+
+<mike@aiinc.ca>
+	[PATCH] Spelling fixes: don't
+	
+	    dont -> don't (135 occurrences)
+
+<jgarzik@redhat.com>
+	[netdrvr tg3] disable 5701 h/w bug workaround during core clock reset
+
+<gerg@snapgear.com>
+	[PATCH] include unistd.h in m68knommu syscalltable.S
+	
+	This includes asm/unistd.h in the system call table setup code for
+	m68knommu.  It needs the local NR_syscalls define.  linux/unistd.h is
+	not assembler clean, so it must be asm/unistd.h.
+
+<gerg@snapgear.com>
+	[PATCH] switch m68knommu to using asm-generic/siginfo.h
+	
+	This modifies the m68knommu siginfo include file to use
+	asm-generic/siginfo.h instead of the asm-m68k/siginfo.h.
+	
+	The asm-generic/siginfo.h is more appropriate here, and
+	the m68k is out of date.
+
+<gerg@snapgear.com>
+	[PATCH] define struct for m68knommu/ColdFire timer registers
+	
+	This creates a sturcture to mirror the m68knommu/ColdFire CPU timer
+	hardware.  This is a much cleaner approach to accessing the timer
+	registers than the previous set of register address defines.
+
+<gerg@snapgear.com>
+	[PATCH] define timer_t and clockid_t for m68k archiecture
+	
+	This adds m68k defines for __kernel_timer_t and __kernel_clockid_t.  The
+	reset signal changes means these are now needed.
+
+<gerg@snapgear.com>
+	[PATCH] include unistd.h in m68knommu vectors.c
+	
+	This includes unistd.h in the high level vector handling code.  It needs
+	NR_syscall.
+
+<gerg@snapgear.com>
+	[PATCH] create NR_syscalls for m68knommu architecture
+	
+	This patch creates a local NR_syscalls define for the m68knommu
+	architecture.
+
+<gerg@snapgear.com>
+	[PATCH] include unistd.h in m68knommu entry.S
+	
+	This includes asm/unistd.h in the vector handling code for m68knommu.
+	It needs the local NR_syscalls define.  linux/unistd.h is not assembler
+	clean, so it must be asm/unistd.h.
+
+<rusty@rustcorp.com.au>
+	[PATCH] Modules race fix
+	
+	Bob Miller points out that the try_module_get in use_module() can, of
+	course, fail.  Secondly, there is a race between setting the module
+	live, and a simultaneous removal of it.
+
+<rusty@rustcorp.com.au>
+	[PATCH] Modules code tidy up
+	
+	Now that we search for 11 different sections by name, the if/else was
+	getting unwieldy.  Also, handle_section just does relocs, so it's a bit
+	of a misnomer, and it's best simply moved into the main code.
+	
+	This open-codes handle_section, which simply does relocations now.
+	
+	Also adds "find_sec" and uses it to find the various sections.
+
+<mulix@mulix.org>
+	[PATCH] trident 1/3 fix "did not come out of reset"
+	
+	The M5451 can sometimes not come out of reset.
+	
+	This is non fatal and it continues to work fine, so print a nasty message
+	but don't fail the driver initialization.
+
+<mulix@mulix.org>
+	[PATCH] trident 2/3 make me the maintainer
+	
+	Make Muli Ben-Yehuda the maintainer for trident as per Alan's suggestion
+
+<mulix@mulix.org>
+	[PATCH] trident 3/3 use pr_debug instead of TRDBG
+	
+	use the standard pr_debug macro instead of TRDBG
+
+<elenstev@mesatop.com>
+	[PATCH] replace it's with its where appropriate.
+	
+	This patch replaces it's (it is) with its (possessive of it)
+	in the following cases where the possessive of it is meant.
+	
+	to it's      -> to its
+	into it's    -> into its
+	from it's    -> from its
+	of it's      -> of its
+	with it's    -> with its
+	under it's   -> under its
+	about it's   -> about its
+
+<elenstev@mesatop.com>
+	[PATCH] replace its with it's where appropriate.
+	
+	This patch replaces its (possessive of it) with it's (it is)
+	in the following cases where "it is" is meant.
+	
+	its a   -> it's a
+	its an  -> it's an
+	its not -> it's not
+	
+	except for the files
+	   arch/cris/boot/rescue/head.S
+	   arch/cris/kernel/kgdb.c
+	where the substitution is "its not" -> "it is not"
+	to avoid possible problems with single quotes in assembly comments.
+
+<jgarzik@redhat.com>
+	[netdrvr tg3] fix NAPI deadlock
+	* do not hold driver spinlock during RX processing in tg3_poll
+	  (this is the deadlock fix)
+	* create netif_poll_{en,dis}able to synchronize against dev->poll()
+	* create __netif_rx_complete to avoid a third irq-save in tg3_poll
+	* create tg3_netif_{start,stop} as driver-specific helper functions
+	  which disable and enable NAPI polling and TX queueing.  Note that
+	  the TX queueing enable/disable is purely advisory, and is not
+	  intended to prevent any races.
+	* remove tg3_halt call from tg3_set_power_state, as all callers
+	  have already called tg3_halt, making it redundant.  Removing this
+	  function call also eliminates some locking complications.
+	* use new helper __netif_rx_complete in tg3_poll
+	* create tg3_reset_task, as a function that runs in process context
+	  which resets the NIC.  This is needed because tg3_netif_stop()
+	  calls schedule() in the process of disabling dev->poll.
+	* schedule tg3_reset_task from tg3_tx_timeout
+	* schedule tg3_reset_task from tg3_timer
+	* wrap several tg3_halt...tg3_init_hw sequences with
+	  tg3_netif_stop...tg3_netif_start.  In addition to synchronizing
+	  with dev->poll, this additionally fixes bugs where we were not
+	  calling netif_wake_queue, when we should have been.
+	* move netif_start_queue call to very bottom of tg3_open
+	* add missing tg3_netif_{start,stop} to tg3_{suspend,resume},
+	  further fixing obvious bugs.
+
+<jgarzik@redhat.com>
+	[netdrvr tg3] bump version to 1.4c / Feb 18
+
+<jgarzik@redhat.com>
+	[netdrvr tg3] properly synchronize with TX, in tg3_netif_stop
+
+<jgarzik@redhat.com>
+	[netdrvr tg3] fix TX race in previous code, and another buglet
+	
+	* call netif_tx_disable after netif_poll_disable, fixing TX race,
+	  in tg3_netif_stop
+	* follow the ordering of the tg3_netif_stop change, and enable
+	  poll after waking TX, in tg3_netif_start
+	* after doing those two steps in tg3_netif_start, check for work
+	  using new helper function tg3_cond_int
+	* add helper function tg3_cond_int, which delivers an interrupt
+	  if and only if the status block was updated (i.e. if work
+	  is likely to be available)
+
+<jt@hpl.hp.com>
+	[wireless] cleanup after recent shuffle
+	
+	        In kernel 2.5.63, you have moved more wireless LAN drivers
+	into ../drivers/net/wireless/. Unfortunately, there was a bit more to
+	cleanup as the result of this work.
+	        You will need to :
+	                o Apply the attached patch
+	                o rm /drivers/net/pcmcia/aironet4500_cs.c
+	
+	        Have fun...
+	
+	        Jean
+	
+	P.S. : You will notice that I took the liberty to organise the config
+	option in what I hope is a more logical order.
+
+<mike@aiinc.ca>
+	[PATCH] Spelling fixes: weird
+	
+	    wierd -> weird
+	    wierdo -> weirdo
+	    wierdness -> weirdness
+
+<mike@aiinc.ca>
+	[PATCH] Spelling fixes: immediately
+	
+	    immediatly -> immediately
+
+<mike@aiinc.ca>
+	[PATCH] Spelling fixes: whether
+	
+	    wether -> whether
+	
+	(A "wether" is a castrated goat.)
+
+<mike@aiinc.ca>
+	[PATCH] Spelling fixes: invocation
+	
+	    invokation -> invocation
+
+<mike@aiinc.ca>
+	[PATCH] Spelling fixes: boundary
+	
+	    boundry -> boundary
+	    boundries -> boundaries
+
+<mike@aiinc.ca>
+	[PATCH] Spelling fixes: ugliness
+	
+	    uglyness -> ugliness
+
+<mike@aiinc.ca>
+	[PATCH] Spelling fixes: guarantee
+	
+	    guarentee -> guarantee
+	    guarenteed -> guaranteed
+	    guarentees -> guarantees
+
+<mike@aiinc.ca>
+	[PATCH] Spelling fixes: accommodate
+	
+	    accomodate -> accommodate
+	    accomodated -> accommodated
+	    accomodates -> accommodates
+
+<torvalds@home.transmeta.com>
+	Fix up kernel/module.c breakage. Bad Rusty!
+
+<greg@kroah.com>
+	[PATCH] USB: add the rest of the interface descriptor info to sysfs
+
+<greg@kroah.com>
+	USB: fix bug that prevented usbcore from shutting down.
+
+<davej@codemonkey.org.uk>
+	[PATCH] C99 struct initialisers for aacraid
+
+<davej@codemonkey.org.uk>
+	[PATCH] aacraid extra devices.
+	
+	>From 2.4
+
+<davej@codemonkey.org.uk>
+	[PATCH] increase aha152x timeouts.
+	
+	This made it into 2.4, and aparently fixes
+	a problem with some tape devices.
+
+<davej@codemonkey.org.uk>
+	[PATCH] dpt_i2o bits from 2.4
+	
+	First hunk is unexplained.
+	Second hunk had the 2.4 changeset comment 'fix warnings'
+
+<davej@codemonkey.org.uk>
+	[PATCH] fdomain isa_ API conversion.
+
+<davej@codemonkey.org.uk>
+	[PATCH] fdomain pcmcia update from 2.4
+
+<davej@codemonkey.org.uk>
+	[PATCH] Put sgiwd93.c back in sync with 2.4
+
+<davej@codemonkey.org.uk>
+	[PATCH] sun3 updates from 2.4
+
+<davej@codemonkey.org.uk>
+	[PATCH] Erroneous colon in sym53c8xx.c
+
+<davej@codemonkey.org.uk>
+	[PATCH] important bits.
+	
+	Spelling fixes! Woo! I gotta get me some of that.
+
+<davej@codemonkey.org.uk>
+	[PATCH] copy-paste ; breakage in sym_2
+	
+	Same bug as other sym driver.
+
+<davej@codemonkey.org.uk>
+	[PATCH] wd33c93 sync up with 2.4
+
+<agrover@groveronline.com>
+	ACPI: Fix derive_pci_id (Ducrot Bruno, Alvaro Lopez)
+
+<agrover@groveronline.com>
+	ACPI: Never use ACPI on VISWS
+
+<eike-kernel@sf-tec.de>
+	[PATCH] Hex numbers in NCR53c406a.c
+	
+	This patch makes sure that there is a "0x" in front of all hex numbers and
+	makes all outputs use a single style (all %x instead of mixed %x and %X).
+	
+	Eike
+
+<levon@movementarian.org>
+	[PATCH] IPS driver typo
+	
+	Not tested, against 2.5.63
+	
+	regards
+	john
+
+<hch@lst.de>
+	[PATCH] scsi_add_host/scsi_Remove_host for aic7xxx/aic79xx
+	
+	I remember having this submitted a while ago, but here's the code
+	again, this time with the untested aic79xx bits.
+
+<levon@movementarian.org>
+	[PATCH] sun3_NCR typo
+	
+	Untested, 2.5.63
+
+<levon@movementarian.org>
+	[PATCH] aix7xxx_old typo
+	
+	Untested, against 2.5.63
+	
+	regards
+	john
+
+<levon@movementarian.org>
+	[PATCH] FlashPoint typo
+	
+	Against 2.5.63, untested
+	
+	regards
+	john
+
+<levon@movementarian.org>
+	[PATCH] NCR5380 typos
+	
+	Against 2.5.63, untested
+	
+	regards
+	john
+
+<hch@lst.de>
+	[PATCH] update nsp_cs to use scsi_add_host / scsi_remove_host
+	
+	On Wed, Feb 26, 2003 at 08:20:05PM +0100, Christoph Hellwig wrote:
+	> This patch updates nsp_cs to use scsi_add_host / scsi_remove_host when
+	> compiledfor Linux 2.5 which allows to get rid of the scsi host list
+	> walks and is a preparation for allowing to support multiple cards of
+	> this type.
+	
+	Sorry, I sent you the wrong paetch, here's the right one:
+
+<levon@movementarian.org>
+	[PATCH] AM53C974 typo
+	
+	Against 2.5.63, untested
+	
+	regards
+	john
+
+<ink@jurassic.park.msu.ru>
+	[PATCH] alpha: context switch fixes
+	
+	- Fix argument order for cmpbge in non-ev67 __ffs(). This caused a machine
+	  check in PAL mode early on boot, apparently in swpctx.
+	- Sync up ret_from_fork with i386. This fixes "Badness in context_switch .."
+	  flood on UP.
+	
+	Ivan.
+
+<ink@jurassic.park.msu.ru>
+	[PATCH] alpha: remove ali ide quirk
+	
+	This quirk doesn't work anyway, the actual problem is fixed
+	in generic PCI code now.
+	
+	Ivan.
+
+<agrover@groveronline.com>
+	ACPI: Expand the mem= cmdline to allow the specification of reserved and
+	ACPI DATA blocks (Pavel Machek)
+
+<mikpe@user.it.uu.se>
+	[PATCH] APIC ID fixes
+	
+	1) apic_write_around(APIC_ID, boot_cpu_physical_apicid) places the APIC
+	value in the lower 8 bits of APIC_ID, when it should be in the upper 8. As
+	as result, it effectively forces the APIC id to always be 0 for the boot
+	CPU, which is fatal on SMP AMD boxes.
+	
+	 Fix: don't do the write at all. The APIC_ID value should be right already.
+	
+	2) phys_cpu_present_map = 1 means we always set bit 0, but later on
+	   in setup_local_APIC() we do
+	        if (!clustered_apic_mode &&
+	            !test_bit(GET_APIC_ID(apic_read(APIC_ID)), &phys_cpu_present_map))
+	                BUG();
+	and the bug is triggered if the APIC_ID is not zero.
+	
+	 Fix: initialize 'phys_cpu_present_map' correctly.
+
+<stern@rowland.harvard.edu>
+	[PATCH] Trivial patch for usb.h
+	
+	The usb_snddefctrl and usb_rcvdefctrl macros are wrong.  This hasn't shown
+	up until now because usb_rcvdefctrl isn't used anywhere at all, and
+	usb_snddefctrl is used exactly once (in core/usb.c).
+	
+	This patch fixes the macros and moves them to hcd.h.
+
+<agrover@groveronline.com>
+	ACPI: Map in entire table before performing checksum (John Stultz)
+
+<greg@kroah.com>
+	[PATCH] USB: add support for two new keyspan drivers
+	
+	Thanks to kernel1@jsl.com for helping with this patch.
+
+<andmike@us.ibm.com>
+	[PATCH] scsi_set_device_offline lock fix
+	
+	Patrick pointed out that I could get into a ABBA issue with holding
+	list_lock while calling scsi_eh_scmd_add which takes host_lock.
+	A call to scsi_prep_fn already holds the queue_lock and then makes a
+	call to scsi_get_command which takes list_lock.
+	
+	-andmike
+	--
+	Michael Anderson
+	andmike@us.ibm.com
+	
+	=====
+	name:		00_scsi_set_device_offline.diff
+	version:	2003-02-26.15:18:19-0800
+	against:	scsi-misc-2.5
+	
+	 scsi.c |   15 +++++++++------
+	 1 files changed, 9 insertions(+), 6 deletions(-)
+	
+	=====
+
+<bunk@fs.tum.de>
+	[PATCH] fix compilation of g_NCR5380.c
+	
+	In 2.5.63 I get the following compile error in drivers/scsi/g_NCR5380.c:
+	
+	<--  snip  -->
+	
+	...
+	  gcc -Wp,-MD,drivers/scsi/.g_NCR5380.o.d -D__KERNEL__ -Iinclude -Wall
+	-Wstrict-prototypes -Wno-trigraphs -O2 -fno-strict-aliasing -fno-common
+	-pipe -mpreferred-stack-boundary=2 -march=k6
+	-Iinclude/asm-i386/mach-default -nostdinc -iwithprefix include
+	-DKBUILD_BASENAME=g_NCR5380 -DKBUILD_MODNAME=g_NCR5380 -c -o
+	drivers/scsi/g_NCR5380.o drivers/scsi/g_NCR5380.c
+	drivers/scsi/g_NCR5380.c: In function `generic_NCR5380_detect':
+	drivers/scsi/g_NCR5380.c:326: too many arguments to function
+	`pnp_activate_dev'
+	...
+	make[2]: *** [drivers/scsi/g_NCR5380.o] Error 1
+	
+	<--  snip  -->
+	
+	
+	The following patch fixes it:
+
+<bunk@fs.tum.de>
+	[PATCH] fix the compilation of sym53c416.c
+	
+	In 2.5.63 I get the following compile error in drivers/scsi/sym53c416.c:
+	
+	
+	<--  snip  -->
+	
+	...
+	  gcc -Wp,-MD,drivers/scsi/.sym53c416.o.d -D__KERNEL__ -Iinclude -Wall
+	-Wstrict-prototypes -Wno-trigraphs -O2 -fno-strict-aliasing -fno-common
+	-pipe -mpreferred-stack-boundary=2 -march=k6
+	-Iinclude/asm-i386/mach-default -nostdinc -iwithprefix include
+	-DKBUILD_BASENAME=sym53c416 -DKBUILD_MODNAME=sym53c416 -c -o
+	drivers/scsi/sym53c416.o drivers/scsi/sym53c416.c
+	drivers/scsi/sym53c416.c: In function `sym53c416_detect':
+	drivers/scsi/sym53c416.c:682: too many arguments to function
+	`pnp_activate_dev'
+	make[2]: *** [drivers/scsi/sym53c416.o] Error 1
+	
+	<--  snip  -->
+	
+	
+	The following patch fixes it:
+
+<davem@nuts.ninka.net>
+	[FRAMEBUFFER]: Use u32 not long in cfbimgblt.
+	
+	cfbimgblit.c did not support 64-bit platforms correctly.
+	In order to do so we would need to grow the cfb_tabX tables
+	to be absolutely enormous.
+	
+	So the simplest fix is to use u32 throughout.
+
+<davem@nuts.ninka.net>
+	[FRAMEBUFFER]: cfbcopyarea accesses fb without using FB_{READ,WRITE}L.
+
+<davem@nuts.ninka.net>
+	[FRAMEBUFFER]: Convert creatorfb to new APIs.
+
+<levon@movementarian.org>
+	[SUNHME]: Fix bit testing typo.
+
+<davem@nuts.ninka.net>
+	[SPARC64]: GPL export syscall table for solaris module.
+
+<joe@fib011235813.fsnet.co.uk>
+	[PATCH] dm: ioctl interface wasn't dropping a table reference
+	
+	When reloading a device the ioctl interface was forgetting to drop a
+	reference on the new table.
+
+<joe@fib011235813.fsnet.co.uk>
+	[PATCH] dm: __LOW macro fix no. 1
+	
+	Fix __LOW macro.  [Kevin Corry]
+
+<joe@fib011235813.fsnet.co.uk>
+	[PATCH] dm: bug in error path for unknown target type
+	
+	Silly mistake in error path when an unknown target type is requested.
+
+<joe@fib011235813.fsnet.co.uk>
+	[PATCH] dm: allow slashes in dm device names
+	
+	Allow slashes ('/') within a DM device name, but not at the beginning.
+	
+	Devfs will automatically create all necessary sub-directories if a name
+	with embedded slashes is registered.  [Kevin Corry]
+
+<joe@fib011235813.fsnet.co.uk>
+	[PATCH] dm: __LOW macro fix no. 2
+	
+	Another fix for the __LOW macro.
+	
+	When dm_table and dm_target structures are initialized, the "limits" fields
+	(struct io_restrictions) are initialized to zero (e.g. in dm_table_add_target()
+	in dm-table.c). However, zero is not a useable value in these fields. The
+	request queue will never let an I/O through, regardless of how small it might
+	be, if max_sectors is set to zero (see generic_make_request in ll_rw_blk.c).
+	This change to the __LOW() macro sets these fields correctly when they are
+	first initialized.  [Kevin Corry]
+
+<joe@fib011235813.fsnet.co.uk>
+	[PATCH] dm: return correct error codes from dm_table_add_target()
+	
+	Return correct error codes from dm_table_add_target().  [Kevin Corry]
+
+<corryk@us.ibm.com>
+	[PATCH] dm: prevent possible buffer overflow in ioctl interface
+	
+	Use the correct size for "name" in register_with_devfs().
+	
+	During Al Viro's devfs cleanup a few versions ago, this function was
+	rewritten, and the "name" string added. The 32-byte size is not large
+	enough to prevent a possible buffer overflow in the sprintf() call,
+	since the hash cell can have a name up to 128 characters.
+
+<joe@fib011235813.fsnet.co.uk>
+	[PATCH] dm: deregister the misc device before removing /dev/mapper
+	
+	Fix problem with devfs when unloading the dm module.
+	
+	dm-ioctl.c: deregister the misc device, and its associated symlink
+	*before* removing the /dev/mapper dir.  [Alasdair Kergon]
+
+<ahaas@airmail.net>
+	[PATCH] Fix initializers on drivers/ide/pci/trident.h
+
+<ahaas@airmail.net>
+	[PATCH] C99 initializers for include/linux/net.h
+
+<ahaas@airmail.net>
+	[PATCH] Trivial C99 changes for kernel/posix-timers.c
+
+<mulix@mulix.org>
+	[PATCH] AD1848 OSS driver build fix
+	
+	This patch fixes bugzilla bug #398,
+	http://bugme.osdl.org/show_bug.cgi?id=398, PNP API breakage in the
+	ad1848 sound driver.
+
+<hch@sgi.com>
+	[PATCH] remove unused file include/linux/ghash.h
+	
+	was this actually ever used? :)
+
+<davej@codemonkey.org.uk>
+	[PATCH] Remove redundant aligns.
+	
+	ENTRY implies ALIGN.
+
+<davej@codemonkey.org.uk>
+	[PATCH] Extraneous ; in cris eeprom code.
+
+<davej@codemonkey.org.uk>
+	[PATCH] Allow booting from 21 sector floppies.
+	
+	As per bugzilla #179
+
+<davej@codemonkey.org.uk>
+	[PATCH] Missing acpi include.
+	
+	Uses CONFIG_ but doesn't include config.h
+
+<davej@codemonkey.org.uk>
+	[PATCH] Enable SSE on newer Athlons.
+
+<davej@codemonkey.org.uk>
+	[PATCH] VIA Nehemiah cache workaround.
+	
+	It turns out that this bug is only on the pre-production models,
+	but as a few of them have 'escaped' the labs to the hands of
+	a few lucky developers, we still need it.
+
+<davej@codemonkey.org.uk>
+	[PATCH] Fix ambiguous else in generic serial
+	
+	Closes bugzilla #307
+
+<davej@codemonkey.org.uk>
+	[PATCH] Handle empty E820 regions correctly.
+
+<ahaas@airmail.net>
+	[PATCH] C99 initializers for drivers/mtd files
+
+<ahaas@airmail.net>
+	[PATCH] C99 initializers for drivers/mtd/chips
+
+<ahaas@airmail.net>
+	[PATCH] C99 initializers for drivers/mtd/maps
+
+<ahaas@airmail.net>
+	[PATCH] C99 initializer for drivers/mtd/nand/spia.c
+
+<rl@hellgate.ch>
+	[PATCH] via-rhine: reset logic
+	
+	Since Linus and Jeff raised the issue of PCI posted writes, I cleaned up
+	wait_for_reset() some more. Experiments show that with MMIO, a reset may
+	indeed take seemingly longer -- that is fixed by flushing that buffer.
+	
+	Also, the driver now polls the appropriate register while waiting for the
+	reset to finish.
+
+<rl@hellgate.ch>
+	[PATCH] via-rhine: fix races
+	
+	This patch addresses two distinct races:
+	
+	- Until now, the driver started the chip for Tx regardless of errors
+	  pending in the status register. Not good if an error occured while
+	  we were queueing packets -- the chip counter had not been reset,
+	  so Tx died. (We can't reliably get an interrupt for every error
+	  condition)
+	
+	- The Rhine-II (when under load) frequently produces a Tx descriptor
+	  write-back race error. Failing to handle this means waiting for the
+	  netdev watchdog. Fixed.
+	
+	  In addition, we must wait for the Tx engine to turn off on error
+	  conditions before we scavenge the descriptor entries. Failing to do
+	  so will typically lead to performance going down to about 10%: Burst,
+	  timeout, burst, timeout.. (again, with a Rhine-II under load).
+
+<bcollins@debian.org>
+	[SPARC64]: hardirq.h needs linux/cache.h
+
+<baldrick@wanadoo.fr>
+	[PATCH] USB speedtouch: better proc info
+	
+	Output the correct device name, show the state of the device (for debugging) and of the
+	ADSL line (anyone want to write a graphical utility to show this, like under windows?).  We
+	no longer consult the usb_device struct in udsl_atm_proc_read, so don't take a reference
+	to it.  Against Greg's current 2.5 USB tree.
+
+<davej@codemonkey.org.uk>
+	[WATCHDOG] Remove unnecessary llseek function
+
+<davem@nuts.ninka.net>
+	[FRAMEBUFFER]: Convert bw2, cg6, and cg3 drivers to new APIs.
+
+<davej@codemonkey.org.uk>
+	[WATCHDOG] Merge AMD 766/768 TCO Timer/Watchdog driver from 2.4
+
+<davej@codemonkey.org.uk>
+	[WATCHDOG] missed C99 named initialiser conversion.
+
+<davej@codemonkey.org.uk>
+	[WATCHDOG] Use symbolic PCI names instead of hardcoded values.
+
+<davej@codemonkey.org.uk>
+	[AGPGART] Add support for Intel 852GM / 855GM and 865G
+
+<davej@codemonkey.org.uk>
+	[AGPGART] Move PCI device IDs to pci_ids.h
+
+<corryk@us.ibm.com>
+	[PATCH] fix recent dm breakage
+	
+	Dammit! I'm not having a good morning. :(
+	
+	Missing GFP_xxx argument to kmalloc.
+
+<rmk@flint.arm.linux.org.uk>
+	[ARM PATCH] 1406/1: Enable mtd partitions via mtdparts in dc21285 map driver
+	
+	Patch from Jonas Larsson
+	
+	The dc21285 mtd map driver supported RedBoot partitioning only. Kernel command line partitioning was not supported. This patch adds the missing functionality.
+
+<rmk@flint.arm.linux.org.uk>
+	[ARM PATCH] 1426/1: Remove rambase from head.S
+	
+	Patch from Dirk Behme
+	
+	Cleanup arch/arm/kernel/head.S a little bit by removing the unused rambase from pgtbl and krnladr macros.
+
+<agrover@groveronline.com>
+	ACPI: Add S4BIOS support (Pavel Machek)
+
+<agrover@groveronline.com>
+	ACPI: Add new file for GPE code
+
+<davej@codemonkey.org.uk>
+	[WATCHDOG] Remove old unneeded borken module locking.
+
+<agrover@groveronline.com>
+	ACPI: Interpreter update
+	  - Add acpi_walk_resource support (Bjorn Helgaas)
+	  - Add S4BIOS support (Pavel Machek)
+	  - Rewrite GPE code to deal with future GPE block devices
+	  - Fix a bug that caused long delays when receiving SCIs
+	  - Fix a bug that causes oopses when battery strings are ""
+
+<agrover@groveronline.com>
+	ACPI: Modify drivers to use new acpi_walk_resource API (Bjorn Helgaas)
+
+<agrover@groveronline.com>
+	ACPI: Add S4BIOS support (Pavel Machek)
+
+<agrover@groveronline.com>
+	ACPI: Update ACPI PHP driver with to use new acpi_walk_resource API
+	(Bjorn Helgaas)
+
+<rmk@flint.arm.linux.org.uk>
+	[ARM PATCH] 1389/1: update iop3xx support for 2.5 (patch 2 of 4)
+	
+	Patch from Eli Carter
+	
+	Supercedes patch 1382
+	This patch copies the relevant documentation for the iop3xx support
+	from the 2.4.19-rmk4-ds2 kernel.
+
+<davej@codemonkey.org.uk>
+	[WATCHDOG] return code checking and various cleanups for ib700wdt.
+	
+	partly based on a patch from Tariq Shureih to the kernel janitors list.
+
+<rmk@flint.arm.linux.org.uk>
+	[ARM PATCH] 1404/1: basic Lubbock/PXA250 updates
+	
+	Patch from Nicolas Pitre
+	
+
+<davej@codemonkey.org.uk>
+	[WATCHDOG] remove remainder of the old broken module locking scheme
+
+<ahaas@airmail.net>
+	[PATCH] C99 initializers for alpha/thread-info.h
+	
+	Hi.
+	
+	This trivial patch switches the file to use C99 initializers.
+	
+	Art Haas
+
+<rth@are.twiddle.net>
+	[ALPHA] Fix Jensen -Werror failures.
+	From Marc Zyngier <mzyngier@freesurf.fr>.
+
+<torvalds@home.transmeta.com>
+	d_validate() needs to use "__dget_locked()" since it's holding the
+	dcache lock.
+	
+	Found by Maneesh Soni <maneesh@in.ibm.com>
+
+<torvalds@home.transmeta.com>
+	Avoid memory leak on fork() failure path.
+	
+	Noticed by Martin Schwidefsky <schwidefsky@de.ibm.com>
+
+<agrover@groveronline.com>
+	ACPI: S3 fixes (Ole Rohne)
+
+<agrover@groveronline.com>
+	ACPI: Update version to 20030228
+
+<baldrick@wanadoo.fr>
+	[PATCH] USB speedtouch: don't race the tasklets
+
+<baldrick@wanadoo.fr>
+	[PATCH] USB speedtouch: be firm when disconnected
+	
+	Just say -ENODEV
+
+<baldrick@wanadoo.fr>
+	[PATCH] USB speedtouch: handle usb_string failure
+
+<david-b@pacbell.net>
+	[PATCH] USB: kerneldoc/pdf
+	
+	Move the USB documentation to a separate file.
+
+<levon@movementarian.org>
+	[PATCH] usbcld typo
+	
+	Against 2.5.63. I believe && is meant here, not &.
+
+<levon@movementarian.org>
+	[PATCH] rio500 typo
+	
+	I believe && is meant here, but I cannot test it. This is against 2.5.63
+
+<bzzz@tmi.comex.ru>
+	[PATCH] Fix ext3/VFS double freeing warning
+	
+	After 12 hours of testing it looks like this problem can be
+	solved by the following..
+
+<mzyngier@freesurf.fr>
+	[PATCH] Fix scsi_probe_and_add_lun
+	
+	This fixes a bug introduced in the recent scsi_scan.c reorganisation.
+	
+	Without this patch, my Alpha Jensen was crashing just after detecting
+	its first SCSI disk.  It is now working fine.
+
+<mbligh@aracnet.com>
+	[PATCH] Move node pgdat into node's own memory
+	
+	Patch from William Lee Irwin
+	
+	This moves the node's pgdat into the node's own local memory area along
+	with the lmem_map.
+	
+	It only touches arch/i386/mm/discontig.c - ie can only affect NUMA
+	machines.  Has been tested in my tree for over a month on UP, SMP, and
+	NUMA and compile tested against a variety of different configs.
+
+<mbligh@aracnet.com>
+	[PATCH] Fix potential NULL pointer
+	
+	translation_table could be unintialised on machines other than NUMA-Q.
+	You never see this, as the compiler happens to optimise it away, but
+	it's still a Really Bad Idea (tm). Thanks to someone whose name I have
+	unfortunately forgotten for pointing this out.
+	
+	Has been tested in my tree for over two weeks on UP, SMP, and NUMA and
+	compile tested against a variety of different configs.
+
+<mbligh@aracnet.com>
+	[PATCH] Move pfn_to_nid inline
+	
+	Patch from William Lee Irwin
+	
+	Inline and simplify pfn_to_nid - this is called heavily, it's a tiny
+	function, and makes a noticable difference in system time for kernel
+	compiles (sorry, lost the data). Is only used on NUMA machines.
+	
+	Has been tested in my tree for over a month on UP, SMP, and NUMA and
+	compile tested against a variety of different configs.
+
+<mbligh@aracnet.com>
+	[PATCH] provide pcibus_to_cpumask from topology
+	
+	Patch from Matthew Dobson
+	
+	Provide a pcibus_to_cpumask function in the topology infrastructure to
+	access the pre-existing array.
+
+<mbligh@aracnet.com>
+	[PATCH] Fix kirq_balance up so I can disable it.
+	
+	At the moment, there are two different switches used, irqbalance_disabled
+	and no_balance_irq ... each of which switches half the code off. This
+	patch harmonises them into one (irqbalance_disable), and uses the old
+	subarch stuff as a default value so that this is auto-disabled on boxes
+	like NUMA-Q that can't cope with it.
+	
+	Also renamed no_balance_irq to NO_BALANCE_IRQ as it's really a static
+	defined number now, not pretending to be a switch variable any more.
+	Now off by default for NUMA-Q, on by default for others, but can be
+	disabled with the boot time flag if people desire.
+
+<mbligh@aracnet.com>
+	[PATCH] need PIT timer available for NUMA-Q
+	
+	This simple patch just makes sure the PIT code is available for NUMA-Q
+	(as its TSCs are not synced).
+	
+	Has been tested in my tree for over a month on UP, SMP, and NUMA and
+	compile tested against a variety of different configs.
+
+<mbligh@aracnet.com>
+	[PATCH] Fix error bounds checking for NUMA-Q
+	
+	Patch from Dave Hansen.
+	
+	Fix simple bounding error found by some Stanford-checker type thing
+	to use the proper MAX_MP_BUSSES define instead of a constant.
+
+<mulix@mulix.org>
+	[PATCH] trident 1/1 fix operator precedence bug
+	
+	Fix an operator precedence bug that caused a comparison to always
+	return false. Patch from John Levon <levon@movementarian.org>.
+
+<linux@brodo.de>
+	[PATCH] cpufreq (1/5): x86 driver updates #1 (elanfreq, gx-suspmod, powernow-k6)
+	
+	- switch the AMD Elan, AMD PowerNow-K6 and the Cyrix/MediaGX driver
+	  to use the advanced cpufreq_driver registration process
+	- cleanups
+
+<linux@brodo.de>
+	[PATCH] cpufreq (2/5): x86 driver updates #2 (acpi, longhaul)
+	
+	- update the VIA Longhaul driver to use frequency table helpers and
+	  the advanced cpufreq driver registration interface.
+	- cleanup of the ACPI P-States cpufreq driver
+	- very small update of the core -- set 24API values ahead of the setpolicy
+	  call.
+
+<linux@brodo.de>
+	[PATCH] cpufreq (3/5): "userspace" governor
+	
+	The old /proc/sys/cpu/ - based interface is nothing else than a
+	cpufreq governor which decides what frequency to use within a policy
+	based on userspace input. So, convert this interface (and add a
+	corresponding sysfs file, /sys/devices/sys/cpu0/scaling_setspeed) to
+	become a cpufreq governor, and move it out to an extra module (which
+	partly explains the size of this patch).
+
+<linux@brodo.de>
+	[PATCH] cpufreq (4/5): update x86 drivers to compile with new "userspace" governor
+	
+	Update x86 drivers so that they can live with the new cpufreq governor
+	"userspace".
+	
+	sparc64 doesn't need any change, and I'll send the corresponding patch
+	for ARM to Russell King.
+
+<linux@brodo.de>
+	[PATCH] cpufreq (5/5): update documentation
+	
+	update CPUfreq documentation, and move it to extra directory.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	kbuild: Module postprocessing needs include/linux/compile.h
+
+<rl@hellgate.ch>
+	[PATCH] via-rhine: fixing the reset fix
+	
+	This trivial patch fixes an obvious typo. Please apply.
+	
+	Bad semicolon in previous patch ([1/2]). Thanks to
+	Erik@harddisk-recovery.nl for spotting this.
+
+<rl@hellgate.ch>
+	[PATCH] via-rhine: 1.17 release
+	
+	Alas no rave reviews on lkml, but the private feedback I have received so
+	far on the recent changes has been excellent. The Rhine-II is now finally
+	usable with via-rhine. Time to call it 1.17.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	kbuild: Silence some warnings when building vmlinux
+	
+	For some people (though not me), the '+' indicating that a command will
+	invoke a sub-make didn't propagated properly, and caused a warning.
+	Putting the command all into one line should fix that.
+	
+	Plus some cosmetics and clean up the per_cpu check.
+
+<sam@mars.ravnborg.org>
+	kbuild: Small updates in top-level makefile
+	
+	1) Define comma so dependency files does not include a '_' in the filename
+	2) Use correct path for mkspec and mkversion
+	3) Removed checkhelp - corresponding perl script is no longer present
+	4) Spelling correction (reported on lkml)
+
+<rmk@arm.linux.org.uk>
+	[PATCH] Fix cardbus build problem
+	
+	This is a temporary patch which should get cardbus working again.
+	In order to use pci_remove_behind_bridge(), we need to separately
+	allocate the pci_dev structures.
+
+<stern@rowland.harvard.edu>
+	[PATCH] Fix USB address setting
+	
+	You wouldn't expect that an innocent two-line patch would practically
+	destroy the entire functionality of the USB subsystem.  But that's what my
+	last patch did.  I didn't realize until I saw it in Greg's list of patches
+	forwarded to Linus; that patch includes a mistakenly unreverted prior
+	change.  This explains the problems I was having yesterday, and probably
+	also the problems a great many people are having today.
+	
+	Anyway, here's the correction -- it puts things back to what they should
+	have been in the first place.  Greg, please apply this and send it to
+	Linus for his tree as soon as reasonably possible.
+
+<rmk@flint.arm.linux.org.uk>
+	[ARM] SA11x0 PCMCIA 1
+	
+	Make SA11x0 generic pcmcia implementation fit better with Dominik's
+	work - pass around our socket structure rather than the socket number
+	itself.  Reference socket operations using the socket structure
+	rather than a static variable.
+
+<rmk@flint.arm.linux.org.uk>
+	[ARM] SA11x0 PCMCIA 2
+	
+	Make low-level configure_socket() method take the socket number as
+	a parameter rather than embedded in a structure.
+
+<rmk@flint.arm.linux.org.uk>
+	[ARM] SA11x0 PCMCIA 3
+	
+	Make low level socket_status() method take the socket index as an
+	argument in the same way that our other methods do.  socket_status()
+	now only returns the status of the requested socket, not all sockets.
+
+<rmk@flint.arm.linux.org.uk>
+	[ARM] SA11x0 PCMCIA 4
+	
+	Convert all SA11x0 drivers to register with the Linux driver model,
+	so they work with the pcmcia layer in 2.5.63.
+
+<rmk@flint.arm.linux.org.uk>
+	[ARM] SA11x0 PCMCIA 5
+	
+	Remove get_irq_info method, passing the information via the init
+	method instead.  The IRQ allocated to a socket never changes on
+	these platforms, so the extra code was just bloat.
+
+<rmk@flint.arm.linux.org.uk>
+	[ARM] SA11x0 PCMCIA 6
+	
+	Sanitise our pcmcia interrupt handling.  Make sure we only use
+	set_irq_type after the interrupt has been registered.
+	
+	Register the socket handling interrupts using the function name
+	rather than some pointer passed by the generic code.
+	
+	Let the generic sa11x0 code handle the cards interrupt masking.
+
+<rmk@flint.arm.linux.org.uk>
+	[ARM] SA11x0 PCMCIA 7
+	
+	Request PCMCIA socket resources without marking them busy - this
+	allows future modifications to pcmcia to allow it to claim the
+	CIS resources for statically mapped sockets.
+
+<rmk@flint.arm.linux.org.uk>
+	[ARM] SA11x0 PCMCIA 8
+	
+	Fix socket memory mapping bug - we need to take account of the
+	requested card offset when returning the address for ioremap. 
+
+<kai@tp1.ruhr-uni-bochum.de>
+	do_mounts: Fix CONFIG_BLK_DEV_MD=m case
+	
+	We don't really have a nice way to say "compile this when CONFIG_FOO
+	is y, don't otherwise".
+	
+	Alternatives are:
+	
+	obj-$(subst m,,$(CONFIG_FOO)) := foo.o
+	
+	or
+	
+	obj-$(CONFIG_FOO)	:= foo.o
+	obj-m :=
+	
+	or
+	
+	obj-y			:= do_foo.o
+	do_foo-$(CONFIG_FOO)	:= foo.o
+	
+	I chose the last one, though I'm not particularly happy with either.
+
+<akpm@digeo.com>
+	[PATCH] spelling fixes
+	
+	s/seperate/separate/
+
+<akpm@digeo.com>
+	[PATCH] fix e100 for big-endian machines
+	
+	Patch from Anton Blanchard <anton@samba.org>
+	
+	e100 is performing a header checksum calculation which is
+	
+	a) duplication of the core kernel's calculation of the same and
+	
+	b) incorrect on big-endian machines.
+	
+	This fix has been tested on ia32 and pppc64 and acked by davem, jgarzik
+	and Scott Feldman
+
+<akpm@digeo.com>
+	[PATCH] deadline IO scheduler dispatching fix
+	
+	Patch from Nick Piggin <piggin@cyberone.com.au>
+	
+	Closes a window in which we can get an invalid (already dispatched) request
+	in the next_drq cache.
+	
+	This fixed an oops which was reported by Janet Morgan.
+
+<akpm@digeo.com>
+	[PATCH] loop: Fix OOM and oops
+	
+	The loop driver takes a copy of the data which it is writing.  When this
+	happens on the try_to_free_pages() path, loop can easily consume ALL memory
+	and bio_copy() will fail to allocate a page.
+	
+	Loop forgets to check the bio_copy() return value and oopses.
+	
+	Fix this by dropping PF_MEMALLOC and throttling to the block writeout speed.
+	
+	The patch exports blk_congestion_wait() to modules for this.  This is a
+	needed export: several filesystems have a "try to allocate and yield if it
+	failed" loop and blk_congestion_wait() is a more appropriate way of
+	implementing the sleep in this situation.
+
+<sam@mars.ravnborg.org>
+	[PATCH] kbuild: do not run split-include for all compilations
+	
+	When a rule in the top-level Makefile includes scripts as one
+	of the prerequisites it inherits FORCE, and thus is always build.
+	include/linux/autoconf.h recently included scripts hereby forcing
+	split-include to be run for each compilation.
+	
+	Fix all rules that lists scripts as a prerequisite but did not list FORCE.
+	Fixed by listing the executable needed direct.
+
+<akpm@digeo.com>
+	[PATCH] fix presto_get_sb() return value and oops.
+	
+	Patch from Maneesh Soni <maneesh@in.ibm.com>
+	
+	It's supposed to return an ERR_PTR value on error, not NULL.
+
+<akpm@digeo.com>
+	[PATCH] fix preempt-issues with smp_call_function()
+	
+	Patch from Thomas Schlichter <schlicht@uni-mannheim.de>
+	
+	Based on a patch from Dave Jones.
+	
+	It converts a large number of instances of:
+	
+		smp_call_function(foo);
+		foo();
+	
+	into
+	
+		on_each_cpu(foo);
+	
+	and in doing so fixes up the preempt-unsafeness of the first version.
+
+<akpm@digeo.com>
+	[PATCH] Don't panic if TSC is enabled and notsc is used
+	
+	Patch from: john stultz <johnstul@us.ibm.com>
+	
+	The kernel will currently panic if it was built with CONFIG_X86_TSC and
+	someone boots it with `notsc'.
+	
+	Change it to just print a warning.
+
+<akpm@digeo.com>
+	[PATCH] clean up redundant code for alloc_pages
+	
+	Patch from Matthew Dobson <colpatch@us.ibm.com>
+	
+	Consolidate alloc_pages() and alloc_pages_node().  There is no change in
+	sizeof(vmlinux).
+
+<akpm@digeo.com>
+	[PATCH] ext2: clear ext3 htree flag on directories
+	
+	Forward port of a change which Ted made to 2.4's ext2.
+	
+	HTREE backwards compatibility patch.
+	
+	"I thought (and assumed) this patch had been applied to both the ext2 and
+	 ext3 filesystems in the 2.4 kernel.  It turns out it had only made it into
+	 the ext3 filesystem code.  This means that if an HTREE-enabled filesystem is
+	 mounted using ext2, it will corrupt the filesystem as far as e2fsck and an
+	 ext3 htree-enabled kernel is concerned.  (The corruption won't cause any
+	 data loss, but it will cause e2fsck and an ext3-htree kernel to omit a lot
+	 of warning messages.)"
+
+<akpm@digeo.com>
+	[PATCH] fix typo in arch/i386/kernel/mpparse.c in printk
+	
+	Patch from "Vitezslav Samel" <samel@mail.cz>
+	
+	Obvious fix of printk level (wrong since 2.5.62).
+
+<akpm@digeo.com>
+	[PATCH] allow CONFIG_SWAP=n for i386
+	
+	Patch from Christoph Hellwig <hch@sgi.com>
+	
+	There's a bunch of minor fixes needed to disable the swap code for systems
+	with mmu.
+
+<akpm@digeo.com>
+	[PATCH] remove dead hugetlb_key forward decl
+	
+	Patch from Rohit Seth.  Remove a dead declaration.
+
+<akpm@digeo.com>
+	[PATCH] hugetlbpage documentation update
+	
+	Patch from Rohit Seth.  Updates the hugetlb page documentation.
+
+<akpm@digeo.com>
+	[PATCH] hugetlb: fix MAP_FIXED handling
+	
+	Patch from Rohit Seth
+	
+	ia64 reserves virtual address region 4 (any address which starts with 0x4)
+	for huge pages.
+	
+	Apparently, for hardware reasons, we do not wish to allow mappings with
+	other page sizes to appear in that region.
+	
+	This patch prevents the user from being able to place regular MAP_FIXED
+	mappings into region 4 on ia64.  It is a no-op for ia32.
+
+<akpm@digeo.com>
+	[PATCH] cciss: fix unlikely startup problem
+	
+	Patch from Stephen Cameron <steve.cameron@hp.com>
+	
+	
+	* Make cciss driver wait longer for board to enter simple mode to
+	  handle an unlikely corner case.  (Hot replace of failed 144GB
+	  drive in RAID 5 set at just the wrong time prior to driver loading
+	  can make the board take a longer than usual time to go into "simple
+	  mode".  Without the patch, the driver gives up too early, and consequently
+	  doesn't work.  (A reboot will generally "fix" it.)  This patch avoids
+	  the problem.
+	* Fix a couple ioctls to return EAGAIN instead of inappropriate EFAULT.
+
+<akpm@digeo.com>
+	[PATCH] cciss: retry bus resets
+	
+	Patch from Stephen Cameron <steve.cameron@hp.com>
+	
+	Make cciss driver retry 3rd party bus reset aborted commands up to 3 times.
+	(ported to 2.5 by me, original patch by Charles White)
+	
+	This is needed for a multi port storage box that can have multiple hosts
+	connected to it, or be used in a multipath configuration.  In certain
+	configurations SCSI bus resets initiated by one host may affect another host.
+
+<sam@mars.ravnborg.org>
+	[PATCH] kbuild: Top-level Makefile, trivial tidy up
+	
+	1) Remove dep from "make help", it is no longer useful
+	2) replace Generating with GEN when generating version.h
+
+<akpm@digeo.com>
+	[PATCH] cciss: add cmd_type to sendcmd parameters
+	
+	Patch from Stephen Cameron <steve.cameron@hp.com>
+	
+	* add cmd_type to sendcmd parameters to allow scsi messages to be
+	  sent down.
+	* factor out duplicated code into fill_cmd function.
+
+<akpm@digeo.com>
+	[PATCH] cciss: add CCISS_GETLUNINFO ioctl
+	
+	Patch from Stephen Cameron <steve.cameron@hp.com>
+	
+	Add CCISS_GETLUNINFO ioctl.
+	
+	This ioctl returns the LUNID, number of partitions, and current number of
+	opens on a logical volume.  Used by the array config utility or any app that
+	needs to send passthrough commands to a particular logical disk.
+
+<akpm@digeo.com>
+	[PATCH] cciss: add passthrough ioctl
+	
+	Patch from Stephen Cameron <steve.cameron@hp.com>
+	
+	Add new big passthrough ioctl to allow large buffers.  Used by e.g.  online
+	array controller firmware flash utility.
+
+<elenstev@mesatop.com>
+	[PATCH] fix Coverted -> Converted
+	
+	This patch fixes what might have been a joke, but wasn't.
+	
+	 Coverted -> Converted
+	
+	One down, 285 to go.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	kbuild: remove dependency on compile.h
+	
+	We had a dummy dependency on include/linux/compile.h, but it really caused
+	more trouble than benefits. It's not actually needed for the module
+	postprocessing, it was only put there to make sure we recognize when
+	gcc changed under us. However, we really can only do so much, and
+	the rest of kbuild won't notice a changed gcc either, so if the user replaces
+	gcc during a build, he just can't rely on the build doing the right thing.
+	
+	The common cases are still covered, anyway. When the command to invoke
+	gcc changes ("CC=gcc32") we notice, and when the path to
+	
+		/usr/lib/gcc-lib/i386-redhat-linux/2.96/include/stdarg.h
+	
+	changes (which luckily contains the "2.96", we'll notice and handle that,
+	too.
+
+<davem@nuts.ninka.net>
+	[FRAMEBUFFER]: Convert cg14 driver to new APIs.
+
+<davem@nuts.ninka.net>
+	[FRAMEBUFFER]: Convert P9100 driver to new APIs.
+
+<davem@nuts.ninka.net>
+	[FRAMEBUFFER]: Convert TCX driver to new APIs.
+
+<davem@nuts.ninka.net>
+	[SPARC64]: Update defconfig.
+
+<davem@nuts.ninka.net>
+	[SPARC64]: Solaris module asm needs asm/thread_info.h
+
+<zaitcev@redhat.com>
+	[SPARC]: Kill GFP_DMA in iommu code.
+
+<zaitcev@redhat.com>
+	[SPARC]: Fix Kconfig typo.
+
+<linux@brodo.de>
+	[SPARC64]: update us3_cpufreq to support userspace governor.
+
+<zaitcev@redhat.com>
+	[SPARC32/64]: Expand ioctl size field in backwards-compatible way.
+
+<hch@lst.de>
+	[NET]: Move fc_type_trans into generic code.
+
+<davem@nuts.ninka.net>
+	[SPARC64]: Use EXTRA_CFLAGS instead of mangling CFLAGS directly.
+
+<bwa@us.ibm.com>
+	[IPV6]: Export in6addr_{any,loopback} to modules.
+
+<hch@lst.de>
+	[NET]: Remove 2.0/2.2 compat code from netfilter, approved by Rusty.
+
+<chas@locutus.cmf.nrl.navy.mil>
+	[ATM]: Use skb_pull instead of direct skb mangling.
+
+<davem@nuts.ninka.net>
+	[ATM]: Fix mispatch.
+
+<yoshfuji@linux-ipv6.org>
+	[IPV6]: Make sure temporary addresses are regenerated properly.
+
+<chas@locutus.cmf.nrl.navy.mil>
+	[ATM]: Get minimum frame size right in lec.c
+
+<rusty@rustcorp.com.au>
+	[NETFILTER]: Switch over to new-style module refcounting, help from Christoph Hellwig.
+
+<chas@locutus.cmf.nrl.navy.mil>
+	[ATM]: Let upper layer k now lec supports multicast.
+
+<chas@locutus.cmf.nrl.navy.mil>
+	[ATM FORE200E]: Fix build.
+
+<harald@gnumonks.org>
+	[NETFILTER]: Fix icmp-type all problem in iptables.
+
+<laforge@netfilter.org>
+	[NETFILTER]: fix NAT ICMP reply translation of inner packet.
+
+<laforge@netfilter.org>
+	[NETFILTER]: Fix conntrack bug introduced by list_del change.
+
+<laforge@netfilter.org>
+	[NETFILTER]: Fix typo in ftp conntrack helper.
+
+<laforge@netfilter.org>
+	[NETFILTER]: Add new ip6tables matches.
+
+<ahaas@airmail.net>
+	[BRIDGE]: C99 patches for net/bridge/netfilter.
+
+<latten@austin.ibm.com>
+	[IPSEC]: Make sure ESP output pads Null Encryption properly.
+
+<yoshfuji@linux-ipv6.org>
+	[IPV6]: More C99 initializers.
+
+<chas@locutus.cmf.nrl.navy.mil>
+	[ATM SUNI]: suni_init should not be __init and remove mod inc/dec.
+
+<davem@nuts.ninka.net>
+	[SCTP]: net/sctp/proc.c needs linux/init.h
+
+<mochel@osdl.org>
+	sysfs: fix oops in directory removal. 
+	
+	If a file that doesn't exist was looked up in a directory, and that
+	directory is later removed, sysfs would reap the negative dentrys along 
+	with the valid ones.
+	
+	Fix is to manually remove the dentrys from the parent's list under the 
+	dcache_lock, then check if they're valid with dget_locked(). 
+	
+	This ensures all the dentrys are removed, valid and invalid, and we don't 
+	reap anything we shouldn't.
+
+<mochel@osdl.org>
+	driver model: remove <linux/sched.h> from include/linux/device.h
+	
+	From Matt Wilcox
+
+<mochel@osdl.org>
+	kobject: fix oops in to_kset()
+	
+	Check whether kset is NULL or not before doing container_of().
+	
+	From Dominik Brodowski
+
+<elenstev@mesatop.com>
+	[PATCH] Spelling fixes from spell-fix.pl
+	
+	This patch contains the first fruits of the automatic spell checking and
+	correcting scripts written by Dan Kegel and Matthias Schniedermeyer.
+	Those scripts are available here: http://www.kegel.com/kerspell/
+	
+	This patch fixes these six words from the first five lines of
+	spell-fix.txt.  280 lines remaining.
+	
+	  accesible   -> accessible
+	  accesing    -> accessing
+	  accomodate  -> accommodate
+	  acommodate  -> accommodate
+	  Acknowlege  -> Acknowledge
+	  acknoledged -> acknowledged
+
+<mochel@osdl.org>
+	driver model: fix device interfaces. 
+	
+	- Remove struct intf_data. 
+	  It was silly, and gave us an unbalanced interface. 
+	  Instead, when removing a device_interface, all of a class's devices are
+	  iterated over, and intf->remove_device() is called for each. (Instead 
+	  of the device's list of interfaces it belongs to). 
+	  Interfaces are expected to tell if they support the device being removed.
+	
+	- Remove struct device::intf_list.
+	
+	- Protect classes' device list access with devclass_sem, which is taken 
+	  when a device or interface is added or removed. This allows access to the
+	  list w/o taking the class's lock, which allows subordinate objects to be
+	  registered (e.g. the interface itself, or objects the interfaces create
+	  for a device). 
+	
+	- This should fix a deadlock when devices are added to interfaces, which 
+	  calls intf->add_device(), then interface_add_data(), which call 
+	  kobject_register() and hangs, since it tries to take the class's lock
+	  again. 
+
+<mochel@osdl.org>
+	cpufreq: convert to use new interface code.
+	
+	- Create and register kobjects when adding a cpu to the cpufreq interface,
+	  instead of the terminally broken struct intf_data.
+	
+	ACKed by Dominik Brodowski.
+
+<mochel@osdl.org>
+	sysfs: fix more merge breakage.
+
+<nico@cam.org>
+	[PATCH] small tty irq race fix
+
+<levon@movementarian.org>
+	[PATCH] Another bitop on boolean in pnpbios
+
+<bde@nwlink.com>
+	[SPARC64]: Fix SMP boot failures.
+
+<davem@nuts.ninka.net>
+	[SYSFS]: fs/sysfs/mount.c needs linux/init.h
+
+<davem@nuts.ninka.net>
+	[HOTPLUG]: drivers/base/hotplug.c needs linux/sched.h and linux/string.h
+
+<mochel@osdl.org>
+	sysfs: fix warning.
+	
+	From Andrew Morton
+
+<mochel@osdl.org>
+	driver model: Make initialization explicit.
+	
+	- Call driver_init() from init/main.c::do_basic_setup(). 
+	
+	This ensures that all the driver model subsystems are initialized before
+	any drivers or devices can be registered. 
+	
+	It nearly frees up the core and postcore initcall levels, making them 
+	available for other kernel code to use freely. 
+
+<mochel@osdl.org>
+	sysfs: initialize from fs/namespace.c::mnt_init().
+	
+	This ensures that sysfs is initialized very early, before anything can 
+	possibily registered with it. 
+	
+	It happens early enough that all filesystems can registered with sysfs 
+	(besides sysfs itself), which is coming next.
+	
+
+<mochel@osdl.org>
+	driver model: implement platform_match()
+	
+	- For matching registered platform devices with platform drivers.
+	
+	- Also, make sure platform_bus is initialized early, with the rest of the 
+	  core stuff.
+
+<akpm@digeo.com>
+	[PATCH] sysfs build fix
+
+<torvalds@home.transmeta.com>
+	pnp interface.c needs <linux/slab.h> for 'kfree()'
+
+<mochel@osdl.org>
+	sysfs: Register filesystems with sysfs.
+	
+	Originally from Nikita Danliov. 
+	
+	- Add struct subsystem to struct file_system_type. 
+	- Add fs_subsys_init() to explicitly call sysfs_init() very early.
+	- Register base fs subsystem then, too.
+	- Register filesystems' embedded subsystem when registered with fs core.
+	
+	Resulting tree looks like:
+	
+	# tree /sys/fs/
+	/sys/fs/
+	|-- bdev
+	|-- devpts
+	|-- eventpollfs
+	|-- ext2
+	|-- ext3
+	|-- futexfs
+	|-- iso9660
+	|-- pipefs
+	|-- proc
+	|-- ramfs
+	|-- rootfs
+	|-- sockfs
+	|-- sysfs
+	`-- tmpfs
+
+<bcollins@debian.org>
+	[PATCH] IEEE1394 updates
+	
+	- Add ioctl32 compat function registration for video1394, dv1394 and
+	  amdtp.
+	- Convert SBP-2 driver to new SCSI hotplug host/device interfaces.
+	- Initial Async ISO (GASP) support.
+
+<bcollins@debian.org>
+	[PATCH] IEEE1394 ioctl allocation documentation
+
+<ak@muc.de>
+	[PATCH] dcache/inode hlist patchkit
+	
+	 - Inode and dcache Hash table only needs half the memory/cache because
+	   of using hlists.
+	 - Simplify dcache-rcu code.  With NULL end markers in the hlists
+	   is_bucket is not needed anymore.  Also the list walking code
+	   generates better code on x86 now because it doesn't need to dedicate
+	   a register for the list head.
+	 - Reorganize struct dentry to be more cache friendly.  All the state
+	   accessed for the hash walk is in one chunk now together with the
+	   inline name (all at the end)
+	 - Add prefetching for all the list walks.  Old hash lookup code didn't
+	   use it.
+	 - Some other minor cleanup.
+
+<torvalds@penguin.transmeta.com>
+	Fix up sunrpc for the dentry hash list changes.
+
+<bcollins@debian.org>
+	[PATCH] More IEEE1394 updates
+	
+	 - Cleanup Makefile.
+	 - Fix potentional crash in dv1394 module unload.
+	 - Why does ARM's memcpy not return void*? Oh well, work around it in
+	  eth1394 by not expecting standard behavior.
+
+<torvalds@home.transmeta.com>
+	Linux 2.5.64
+

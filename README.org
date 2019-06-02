@@ -1,0 +1,17 @@
+* kChangeLogFinder
+This is an application to find a keyword in kernel change-logs. If you
+want to download all changelog files in kernel source code, you can
+use this script to download.
+
+** Usage
+#+BEGIN_SRC shell
+  $ chmod +x ./downloader.sh
+  $ ./downloader.sh -d # download changelog
+  $ ./downloader.sh -k dev_t # same as nrgrep dev_t changelogs/*/*
+#+END_SRC
+
+** Author
+   Sukbeom Kim (sukbeom.kim@gmail.com)
+
+** License
+   MIT License

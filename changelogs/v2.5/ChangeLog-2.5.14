@@ -1,0 +1,434 @@
+
+Summary of changes from v2.5.13 to v2.5.14
+============================================
+
+<jsimmons@heisenberg.transvirtual.com> (02/05/01 1.447.68.2)
+	A bunch of fixes.
+
+<jsimmons@heisenberg.transvirtual.com> (02/05/02 1.447.68.3)
+	Pmac updates
+
+<jsimmons@heisenberg.transvirtual.com> (02/05/03 1.513.1.2)
+	Some more small fixes.
+
+<rmk@arm.linux.org.uk> (02/05/03 1.513.2.1)
+	[PATCH] 2.5.13: vmalloc link failure
+	
+	The following patch fixes this, and also fixes the similar problem in
+	scsi_debug.c:
+
+<trond.myklebust@fys.uio.no> (02/05/03 1.513.2.2)
+	[PATCH] in_ntoa link failure
+	
+	Nothing serious. Whoever it was that did that global replace missed a
+	spot is all...
+
+<viro@math.psu.edu> (02/05/03 1.513.2.3)
+	[PATCH] change_floppy() fix
+	
+	Needed both in 2.4 and 2.5
+
+<viro@math.psu.edu> (02/05/03 1.513.2.4)
+	[PATCH] ufs/super.c
+	
+	D'oh.  Missing commas...
+
+<dalecki@evision-ventures.com> (02/05/03 1.513.2.5)
+	[PATCH] 2.5.13 IDE 50
+	
+	 - Fix wrong usage of time_after in ide.c. This should cure the drive seek
+	   timeout problems some people where expierencing. This was clarified to me by
+	   Bartek, who apparently checked whatever the actual code is consistent with
+	   the comments in front of it. Thank you Bartlomiej Zolnierkiewicz.
+	
+	   I think now that we should have time_past(xxx) in <linux/timer.h>.
+	
+	 - Fix hpt34x.c compilation.
+	
+	 - Minor improvements in ide-pci and some cleanups in ide-probe.c
+	
+	 - Nuke some vastly outdated comments.
+
+<dalecki@evision-ventures.com> (02/05/03 1.513.2.6)
+	[PATCH] 2.5.13 IDE 51
+	
+	 - Synchronize with Jens.  Applying tons of janitorian stuff to his TCQ
+	   code.  Making functions static where appropriate and so on...
+	   Marking the config entry for it experimental and so on.  His
+	   changelog:
+	
+		2.5.13 now has the generic tag support that I wrote included,
+		here's an IDE TCQ that uses that.  Changes since the version
+		posted for 2.5.12:
+	
+		Fix the ide_tcq_invalidate_queue() WIN_NOP usage needed to clear
+		the internal queue on errors.  It was disabled in the last
+		version due to the ata_request changes, it should work now.
+	
+		Remove Promise tcq disable check, it works just fine on Promise
+		as long as we handle the two-drives-with-tcq case like we
+		currently do.
+
+<axboe@suse.de> (02/05/03 1.513.2.7)
+	[PATCH] remove PRD_SEGMENTS
+	
+	PRD_SEGMENTS was a leftover from struct ata_request an its per-command
+	sg tables.
+
+<zippel@linux-m68k.org> (02/05/03 1.513.2.8)
+	[PATCH] 2.5.13: remove VALID_PAGE
+	
+	This patch removes VALID_PAGE(), as the test was always too late for
+	discontinous memory configuration. It is replaced with pfn_valid()/
+	virt_addr_valid(), which are used to test the original input value.
+	Other helper functions:
+	pte_pfn() - extract the page number from a pte
+	pfn_to_page()/page_to_pfn() - convert a page number to/from a page struct
+
+<zippel@linux-m68k.org> (02/05/03 1.513.2.9)
+	[PATCH] replace mk_pte_phys() with pfn_pte()
+	
+	Here is the patch to replace mk_pte_phys() with pfn_pte() and so creates
+	the counterpart to pte_pfn().
+
+<maxk@qualcomm.com> (02/05/03 1.517)
+	[PATCH] Bluetooth subsystem sync up
+	
+	This updates 2.5.x Bluetooth subsystem and removes the EXPERIMENTAL
+	status of Bluetooth support.
+	
+	         BlueZ Core:
+	                 New generic HCI connection manager.
+	                 Complete role switch and link policy support.
+	                 Security mode 1 and 3 support.
+	                 L2CAP service level security support.
+	                 HCI filter support.
+	                 HCI frame time-stamps.
+	                 SCO (voice links) support.
+	                 Improved HCI device unregistration (device destructors).
+	                 Support for L2CAP signalling frame fragmentation.
+	                 Improved L2CAP timeout handling.
+	                 New HCI ioctls for changing ACL and SCO MTU.
+	                 Killed HCI_MAX_DEV limit.
+	                 Security fixes.
+	
+	         HCI USB driver:
+	                 Performance improvements.
+	                 Firmware loading support.
+	                 Stability fixes. URB and disconnect handling rewrite.
+	
+	         HCI UART driver:
+	                 Support for multiple UART protocols.
+	
+	         HCI PCMCIA driver:
+	                 Support for Nokia Bluetooth PC Cards.
+	                 Support for Anycom Bluetooth PC/CF Cards.
+
+<wim@iguana.be> (02/05/04 1.516.1.1)
+	[PATCH] 2.5.13 - i8xx series chipsets patches
+	
+	i810_rng: add support for other i8xx chipsets to the Random Number Generator module.
+	This is being done by adding the detection of the 82801E I/O Controller Hub.
+
+<wim@iguana.be> (02/05/04 1.516.1.2)
+	[PATCH] 2.5.13 - i8xx series chipsets patches (patch 2)
+	
+	Update of PCI-IDS for the 82801BA(M), 82801CA(M) and 82801E I/O Controller Hub's.
+
+<wim@iguana.be> (02/05/04 1.516.1.3)
+	[PATCH] 2.5.13 - watchdog patches
+	
+	Merge updates from the 2.4 kernel into watchdog.h .
+
+<wim@iguana.be> (02/05/04 1.516.1.4)
+	[PATCH] 2.5.13 - i8xx series chipsets patches
+	
+	i810-tco: Merge changes of the 2.4 kernel into the i810-tco module. Changes included are:
+	Support for 82801CA(M) chipset, timer margin needs to be > 3, support for WDIOC_SETTIMEOUT and WDIOC_GETTIMEOUT.
+
+<miltonm@bga.com> (02/05/04 1.522)
+	[PATCH] severe ext3 filesystem corruption warning!
+	
+	Fix silly truncate status update
+
+<trond.myklebust@fys.uio.no> (02/05/04 1.523)
+	[PATCH] Do RPC over TCP reply message delivery in sock->data_ready()
+	
+	xprt.c:
+	  Speed up synchronous RPC over TCP calls by having the
+	  replies delivered by the IPV4 "bottom half", instead of
+	  switching to the rpciod process in order to call recvmsg().
+	   - Remove sock_recvmsg() interface.
+	   - Remove rpc_xprt_pending list and rpciod_tcp_dispatcher() interface.
+	   - Use the new tcp_read_sock() interface to deliver data directly
+	     from within tcp_data_ready().
+	sched.c:
+	   - Remove references to rpciod_tcp_dispatcher.
+	xprt.h:
+	   - New set of flags to reflect the TCP record read state.
+	
+	Cheers,
+	  Trond
+
+<trond.myklebust@fys.uio.no> (02/05/04 1.524)
+	[PATCH] Fix RPC over TCP 'connect' code
+	
+	xprt.c:
+	  Fix the RPC over TCP socket reconnect code.
+	
+	Cheers,
+	  Trond
+
+<trond.myklebust@fys.uio.no> (02/05/04 1.525)
+	[PATCH] Fix compile warnings...
+	
+	xprt.c:
+	  Merge *_write_space() in order to fix compile warning and save space.
+	
+	Cheers,
+	  Trond
+
+<Andries.Brouwer@cwi.nl> (02/05/04 1.526)
+	[PATCH] kd.h
+	
+	Andrej Lajovic observes that in kd.h the definitions of K_NUMLOCK and
+	K_CAPSLOCK are interchanged.  He is right (and this is the case since
+	1.1.54; nobody noticed because setleds.c does not use these defines).
+	So, here is the fix.  No kernel behaviour is changed.
+
+<tomita@cinet.co.jp> (02/05/04 1.527)
+	[PATCH] IDE PIO mode Fix
+	
+	I found this bug in 2.5.10 first. And caused ext2 FS corruption.
+	We are porting Linux to PC-9801 architecture (made by NEC Japan).
+	It has PIO ONLY IDE I/F. So please check PIO mode too.
+	
+	It was introduced in 2.5.9 and still exists in 2.5.13, and caused
+	superblock corruption for Andries.  This fixes it.
+
+<aia21@cantab.net> (02/05/04 1.516.2.1)
+	NTFS: Release 2.0.6 - Major bugfix to make compatible with other kernel changes.
+	- Initialize the mftbmp address space properly now that there are more
+	fields in the struct address_space. This was leading to hangs and
+	oopses on umount since 2.5.12 because of changes to other parts of
+	the kernel. We probably want a kernel generic init_address_space()
+	function...
+	- Drop BKL from ntfs_readdir() after consultation with Al Viro. The
+	only caller of ->readdir() is vfs_readdir() which holds i_sem during
+	the call, and i_sem is sufficient protection against changes in the
+	directory inode (including ->i_size).
+	- Use generic_file_llseek() for directories (as opposed to
+	default_llseek()) as this downs i_sem instead of the BKL which is
+	what we now need for exclusion against ->f_pos changes considering we
+	no longer take the BKL in ntfs_readdir().
+
+<aia21@cantab.net> (02/05/05 1.516.3.1)
+	mm/memory.c:
+	- Remove always unused variable page from remap_pte_range().
+	- Fix printk in do_wp_page() so it doesn't print out an uninitialized
+	  variable (old_page). Add KERN_ERR log level while at it.
+
+<dalecki@evision-ventures.com> (02/05/05 1.530)
+	[PATCH] 2.5.13 IDE 52
+	
+	Adapted from patch Bar³omiej ¯o³nierkiewicz:
+	
+	 - make straight8 a flag in ata_channel instead of byte
+	
+	 - don't store tables as code in drive_is_flashcard()
+	   and ide_xfer_verbose()
+	
+	 - fix init_gendisk() (due to 2.5.13 blksize_size[] change)
+	
+	 - compress region requesting/releasing
+	   in channel_probe() and ide_unregister()
+	
+	 - clean a bit ide_setup_ports()
+	
+	Start of DMA handling tratment.
+	
+	 - Fix the parameters to ide_build_dmatable() to be channel and request.
+	   Rename it to udma_new_table(). udma will mark arch specific functions
+	   later.
+	
+	 - Let ide_start_dma() take the request directly as an arguemnt. Rename it to
+	   ata_start_dma(). After realizing that the usage of the func argument of it
+	   was bogous and that nobody is using rwproc we where able to remove both of
+	   them.
+	
+	 - Fix ide_destroy_dmatable() to take the channel as argument and rename it to
+	   udma_destroy_table(). This function should have possible architecture
+	   specific implementation as well at some point in time.
+	
+	 - Split up the TCQ UDMA handling stuff in to proper functions. Jens must has
+	   been dreaming as he introduced them ;-).
+
+<dalecki@evision-ventures.com> (02/05/05 1.531)
+	[PATCH] 2.5.13 IDE 53
+	
+	 - Start splitting the functions for host chip handling in to separate entities.
+	   This change is quite sensitive and may cause some trouble but it's for
+	   certain worth it anyway, because it should for example provide a much better
+	   infrastructure for th handling of different architectures.
+
+<dalecki@evision-ventures.com> (02/05/05 1.532)
+	[PATCH] [PATCH 2.5.13 IDE 54
+	
+	 - Finish the changes from patch 53. ide_dma_actaion_t is gone now as well as
+	   whole hidden code paths associated with it. I hope I didn't mess too many
+	   things up with this, since the sheer size of the changes make them sensitive.
+	   (Tested on tree different host chip sets so it shouldn't be too bad...)
+	
+	   Just still some minor cleanup remaining to be done in this area. The tags
+	   lefts there are intentional.
+	
+	   In esp. the ide_dma_on method in cy82c693 looks suspicious.
+	
+	   Using udma_enable in ide-cd.c, ide-floppy.c and ide-tape.c is suspicious as
+	   well. We have just uncovered it.
+	
+	   In the next round we will concentrate on the fixes people did send me
+	   last time.
+
+<akpm@zip.com.au> (02/05/05 1.533)
+	[PATCH] suppress allocation warnings for radix-tree allocations
+	
+	The recently-added page allocation failure warning generates a lot of
+	noise due to radix-tree node allocation failures.  Those messages are
+	not interesting.
+	
+	But I think the warning is otherwise useful - "I got an allocation
+	failure and then it crashed" is better than "it crashed".
+	
+	The patch suppresses the message for ratnode allocation failures.
+
+<akpm@zip.com.au> (02/05/05 1.534)
+	[PATCH] radix-tree locking fix
+	
+	__delete_from_swap_cache modifies the radix tree.  We need to take the
+	lock for writing.
+
+<akpm@zip.com.au> (02/05/05 1.535)
+	[PATCH] Allow truncate to discard unmapped buffers
+	
+	The buffer state "uptodate, dirty, unmapped" is legal.  It occurs when
+	a mapped page with attached buffers which is over a hole is dirtied.
+	
+	So discard_buffer() needs to be able to discard those buffers as well;
+	otherwise the page ends up clean, with dirty buffers and is unfreeable.
+
+<akpm@zip.com.au> (02/05/05 1.536)
+	[PATCH] decouple swapper_space treatment from other address_spaces
+	
+	swapper_space is different.  Its pages are locked during writeout, it
+	uses PAGE_SIZE rather than PAGE_CACHE_SIZE.  Converting swap to look
+	more like the other address_spaces is a separate project.  This patch
+	fully restores the old swap behaviour.
+	
+	- Don't dirty swapcache page buffers in set_page_dirty().
+	
+	  Fixes a problem where __free_pte() runs set_page_dirty() and then
+	  immediately runs ClearPageDirty().  The pages ends up clean, with
+	  dirty buffers, and is unfreeable.
+	
+	- Hence, don't mark the page clean if its buffers are clean - swap
+	  does not have page/buffers dirty state coherency.
+
+<akpm@zip.com.au> (02/05/05 1.537)
+	[PATCH] Allow ext3 pages to be written back by VM pressure
+	
+	When ext3 refiles journalled buffers for writeback, it is better to set the
+	page dirty as well as the buffer.  So the page will be written out by
+	VM pressure rather than by kjournald alone.
+
+<akpm@zip.com.au> (02/05/05 1.538)
+	[PATCH] Fix SMP race in truncate
+	
+	Closes a small race window: testing PageWriteback() outside the page
+	lock introduces the possibility that page could be redirtied and have
+	writeback started after we've inspected PageWriteback.
+
+<akpm@zip.com.au> (02/05/05 1.539)
+	[PATCH] handle concurrent block_write_full_page and set_page_dirty
+	
+	set_page_dirty() runs without the page lock.  So
+	__block_write_full_page() needs to be able to cope with the page's
+	buffers being dirtied concurrently, on another CPU.
+	
+	Do this with careful ordering and a test-and-set.
+
+<akpm@zip.com.au> (02/05/05 1.540)
+	[PATCH] Fix PG_launder
+	
+	Set PG_launder against pages which are under VM writeback.  So page
+	allocators will throttle against them.
+
+<akpm@zip.com.au> (02/05/05 1.541)
+	[PATCH] Fix concurrent writepage and readpage
+	
+	Pages under writeback are not locked.  So it is possible (and quite
+	legal) for a page to be under readpage() while it is still under
+	writeback.  For a partially uptodate page with blocksize <
+	PAGE_CACHE_SIZE.
+	
+	When this happens, the read and write I/O completion handlers get
+	confused over the shared BH_Async usage and the page ends up not
+	getting PG_writeback cleared.  Truncate gets stuck in D state.
+	
+	The patch separates the read and write I/O completion state.
+	
+	It also shuffles the buffer fields around.  Putting the
+	commonly-accessed b_state at offset zero shrinks the kernel by a few
+	hundred bytes because it can be accessed with indirect addressing, not
+	indirect+indexed.
+
+<akpm@zip.com.au> (02/05/05 1.542)
+	[PATCH] Documentation update
+	
+
+<viro@math.psu.edu> (02/05/05 1.543)
+	[PATCH] do_mounts.c printk fix
+	
+		D'uh.  Linus, 2.5 also needs that one.
+	
+	BTW, folks - whoever had submitted "fixes" replacing /dev/root.old with
+	/old/dev/root.old several lines above that one are welcome to think
+	about the reasons why their patches removed "failed" from boot log.
+
+<hch@infradead.org> (02/05/05 1.544)
+	[PATCH] remove global_bufferlist_lock
+	
+	This patch addresses Andrew's FIXME in buffer.c and adds a spinlock that
+	can be passed to the buffer list manipulation functions to the reiserfs
+	journal.  This obsoletes the cheks for lock beeing NULL in buffer.c and
+	the global_bufferlist_lock.
+	
+	In addition osync_inode_list is changed to use list_for_each_prev as in 2.4
+	instead of a hand-crafted loop.
+	
+	A little comment to the reiserfs folks:  your code would be _sooo_ much
+	easier to understand if you used temporary local variables for often
+	referenced fields..
+
+<hch@infradead.org> (02/05/05 1.545)
+	[PATCH] fix config.in syntax errors.
+	
+	 - appletalk adds unnessesary additional arguments to bool
+	 - net/wan has two comment statements on one line, separated by a + (!),
+	   also fixup indentation here.
+	 - sound uses a bool where it should use a dep_bool
+
+<hch@infradead.org> (02/05/05 1.546)
+	[PATCH] architecture-independand si_meminfo
+	
+	Si_meminfo() is basically the same for all architectures (mips is a little
+	different by providing a value for the shared field that is different from
+	the originial intent, I will come back to this later), so it makes to have just
+	one instance of it:
+
+<torvalds@home.transmeta.com> (02/05/05 1.547)
+	Fix missed parts in the BH locking patch
+
+<torvalds@home.transmeta.com> (02/05/05 1.548)
+	Update kernel version
+

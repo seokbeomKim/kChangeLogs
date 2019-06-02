@@ -1,0 +1,1146 @@
+
+Summary of changes from v2.5.61 to v2.5.62
+============================================
+
+<d.mueller@elsoft.ch>
+	PPC32: Export additional symbols for CONFIG_4xx.
+
+<scott_anderson@mvista.com>
+	PPC32: Invalidate the icache before use on PPC40x.
+
+<Jeff.Wiedemeier@hp.com>
+	[PATCH] alpha numa setup_memory leaves meaningless {min,max}_low_pfn
+	
+	Currently, after the numa version of setup_memory, {min,max}_low_pfn are
+	set to the values used in the calculation of the last potential node
+	rather than anything meaningful to the system. On side-effect is that if
+	there is no memory in the last node considered, min_low_pfn is left at
+	~0UL resulting in initrd being disabled as "overwritten".
+	
+	This patch makes setup_memory_node use local node_{min,max}_pfn
+	variables in computing memory for the node rather than the global
+	{min,max}_low_pfn. For nodes with memory, the limits are propagated to
+	the globals.
+	
+	/jeff
+
+<rmk@flint.arm.linux.org.uk>
+	[ARM] Fix resource initialisation for IOP310
+
+<rmk@flint.arm.linux.org.uk>
+	[ARM] Miscellaneous cleanups
+	
+	- Fix some minor build problems
+	- Ensure init task initially runs the "user" domain in "manager" mode
+	- Make backtrace more readable when KALLSYMS is enabled
+
+<paulus@samba.org>
+	PPC32: Changes to accommodate recent signal changes (current->sighand).
+
+<paulus@samba.org>
+	PPC32: Fix compile warnings in some programs used in the build process
+
+<anton@samba.org>
+	ppc64: add TCSBRKP
+
+<akpm@digeo.com>
+	ppc64: kill ppc64 unused var warning
+
+<akpm@digeo.com>
+	ppc64: fix warning in smp_prepare_cpus
+
+<anton@samba.org>
+	ppc64: Remove sys32_mremap, not required on ppc64 since we alter TASK_SIZE
+
+<anton@samba.org>
+	ppc64: fix compile warnings
+
+<tinglett@vnet.ibm.com>
+	ppc64: revised machine check exception handler
+
+<anton@samba.org>
+	ppc64: clean up some of big bad sys_ppc32.c
+
+<anton@samba.org>
+	ppc64: always compile in 32bit ELF support
+
+<rmk@flint.arm.linux.org.uk>
+	[ARM] Reduce scope of "safe_buffers"
+
+<rmk@flint.arm.linux.org.uk>
+	[ARM PATCH] 1372/1: EPXA10DB: Add missing include files to irq.c for 2.5.59
+	
+	Patch from Dirk Behme
+	
+	Add to mach-epxa10db/irq.c the include files needed for include/asm-arm/mach/irq.h. Same as patch 1371/1 for 2.4.19.
+
+<rmk@flint.arm.linux.org.uk>
+	[ARM PATCH] 1373/1: EPXA10DB: Update def-config file
+	
+	Patch from Dirk Behme
+	
+	Update arch/arm/def-configs/epxa10db. The old one doesn't built a working configuration any more (the PC 8250 serial driver was activated for some reasons ...).
+
+<rmk@flint.arm.linux.org.uk>
+	[ARM PATCH] 1376/1: Use #defines for iq80310 serial port
+	
+	Patch from Eli Carter
+	
+	linux/include/asm-arm/arch-iop310/serial.h
+	uses hardcoded 0xfe800000, while
+	linux/include/asm-arm/arch-iop310/iq80310.h
+	gives us a #define for the UART locations.
+	
+	This patch changes serial.h to use the #defines from iq80310.h
+
+<rmk@flint.arm.linux.org.uk>
+	[ARM PATCH] 1377/1: Retain endianess state on XScale CPUs during boot
+	
+	Patch from Deepak Saxena
+	
+	Booting a BE system does not work if we disable the BE bit.
+
+<rmk@flint.arm.linux.org.uk>
+	[ARM PATCH] 1368/1: Fix some typos in proc-armv/system.h
+	
+	Patch from Dirk Behme
+	
+	Fix two typos (CR instead of CD) and add a macro for reading the configuration register of coprocessor 15.
+
+<rmk@flint.arm.linux.org.uk>
+	[ARM] Better handling of bad IRQ implementations.
+	
+	There are edge triggered interrupt controllers around where the
+	"enable" control is before the edge detection.  This means that
+	we must keep the interrupts enabled, even when disable_irq() is
+	in effect, and mark such interrupts for later processing.
+	
+	To make matters worse, some of these interrupt controllers do not
+	provide any method to re-trigger the interrupt.  We are unable
+	to call the handler direct from enable_irq() since we may be
+	in an IRQ-protected context.
+	
+	Therefore, we add such interrupts to a list of pending interrupts,
+	which we process at the next hardware interrupt.
+
+<trini@kernel.crashing.org>
+	PPC32: Fix some license drain bamage.  Noticed by Christoph Hellwig
+
+<anton@samba.org>
+	ppc64: Never call event-scan faster than once per second, required on some machines
+
+<rmk@flint.arm.linux.org.uk>
+	[ARM PATCH] 1380/1: Big-Endian support for jiffies
+	
+	Patch from Deepak Saxena
+	
+	jiffies is defined as pointing to jiffies_64 for backwards comptability (I think, not 100% sure why we don't just use jiffies_64 everywhere?). On BE systems, we need to point to the upper 4 bytes of jiffies_64 or we will never get past calibrate_delay. This is what is done in PPC, SH, and other big endian architectures.
+
+<rth@are.twiddle.net>
+	[ALPHA] Add missing sighand bits.
+	From Ivan Kokshaysky <ink@jurassic.park.msu.ru>.
+
+<paulus@samba.org>
+	PPC32: Add set_tid_address and fadvise64 system calls.
+
+<tinglett@vnet.ibm.com>
+	ppc64: new scanlog interface
+
+<anton@samba.org>
+	ppc64: dont attempt a traceback table lookup for userspace addresses
+
+<anton@samba.org>
+	ppc64: warning fix, caused by me
+
+<paulus@samba.org>
+	PPC32: declare pm_power_off
+
+<paulus@samba.org>
+	PPC32: use ptrace_notify
+
+<rmk@flint.arm.linux.org.uk>
+	[ARM] Add init_sighand for 2.5.60.
+
+<rmk@flint.arm.linux.org.uk>
+	[ARM] Ensure backtrace terminates on corrupted frame pointers.
+	
+	Prevent a corrupted kernel stack causing an infinite dumping of
+	backtrace.
+
+<rmk@flint.arm.linux.org.uk>
+	[ARM] Update Acorn SCSI drivers
+	
+	Update Acorn SCSI drivers for the recent SCSI device ID/Lun changes.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	kbuild: Always postprocess modules
+	
+	Currently, we are doing the final module link (.ko) at different places
+	(Makefile.build vs Makefile.modver) depending on CONFIG_MODVERSIONS.
+	Apart from being confusing, that also means we have this code path
+	duplicated, and the modversions path most likely gets little testing.
+	    
+	It's actually cleaner to just do the final link from Makefile.modver always,
+	performance-wise it's not a noticable difference, since we don't descend
+	in that step, but just use the list of modules generated during the build.
+	    
+	This step is also preliminary for doing additional postprocessing, e.g.
+	generating module alias information from PCI / USB device tables.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	kbuild: Move the version magic generation into module postprocessing
+	
+	Since we'll have to always do module postprocessing shortly, we can as well
+	get rid of the special cased init/vermagic.o which needed to be compiled
+	before descending, and instead include the current version magic string
+	during post processing. For that purpose, the generation of the string is
+	moved from init/vermagic.c to include/linux/vermagic.h.
+	
+	People who externally maintain modules will also be happy about that.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	kbuild: Use list of modules for "make modules_install"
+	
+	Since we rely on our list of all modules for building anyway, we
+	can as well use it to install the modules. So we don't need to
+	descend in that step anymore, speeding it up, though it's not
+	a particularly performance-critical area.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	kbuild: Do module post processing in C
+	
+	Doing the module post processing using some scripting with sed/grep etc
+	was doable, but performance is of course much better when we do it in C
+	instead, and it also allows for easier extensibility for additional
+	postprocessing for e.g. the MODULE_DEVICE_TABLE's.
+	  
+	Executing the new helper "modpost" will build the additional C code for all
+	modules at once, so we can just keep the hash table of exported symbols
+	in memory instead of rebuilding it for every module.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	kbuild: Add dependency info to modules
+	
+	During postprocessing, we get the information which modules we depend on 
+	(i.e. which modules export symbols we need to import) for free, so we
+	record it in .modinfo. This may allow us to remove the "depmod" program
+	at a later time, though for now it remains working as usual.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	kbuild: Add dependency info to modules
+	
+	During postprocessing, we get the information which modules we depend on 
+	(i.e. which modules export symbols we need to import) for free, so we
+	record it in .modinfo. This may allow us to remove the "depmod" program
+	at a later time, though for now it remains working as usual.
+
+<rusty@rustcorp.com.au>
+	kbuild: Module alias and device table support
+	
+	Introduces "MODULE_ALIAS" which modules can use to embed their own
+	aliases for modprobe to use.  Also adds a "finishing" step to modules to
+	supplement their aliases based on MODULE_TABLE declarations, eg.
+	'usb:v0506p4601dl*dh*dc*dsc*dp*ic*isc*ip*' for drivers/usb/net/pegasus.o
+
+<anton@samba.org>
+	ppc64: use get_user in alignment exception handler
+
+<anton@samba.org>
+	ppc64: ptrace signal fix
+
+<anton@samba.org>
+	ppc64: make sure socketcall_table is 8 byte aligned
+
+<kai@tp1.ruhr-uni-bochum.de>
+	kbuild: Figure endianness / word size at compile time
+	
+	The helper file2alias had to jump through a lot of hoops because it did not
+	know the host and target endianness / word size at compile time.
+	We now build a small header scripts/elfconfig.h which contains this
+	information for file2alias to use.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	kbuild: Merge file2alias into scripts/modpost.c
+	
+	Up to now, we called "nm" to find the symbol table in vmlinux / modules.
+	Using code from scripts/file2alias.c allows us to do that parsing ourselves,
+	which is faster and will give us the opportunity to merge the
+	MODULE_DEVICE_TABLE() parsing into modpost, too.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	kbuild: Rename some module postprocessing stuff
+	
+	Since it's now not only used for modversioning but generally, rename
+	the Makefile .modver -> .modpost and the generated files to
+	<module>.ver.[co].
+	  
+	Also, when there's now vmlinux during module postprocessing, don't print
+	warnings on unresolved symbols (there's just too many, then).
+
+<rusty@rustcorp.com.au>
+	kbuild: Do modversions checks on module structure
+	
+	Checks the module structure itself when CONFIG_MODVERSIONS is set.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	kbuild: scripts/elfconfig.h is generated
+	
+	so it shouldn't be in the tree...
+
+<anton@samba.org>
+	ppc64: add set_tid_address and fadvise64
+
+<elenstev@mesatop.com>
+	[tokenring proteon] trivial, spelling fix
+
+<axboe@suse.de>
+	[PATCH] deadline ioscheduler bug fixes
+	
+	Cleaner fix for the ioscheduler:
+	
+	- Problem with alias request, the new request gets lost.
+	- Must always clear merge hash in move_to_dispatch()
+
+<axboe@suse.de>
+	[PATCH] fix request-to-request front merging
+	
+	bio-to-request front merging works, but request-to-request has been
+	broken due to a bit too much copy'n pasting.
+
+<axboe@suse.de>
+	[PATCH] missing lock in get_request_wait()
+	
+	We must grab lock before checking rl->count.
+
+<willy@debian.org>
+	[PATCH] Fix mandatory locking
+	
+	Robbie Williamson found some bugs in the mandatory locking implementation.
+	This patch fixes all the problems he found:
+	
+	 - Fix null pointer dereference caused by sys_truncate() passing a null filp.
+	 - Honour the O_NONBLOCK flag when calling ftruncate()
+	 - Local variable `fl' wasn't being initialised correctly in
+	   locks_mandatory_area()
+	 - Don't return -ENOLCK from __posix_lock_file() when FL_ACCESS is set.
+
+<akpm@digeo.com>
+	[PATCH] JFS build fix with gcc-2.95.3
+	
+	I'm getting a build error:
+	
+		fs/jfs/super.c: In function `jfs_fill_super':
+		fs/jfs/super.c:335: parse error before `)'
+	
+	and it doesn't happen with gcc-3.2.x.
+	
+	Taking out the file-n-line fixes it up.  This patch was acked by shaggy.
+
+<akpm@digeo.com>
+	[PATCH] flush_tlb_all is not preempt safe
+	
+	Patch from: Zwane Mwaikambo <zwane@holomorphy.com>
+	
+	Considering that smp_call_function isn't allowed to hold a lock reference and
+	within smp_call_function we lock and unlock call_lock thus triggering a
+	preempt point.  Therefore we can't guarantee that we'll be on the same
+	processor when we hit do_flush_tlb_all_local.
+	
+	void flush_tlb_all(void)
+	{
+		smp_call_function (flush_tlb_all_ipi,0,1,1);
+	
+		do_flush_tlb_all_local();
+	}
+	
+	...
+	
+	smp_call_function()
+	{
+		spin_lock(call_lock);
+		...
+		spin_unlock(call_lock);
+		<preemption point>
+	}
+	
+	...
+	
+	do_flush_tlb_all_local() - possibly not executing on same processor
+	anymore.
+
+<akpm@digeo.com>
+	[PATCH] move fault_in_pages_readable/writeable to header
+	
+	Patch from Oleg Drokin <green@namesys.com>
+	
+	Move these already-inline functions to a header file so that filesystems can
+	reuse them.  For the reiserfs_file_write patch.
+
+<akpm@digeo.com>
+	[PATCH] separate checks from generic_file_aio_write
+	
+	Patch from: Oleg Drokin <green@namesys.com>
+	
+	It moves all the arg checking code from the start of generic_file_aio_write()
+	into a standalone function, so other filesystems can avoid having to
+	cut-n-paste them.
+	
+	The new function is exported to modules, and also inlined in filemap.c so
+	that the current filesystems are unaffected.  If someone is using ext2 and
+	reiserfs at the same time, they lose a bit of icache.
+
+<akpm@digeo.com>
+	[PATCH] fix ext3 BUG due to race with truncate
+	
+	When ext3_writepage races with truncate, block_write_full_page() will see
+	that the page is outside i_size and will bale out with -EIO.  But
+	ext3_writepage() will ignore this and will proceed to add the buffers to the
+	transaction.
+	
+	Later, kjournald tries to write them out and goes BUG() because those buffers
+	are not mapped to disk.
+	
+	The fix is to not attach the buffers to the transaction in ext3_writepage()
+	if block_write_full_page() failed.
+	
+	So far so good, but that page now has dirty, unmapped buffers (the buffers
+	were attached in a dirty state by ext3_writepage()).  So teach
+	block_write_full_page() to clean the buffers against the page if it is wholly
+	outside i_size.
+	
+	(A simpler fix to all of this mught be to just bale out of ext3_writepage()
+	if the page is outside i_size.  But that is racy against
+	block_write_full_page()'s subsequent execution of the same comparison).
+
+<akpm@digeo.com>
+	[PATCH] crc32 improvements
+	
+	Patch from Joakim Tjernlund <joakim.tjernlund@lumentis.se>
+	
+	I did the optimizations in the crc32 patch Brian Murphy submitted a while ago.
+	Now I have cleaned it up a little and made some more optimizations.
+	
+	gcc is quite bad at loop optimizations (at least for PPC) so I have
+	rewritten them to make gcc to generate better code. Even recent gcc's(3.2.x) produces
+	better code.
+	
+	Also reduced the unrolling since it did not make a noticeable difference.
+
+<akpm@digeo.com>
+	[PATCH] dcache_rcu: revert fast_walk code
+	
+	Patch from Maneesh Soni <maneesh@in.ibm.com>
+	
+	Revert the fast-walk dcache code in preparation for dcache_rcu.
+
+<akpm@digeo.com>
+	[PATCH] dcache_rcu
+	
+	Patch from Maneesh Soni <maneesh@in.ibm.com>, Dipankar Sarma
+	<dipankar@in.ibm.com> and probably others.
+	
+	
+	This patch provides dcache_lock free d_lookup() using RCU. Al pointed
+	races with d_move and lockfree d_lookup() while concurrent rename is
+	going on. We tested this with a test doing million renames
+	each in 50 threads on 50 different ramfs filesystems. And simultaneously
+	running millions of "ls". The tests were done on 4-way SMP box.
+	
+	1. Lookup going to a different bucket as the current dentry is
+	   moved to a different bucket due to rename. This is solved by
+	   having a list_head pointer in the dentry structure which points
+	   to the bucket head it belongs. The bucket pointer is updated when the
+	   dentry is added to the hash chain. Lookup checks if the current
+	   dentry belongs to a different bucket, the cached lookup is
+	   failed and real lookup will be done. This condition occured nearly
+	   about 100 times during the heavy_rename test.
+	
+	2. Lookup has got the dentry it is looking and it is comparing
+	   various keys and meanwhile a rename operation moves the dentry.
+	   This is solved by using a per dentry counter (d_move_count) which
+	   is updated at the end of d_move. Lookup takes a snapshot of the
+	   d_move_count before comparing the keys and once the comparision
+	   succeeds, it takes the per dentry lock to check the d_move_count
+	   again. If move_count differs, then dentry is moved (or renamed)
+	   and the lookup is failed.
+	
+	3. There can be a theoritical race when a dentry keeps coming back
+	   to original bucket due to double moves. Due to this lookup may
+	   consider that it has never moved and can end up in a infinite loop.
+	   This is solved by using a loop_counter which is compared with a
+	   approximate maximum number of dentries per bucket. This never got
+	   hit during the heavy_rename test.
+	
+	4. There is one more change regarding the loop termintaion condition
+	   in d_lookup, now the next hash pointer is compared with the current
+	   dentries bucket pointer (is_bucket()).
+	
+	5. memcmp() in d_lookup() can go out of bounds if name pointer and length
+	   fields are not consistent. For this we used a pointer to qstr to keep
+	   length and name pointer in one structre.
+	
+	We also tried solving these by using a rwlock but it could not compete
+	with lockless solution.
+
+<akpm@digeo.com>
+	[PATCH] error checking in ext3 xattr code
+	
+	from Andreas Gruenbacher
+
+<akpm@digeo.com>
+	[PATCH] xattr: listxattr fix
+	
+	Patch from Andreas Gruenbacher <agruen@suse.de>
+	
+	This patch fixes a bug in the ext2 and ext3 listxattr operation: Even if
+	an attribute is hidden from the user, the terminating NULL character was
+	included in the listxattr result. After the patch this doesn't happen
+	anymore.
+
+<akpm@digeo.com>
+	[PATCH] xattr: infrastructure for permission overrides
+	
+	Patch from Andreas Gruenbacher <agruen@suse.de>
+	
+	This adds flags parameters to the getxattr, listxattr, and removexattr inode
+	operations.  This is in preparation for the next patch, which allows
+	in-kernel code (i.e., modules) to override extended attribute permission
+	restrictions (which in turn is used by HSM implementations and the like).
+
+<akpm@digeo.com>
+	[PATCH] xattr: allow kernel code to override EA permissions
+	
+	Patch from Andreas Gruenbacher <agruen@suse.de>
+	
+	This adds the XATTR_KERNEL_CONTEXT extended attributes flag.  Kernel code may
+	use this flag to override extended attribute permission restrictions that
+	would otherwise be imposed on the calling process.
+
+<akpm@digeo.com>
+	[PATCH] xattr: trusted extended attributes
+	
+	Patch from Andreas Gruenbacher <agruen@suse.de>
+	
+	This patch adds trusted extended attributes.  Trusted extended attributes are
+	visible and accessible only to processes that have the CAP_SYS_ADMIN
+	capability.  Attributes in this class are used to implement mechanisms in
+	user space (i.e., outside the kernel) which keep information in extended
+	attributes to which ordinary processes have no access.  HSM is an example.
+
+<akpm@digeo.com>
+	[PATCH] blk_congestion_wait tuning and lockup fix
+	
+	blk_congestion_wait() will currently not wait if there are no write requests
+	in flight.  Which is a potential problem if all the dirty data is against NFS
+	filesystems.
+	
+	For write(2) traffic against NFS, things work nicely, because writers
+	throttle in nfs_wait_on_requests().  But for MAP_SHARED dirtyings we need to
+	avoid spinning in balance_dirty_pages().  So allow callers to fall through to
+	the explicit sleep in that case.
+	
+	This will also fix a weird lockup which the reiser4 developers report.  In
+	that case they have managed to have _all_ inodes against a superblock in
+	locked state, yet there are no write requests in flight.  Taking a nap in
+	blk_congestion_wait() in this case will yield the CPU to the threads which
+	are trying to write out pages.
+	
+	Also tune up the sleep durations in various callers - 250 milliseconds seems
+	rather long.
+
+<akpm@digeo.com>
+	[PATCH] cciss driver update
+	
+	Patch from: steve cameron <steve.cameron@hp.com>
+	
+	Steve sent out a nice series of 11 broken-out patches.  I have lumped them
+	all together.
+	
+	- Makes the cciss driver compile in 2.5.60  (from tony@cantech.net.au)
+	
+	- From randy.dunlap@verizon.net, fix memory leaks in cciss driver
+	
+	- Allow cciss driver attached disks other than the first to be accessed.
+	
+	- Zero out cylinders when zeroing out other disk info in cciss driver.
+	
+	- Remove unused variable from cciss_scsi.c
+	
+	- This patch makes scsi commands to tape drives have no timeouts.
+	  Previously the timeout was 1000 seconds, too short, and nothing good
+	  happens when the timeout expires.  Better to have no timeout.  e.g.  mt -f
+	  /dev/st0 erase may take about 2 hours 30 min on AIT 100.
+	
+	- Remove unneeded cciss_scsi init code from cciss driver.
+	
+	- Remove udelay in command polling routine
+	- extend timeout to 20 seconds (need for certain multiport storage box)
+	- Remove unneeded init time code in cciss_scsi.c (thus allowing removal
+	  of udelay in command polling code.)
+	
+	- Factor out duplicated read capacity code into common routine in cciss
+	  driver.
+	
+	- factor duplicated geometry inquiry code into common routine in cciss
+	  driver.
+
+<akpm@digeo.com>
+	[PATCH] cciss, fix array bounds overrun
+	
+	Patch from steve cameron <steve.cameron@hp.com>
+	
+	Fix overrun if you have more than 16 attached tape drives + tape changers.
+	Thanks to Mike Anderson for pointing this out.
+
+<akpm@digeo.com>
+	[PATCH] direct-io return value fix
+	
+	If at the end of direct_io_worker, dio->result is non-zero then we
+	unconditionally copy that into the return value, potentially ignoring any I/O
+	errors which were accumulated into local variable `ret'.
+	
+	Only do the assignment if `ret' is zero.
+
+<akpm@digeo.com>
+	[PATCH] direct-io: allow reading of the part-filled EOF block
+	
+	driect-io will currently return EINVAL when the application tries to read the
+	final bit of the file at EOF.  (assuming the file's length is not a multiple
+	of the filesystem blocksize).
+	
+	The 2.4 kernelwill reurn 0 (it won't read it at all).
+	
+	This patch changes the 2.5 kernel to allow that block to be read.
+
+<akpm@digeo.com>
+	[PATCH] Fix ext3 build when EXT3_DEBUG is defined
+	
+	When EXT3_DEBUG is turned on (by editing the header file) there is one
+	compile failure and a few warnings.  Fix that up.
+
+<akpm@digeo.com>
+	[PATCH] Make the world safe for -Wundef
+	
+	Patch from: Valdis.Kletnieks@vt.edu
+	
+	This is a patch to clean things up so compiling with -Wundef becomes feasible
+	(This patch cuts the number of warnings with 'make allyesconfig' drop from
+	around 10,000 to several hundred).  It was originally inspired by the
+	discussion of things that include linux/version.h but don't use the contents
+	- after doing this, I was able to find that there *WAS* at least one place
+	where version.h was missing (see following patch).
+
+<akpm@digeo.com>
+	[PATCH] fix compile breakage on drivers/scsi/NCR53C9x.c
+	
+	Patch from John Kim <john@larvalstage.com>
+	
+	This fixes compile breakage due to recent changes to scsi.h
+
+<akpm@digeo.com>
+	[PATCH] Use table lookup for radix_tree_maxindex()
+	
+	Patch from Szabolcs Berecz <szabi@mplayerhq.hu>
+	
+	With the following patch maxindex is taken from an array instead of
+	recalculating it all the time.
+
+<bcollins@debian.org>
+	[PATCH] IEEE-1394 Updates
+	
+	- Converts Video1394 to PCI dma.
+	- Converts ioctl's to standard interface.
+	- Various minor fixes
+	- Merges from 2.5.x tree
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] Add printk levels to mtrr, also clarify
+	
+	The big thing here is actually turning
+	'Your bios sucks'
+	into
+	'Your bios sucks, but we fixed it and life is good, don't panic'
+	
+	Which with a vendor hat on is important.  Its currently hard to tell
+	whether some Linux errors are things to worry about or merely spanking
+	the manufacturer.  I'd urge people writing error messages to think about
+	that btw - does it tell the user if the problem is fixed ?
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] merge the NEC98 parsing code
+	
+	This is nice and clean (your tree already knows the idents)
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] make the io-apic printk generate less junk mail
+	
+	Also suggest bugzilla.kernel.org now not the mailing list
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] printk levels for mpparse
+	
+	Also recognize the NEC98 busses
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] remove bogowarning
+	
+	No lilo since about 1997 has stomped the EBDA
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] itanic people cant spell either
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] nor PPC people ;)
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] specialix fix from 2.4 missing in 2.5
+
+<elenstev@mesatop.com>
+	[PATCH] high pedantry in ppc spelling
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] bring 2.5 arcnet into line with 2.4
+	
+	Fixes a request region breakage
+	Fixes a size request error
+	Handles a new card type
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] Fix aha1542
+	
+	Randy Dunlap included this with the 152x stuff which then got lost in
+	discussion about core changes and queueing reset. 154x doesnt need the
+	extra discussion. Also adds a fix to use mca-legacy as needed for 1640
+	right now
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] mca 53c9x also needs mca-legacy
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] another ia64 typo
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] header update for arcnet updates (again to match 2.4)
+
+<elenstev@mesatop.com>
+	[PATCH] alpha typo fix
+
+<rml@tech9.net>
+	[PATCH] trivial: unused var in sunrpc
+	
+	There is an unused variable, `int maxlen', in net/sunrpc/clnt.c ::
+	rpc_setup_pipedir().
+
+<sfr@canb.auug.org.au>
+	[PATCH] compat_sys_futex 1/3 generic, parisc, ppc64, s390x and x86_64
+	
+	This is the generic part of the patch and the architecture specific parts
+	I have been asked to forward directly to you.
+
+<linux@brodo.de>
+	[PATCH] pcmcia: add device_class pcmcia_socket, update devices & drivers
+	
+	A new device_class "pcmcia_socket_class" is introduced for PCMCIA and
+	CardBus sockets.  All socket drivers I could find are updated so that
+	they register a driver, and -if necessary- the "platform"/legacy device.
+	This will allow for a cleanup of pcmcia_{un}register_socket() /
+	{un}register_ss_entry() as well as reflect the parent for pcmcia_bus
+	devices.
+	
+	Russell King allowed me to break sa1100_generic pcmcia support for the
+	time being - so drop that part of the patch for the moment.
+
+<linux@brodo.de>
+	[PATCH] pcmcia: use device_class->add_device/remove_device
+	
+	This patch removes the {un}register_ss_entry/pcmcia_{un}register_socket
+	calls, and replaces them with generic driver-model-compatible functions.
+	
+	Also, update the CodingStyle of these cs.c functions to what's recommended
+	in the Linux kernel.
+
+<anton@samba.org>
+	[PATCH] disable printout of interrupts in /proc/stat on ppc64
+	
+	The interrupt printout in /proc/stat doesnt make sense on many ppc64
+	boxes because we remap interrupts. Also, with enough active interrupt
+	sources /proc/stat might get much bigger than a page which results
+	in memory corruption.
+
+<anton@samba.org>
+	[PATCH] enable OFFB on ppc64
+
+<anton@samba.org>
+	[PATCH] remove stale comment
+	
+	I added this comment but the line it refers to is long gone.
+
+<linux@brodo.de>
+	[PATCH] cpufreq: move frequency table helpers to extra module
+	
+	The CPU frequency table helpers can easily be modularized --
+	especially as they are not needed on all architectures, or for
+	all drivers (even on x86 -- see longrun and gx-suspmod)
+
+<linux@brodo.de>
+	[PATCH] cpufreq: move /proc/cpufreq interface code to extra module
+	
+	The deprecated /proc/cpufreq interface can easily live outside the
+	cpufreq core now.
+
+<ahaas@airmail.net>
+	[PATCH] C99 initializers for drivers/net/aironet4500_proc.c
+
+<ahaas@airmail.net>
+	[PATCH] C99 initializers for drivers/char/rtc.c
+
+<ahaas@airmail.net>
+	[PATCH] C99 initializers for drivers/cdrom/cdrom.c
+
+<ahaas@airmail.net>
+	[PATCH] C99 initializers for drivers/net/arlan-proc.c
+
+<torvalds@home.transmeta.com>
+	Fix futex compile breakage introduced by the compat code.
+
+<rl@hellgate.ch>
+	[netdrvr via-rhine] trivial bits:
+	- nuke mii_status_bits
+	- move clear_tally_counters() up so it can get inlined (pointed out by
+	  Luca Barbieri)
+	- rename via_restart_tx() -> via_rhine_restart_tx()
+
+<rl@hellgate.ch>
+	[netdrvr via-rhine] fix broken tx-underrun handling:
+	The Tx underrun handling in the current driver is broken. The details have
+	been explained in a posting "VIA Rhine 1.15exp1, patch for
+	testing/discussion" a couple of months ago.
+
+<rl@hellgate.ch>
+	[netdrvr via-rhine] various duplex-related fixes:
+	Fix the following bugs:
+	- after a watchdog timeout (still a common thing with the Rhine), the
+	  driver will fall back to half-duplex, ignoring the auto-negotiation
+	  results, killing performance completely until the driver is reloaded;
+	  fixed by clearing full_duplex in init_registers()
+	- driver considers only 0x200 for full-duplex option; now 0x220
+	- duplex code used dev->name before it's initialized; code section moved
+	
+	The full_duplex and force_media related code is quite a mess, but this
+	minimal fix will make the most annoying problems go away. Looking at some
+	other code (e.g. mii.c) it seems to me the interaction between user force,
+	autoneg results and full_duplex/force_media is amazingly complex, so I'll
+	leave it at this for now.
+
+<rl@hellgate.ch>
+	[netdrvr via-rhine] reset function rewrite:
+	The new reset function only waits up to 0.1 ms for the reset to complete,
+	instead of 10 ms. However, it introduces the use of a forced reset flag if
+	a chip doesn't seem cooperative. This fixes cases where until now only
+	reloading the driver or even rebooting the machine would bring the chip
+	back.
+
+<rl@hellgate.ch>
+	[netdrvr via-rhine] bump version, use constant instead of magic number
+
+<bunk@fs.tum.de>
+	[netdrvr] make CONFIG_MII one-line desc more pretty
+
+<kai@tp1.ruhr-uni-bochum.de>
+	kbuild: Warn on undefined exported symbols
+	
+	modpost did not warn on symbols which are exported but not defined
+	in the current module, but it should.
+	
+	Also, fix a compile time warning, and have bk ignore *.mod.c files.
+
+<romieu@fr.zoreil.com>
+	[netdrvr rrunner] small fixes and cleanups:
+	 - pci_disable_device() added in rr_remove_one() to balance
+	   pci_enable_device() in rr_init_one()
+	 - rr_timer() and rr_close() are leaking pci_map'ed memory: make them
+	   use rr_raz_{rx/tx}
+	 - error exiting path in rr_open() was balancing pci_alloc_consistent()
+	   with kfree().
+
+<stevef@smfhome1.austin.rr.com>
+	Merge in fixes from version 0.6.5 of the CIFS VFS.  Greatly improved performance including improved distributed caching support and support for readpages and larger read sizes. Cache data now flushed properly at file close time. Socket and memory leak fixed.  Fix two oops. Fix error logging and made more consistent.  Generic sendfile added.
+
+<akpm@digeo.com>
+	[PATCH] elv_former_request reversion
+	
+	This morning's fix for elv_former_request() is causing oopses all over the
+	place in the IO scheduler.
+	
+	Jens, remember that I did try that fix a while ago, and the same happened.
+	
+	I believe it has exposed a new problem at the __make_request/attempt_front_merge
+	level: if attempt_front_merge() actually succeeds, the wrong request gets freed
+	up in elv_merged_request().
+	
+	It may be best to back this change out until it can be fixed up for real.
+
+<linux@brodo.de>
+	[PATCH] cpufreq: fix compilation of ACPI if !CPU_FREQ
+	
+	here's the compile fix for this breakage which appears if CONFIG_ACPI &&
+	!(CONFIG_CPU_FREQ_TABLE || CONFIG_CPU_FREQ_TABLE_MODULE).
+
+<Andries.Brouwer@cwi.nl>
+	[PATCH] add static, fix typo
+
+<rjweryk@uwo.ca>
+	[PATCH] Fix small typo
+
+<linux@brodo.de>
+	[PATCH] pcmcia: small bugfix & cleanup
+	
+	Remove unneeded function declarations and correct /proc-directory name
+	for > 1 pcmcia_socket_class devices.
+
+<elenstev@mesatop.com>
+	[PATCH] 2.5.61 fix erroneous spellings of error.
+
+<drow@nevyn.them.org>
+	Clean up ptrace_setoptions and PT_* constants
+
+<drow@nevyn.them.org>
+	Set ptrace_message before PT_TRACE_EXIT.
+
+<rmk@flint.arm.linux.org.uk>
+	[ARM] Update wdt285 and wdt977 watchdog drivers
+	
+	General updates to these two watchdog drivers, including:
+	- converting initialisers to C99 syntax
+	- correcting module descriptions
+	- ensuring private symbols are declared static
+	- ensuring correct options are reported in the watchdog_info structure
+	- ensuring we use the right clock value for calculating timeouts
+	- ensuring failure cleanup paths are properly implemented
+	- don't use MOD_{INC,DEC}_USE_COUNT
+
+<rmk@flint.arm.linux.org.uk>
+	[ARM] Add input_devclass support to SA1111 PS/2 port driver.
+
+<rmk@flint.arm.linux.org.uk>
+	[ARM PATCH] 1099/4: trizeps MTD support
+	
+	Patch from Guennadi Liakhovetski
+	
+	An update of the partition-table and a typo-fix. Please, apply.
+
+<perex@suse.cz>
+	ALSA update
+	  - AC'97 - added quirks for tuning of hardware configuration
+	  - PCM midlevel - improved ring buffer allocation
+	  - sa11xx-uda1341 - small fixes
+	  - ISA - fixed ring buffer pointer calculation
+	  - OSS PCM - fixed deadlock (rate plugin)
+	  - timer - fixed deadlock when user interface is used
+	  - CS4232 - added detection of plain CS4236
+	  - USB driver - added boot quirk for SoundBlaster Extigy
+
+<axboe@suse.de>
+	[PATCH] front merge fix (really!)
+	
+	Ok, this is the fixed and tested variant that also fixes the bug that
+	the previous trivial fix exposed.
+
+<rmk@flint.arm.linux.org.uk>
+	[ARM] Update signal handling for ARM.
+	
+	Update the ARM signal handling to use the generic
+	get_signal_to_deliver() implementation.  There is a caveat though -
+	ARM has no hardware support for single stepping, and thus needs the
+	kernel to help provide this.
+	
+	We introduce a new ptrace flag for this, PT_SINGLESTEP, which
+	indicates to architecture specific code that it should take extra
+	actions in the signal handler to set and/or clear breakpoints as
+	appropriate.
+
+<bgerst@didntduck.org>
+	[PATCH] remove .mod.c files in make clean
+	
+	Remove the generated *.mod.c files in make clean.
+
+<rl@hellgate.ch>
+	[PATCH] Fix 8139too device close
+	
+	Starting with 2.5.61, 8139too takes forever (30+ seconds) to take an
+	interface down.  This gets the driver back to regular fraction of a
+	second time.
+	
+	The thread exit code assumes it can use SIGTERM to kill the driver
+	thread, not SIGKILL.
+
+<elenstev@mesatop.com>
+	[PATCH] 2.5.61 Reduce the number of "nuber" by four.
+	
+	This reduces the number of "nuber" by four and fixes the spelling
+	of necessary in one of those files.
+
+<elenstev@mesatop.com>
+	[PATCH] 2.5.61 fix spelling of necessary in 11 files
+	
+	This fixes the spelling of "necessary" in 11 files, plus these other
+	fixes which were nearby:
+	
+	 divisable -> divisible
+	 feild -> field
+	 effectivly -> effectively
+	 belive -> believe
+
+<elenstev@mesatop.com>
+	[PATCH] fix different spellings of different and differences
+
+<elenstev@mesatop.com>
+	[PATCH] correct the spelling of correction and correctly
+
+<elenstev@mesatop.com>
+	[PATCH] more accurate spelling of accuracy
+
+<elenstev@mesatop.com>
+	[PATCH] yet more pedantry: complement vs compliment.
+	
+	A compliment is an expression of esteem, respect, affection, or
+	admiration.  As far as I can tell, this word does not yet have a
+	place in the kernel source.
+	
+	A complement on the other hand, is what is meant in the following
+	places.
+
+<torvalds@home.transmeta.com>
+	Clean up and fix locking around signal rendering
+
+<kai@tp1.ruhr-uni-bochum.de>
+	kbuild: Fix modules_install w/o modules error
+	
+	I fixed scripts/Makefile.modpost to handle CONFIG_MODULES but no modules
+	selected, but forgot scripts/Makefile.modinst
+	
+	(pointed out by akpm)
+
+<kai@tp1.ruhr-uni-bochum.de>
+	kbuild: Fix a 64-bit issue in scripts/modpost.c
+	
+	The checksums are generally 32-bit (unsigned int), though they are saved
+	in symbol values, which may 64-bit, so we need to convert.
+	
+	Pointed out by Anton Blanchard.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	kbuild: Fix a "make -j" bug.
+	
+	We really need fixdep before we can compile anything...
+	
+	(Pointed out by wli, and others)
+
+<torvalds@home.transmeta.com>
+	Do proper signal locking for the old-style /proc/stat too.
+
+<anton@samba.org>
+	[PATCH] compat futex fix
+	
+	Fix compile errors after futex merge.
+
+<rusty@rustcorp.com.au>
+	[PATCH] get rid of exec_usermodehelper, replace with call_usermodehelper
+	
+	Urban Widmark points out that modprobe calls system() in many
+	configurations, which drops privs since request_module() doesn't
+	set ruid and rguid.
+	
+	This gets rid of exec_usermodehelper and makes everyone use
+	call_usermodehelper, which has a new "wait" flag.
+
+<torvalds@home.transmeta.com>
+	It's usually considered stupid to lock the same spinlock twice in 
+	close succession. However, for this once we'll just call it "inspired".
+	
+	But let's decide pair the lock with an unlock anyway, even if it is
+	boring and "square".
+
+<Jeff.Wiedemeier@hp.com>
+	[PATCH] delay marvel agp printk until after !hose check
+	
+	Delay the marvel agp hose printk until after the check for whether a
+	valid AGP hose was found. Otherwise if none was found, hose->index in
+	the printk arg list dereferences NULL.
+	
+	/jeff
+
+<rth@kanga.twiddle.net>
+	[ALPHA] Add isa_eth_io_copy_and_sum.
+	From Geoffrey Lee <glee@gnupilgrims.org>.
+
+<rth@kanga.twiddle.net>
+	[ALPHA] Add fadvise64.
+
+<shaggy@shaggy.austin.ibm.com>
+	JFS: Fix jfs_sync_fs
+	
+	jfs_sync_fs was implemented using the same code as the unmount code to flush
+	the journal and wait for the journal to quiesce.  Since jfs_sync_fs may  be
+	called while the volume is under heavy use, we can end up waiting
+	indefinately.  Code in jfs_flush_journal meant to detect a hang at unmount
+	time may be triggered in this case causing a trap.  This patch changes
+	jfs_sync_fs to only wait until the most recent transaction has been
+	commited to disk, rather than waiting until the commit queue is empty.
+
+<torvalds@home.transmeta.com>
+	Fix locking for "send_sig_info()", to avoid possible races with signal
+	state changes due to execve() and exit(). We need to hold the tasklist
+	lock to guarantee stability of "task->sighand".
+
+<rusty@rustcorp.com.au>
+	kbuild: Fix non-verbose make modules_install output
+
+<mzyngier@freesurf.fr>
+	[PATCH] EISA/sysfs updates
+	
+	This is an update to the EISA/sysfs code :
+	
+	 - Separate bus root code from generic code.
+	 - Add driver for PCI/EISA bridge.
+	 - Hacked parisc eisa driver so it can act as a root device.
+	 - Add driver for so-called virtual root (for bridge-less systems).
+	 - Allow multiple roots.
+	 - Moved quirk_eisa_bridge from alpha to generic code, since
+	   the EISA code needs it now (on x86, for example...).
+	 - 3c59x :
+	   Prevent driver from returning ENODEV in case it has registered with
+	   the EISA framework, but no device has been found yet (it happends
+	   when the driver is built into the kernel, and the EISA bus root has
+	   not been discovered yet).
+	
+	It's been discussed on lkml, and all suggestions (mainly from Ivan
+	Kokshaysky <ink@jurassic.park.msu.ru>) have been taken into account.
+
+<rddunlap@osdl.org>
+	[PATCH] fix Documentation/cli-sti-removal.txt thinko
+	
+	The 3 lines being deleted are repeated from above (in same file).
+	I pulled the 2 lines being added from an earlier version of the patch.
+
+<sam@ravnborg.org>
+	[PATCH] fix warning in kernel/dma.c
+	
+	When compiling without PROC_FS enabled a warning is issued about
+	proc_dma_show defined but not used.
+	
+	Move both versions of proc_dma_show inside the #ifdef CONFIG_PROC_FS
+
+<sam@ravnborg.org>
+	[PATCH] char/drivers/random.c - fix warning
+	
+	When compiling random.c without SYSCTL defined a warning is
+	issued about free_entropy_store being defined but not used.
+	Put ifdef's around the functions.
+	
+	I could have moved the whole function, but it logically belongs
+	to this part of the file.
+
+<torvalds@home.transmeta.com>
+	Linux 2.5.62
+

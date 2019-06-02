@@ -1,0 +1,225 @@
+final:
+
+- 2.0.40-rc8 was released as 2.0.40 with no changes.
+
+2.0.40-rc8
+
+Ahem, 2.0.40-rc7 never happened, and thus never contained a non-working
+sk_buff.c...  *Lalalalala*
+
+o	Fix sk_buff.c				(me)
+	| Thanks to the following who
+	| informed me of my blunder:
+	| Jari Ruusu, Seiichi Nakashima,
+	| Steven ?, Michael Deutschmann
+o	Correct AF_UNIX fd-passing		(Michael Deutschmann)
+	semantics to match what OpenSSH
+	expects
+o	Fix typo in rtl8139.c introduced in	(me)
+	2.0.40-rc7
+o	Fix typo in ni65.c introduced in	(me)
+	2.0.40-rc7
+o	Fix compile-time error in pci2000.h	(me)
+o	Fix ICMP-fix for ip_forward.c		(me)
+o	Fix two compile-time warnings		(me)
+	in menuconfig
+o	Minor changes to CREDITS		(me)
+o	Cosmetic changes to MAINTAINERS		(me)
+
+
+2.0.40-rc7
+
+Well, lets pretend, like many times before, that this really is the
+last release candidate for the 2.0.40-kernel.  I won't bother with
+excusing myself for being late (bordering on the extreme) with this
+release.  Better late than never.
+
+o	__Security-fix__: fix local LCALL7	(taken from 2.2.23)
+	crasher
+o	__Security-fix__: made mmap of		(me)
+	/proc/*/mem a config-option,
+	disabled by default
+o	__Security-fix__: fix ICMP data leak	(Philippe Biondi, me)
+o	__Security-fix__: Fix ethernet		(backported from 2.2.24)
+	padding data leak
+	| fixed drivers:
+	| 3c501
+	| 3c505
+	| 3c507
+	| 8390
+	| atarilance
+	| de600
+	| de620
+	| depca
+	| epic100
+	| hp100
+	| ni52
+	| ni65
+	| rtl8139
+	| seeq8005
+	| sk_g16
+	| smc9194
+	| tulip
+	| via-rhine
+	| znet
+	| todo:
+	| a2065
+	| ariadne
+o	Make tulip handle the case where	(taken from 2.2.24)
+	init_etherdev returns NULL
+o	Rest in Peace, Leonard Zubkoff		(me, Paul Gortmaker)
+o	RTC wildcard fix			(taken from 2.2.24)
+o	Make padding work properly in		(Jeff DeFouw, me)
+	ip_options
+	| Did whitespace-changes too
+o	Fix typo and incorrect C-code		(Michael Deutschmann)
+	in arch/i386/kernel/setup.c
+o	Documentation fix for unicode.txt	(Michael Deutschmann)
+o	Updated COPYING to fix y2k-issues...	(me)
+o	Update of various documentation		(Thunder from the Hill, me)
+	to reflect the fact that Linus is NOT
+	the right person to contact
+	about 2.0-related bugs...
+o	Remove the MCA-entry from		(me)
+	MAINTAINERS, since the 2.0-tree
+	does not support MCA
+o	Change my e-mail address to		(me)
+	tao@kernel.org; since I have such
+	an address, I might as well use it
+	for kernel-related matters.  Also
+	added my GPG-key information
+o	Add default:-clause to a switch in 	(me)
+	vsprintf.c
+	| Minor whitespace-changes while
+	| at it
+o	Add default:-clauses to			(me)
+	mm/{shm,sem,msg}.c
+	| No whitespace-changes here
+
+
+2.0.40-rc6
+
+o	Make sys_utime and sys_utimes		(Stephen Rothwell, me)
+	perform the same permission checking
+	| Again, I did some whitespace changes
+	| while at it; Stephen's innocent
+o	Remy Card no longer maintains ext2	(me)
+
+
+2.0.40-rc5
+
+o	Ignore SIGURG in SIG_DFL, as per SUSv3	(Christopher Yeoh, me)
+o	Fix ipc/sem.c SUS/LSB compliance	(Christopher Yeoh)
+	| Both these fixes contains whitespace
+	| changes. Don't blame poor Chris for
+	| this; I made them
+o	Changes to MAINTAINERS			(Riley Williams, me)
+	| Added Riley Williams
+	| Various tidying
+	| Updated the address to the
+	| Appletalk mailing-list
+	| Updated Christoph Lameter's
+	| e-mail address
+	| Updated Andre Hedrick's entry
+	| Updated Thomas Bogendörfer's entry
+	| Updated Martin Mares' e-mail address
+
+
+2.0.40-rc4
+
+o	Commented out a printk in fs/buffer.c   (Michael Deutschmann)
+	that complains about mismatching
+	blocksizes
+
+
+2.0.40-rc3
+
+o	Fix memory-leak in af_unix		(Jon Nelson, Alan Cox, me)
+
+
+2.0.40-rc2
+
+o	Fix ICMP bug				(David S. Miller)
+o	Add autodetection for wd1002s-wx2	(Paul, who appears to
+	in the xd-driver			 have no last name =])
+o	Fix path MTU discovery for		(Kirk Petersen)
+	transparent TCP sockets
+o	Revert array-size change in		(me, on advise from
+	include/linux/module.h			 Jari Ruusu)
+o	Remove workaround for gcc-2.4.5		(Adrian Bunk)
+	| This is basically a whitespace-
+	| change, since it removes code
+	| inside an #ifdef #endif clause
+
+
+2.0.40-rc1
+
+o	Fix possible vmalloc bug for		(Ralf Baechle)
+	architectures with virtually
+	indexed caches
+o	Micro-optimization in vmalloc		(Ralf Baechle)
+o	Fix group descriptor corruption		(Daniel Phillips,
+	in ext2fs				 Ville Herva,
+						 Samuli Kärkkäinen)
+o	Fix some missing includes		(me)
+o	Change array-size from 0 to 1 for	(me)
+	two arrays in the symbol-table
+	in include/linux/module.h
+o	Fix type of struct timeval xtime in	(me)
+	include/linux/sched.h
+o	Fix warnings in include/linux/skbuff.h	(me)
+o	Fix a few typos in Configure.help	(me)
+o	Various small whitespace changes	(me)
+	and fixes of strange indentation
+	| I know some of you won't like this
+	| and I don't give a damn ;-)
+
+
+2.0.40-pre3
+
+o	Fix typo in sched.c			(Tim Sutherland)
+	| this time for real; I applied this
+	| patch to the wrong kernel-tree last
+	| time, hence the reject
+o	IDE probe patch for some ATAPI drives	(Geert Van der Plas)
+
+
+2.0.40-pre2
+
+o	Make pci2000 compile			(Joseph Martin)
+o	Use KERNELRELEASE in module		(me)
+	installpath as well
+o	Removed unused variable in		(me)
+	ext2/super.c
+o	Fixed warning in ext2/dir.c		(me)
+o	Fix a blunder of my own in		(me)
+	arch/kernel/i386/traps.c
+o	Fix typo in sched.c			(Tim Sutherland)
+o	Fix bug in mkdep.c			(Tim Sutherland)
+o	Fix bug in autoirq.c			(Michael Deutschmann)
+o	Add allocation debugging code		(Michael Deutschmann)
+o	Fix bugs in the math-emu code		(Bill Metzenthen,
+						 Michael Deutschmann)
+
+2.0.40-pre1
+
+o	Fixed the ordering of			(Philipp Rumpf)
+	watchdog initialising, to make sure
+	hardware watchdogs takes precedence
+	over the softdog driver
+o	Fix the CREDITS-entry for		(Kai Petzke)
+	Kai Petzke
+o	Updated the MAINTAINERS-file a little	(me)
+o	Fix "dumpable"-race			(Solar Designer)
+o	Fix theoretical exploit in printk	(Solar Designer)
+o	Backported checkconfig.pl,		(me)
+	checkhelp.pl and checkincludes.pl
+	from v2.4
+o	Backported support for tags and		(me)
+	TAGS
+o	Added an extra-version entry to		(me)
+	the version#, to keep track of
+	the prepatches etc.
+o	Fix all occurences of			(me)
+	#endif BLABLA type; don't forget
+	that it should be /* BLABLA */ !!!

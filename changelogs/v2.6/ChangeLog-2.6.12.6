@@ -1,0 +1,125 @@
+commit d04a37911968d919fa842ad40fa9e9ff1dd10904
+Author: Chris Wright <chrisw@osdl.org>
+Date:   Mon Aug 29 09:55:27 2005 -0700
+
+    Linux 2.6.12.6
+
+commit f982542ed2f495cbe94e6d9001878f27ea738b36
+Author: Patrick McHardy <kaber@trash.net>
+Date:   Wed Aug 17 12:04:22 2005 -0700
+
+    [PATCH] Fix SKB leak in ip6_input_finish()
+    
+    Changing it to how ip_input handles should fix it.
+    
+    Signed-off-by: Patrick McHardy <kaber@trash.net>
+    Signed-off-by: "David S. Miller" <davem@davemloft.net>
+    Signed-off-by: Chris Wright <chrisw@osdl.org>
+
+commit ec3b77ec116cf2b9d42f6544caa71f084cfc1ff1
+Author: Jan Blunck <j.blunck@tu-harburg.de>
+Date:   Tue Aug 23 22:25:14 2005 +0200
+
+    [PATCH] sg.c: fix a memory leak in devices seq_file implementation (2nd)
+    
+    I know that scsi procfs is legacy code but this is a fix for a memory leak.
+    
+    While reading through sg.c I realized that the implementation of
+    /proc/scsi/sg/devices with seq_file is leaking memory due to freeing the
+    pointer returned by the next() iterator method. Since next() might
+    return NULL or an error this is wrong. This patch fixes it through using
+    the seq_files private field for holding the reference to the iterator
+    object.
+    
+    Here is a small bash script to trigger the leak. Use slabtop to watch
+    the size-32 usage grow and grow.
+    
+    #!/bin/sh
+    
+    while true; do
+    	cat /proc/scsi/sg/devices > /dev/null
+    done
+    
+    Signed-off-by: Jan Blunck <j.blunck@tu-harburg.de>
+    Signed-off-by: Chris Wright <chrisw@osdl.org>
+
+commit 7b1bfbc0786fdc9ba511d0136f6417736bdc4cc6
+Author: lepton <ytht.net@gmail.com>
+Date:   Mon Aug 22 14:02:39 2005 +0800
+
+    [PATCH] fix gl_skb/skb type error in genelink driver in usbnet
+    
+    I think there is a type error when port genelink driver to 2.6..
+    With this error, a linux host will panic when it link with a windows
+    host.
+    
+    Cc: David Brownell <david-b@pacbell.net>
+    Signed-off-by: Chris Wright <chrisw@osdl.org>
+
+commit 3ad543d4783e47b413300715d790b5ad652567ff
+Author: Patrick McHardy <kaber@trash.net>
+Date:   Thu Aug 18 20:59:37 2005 +0200
+
+    [PATCH] Fix DST leak in icmp_push_reply()
+    
+    Based upon a bug report and initial patch by
+    Ollie Wild.
+    
+    Signed-off-by: Patrick McHardy <kaber@trash.net>
+    Signed-off-by: "David S. Miller" <davem@davemloft.net>
+    Signed-off-by: Chris Wright <chrisw@osdl.org>
+
+commit 6e5ca4f13185dea47ef4c151d32e9e387e7bb47b
+Author: Linus Torvalds <torvalds@osdl.org>
+Date:   Wed Aug 17 21:19:24 2005 +0100
+
+    [PATCH] Revert unnecessary zlib_inflate/inftrees.c fix
+    
+    It turns out that empty distance code tables are not an error, and that
+    a compressed block with only literals can validly have an empty table
+    and should not be flagged as a data error.
+    
+    Some old versions of gzip had problems with this case, but it does not
+    affect the zlib code in the kernel.
+    
+    Analysis and explanations thanks to Sergey Vlasov <vsu@altlinux.ru>
+    
+    Cc: Sergey Vlasov <vsu@altlinux.ru>
+    Cc: Tavis Ormandy <taviso@gentoo.org>
+    Cc: Tim Yamin <plasmaroo@gentoo.org>
+    Signed-off-by: Linus Torvalds <torvalds@osdl.org>
+    Signed-off-by: Chris Wright <chrisw@osdl.org>
+
+commit 4b45a6364a096cc4d899c9d19aad852865eb0ebb
+Author: Bhavesh P. Davda <bhavesh@avaya.com>
+Date:   Mon Aug 29 09:55:12 2005 -0700
+
+    [PATCH] NPTL signal delivery deadlock fix
+    
+    This bug is quite subtle and only happens in a very interesting
+    situation where a real-time threaded process is in the middle of a
+    coredump when someone whacks it with a SIGKILL. However, this deadlock
+    leaves the system pretty hosed and you have to reboot to recover.
+    
+    Not good for real-time priority-preemption applications like our
+    telephony application, with 90+ real-time (SCHED_FIFO and SCHED_RR)
+    processes, many of them multi-threaded, interacting with each other for
+    high volume call processing.
+    
+    Acked-by: Roland McGrath <roland@redhat.com>
+    Signed-off-by: Linus Torvalds <torvalds@osdl.org>
+    Signed-off-by: Chris Wright <chrisw@osdl.org>
+
+commit 332b8bee402fe1076e50d08dfa535a9f0a349cba
+Author: Herbert Xu <herbert@gondor.apana.org.au>
+Date:   Sat Aug 6 13:33:15 2005 -0700
+
+    [PATCH] Restrict socket policy loading to CAP_NET_ADMIN - CAN-2005-2555
+    
+    The interface needs much redesigning if we wish to allow
+    normal users to do this in some way.
+    
+    Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+    Signed-off-by: "David S. Miller" <davem@davemloft.net>
+    Signed-off-by: Chris Wright <chrisw@osdl.org>
+

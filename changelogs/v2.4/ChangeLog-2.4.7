@@ -1,0 +1,71 @@
+-final:
+ - me: fix ptrace and /proc issues with new core-dump permissions
+ - numerous: IDE tape driver update for completion handlers
+ - Ben Collins: ieee1394 GUID cleanups
+ - Jacek Stepniewski: nasty deadlock in rename()
+
+-pre9:
+ - Dan Quinlan: cramfs update
+ - Ben Collins: IEEE 1394 update
+ - David Miller: network update (pppoe, routing cache stats), sparc32 update
+ - me: only dump core once per threaded app (first one wins)
+ - me: use new completion handlers for block device requests (same race
+   as with vfork, see -pre7)
+
+-pre8:
+ - Chris Mason: reiserfs update
+ - Paul Mackerras: PPC updates (softirq)
+ - Kai Germaschewski: ISDN updates
+ - various: workaround for cpuid inline asm problem with egcs-2.91.66
+
+-pre7:
+ - Andreas Dilger: various ext2 cleanups
+ - Richard Gooch: devfs update
+ - Johannes Erdfelt: USB updates
+ - Alan Cox: merges
+ - David Miller: fix SMP pktsched bootup deadlock (CONFIG_NET_SCHED)
+ - Roman Zippel: AFFS update
+ - Anton Altaparmakov: NTFS update
+ - me: fix races in vfork() (semaphores are not good completion handlers)
+ - Jeff Garzik: net driver updates, sysvfs update
+
+-pre6:
+ - me: fix more buffer head SMP races (non-x86 only - weak memory ordering)
+ - Andrea Arkangeli: some bh cleanups from the buffer race condition fix
+ - Tim Waugh: parport drievr documentation, init sanity
+ - Ion Badulescu: starfire net driver update
+ - David Miller: sparc and networking updates
+ - Ivan Kokshaysky: alpha version of the inlined rw-semaphores
+ - NIIBE Yutaka: SuperH update
+
+-pre5:
+ - remember to bump the version string
+ - Andrea Arkangeli: softirq cleanups and fixes, and everybody is happy
+   again (ie I changed some details to make me happy ;)
+ - Neil Brown: raid5 stall fix, nfsd filehandle sanity check fix
+
+-pre4:
+ - David Miller: sparc and networking updates
+ - Al Viro: SysV FS add_link off-by-two bogosity.
+ - Jeff Garzik: merge D-Link DL2k GigE driver, other network driver cleanups
+ - Kai Germaschewski: ISDN update
+ - Alan Cox: more merging (MPT fusion core)
+ - Johannes Erdfelt: USB updates
+ - Stas Sergeev: make sure we return out of vm86 mode when interrupts
+   get re.enabled
+ - Rusty Russell: netfilter fixes for ipt_unclean and ip_queue
+ - me: initialize page->age when adding it to the swap cache
+ - Paul Mackerras: PPC updates
+ - some subtle fs/buffer.c race conditions (Andrew Morton, me)
+
+-pre3:
+ - merge with Alan (SCSI subsystem)
+ - Jeff Garzik: make serial driver PCI hotplug-aware
+
+-pre2:
+ - merge with Alan (USB, zoran, sony motion-eye, rio, dmi-scan)
+
+-pre1:
+ - merge with Alan (irda, s390, mips64, chris, sk98lin, mips/mm)
+ - rth: fix alpha RTC calibration
+ - Paul Mackerras: fix PPC typo

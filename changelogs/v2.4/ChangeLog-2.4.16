@@ -1,0 +1,9 @@
+final:
+
+- Fix 8139too oops				(Philipp Matthias Hahn)
+
+pre1:
+- Correctly sync inodes in iput()                          (Alexander Viro)
+- Make pagecache readahead size tunable via /proc          (was in -ac tree)
+- Fix PPC kernel compilation problems                      (Paul Mackerras)
+

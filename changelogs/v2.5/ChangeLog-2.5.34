@@ -1,0 +1,1242 @@
+
+Summary of changes from v2.5.33 to v2.5.34
+============================================
+
+<green@angband.namesys.com>
+	Add displaying of more reiserfs statistical info through /proc interface, by Nikita Danilov
+
+<green@angband.namesys.com>
+	Corrected calculation of amount of blocks that file occupies on reiserfs.
+
+<green@angband.namesys.com>
+	Implemented new block allocator for reiserfs, new tail policy for smaller tails.
+	
+	New block allocator contains code from Alexander Zarochencev, Jeff Mahoney and Oleg Drokin.
+
+<laforge@gnumonks.org>
+	MAINTAINERS: Update NETFILTER entry.
+
+<skip.ford@verizon.net>
+	include/asm-sparc64/hardirq.h: Comment fix.
+
+<ica2_ts@csv.ica.uni-stuttgart.de>
+	include/net/tcp.h: Use ____cacheline_aligned
+
+<c-d.hailfinger.kernel.2002-07@gmx.net>
+	net/ipv4/netfilter/ipchains_core.c: Fix MODULE_LICENSE
+
+<davem@nuts.ninka.net>
+	[IGMP]: Make ip_mc_dec_group return void.
+
+<laforge@gnumonks.org>
+	[NETFILTER]: Fix OOPS in ipt_ULOG
+	- If an iptables rule is using --ulog-nlgroup with a
+	value greated than 4, we crash
+	- Remove a memory leak when someone throws packets at
+	the ulog netlink socket
+
+<davem@nuts.ninka.net>
+	net/core/dst.c: asm/bitops.h --> linux/bitops.h
+
+<davem@nuts.ninka.net>
+	drivers/net/ppp_generic.c: Fix byte-aligned packets, nearly every arch csum_partial cannot handle this.
+
+<davem@nuts.ninka.net>
+	arch/sparc64/kernel/ioctl32.c: Handle SIOCDEVPRIVATE transparently.
+
+<davem@nuts.ninka.net>
+	drivers/net/ppp_generic.c: Fix skb_put len arg when copying unaligned skb.
+
+<torvalds@home.transmeta.com>
+	De-queue the floppy request late, so that the higher levels
+	know the floppy driver is busy.
+
+<davem@nuts.ninka.net>
+	[SPARC]: Fix build breakage.
+	- Update for PCI config space access api changes
+	- Handle new do_fork args
+	- Delete SET/CLEAR TID handling from copy_thread
+	- Update arch/sparc64/defconfig
+
+<jmorris@intercode.com.au>
+	net/ipv6/af_inet6.c: Fix __FUNCTION__ pasting.
+
+<jmorris@intercode.com.au>
+	net/ipv4/netfilter/ipfwadm_core.c: Fix build bustage when debugging is enabled.
+
+<davem@nuts.ninka.net>
+	net/ipv4/netfilter/ip_nat_helper.c: Fix __FUNCTION__ pasting.
+
+<nmiell@attbi.com>
+	net/sctp/sm_make_chunk.c: Fix typo.
+
+<hirofumi@mail.parknet.co.jp>
+	[PATCH] remove BUG_ON(p->ptrace) in release_task()
+	
+	The BUG_ON(p->ptrace) will be called if the CLONE_DETACH process is
+	traced.  This patch removes BUG_ON(p->ptrace), and also removes a
+	workaround for it in sys_wait4().
+
+<hch@sb.bsdonline.org>
+	JFS: use jfs_file_inode_operations for special files aswell
+
+<hch@sb.bsdonline.org>
+	JFS: sanitize naming of ea read/write functions, add missing statics
+
+<ray-lk@madrabbit.org>
+	[PATCH] Re: 2.5.33 PNPBIOS does not compile
+	
+	I don't know if the current form is harmless or not, but it is
+	definitely incorrect.  The patch below corrects the compile failure, as
+	well as the multi-statement macro defines used in bare if statements;
+	please apply.
+
+<hch@sb.bsdonline.org>
+	JFS: Remove unused file jfs_extendfs.h
+	
+	JFS/Linux implements resizing by remount.
+
+<hch@sb.bsdonline.org>
+	JFS: remove some cruft left over from the pre-mempool metapage code
+
+<hch@sb.bsdonline.org>
+	JFS: use buffer_heads to access the superblock
+
+<hch@sb.bsdonline.org>
+	JFS: use block device inode/mapping instead of direct_inode/direct_mapping
+	
+	Change __get_metapage to use the block device mapping to back metapages
+	that are addresses by filesystem relative blocks.  Remove all code to
+	implement the JFS-private per-filesystem mapping and fake inode.
+
+<davem@nuts.ninka.net>
+	drivers/net/ppp_generic.c: Allocate right length in unaligned SKB fix.
+
+<hch@sb.bsdonline.org>
+	JFS: ifdef out unused functions related to partial blocks
+
+<hch@sb.bsdonline.org>
+	JFS: remove superflous externs for generic_file_ functions
+
+<hch@sb.bsdonline.org>
+	JFS: remove superflous return at the end of lbmIODone
+
+<davem@nuts.ninka.net>
+	arch/sparc64/kernel/ioctl32.c: Translate PPPIOCS{PASS,ACTIVE}
+
+<hch@sb.bsdonline.org>
+	JFS: Don't include <linux/smp_lock.h> in jfs_dtree.c
+
+<kai@tp1.ruhr-uni-bochum.de>
+	kbuild: Remove CONFIG_DEVFS_FS from arch/ia64/config.in
+	
+	Defining CONFIG_DEVFS_FS in two different places does not work correctly.
+	Nobody objected on linux-ia64, so I just removed the statements
+	unconditionally enabling devfs on IA64/SNI.
+	
+	Pointed out by Greg Banks.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	ISDN: Fix __FUNCTION__ usage
+
+<kai@tp1.ruhr-uni-bochum.de>
+	ISDN: cleanups / overflow check
+	
+	Based on work done by Solar Designer for 2.2
+
+<kai@tp1.ruhr-uni-bochum.de>
+	ISDN: One last ISDN designated initializer
+	
+	(by Rusty Russell)
+
+<kai@tp1.ruhr-uni-bochum.de>
+	ISDN: Remove __NO_VERSION__
+	
+	#define __NO_VERSION__ has been unnecessary for a long time, so here it
+	goes...
+	
+	(Rusty Russell)
+
+<kai@tp1.ruhr-uni-bochum.de>
+	kbuild: Fix export-objs
+	
+	Fix various Makefiles to really list the objects which use EXPORT_SYMBOL.
+	
+	Patch by "Lightweight Patch Manager".
+
+<kai@tp1.ruhr-uni-bochum.de>
+	kbuild: fix ACPI Config.in breakage
+	
+	Christoph Hellwig:
+	
+	bools don't have depencies, only dep_bools do.  Use three-space indents.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	drivers/char/sonypi.h: Fix __FUNCTION__ usage
+
+<kai@tp1.ruhr-uni-bochum.de>
+	include/linux/ptrace.h: fix includes
+	
+	ptrace.h needs struct task_struct, so we need to include <linux/sched.h>.
+
+<kuznet@ms2.inr.ac.ru>
+	net/ipv4/tcp_output.c: Fix crashes due to bugs in TSO.
+
+<paulus@samba.org>
+	PPC32: Convert the various PCI config space accessors to the new API.
+
+<torvalds@kiwi.transmeta.com>
+	Fix sonipi driver to not do __FUNCTION__ pasting.
+
+<davem@nuts.ninka.net>
+	arch/sparc64/lib/VIScsum.S: Do not use VIS on oddly aligned buffer.
+
+<davem@nuts.ninka.net>
+	drivers/net/ppp_generic.c: Revert my idiotic unaligned SKB changes.
+
+<davem@nuts.ninka.net>
+	arch/sparc64/lib/VIScsum.S: Fix endianness bugs in previous change.
+
+<hch@sb.bsdonline.org>
+	JFS: sync blockdevice at umount
+	
+	We need to sync the blockdevice mapping at umount although sync_blockdev
+	already does it as we need to make sure everything hits the disk before
+	we mark the superblock clean.
+	
+	Found by Dave Kleikamp.
+
+<hch@sb.bsdonline.org>
+	JFS: fix up more merge issues
+	
+	The BK merging was a little too smart for the conflicting changes.
+	Add back what we lost with the last changeset.
+
+<hch@sb.bsdonline.org>
+	JFS: we still need extHint
+
+<torvalds@home.transmeta.com>
+	Major partial request completion boo-boo in the bio layer.
+	
+	This was _bad_. Major floppy corruption, and possibly the reason
+	for other block device corruption for any driver that generated
+	partial results for a block device request.
+
+<torvalds@home.transmeta.com>
+	Fix floppy driver end_request() handling - it used to do insane
+	contortions instead of just calling "end_that_request_first()" with
+	the proper sector count.
+
+<geert@linux-m68k.org>
+	[PATCH] duplicate declaration of pci_lock
+	
+	Kill duplicate declaration of pci_lock
+
+<jmorris@intercode.com.au>
+	[PATCH] sigio/sigurg cleanup for 2.5.32
+	
+	This is a cleanup of the sigio/sigurg code.
+	
+	Summary:
+	  o Removed sk->proc, SIGURG now sent via vfs, credentials checked
+	    during delivery.
+	  o SIOCSPGRP etc. ioctls use vfs, and work now for SIGIO as well
+	    as SIGURG.
+	  o Removed socket fcntl code.
+	  o Consolidate lsm file_set_fowner() hooks.
+	  o Fixed fowner race.
+	  o Fixed associated mainline memory leak in fcntl_dirnotify().
+
+<rml@tech9.net>
+	[PATCH] flag type cleanup
+	
+	This fixes various instances of the interrupt flag variable not being
+	the proper `unsigned long', most notably kernel/softirq.c ...
+
+<rml@tech9.net>
+	[PATCH] bad: schedule() with irqs disabled!
+	
+	OK, Linus, you are right... there are enough instances of this we are
+	not going to find them all (although I suspect Andrew's slab.c fixes
+	will cover most of the cases).  Further, I think we can should actually
+	purposely call preempt_schedule() in certain cases after interrupt
+	reenable to check for reschedules...
+	
+	Let's just make it a rule "no preemption if interrupts are off" and
+	enforce that.
+
+<davem@nuts.ninka.net>
+	arch/sparc64/kernel/ioctl32.c: Frob cmd in PPPIOCS{PASS,ACTIVE}.
+
+<ac9410@attbi.com>
+	[PATCH] 2.5.33 dmi_scan blacklist ibm thinkpad for i2c/sensors
+	
+	This adds IBM thinkpads to a list of mainboards that should not be
+	scanned by i2c sensors during detection phase.
+
+<akpm@zip.com.au>
+	[PATCH] place rmap locking in rmap-locking.h
+	
+	The rmap locking inlines are causing some header file
+	dependency/ordering problems - move them out of page-flags.h and into
+	their own header file.
+
+<akpm@zip.com.au>
+	[PATCH] convert node/zone_start_paddr to pfns
+	
+	I've had ia32-discontigmem under test for a month, uneventfully.  Possibly
+	because I don't have a machine to test it on....
+	
+	A major part of this work is a general move to convert the low-level
+	memory management to consistently use pageframe numbers.  It's a bit
+	schizo at present..
+	
+	This patch was written by Martin Bligh.  A version of this patch is in
+	the 2.4 aa tree.
+	
+	It changes the unsigned longs node_start_paddr and zone_start_paddr to
+	page frame numbers.  This is necessary because a PAE address is 36 bits
+	and cannot be represented in an unsigned long.
+	
+	 - The per-node physical memory start address node_start_paddr becomes
+	   a pfn, node_start_pfn.
+	
+	 - The per-zone physical memory start address zone_start_paddr becomes
+	   a pfn, zone_start_pfn.
+	
+	 - free_area_init_node() takes a pfn rather than a physical address.
+	
+	Patricia has tested this patch on the following configurations: UP,
+	SMP, SMP PAE, multiquad, multiquad PAE, multiquad DISCONTIGMEM,
+	multiquad DISCONTIGMEM PAE.
+
+<akpm@zip.com.au>
+	[PATCH] reorganise setup_arch() for ia32 discontigmem
+	
+	This restructures setup_arch() for i386 to make it easier to include the
+	i386 numa changes (for CONFIG_DISCONTIGMEM) I've been working on.  It
+	also makes setup_arch() easier to read.  A version of this patch is the
+	in 2.4 aa tree.
+	
+	This does not depend on the other patches I'm submitting today, but my
+	discontigmem patch does depend on this one.
+	
+	I've tested this patch on the following configurations: UP, SMP, SMP
+	PAE, multiquad, multiquad PAE.
+
+<akpm@zip.com.au>
+	[PATCH] restructure mem_init for ia32 discontigmem
+	
+	 - Pull the middle out of one_highpage_init() so that the i386 NUMA
+	   patch can call it on a per-page basis.
+	
+	 - Move a few lines out of mem_init() into the new
+	   set_max_mapnr_init(), which the i386 NUMA code requires.
+
+<akpm@zip.com.au>
+	[PATCH] discontigmem support for ia32 NUMA
+	
+	 - All the support macros which assume a linear mem_map[] have been
+	   wrapped in !CONFIG_DISCONTIGMEM.  pfn_to_page, page_to_pfn,
+	   page_to_phys, pmd_page, kern_addr_valid.
+	
+	 - Move some initialsation macros into setup.h so they can be used in
+	   the i386 discontig.c (INITRD_START, INITRD_SIZE).
+	
+	 - Alternate version of the bootmem allocator
+	
+	 - add i386 discontig support and numaq support.
+
+<akpm@zip.com.au>
+	[PATCH] use page_to_pfn() instead of mem_map[]
+	
+	A patch from Martin Bligh which cleans up the open-coded uses of
+	mem_map for ia32.  Basically it replaces
+	
+	mem_map + pagenr
+	
+	with
+	
+	pfn_to_page(pagenr)
+	
+	in lots of places.  Because mem_map[] doesn't work like that with
+	discontigmem.
+	
+	It also fixes a bug in bad_range, that happens to work for contig mem
+	systems, but is incorrect.  Tested both with and without discontigmem
+	support.
+
+<Andries.Brouwer@cwi.nl>
+	[PATCH] try more sd.c MODE SENSE modes
+	
+	In sd.c we call MODE SENSE (6) in order to find out whether the
+	device is write protected. The info we need is in byte 2, the
+	header of the MODE SENSE answer, but in the request we have to
+	specify (i) what page(s) we want, and (ii) how many bytes we want.
+	
+	Long ago we asked for 12 bytes from page 1 (Daniel Roche, 1.3.35).
+	Matthew Dharm made this 8 bytes from page 3F (all pages), patch-2.4.0-test8.
+	In patch-2.4.10 the 8 was increased to 255.
+	
+	I found on the one hand devices that only react to page 0
+	(the vendor page), and return an error for page 3F.
+	And on the other hand devices that are unable to handle requests
+	for more bytes than they actually have.
+	
+	So, it seems that the cautious way to ask for MODE SENSE data is
+	to first ask for the header only, see how much is available,
+	and then ask for everything.
+	
+	The patch below first separates out the MODE SENSE call,
+	and then tries it three times: on all pages (3F), only the first
+	four bytes; on the vendor page (0), only the first four bytes;
+	on all pages (3F), 255 bytes.
+	
+	This should be at least as robust as our current code.
+	I tried it on 8 SCSI devices (of which 2 fail under 2.5.33)
+	and found no problems.
+
+<Andries.Brouwer@cwi.nl>
+	[PATCH] sddr09.c MODE SENSE fixes
+	
+	Teach usb/storage/sddr09.c how to return less than a full page of sense
+	data.
+
+<ak@muc.de>
+	[PATCH] Fix RELOC_HIDE miscompilation
+	
+	RELOC_HIDE got miscompiled on gcc3.1/x86-64 in the access to softirq.c's per
+	cpu variables.  This fixes the problem.
+	
+	Clearly to hide the relocation the addition needs to be done after the
+	value obfuscation, not before.
+	
+	I don't know if it triggers on other architectures (x86-64 is especially
+	stressf here because it has negative kernel addresses), but seems like the
+	right thing to do.
+
+<rusty@rustcorp.com.au>
+	[PATCH] Early child_reaper initialization
+	
+	This sets child_reaper to the idle thread upon creation, so that
+	ksoftirqd's reparent_to_init call doesn't get the swapper as parent.
+
+<rusty@rustcorp.com.au>
+	[PATCH] daemonize() calls reparent_to_init cleanup
+	
+	 This makes daemonize() call reparent_to_init() itself, as long
+	suggested for 2.5, and fixes the callers so they don't call it again.
+	Also fixes callers which set current->tty to NULL themselves (also
+	no longer neccessary).
+
+<rusty@rustcorp.com.au>
+	[PATCH] Important per-cpu fix.
+	
+	Frankly, I'm amazed the kernel worked for long without this.
+	
+	Every linker script thinks the section is called .data.percpu.
+	Without this patch, every CPU ends up sharing the same "per-cpu"
+	variable.
+	
+	This might explain the wierd per-cpu problem reports from Andrew and
+	Dave, and also that nagging feeling that I'm an idiot...
+
+<rusty@rustcorp.com.au>
+	[PATCH] list_t removal
+	
+	This removes list_t, which is a gratuitous typedef for a "struct
+	list_head".  Unless there is good reason, the kernel doesn't usually
+	typedef, as typedefs cannot be predeclared unlike structs.
+
+<paulus@au1.ibm.com>
+	PPC32: remove unnecessary includes in ppc_ksyms.c
+
+<paulus@au1.ibm.com>
+	PPC32: add the extra argument for do_fork to the PPC calls.
+
+<paulus@samba.org>
+	PPC32: update some initializers to the standard format, from Rusty.
+
+<paulus@samba.org>
+	PPC32: Put back an export-objs that someone incorrectly removed.
+
+<paulus@samba.org>
+	PPC32: moved the compatibility padding entries in the aux vector
+	to the bottom of the aux table.
+
+<paulus@samba.org>
+	PPC32: Correct a comment about soft/hardirq masks in asm-ppc/hardirq.h
+
+<paulus@samba.org>
+	PPC32: fix a comment in asm-ppc/semaphore.h (extraneous "the")
+
+<paulus@samba.org>
+	PPC32: use page_to_pfn instead of page - mem_map in a couple of places
+
+<paulus@samba.org>
+	PPC32: remove a couple of unused files.
+
+<paulus@au1.ibm.com>
+	[PATCH] fix create_elf_tables on PPC
+	
+	create_elf_tables in fs/binfmt_elf.c now sets up the list of aux table
+	entries in a buffer on the kernel stack before copying it to the user
+	stack.
+	
+	Unfortunately, while the buffer is big enough for most architectures, it
+	isn't big enough on PPC, which uses 5 extra aux table entries (put on
+	with ARCH_DLINFO).  The following patch increases the buffer to be big
+	enough for PPC.  (Note that each aux table entry uses two elements of
+	the elf_info array.)
+
+<willy@debian.org>
+	[PATCH] move AGP PCI defines to pci_ids.h
+	
+	Unify the PCI device ID constants used by AGP with the normal Linux ones.
+
+<torvalds@home.transmeta.com>
+	Fix IO-APIC edge IRQ handling. IRQ_INPROGRESS was cleared spuriously
+	if a new edge happened while we were still processing the previous
+	one.
+	
+	Then, if a _third_ edge came in, it would actually cause a reentrant
+	irq handler invocation, because the original INPROGRESS bit was now
+	lost.
+	
+	This was actually seen on IDE in PIO mode.
+
+<viro@math.psu.edu>
+	[PATCH] IDE cleanups (2.5; similar to ones done for other drivers)
+	
+		OK, before the next bunch of gendisk merges, here comes a couple
+	of 2.5 IDE cleanups.
+	
+		a) exclusion between rereading partition tables and open() is done
+	in fs/block_dev.c these days, so homegrown one in ide.c is redundant - that
+	code _never_ blocks now.  Removed, just as it had been done with counterparts
+	in other drivers.
+	
+		b) blk_ioctl() calls are done in blkdev_ioctl() now; driver doesn't
+	need to handle them.  Again, removed as it had been done in all other drivers.
+
+<andrea@suse.de>
+	[PATCH] Missing acess_ok() check in aio
+	
+	BTW, while merging aio from 2.5 to 2.4 and fixing and porting the libaio
+	(in particular thanks to one of Ben's testcases that was checkin for
+	this specific case) I found this bug in 2.5
+
+<davidm@napali.hpl.hp.com>
+	[PATCH] trivial Makefile fix
+	
+	Tthis one seems to have been around since 2.5.31 and nobody has fixed it
+	yet...
+
+<ac9410@attbi.com>
+	[PATCH] 2.5.33 i2c-proc.c remove inode_fill code
+	
+	My previous patch added procs i2c_fill_inode and i2c_dir_fill_inode that
+	Al Viro deemed unnecessary.  i2c developers are in contact with Al to
+	get the latest scoop.  Meantime lets reverse the change before he flies
+	off at me about procfs abuse.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	kbuild: Preprocess vmlinux.lds on i386 as well.
+	
+	We want do so on all architectures for consistency, and i386 will need
+	the preprocessing soon anyway.
+
+<mingo@elte.hu>
+	[PATCH] ptrace-fix-2.5.33-A1
+	
+	This contains Daniel's suggested fix that allows a parent to
+	PTRACE_ATTACH to a child it forked.  That fixes the incorrect BUG_ON()
+	assert that Ogawa's patch was intended to fix, and we thus undo Ogawa's
+	patch.
+	
+	I've tested various ptrace uses and they appear to work just fine.
+
+<mingo@elte.hu>
+	[PATCH] pid-max-2.5.33-A0
+	
+	This is the pid-max patch, the one i sent for 2.5.31 was botched.  I
+	have removed the 'once' debugging stupidity - now PIDs start at 0 again.
+	Also, for an unknown reason the previous patch missed the hunk that had
+	the declaration of 'DEFAULT_PID_MAX' which made it not compile ...
+
+<torvalds@penguin.transmeta.com>
+	Make in-kernel inode 'nlink' field be "unsigned int" instead
+	of something arch-dependent and usually less. 
+	
+	We may want to do value limiting in generic_fillattr() if people
+	end up caring.
+
+<vandrove@vc.cvut.cz>
+	[PATCH] IDE cleanup (1.612) broke all fdisks I have...
+	
+	It is nice that blkdev_ioctl calls blk_ioctl itself, but unfortunately
+	it does that only if driver's ioctl returns -EINVAL - and IDE returns
+	-EIO :-(
+	
+	Patch below is tested for disks - I do not have IDE floppy nor IDE tape.
+
+<torvalds@home.transmeta.com>
+	Finally get rid of that irritating disk change message.
+
+<mingo@elte.hu>
+	[PATCH] more ptrace updates
+	
+	I've done the attached patch to collect & clean up all the things that
+	happened since yesterday.
+
+<dan@debian.org>
+	[PATCH] More ptrace fixes for 2.5.33
+	
+	Here are the changes I have
+	
+	  - Fix some bugs I introduced in zap_thread
+	  - Improve the check for traced children in sys_wait4
+	  - Fix parent links when using CLONE_PTRACE
+	
+	My thanks to OGAWA Hirofumi for pointing out the first bit.
+	
+	The only other issue I know of is something else Hirofumi pointed out
+	earlier; there are problems when a tracing process dies unexpectedly.  I'll
+	come back to that later.
+
+<ink@jurassic.park.msu.ru>
+	[PATCH] alpha: pci_ops update
+	
+	Tested on CIA (sparse config space) and Irongate (dense config space);
+	other platforms should work as they are similar to these two.
+	
+	Access config space directly on rx164.
+
+<ink@jurassic.park.msu.ru>
+	[PATCH] alpha: compile fixes
+	
+	 - add another argument to do_fork();
+	 - assorted compile fixes.
+
+<ink@jurassic.park.msu.ru>
+	[PATCH] alpha: misc fixes
+	
+	Patch set from Jay Estabrook:
+	
+	 - include/asm-alpha/dma.h:
+		Add MAX_DMA_ADDR for SABLE and ALCOR
+	
+	 - include/asm-alpha/floppy.h:
+		enable the full CROSS_64KB macro for all platforms
+	
+	 - include/asm-alpha/core_t2.h:
+		fix HAE usage
+	
+	 - arch/alpha/kernel/pci.c:
+		fiddle with quirk_cypress
+	
+	 - arch/alpha/kernel/traps.c:
+		prevent opDEC_check() from multiple calls (EV4 SMP SABLEs)
+	
+	 - arch/alpha/kernel/proto.h:
+		make t2_pci_tbi() real
+	
+	 - arch/alpha/kernel/time.c:
+		shorten timeout delay
+	
+	 - arch/alpha/kernel/sys_alcor.c:
+		use ALCOR_MAX_DMA_ADDR because of the 1GB limit on ISA devices
+	
+	 - arch/alpha/kernel/core_t2.c:
+		add S/G support and allow direct-map to handle 2GB of memory
+	
+	 - arch/alpha/kernel/core_tsunami.c:
+		rework alignment requirements for ISA DMA, esp. for ACER platforms
+	
+	 - arch/alpha/kernel/sys_sable.c:
+		fix MAX_DMA_ADDR for the 1GB limitation
+	
+	 - arch/alpha/kernel/pci_impl.h:
+		add T2_DEFAULT_MEM_BASE to help avoid HAE use
+	
+	 - arch/alpha/kernel/pci_iommu.c:
+		fix ISA_DMA_MASK calculation, and force ISA alignment to 64KB
+
+<viro@math.psu.edu>
+	[PATCH] (1/25) Unexporting helper functions
+	
+		wipe_partitions() and driverfs_register_partitions(..., 1) (i.e.
+	unregistering them) pulled into del_gendisk() and removed from callers.
+	grok_partitions() merged with register_disk().  devfs_register_partitions(),
+	grok_partitions() and wipe_partitions() not exported anymore.
+
+<viro@math.psu.edu>
+	[PATCH] (2/25) Removing ->nr_real
+	
+		Since ->nr_real is always 1 now, we can remove that field completely.
+	Removed the last remnants of switch in disk_name() (it could be killed
+	a long time ago, I just forgot to remove the last two cases when md and i2o
+	got converted).  Collapsed several instances of
+	disk->part[minor - disk->first_minor] - in cases when we know that we deal
+	with disk->part[0].
+
+<viro@math.psu.edu>
+	[PATCH] (3/25) Removing useless minor arguments
+	
+		driverfs_remove_partitions(), devfs_register_partitions(),
+	driverfs_create_partitions(), devfs_register_partition(), devfs_register_disc(),
+	had lost 'minor' argument - it's always disk->first_minor these days.
+	disk_name() takes partition number instead of minor now.  Callers of
+	wipe_partitions() in fs/block_dev.c expanded.  Remaining caller passes
+	gendisk instead of kdev_t now.
+
+<viro@math.psu.edu>
+	[PATCH] (4/25) Unexporting driverfs_remove_partitions()
+	
+		call of driverfs_remove_partitions() pulled into del_gendisk();
+	function isn't exported anymore.  Both it and driverfs_create_partitions()
+	cleaned up.
+
+<viro@math.psu.edu>
+	[PATCH] (5/25) Removing bogus arrays - ->flags[]
+	
+		Seeing that now disk->flags[] always consists of one element, we
+	replace char *flags with int flags, remove the junk from places that used
+	to allocate these "arrays" and do obvious updates of the code
+	(s/->flags[0]/->flags/).
+
+<viro@math.psu.edu>
+	[PATCH] (6/25) Removing bogus arrays - ->driverfs_dev_arr[]
+	
+		disk->driverfs_dev_arr is either NULL or consists of exactly one
+	element.  Same change as above (struct device ** -> struct device *); old
+	"is the pointer to array itself NULL or not?" replaced with a flag (in
+	disk->flags).
+
+<viro@math.psu.edu>
+	[PATCH] (7/25) Removing bogus arrays - ->part[].number
+	
+		Each hd_struct used to have int number; in it.  It's used _only_
+	in disk->part[0] - disk->part[n].number is never assigned/checked for any
+	positive n.  Moved from hd_struct to gendisk (disk->part[0].number to
+	disk->number).
+
+<viro@math.psu.edu>
+	[PATCH] (8/25) Removing bogus arrays - ->de_arr[]
+	
+		similar to ->flags and ->driverfs_dev_arr, ->de_arr[] got replaced
+	with its (single) element + flag.
+
+<viro@math.psu.edu>
+	[PATCH] (9/25) update_partition()
+	
+		new helper - update_partition(disk, partition_number); does the
+	right thing wrt devfs and driverfs (un)registration of partition entries.
+	BLKPG ioctls fixed - now they call that beast rather than calling only
+	devfs side.  New helper - rescan_partitions(disk, bdev); does all work
+	with wiping/rereading/etc. and fs/block_dev.c now uses it instead of
+	check_partition().  The latter became static.
+
+<viro@math.psu.edu>
+	[PATCH] (10/25) sr.c device name handling
+	
+		sr.c: we set SCp->cdi.name from the very beginning, which allows
+	to kill passing minors in many cases (we can use "%s...", SCp->cd.name instead
+	of "sr%d...", minor and that turns out to be the majority of places where
+	we use minors at all).
+
+<viro@math.psu.edu>
+	[PATCH] (11/25) sr.c naming cleanup
+	
+		Global search'n'replace job - 'SCp' (Scsi_CD pointer - I'm not kidding;
+	and yes, they spell it "Scsi") replaced with 'cd' (sr.c, sr_ioctl.c,
+	sr_vendor.c).
+
+<viro@math.psu.edu>
+	[PATCH] (12/25) sr.c passes pointers instead of minors now
+	
+		 killed passing minors around; we always pass a pointer to structure;
+	scsi_CDs made static.  That killed uses of cdi->dev in sr.c and friends.
+
+<viro@math.psu.edu>
+	[PATCH] (13/25) sbpcd.c - beginning of cleanup
+	
+		sbpcd.c - sigh... It used to have a global variable inventively called
+	'd'.  Current disk number.  Tons of uses, 99% of them being D_S[d].<blah>.
+	Added a new variable - current_drive.  Said animal is equal to D_S + d -
+	it's reassigned at the same place as d.
+
+<viro@math.psu.edu>
+	[PATCH] (14/25) sbpcd.c - use *current_drive instead of D_S[d]
+	
+		 sbpcd.[c,h] - uses of D_S[d] replaced with uses of *current_drive.
+
+<viro@math.psu.edu>
+	[PATCH] (15/25) sbpcd.c - killed useds of cdi->dev
+	
+		sbpcd.c - d eliminated, ditto for uses of cdi->dev (we set cdi->handle
+	pointing to structure we neeed).  Cleaned up a bit.
+
+<viro@math.psu.edu>
+	[PATCH] (16/25) pcd.c - beginning of macroectomy
+	
+		 pcd.c - killed RR and WR macros (replaced with inlines without hidden
+	arguments; the first step in cleanup, they were monstrous).
+
+<viro@math.psu.edu>
+	[PATCH] (17/25) Lindent pcd.c
+	
+		Lindent pcd.c.
+
+<viro@math.psu.edu>
+	[PATCH] (18/25) pcd.c - cleanup, killed used of cdi->dev
+	
+		 pcd.c cleaned up, uses of cdi->dev eliminated, abuse of macros killed
+	(it used to have
+	#define PCD pcd[unit]
+	#define PI PCD.pi
+	and expected 'unit' to be local variable in each function that used these
+	(== almost every function in there)).
+
+<viro@math.psu.edu>
+	[PATCH] (19/25) mcdx.c cleanup
+	
+		mcdx.c cleaned up, uses of cdi->dev eliminated
+
+<viro@math.psu.edu>
+	[PATCH] (20/25) cdu31a.c cleanup
+	
+		minor cleanup in cdu31a.c
+
+<viro@math.psu.edu>
+	[PATCH] (21/25) cdrom->reset() cleanup
+	
+		invalidate_buffers() pulled from cdrom ->reset() into its caller.
+	At that point only cdrom.c using cdi->dev.  That will play a bit later.
+
+<viro@math.psu.edu>
+	[PATCH] (22/25) gendisks for SCSI cdroms
+	
+		SCSI cdroms got gendisks.
+
+<viro@math.psu.edu>
+	[PATCH] (23/25) move pointer to gendisk from hwif to drive
+	
+		 ide switched from hwif->gd[i] to hwif->drive[i]->disk - IOW, instead
+	of array of two pointers to gendisks refered from hwif, we keep these pointers
+	in relevant drives.  Cleaned up.
+
+<viro@math.psu.edu>
+	[PATCH] (24/25) disk capacity helpers
+	
+		new helpers - get_capacity(gendisk)/set_capacity(gendisk, sectors).
+	Drivers switched to these; that eliminates most of the accesses to
+	disk->part[]... in the drivers (and makes code more readable, while
+	we are at it).  That had caught several bugs when minor had been
+	used in place of minor>>minor_shift (acsi.c is especially nasty in
+	that respect; I don't know if it had ever been used with multiple
+	devices...)
+
+<viro@math.psu.edu>
+	[PATCH] (25/25) more cleanups of struct gendisk.
+	
+		* we remove the paritition 0 from ->part[] and put the old
+	contents of ->part[0] into gendisk itself; indexes are shifted, obviously.
+		* ->part is allocated at add_gendisk() time and freed at del_gendisk()
+	according to value of ->minor_shift; static arrays of hd_struct are gone
+	from drivers, ditto for manual allocations a-la ide.  As the matter of fact,
+	none of the drivers know about struct hd_struct now.
+
+<torvalds@home.transmeta.com>
+	Fsck knows why the devil does st.c has to call something a partition,
+	but it does...
+
+<torvalds@home.transmeta.com>
+	Avoid unused variable if CONFIG_BLK_DEV_MD isn't defined.
+
+<rwhron@earthlink.net>
+	[PATCH] qlogic "this should not happen" fix
+	
+	This patch is based on changes I've used for 2.5.31, 2.5.31-mm1,
+	2.5.32-mm1, 2.5.32-mm2, and 2.5.33-mm1.
+	
+	Without the patch, 2.5.x during heavy benchmark/stress testing
+	eventually locks up with these final messages:
+	
+	kernel: qlogicfc0 : no handle slots, this should not happen.
+	kernel: hostdata->queued is 6, in_ptr: 7d
+	
+	This is a combination of Doug Ledford's patch:
+	http://marc.theaimsgroup.com/?l=linux-kernel&m=103005703808312&w=2
+	and Eric Weigle's patch:
+	http://marc.theaimsgroup.com/?l=linux-kernel&m=103005790509079&w=2
+	
+	2.5.33 (and all predecessors i've tested) locked up without it.
+
+<ink@jurassic.park.msu.ru>
+	[PATCH] pci bus resources, transparent bridges
+	
+	Added PCI_BUS_NUM_RESOURCES as Ben suggested. Default value is 4
+	and can be overridden by arch (probably in asm/system.h).
+	pci_read_bridge_bases() and pci_assign_bus_resource() changed
+	accordingly. "for (i = 0 ; i < 4; i++)" in pci_add_new_bus() not
+	changed, as it's used _only_ for pci-pci and cardbus bridges.
+
+<mingo@elte.hu>
+	[PATCH] shared thread signals
+	
+	Support POSIX compliant thread signals on a kernel level with usable
+	debugging (broadcast SIGSTOP, SIGCONT) and thread group management
+	(broadcast SIGKILL), plus to load-balance 'process' signals between
+	threads for better signal performance. 
+	
+	Changes:
+	
+	- POSIX thread semantics for signals
+	
+	there are 7 'types' of actions a signal can take: specific, load-balance,
+	kill-all, kill-all+core, stop-all, continue-all and ignore. Depending on
+	the POSIX specifications each signal has one of the types defined for both
+	the 'handler defined' and the 'handler not defined (kernel default)' case.  
+	Here is the table:
+	
+	 ----------------------------------------------------------
+	 |                    |  userspace       |  kernel        |
+	 ----------------------------------------------------------
+	 |  SIGHUP            |  load-balance    |  kill-all      |
+	 |  SIGINT            |  load-balance    |  kill-all      |
+	 |  SIGQUIT           |  load-balance    |  kill-all+core |
+	 |  SIGILL            |  specific        |  kill-all+core |
+	 |  SIGTRAP           |  specific        |  kill-all+core |
+	 |  SIGABRT/SIGIOT    |  specific        |  kill-all+core |
+	 |  SIGBUS            |  specific        |  kill-all+core |
+	 |  SIGFPE            |  specific        |  kill-all+core |
+	 |  SIGKILL           |  n/a             |  kill-all      |
+	 |  SIGUSR1           |  load-balance    |  kill-all      |
+	 |  SIGSEGV           |  specific        |  kill-all+core |
+	 |  SIGUSR2           |  load-balance    |  kill-all      |
+	 |  SIGPIPE           |  specific        |  kill-all      |
+	 |  SIGALRM           |  load-balance    |  kill-all      |
+	 |  SIGTERM           |  load-balance    |  kill-all      |
+	 |  SIGCHLD           |  load-balance    |  ignore        |
+	 |  SIGCONT           |  load-balance    |  continue-all  |
+	 |  SIGSTOP           |  n/a             |  stop-all      |
+	 |  SIGTSTP           |  load-balance    |  stop-all      |
+	 |  SIGTTIN           |  load-balancen   |  stop-all      |
+	 |  SIGTTOU           |  load-balancen   |  stop-all      |
+	 |  SIGURG            |  load-balance    |  ignore        |
+	 |  SIGXCPU           |  specific        |  kill-all+core |
+	 |  SIGXFSZ           |  specific        |  kill-all+core |
+	 |  SIGVTALRM         |  load-balance    |  kill-all      |
+	 |  SIGPROF           |  specific        |  kill-all      |
+	 |  SIGPOLL/SIGIO     |  load-balance    |  kill-all      |
+	 |  SIGSYS/SIGUNUSED  |  specific        |  kill-all+core |
+	 |  SIGSTKFLT         |  specific        |  kill-all      |
+	 |  SIGWINCH          |  load-balance    |  ignore        |
+	 |  SIGPWR            |  load-balance    |  kill-all      |
+	 |  SIGRTMIN-SIGRTMAX |  load-balance    |  kill-all      |
+	 ----------------------------------------------------------
+	
+	as you can see it from the list, signals that have handlers defined never 
+	get broadcasted - they are either specific or load-balanced.
+	
+	- CLONE_THREAD implies CLONE_SIGHAND
+	
+	It does not make much sense to have a thread group that does not share
+	signal handlers. In fact in the patch i'm using the signal spinlock to
+	lock access to the thread group. I made the siglock IRQ-safe, thus we can
+	load-balance signals from interrupt contexts as well. (we cannot take the
+	tasklist lock in write mode from IRQ handlers.)
+	
+	this is not as clean as i'd like it to be, but it's the best i could come
+	up with so far.
+	
+	- thread group list management reworked.
+	
+	threads are now removed from the group if the thread is unhashed from the
+	PID table. This makes the most sense. This also helps with another feature 
+	that relies on an intact thread group list: multithreaded coredumps.
+	
+	- child reparenting reworked.
+	
+	the O(N) algorithm in forget_original_parent() causes massive performance
+	problems if a large number of threads exit from the group. Performance 
+	improves more than 10-fold if the following simple rules are followed 
+	instead:
+	
+	 - reparent children to the *previous* thread [exiting or not]
+	 - if a thread is detached then reparent to init.
+	
+	- fast broadcasting of kernel-internal SIGSTOP, SIGCONT, SIGKILL, etc.
+	
+	kernel-internal broadcasted signals are a potential DoS problem, since
+	they might generate massive amounts of GFP_ATOMIC allocations of siginfo
+	structures. The important thing to note is that the siginfo structure does
+	not actually have to be allocated and queued - the signal processing code
+	has all the information it needs, neither of these signals carries any
+	information in the siginfo structure. This makes a broadcast SIGKILL a
+	very simple operation: all threads get the bit 9 set in their pending
+	bitmask. The speedup due to this was significant - and the robustness win
+	is invaluable.
+	
+	- sys_execve() should not kill off 'all other' threads.
+	
+	the 'exec kills all threads if the master thread does the exec()' is a
+	POSIX(-ish) thing that should not be hardcoded in the kernel in this case.
+	
+	to handle POSIX exec() semantics, glibc uses a special syscall, which
+	kills 'all but self' threads: sys_exit_allbutself().
+	
+	the straightforward exec() implementation just calls sys_exit_allbutself()  
+	and then sys_execve().
+	
+	(this syscall is also be used internally if the thread group leader
+	thread sys_exit()s or sys_exec()s, to ensure the integrity of the thread
+	group.)
+
+<akpm@digeo.com>
+	[PATCH] Fix the boot-time reporting of each zone's available pages
+	
+	Patch from Bjorn Helgaas, via Rusty.
+	
+	Change:
+	
+	  On node 0 totalpages: 61031         <--- not including holes
+	  zone(0): 65172 pages.               <--- including holes
+	  zone(1): 0 pages.                   ...
+	  zone(2): 0 pages.
+	
+	to:
+	
+	  On node 0 totalpages: 61031         <--- not including holes
+	  DMA zone: 61031 pages               <--- not including holes
+	  Normal zone: 0 pages
+	  HighMem zone: 0 pages
+
+<akpm@digeo.com>
+	[PATCH] Fix the __block_write_full_page() error path.
+	
+	Fix the ENOSPC recovery code in __block_write_full_page()
+	
+	- Don't write out clean buffers.
+	
+	- Set PG_writeback before submitting the IO.  Otherwise the completion
+	  handler will go BUG when it sees a non-PageWriteback page.  If the IO
+	  is very fast, or synchronous.
+
+<akpm@digeo.com>
+	[PATCH] Back out the initial work for atomic copy_*_user()
+	
+	Back out the use of preempt_count to signify atomicity wrt pagefaults.
+	We won't do it that way - in_atomic() works fine.
+
+<akpm@digeo.com>
+	[PATCH] refill the inactive list more quickly
+	
+	Fix a problem noticed by Ed Tomlinson: under shifting workloads the
+	shrink_zone() logic will refill the inactive load too slowly.
+	
+	Bale out of the zone scan when we've reclaimed enough pages.  Fixes a
+	rarely-occurring problem wherein refill_inactive_zone() ends up
+	shuffling 100,000 pages and generally goes silly.
+	
+	This needs to be revisited - we should go on and rebalance the lower
+	zones even if we reclaimed enough pages from highmem.
+
+<akpm@digeo.com>
+	[PATCH] atomic copy_*_user infrastructure
+	
+	The patch implements the atomic copy_*_user() function.
+	
+	If the kernel takes a pagefault while running copy_*_user() in an
+	atomic region, the copy_*_user() will fail (return a short value).
+	
+	And with this patch, holding an atomic kmap() puts the CPU into an
+	atomic region.
+	
+	- Increment preempt_count() in kmap_atomic() regardless of the
+	  setting of CONFIG_PREEMPT.  The pagefault handler recognises this as
+	  an atomic region and refuses to service the fault.  copy_*_user will
+	  return a non-zero value.
+	
+	- Attempts to propagate the in_atomic() predicate to all the other
+	  highmem-capable architectures' pagefault handlers.  But the code is
+	  only tested on x86.
+	
+	- Fixed a PPC bug in kunmap_atomic(): it forgot to reenable
+	  preemption if HIGHMEM_DEBUG is turned on.
+	
+	- Fixed a sparc bug in kunmap_atomic(): it forgot to reenable
+	  preemption all the time, for non-fixmap pages.
+	
+	- Fix an error in <linux/highmem.h> - in the CONFIG_HIGHMEM=n case,
+	  kunmap_atomic() takes an address, not a page *.
+
+<akpm@digeo.com>
+	[PATCH] Use kmap_atomic() for generic_file_read()
+	
+	This patch allows the kernel to hold atomic kmaps in file_read_actor().
+	
+	We try to fault in the page, then take an atomic kmap.  If the atomic
+	copy_to_user() then faults, drop a printk and fall back to kmap().
+
+<akpm@digeo.com>
+	[PATCH] Use kmap_atomic() for generic_file_write()
+	
+	This patch uses the atomic copy_from_user() facility in
+	generic_file_write().
+	
+	This required a change in the prepare_write/commit_write API
+	definition.  It is no longer the case that these functions will kmap
+	the page for you.
+	
+	If any part of the kernel wants to get at the page in the write path,
+	it now has to kmap it for itself.  The best way to do this is with
+	kmap_atomic(KM_USER0).
+	
+	This patch updates all callers.  It also converts several places which
+	were unnecessarily using kmap() over to using kmap_atomic().
+	
+	The reiserfs changes here are Oleg Drokin's revised version.
+	
+	The patch has been tested with loop, ext2, ext3, reiserfs, jfs,
+	minixfs, vfat, iso9660, nfs and the ramdisk driver.
+	
+	I haven't fixed the racy deadlock avoidance thing in
+	generic_file_write() - the case where we take a fault when the source
+	and dest of the copy are both the same pagecache page.
+	
+	There is a printk in there now which will trigger if the page was
+	unexpectedly not present.  And guess what?  I get 50-100 of them when
+	running `dbench 64' on mem=48m.   This deadlock can happen.
+
+<mingo@elte.hu>
+	[PATCH] Re: pinpointed: PANIC caused by dequeue_signal() in current Linus
+	
+	This fixes the bootup crash.  There were two initialization bugs:
+	
+		- INIT_SIGNAL needs to set shared_pending.
+	
+		- exec() needs to set up newsig properly.
+	
+	the second one caused the crash Anton saw.
+
+<hugh@veritas.com>
+	[PATCH] M386 flush_one_tlb invlpg
+	
+	CONFIG_M386 kernel running on PPro+ processor with X86_FEATURE_PGE may
+	set _PAGE_GLOBAL bit: then __flush_tlb_one must use invlpg instruction.
+	H. J. Lu reports (LKML 8 Sept) that his P4 reboots due to this problem.
+
+<viro@math.psu.edu>
+	[PATCH] handle_initrd() and request_module()
+	
+	There are 4 different scenarios of late boot:
+	
+	1.	no initrd or ROOT_DEV is ram0.  That's the simplest one - we want
+		whatever is on ROOT_DEV as final root.
+	
+	2.	initrd is there, ROOT_DEV is not ram0, /linuxrc on initrd doesn't
+		exit.   We want initrd mounted, /linuxrc launched and /linuxrc
+		will mount whatever it wants, maybe do pivot_root and exec init
+		itself.  Task with PID 1 (parent of linuxrc) will sit there reaping
+		zombies, never leaving the kernel mode.
+	
+	3.	initrd is there, ROOT_DEV is not ram0, /linuxrc on initrd does exit
+		and sets real-root-dev to 256 (1:0, aka. ram0).   We want initrd
+		mounted, /linuxrc launched and we expect linuxrc to mount all stuff
+		we need, maybe do pivot root and exit.  Parent of /linuxrc (PID 1)
+		will proceed to exec init once /linuxrc is done.
+	
+	4.	initrd is there, ROOT_DEV is not ram0, /linuxrc on initrd might have
+		done something or not, but when it exits real-root-dev is not ram0.
+		We want initrd mounted, /linuxrc launched and when it exits we are
+		going to mount final root according to real-root-dev.  If there is
+		/initrd on the final root, initrd will be moved there.  Otherwise
+		initrd will be unmounted and its memory (if possible) freed.  Then
+		we exec init from final root.
+	
+	Note that we want the parent of linuxrc chrooted to initrd while linuxrc
+	runs - otherwise things like request_module() will be rather unhappy.  That
+	goes for all variants that run linuxrc.
+	
+	Scenarios above go in order of increasing complexity.  Let's start with #4:
+	
+		we had loaded initrd
+		we mount initrd on /root
+		we open / and /old (on initrd)
+		chdir /root
+		mount -- move . /
+		chroot .
+	
+	Now we have initrd mounted on /, we are chrooted into it but keep opened
+	descriptors of / and /old, so we'll be able to break out of jail later.
+	
+		we fork a child that will be linuxrc
+		child closes opened descriptors, opens /dev/console, dups it to stdout
+	and stderr, does setsid and execs /linuxrc.
+	
+		parent sits there reaping zombies until child is finished.
+	
+	Note that both parent and linuxrc are chrooted into /initrd and if linuxrc
+	calls pivot_root, the parent will also have its root/cwd switched.
+	
+		OK, child is finished and after checking real_root_dev we see that
+	it's not MKDEV(1,0).  Now we know that it's scenario #4.
+	We break out of jail, doing the following:
+	
+		fchdir to /old on rootfs
+		mount --move / .
+		fchdir to / on rootfs
+		chroot to .
+	
+	That will move initrd to /old and leave us with root and cwd in / of rootfs.
+	We can close these two descriptors now - they'd done their job.
+	
+		We mount final root to /root
+		We attempt to mount -- move /old /root/initrd; if we are successful -
+	we chdir to /root, mount --move . / and chroot to .  That will leave us with
+		* final root on /
+		* initrd on /initrd of final root
+		* cwd and root on final root.
+	
+	At that point we simply exec init.
+	
+		Now, if mount --move had failed, we got to clean up the mess.  We
+	unmount (with MNT_DETACH) initrd from /old and do BLKFLSBUF on ram0.  After
+	that we have final root on /root, initrd maybe still alive, but not mounted
+	anywhere and our root/cwd in / of rootfs.  Again,
+	
+		chdir /root
+		mount --move . /
+		chroot to .
+	
+	and we have final root mounted on /, we are chrooted into it and it's time
+	for exec init.
+	
+		That's it for scenario 4.  The rest will be simpler - there's less
+	work to do.
+	
+	#3 diverges from #4 after linuxrc had finished and we had already broken out
+	of jail.  Whatever we got from linuxrc is mounted on /old now, so we move it
+	back to /, get chrooted there and exec init.   We could've left earlier
+	(skipping the move to /old and move back parts), but that would lead to
+	even messier logics in prepare_namespace() ;-/
+	
+	#2 means that parent of /linuxrc never gets past waiting its child to finish.
+	End of story.
+	
+	#1 is the simplest variant - it mounts final root on /root and then does usual
+	"chdir there, mount --move . /, chroot to ." and execs init.
+	
+	Relevant code is in prepare_namespace()/handle_initrd() and yes, it's messy.
+	Had been even worse... ;-/
+
+<mingo@elte.hu>
+	[PATCH] CLONE_DETACHED fix
+	
+	This avoids a crash that can be caused by a CLONE_DETACHED thread.
+
+<torvalds@home.transmeta.com>
+	Linux 2.5.34
+

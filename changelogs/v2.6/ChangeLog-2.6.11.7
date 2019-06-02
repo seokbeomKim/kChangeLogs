@@ -1,0 +1,162 @@
+
+Summary of changes from v2.6.11.6 to v2.6.11.7
+==============================================
+
+<tiwai@suse.de>
+	[PATCH] Fix Oops with ALSA timer event notification
+	
+	the patch below fixes the bug of ALSA timer notification, which is
+	used in the recent ALSA dmix plugin.
+	
+	 - fixed Oops in read()
+	 - fixed wake-up polls and signals with new events
+	
+	Signed-off-by: Takashi Iwai <tiwai@suse.de>
+	Signed-off-by: Chris Wright <chrisw@osdl.org>
+	Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
+
+<jack@suse.cz>
+	[PATCH] Prevent race condition in jbd
+	
+	From: Stephen Tweedie <sct@redhat.com>
+	Subject: Prevent race condition in jbd
+	
+	This patch from Stephen Tweedie which fixes a race in jbd code (it
+	demonstrated itself as more or less random NULL dereferences in the
+	journal code).
+	
+	Acked-by: Jan Kara <jack@suse.cz>
+	Acked-by: Chris Mason <mason@suse.com>
+	Signed-off-by: Chris Wright <chrisw@osdl.org>
+	Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
+
+<amy.griffis@hp.com>
+	[PATCH] fix ia64 syscall auditing
+	
+	Attached is a patch against David's audit.17 kernel that adds checks
+	for the TIF_SYSCALL_AUDIT thread flag to the ia64 system call and
+	signal handling code paths.  The patch enables auditing of system
+	calls set up via fsys_bubble_down, as well as ensuring that
+	audit_syscall_exit() is called on return from sigreturn.
+	
+	Neglecting to check for TIF_SYSCALL_AUDIT at these points results in
+	incorrect information in audit_context, causing frequent system panics
+	when system call auditing is enabled on an ia64 system.
+	
+	I have tested this patch and have seen no problems with it.
+	
+	[Original patch from Amy Griffis ported to current kernel by David Woodhouse]
+	
+	From: Amy Griffis <amy.griffis@hp.com>
+	From: David Woodhouse <dwmw2@infradead.org>
+	Signed-off-by: Chris Wright <chrisw@osdl.org>
+	Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
+
+<khali@linux-fr.org>
+	[PATCH] I2C: Fix oops in eeprom driver
+	
+	This fixes an oops in the eeprom driver. It was first reported here:
+	  http://bugzilla.kernel.org/show_bug.cgi?id=4347
+	
+	It was additionally discussed here (while tracking a completely
+	different bug):
+	  http://archives.andrew.net.au/lm-sensors/msg30021.html
+	
+	The patch is already in 2.6.12-rc1:
+	  http://linux.bkbits.net:8080/linux-2.5/cset@1.2227
+	
+	The oops happens when one reads data from the sysfs interface file such
+	that (off < 16) and (count < 16 - off). For example "sensors" from
+	lm_sensors 2.9.0 does this, and causes the oops.
+	
+	Signed-off-by: Jean Delvare <khali@linux-fr.org>
+	Signed-off-by: Andrew Morton <akpm@osdl.org>
+	Signed-off-by: Linus Torvalds <torvalds@osdl.org>
+	Signed-off-by: Chris Wright <chrisw@osdl.org>
+	Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
+
+<kaber@trash.net>
+	[PATCH] : Do not hold state lock while checking size
+	
+	This patch from Herbert Xu fixes a deadlock with IPsec.
+	When an ICMP frag. required is sent and the ICMP message
+	needs the same SA as the packet that caused it the state
+	will be locked twice.
+	
+	[IPSEC]: Do not hold state lock while checking size.
+	
+	This can elicit ICMP message output and thus result in a
+	deadlock.
+	
+	Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+	Signed-off-by: David S. Miller <davem@davemloft.net>
+	Signed-off-by: Chris Wright <chrisw@osdl.org>
+	Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
+
+<akpm@osdl.org>
+	[PATCH] rwsem fix
+	
+	We should merge this backport - it's needed to prevent deadlocks when
+	dio_complete() does up_read() from IRQ context.  And perhaps other places.
+	
+	From: David Howells <dhowells@redhat.com>
+	
+	[PATCH] rwsem: Make rwsems use interrupt disabling spinlocks
+	
+	The attached patch makes read/write semaphores use interrupt disabling
+	spinlocks in the slow path, thus rendering the up functions and trylock
+	functions available for use in interrupt context.  This matches the
+	regular semaphore behaviour.
+	
+	I've assumed that the normal down functions must be called with interrupts
+	enabled (since they might schedule), and used the irq-disabling spinlock
+	variants that don't save the flags.
+	
+	Signed-Off-By: David Howells <dhowells@redhat.com>
+	Tested-by: Badari Pulavarty <pbadari@us.ibm.com>
+	Signed-off-by: Linus Torvalds <torvalds@osdl.org>
+	Signed-off-by: Chris Wright <chrisw@osdl.org>
+	Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
+
+<davem@davemloft.net>
+	[PATCH] Fix BIC congestion avoidance algorithm error
+	
+	Since BIC is the default congestion control algorithm
+	enabled in every 2.6.x kernel out there, fixing errors
+	in it becomes quite critical.
+	
+	A flaw in the loss handling caused it to not perform
+	the binary search regimen of the BIC algorithm
+	properly.
+	
+	The fix below from Stephen Hemminger has been heavily
+	verified.
+	
+	[TCP]: BIC not binary searching correctly
+	
+	While redoing BIC for the split up version, I discovered that the existing
+	2.6.11 code doesn't really do binary search. It ends up being just a slightly
+	modified version of Reno.  See attached graphs to see the effect over simulated
+	1mbit environment.
+	
+	The problem is that BIC is supposed to reset the cwnd to the last loss value
+	rather than ssthresh when loss is detected.  The correct code (from the BIC
+	TCP code for Web100) is in this patch.
+	
+	Signed-off-by: Stephen Hemminger <shemminger@osdl.org>
+	Signed-off-by: David S. Miller <davem@davemloft.net>
+	Signed-off-by: Chris Wright <chrisw@osdl.org>
+	Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
+
+<blaisorblade@yahoo.it>
+	[PATCH] [patch 1/1] uml: va_copy fix
+	
+	Uses __va_copy instead of va_copy since some old versions of gcc (2.95.4
+	for instance) don't accept va_copy.
+	
+	Signed-off-by: Paolo 'Blaisorblade' Giarrusso <blaisorblade@yahoo.it>
+	Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
+
+<gregkh@suse.de>
+	Linux 2.6.11.7
+

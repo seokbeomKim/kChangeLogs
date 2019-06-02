@@ -1,0 +1,65 @@
+-final:
+  - Kai Germaschewski: Makefile dependency fixes. ISDN update
+  - Chris Mason: another reiserfs tail writing fix
+  - unify pte/pmd allocation
+  - undo some VIA PCI fixups - conflicting behaviour
+
+-pre8:
+  - Paul Mackerras: PPC update for thread-safe page table handling
+  - Ingo Molnar: x86 PAE update for thread-safe page table handling
+  - Jeff Garzik: network driver updates, i810 rng driver, and
+    "alloc_etherdev()" network driver insert race condition fix.
+  - David Miller: UltraSparcIII update, network locking fixes
+  - Al Viro: fix fs counts on mount failure
+
+-pre7:
+  - more bugs found by the automatic stanford checker, yay!
+  - Andrew Morton: fix SAK locking bugs by moving it into a process context
+  - Johannes Erdfelt: USB updates
+  - Jeff Garzik: merge Hermes driver by David Gibson
+  - Jens Axboe: cdrom merges, ll_rw_blk proper accounting
+
+-pre6:
+  - Jeff Garzik: network driver merge
+  - Andrew Morton: fix missed page_table_lock unlock
+  - David Miller: Qlogic,FC bufix, page allocation order problem.
+
+-pre5:
+  - Rik van Riel and others: mm rw-semaphore (ps/top ok when swapping)
+  - IDE: 256 sectors at a time is legal, but apparently confuses some
+    drives. Max out at 255 sectors instead.
+  - Petko Manolov: USB pegasus driver update
+  - make the boottime memory map printout at least almost readable.
+  - USB driver updates
+  - pte_alloc()/pmd_alloc() need page_table_lock.
+
+-pre4:
+  - Petr Vandrovec, Al Viro: dentry revalidation fixes
+  - Stephen Tweedie / Manfred Spraul: kswapd and ptrace race
+  - Neil Brown: nfsd/rpc/raid cleanups and fixes
+
+-pre3:
+  - Alan Cox: continued merging
+  - Urban Widmark: smbfs fix (d_add on already hashed dentry - no-no).
+  - Andrew Morton: 3c59x update
+  - Jeff Garzik: network driver cleanups and fixes
+  - Gérard Roudier: sym-ncr drivers update
+  - Jens Axboe: more loop cleanups and fixes
+  - David Miller: sparc update, some networking fixes
+
+-pre2:
+  - Jens Axboe: fix loop device deadlocks
+  - Greg KH: USB updates
+  - Alan Cox: continued merging
+  - Tim Waugh: parport and documentation updates
+  - Cort Dougan: PowerPC merge
+  - Jeff Garzik: network driver updates
+  - Justin Gibbs: new and much improved aic7xxx driver 6.1.5
+
+-pre1:
+  - Chris Mason: reiserfs, another null bytes bug
+  - Andrea Arkangeli: make SMP Athlon build
+  - Alexander Zarochentcev: reiserfs directory fsync SMP locking fix
+  - Jeff Garzik: PCI network driver updates
+  - Alan Cox: continue merging
+  - Ingo Molnar: fix RAID AUTORUN ioctl, scheduling improvements

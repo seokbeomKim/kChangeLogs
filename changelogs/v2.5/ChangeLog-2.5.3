@@ -1,0 +1,82 @@
+final:
+ - Doug Ledford: i810 audio driver update
+ - Evgeniy Polyakov: update various SCSI drivers to new locking
+ - David Howells: syscall latency improvement, try 2
+ - Francois Romieu: dscc4 driver update
+ - Patrick Mochel: driver model fixes
+ - Andrew Morton: clean up a few details in ext3 inode initialization
+ - Pete Wyckoff: make x86 machine check print out right address..
+ - Hans Reiser: reiserfs update
+ - Richard Gooch: devfs update
+ - Greg KH: USB updates
+ - Dave Jones: PNPBIOS
+ - Nathan Scott: extended attributes
+ - Corey Minyard: clean up zlib duplication (triplication..)
+
+pre6:
+ - Asit Mallick: mtrr update
+ - Patrick Mochel: split up kernel/device.c into drivers/base
+ - Mikael Pettersson/Al Viro: fix missing in-core inode initialization
+   in ext2 introduced by Al's inode trimming
+ - David Miller: sparc and network updates
+ - Frank Davis: firewire video mmap page remapping fix
+ - me: fix configure help scripts to fix breakage noticed by Dave Jones
+ - Greg KH: USB updates
+ - Kai Germaschewski: ISDN fixes, Config.help entries
+ - Douglas Gilbert: SCSI doc update
+ - Ingo Molnar: x86 taskswitch optimizations, scheduler updates
+ - Mikael Pettersson: make APIC work on old external setups
+ - Al Viro: more inode trimming
+
+pre5:
+ - Patrick Mochel: devicefs locking cleanups, refcount fixes
+ - Brian Gerst: apic timer cleanup
+ - Adam Richter: fix loop over block device bio breakage, ipfwadm compile fix
+ - me: split up Configure.help over the subdirectories where it is used
+ - Peter Anvin: bootproto v2.03
+ - Jeff Garzik: net driver updates
+ - NIIBE Yutaka: SuperH update
+
+pre4:
+ - Patrick Mochel: initcall levels
+ - Patrick Mochel: devicefs updates, add PCI devices into the hierarchy
+ - Denis Oliver Kropp: neomagic fb driver
+ - David Miller: sparc64 and network updates
+ - Kai Mäkisara: scsi tape update
+ - Al Viro: more inode trimming, VFS cleanup
+ - Greg KH: USB update - proper urb allocations
+ - Eric Raymond: kdev_t updates for fb devices
+
+pre3:
+ - Al Viro: VFS inode allocation moved down to filesystem, trim inodes
+ - Greg KH: USB update, hotplug documentation
+ - Kai Germaschewski: ISDN update
+ - Ingo Molnar: scheduler tweaking ("J2")
+ - Arnaldo: emu10k kdev_t updates
+ - Ben Collins: firewire updates
+ - Björn Wesen: cris arch update
+ - Hal Duston: ps2esdi driver bio/kdev_t fixes
+ - Jean Tourrilhes: move wireless drivers into drivers/net/wireless,
+   update wireless API #1
+ - Richard Gooch: devfs race fix
+ - OGAWA Hirofumi: FATFS update
+
+pre2:
+ - David Howells: abtract out "current->need_resched" as "need_resched()"
+ - Frank Davis: ide-tape update for bio
+ - various: header file fixups
+ - Jens Axboe: fix up bio/ide/highmem issues
+ - Kai Germaschewski: ISDN update
+ - Greg KH: USB and Compaq PCI hotplug updates
+ - Tim Waugh: parport update
+
+pre1:
+ - Al Viro: fix up silly problem in swapfile filp cleanups in 2.5.2
+ - Tachino Nobuhiro: fix another error return for swapfile filp code
+ - Robert Love: merge some of Ingo's scheduler fixes
+ - David Miller: networking, sparc and some scsi driver fixes
+ - Tim Waugh: parport update
+ - OGAWA Hirofumi: fatfs cleanups and bugfixes
+ - Roland Dreier: fix vsscanf buglets.
+ - Ben LaHaise: include file cleanup
+ - Andre Hedrick: IDE taskfile update

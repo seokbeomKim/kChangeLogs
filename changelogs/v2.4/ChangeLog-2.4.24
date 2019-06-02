@@ -1,0 +1,24 @@
+final:
+
+- 2.4.24-rc1 was released as 2.4.24 with no changes.
+
+
+Summary of changes from v2.4.23 to v2.4.24-rc1
+============================================
+
+<bjorn.helgaas:hp.com>:
+  o Fix 2.4 EFI RTC oops
+
+<marcelo.tosatti:cyclades.com>:
+  o Andrea Arcangeli: malicious users of mremap() syscall can gain priviledges
+
+<marcelo:logos.cnet>:
+  o Harald Welte: Fix ipchains MASQUERADE oops
+  o Change EXTRAVERSION to 2.4.24-rc1
+
+<trini:mvista.com>:
+  o /dev/rtc can leak parts of kernel memory to unpriviledged users
+
+Jean Tourrilhes:
+  o IrDA kernel log buster
+

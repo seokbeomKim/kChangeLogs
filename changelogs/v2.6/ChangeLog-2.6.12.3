@@ -1,0 +1,195 @@
+commit 84d9ba1c2ec7ca62680d16b9786f545182c8d9f1
+Author: Greg KH <gregkh@suse.de>
+Date:   Fri Jul 15 14:18:57 2005 -0700
+
+    Linux 2.6.12.3
+
+commit b4a3c2ae79b275a58192f418aa33f156fb648f38
+Author: Wen-chien Jesse Sung <jesse@cola.voip.idv.tw>
+Date:   Thu Jun 30 11:42:10 2005 +0800
+
+    [PATCH] fix semaphore handling in __unregister_chrdev_region
+    
+    This up() should be down() instead.
+    
+    Signed-off-by: Wen-chien Jesse Sung <jesse@cola.voip.idv.tw>
+    Signed-off-by: Chris Wright <chrisw@osdl.org>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
+
+commit b050ac70a8b72a48a8ab3130c35dfe38850b668b
+Author: blaisorblade@yahoo.it <blaisorblade@yahoo.it>
+Date:   Tue Jul 12 19:28:37 2005 +0200
+
+    [PATCH] uml: fix TT mode by reverting "use fork instead of clone"
+    
+    From: Jeff Dike <jdike@addtoit.com>, Paolo 'Blaisorblade' Giarrusso <blaisorblade@yahoo.it>
+    
+    Revert the following patch, because of miscompilation problems in different
+    environments leading to UML not working *at all* in TT mode; it was merged
+    lately in 2.6 development cycle, a little after being written, and has caused
+    problems to lots of people; I know it's a bit too long, but it shouldn't have
+    been merged in first place, so I still apply for inclusion in the -stable
+    tree. Anyone using this feature currently is either using some older kernel
+    (some reports even used 2.6.12-rc4-mm2) or using this patch, as included in my
+    -bs patchset.
+    
+    For now there's not yet a fix for this patch, so for now the best thing is to
+    drop it (which was widely reported to give a working kernel).
+    
+    "Convert the boot-time host ptrace testing from clone to fork.  They were
+    essentially doing fork anyway.  This cleans up the code a bit, and makes
+    valgrind a bit happier about grinding it."
+    
+    URL:
+    http://www.kernel.org/git/?p=linux/kernel/git/torvalds/linux-2.6.git;a=commit;h=98fdffccea6cc3fe9dba32c0fcc310bcb5d71529
+    
+    Signed-off-by: Jeff Dike <jdike@addtoit.com>
+    Signed-off-by: Paolo 'Blaisorblade' Giarrusso <blaisorblade@yahoo.it>
+    Signed-off-by: Chris Wright <chrisw@osdl.org>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
+
+commit 19a51b0ee71ee00497619f441c59b4acd44cf1e5
+Author: KAMBAROV, ZAUR <kambarov@berkeley.edu>
+Date:   Wed Jun 29 18:12:05 2005 -0700
+
+    [PATCH] coverity: tty_ldisc_ref return null check
+    
+    We add a check of the return value of tty_ldisc_ref(), which
+    is checked 7 out of 8 times, e.g.:
+    
+    149  		ld = tty_ldisc_ref(tty);
+    150  		if (ld != NULL) {
+    151  			if (ld->set_termios)
+    152  				(ld->set_termios)(tty, &old_termios);
+    153  			tty_ldisc_deref(ld);
+    154  		}
+    
+    This defect was found automatically by Coverity Prevent, a static analysis
+    tool.
+    
+    (akpm: presumably `ld' is never NULL.  Oh well)
+    
+    Signed-off-by: Zaur Kambarov <zkambarov@coverity.com>
+    Acked-by: Alan Cox <alan@lxorguk.ukuu.org.uk>
+    Signed-off-by: Andrew Morton <akpm@osdl.org>
+    Signed-off-by: Chris Wright <chrisw@osdl.org>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
+
+commit aebaaf4060dd0db163694da8e4ab7ba86add57b9
+Author: Michael Krufky <mkrufky@m1k.net>
+Date:   Thu Jun 30 16:06:41 2005 -0400
+
+    [PATCH] v4l cx88 hue offset fix
+    
+    Changed hue offset to 128 to correct behavior in cx88 cards.  Previously,
+    setting 0% or 100% hue was required to avoid blue/green people on screen.
+    Now, 50% Hue means no offset, just like bt878 stuff.
+    
+    Signed-off-by: Michael Krufky <mkrufky@m1k.net>
+    Signed-off-by: Mauro Carvalho Chehab <mchehab@brturbo.com.br>
+    Signed-off-by: Chris Wright <chrisw@osdl.org>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
+
+commit 0f4e46cb107ddfedfc6319d377f7ad9cc4dc7c4b
+Author: Kylene Jo Hall <kjhall@us.ibm.com>
+Date:   Wed Jun 29 09:32:28 2005 -0500
+
+    [PATCH] tpm breaks 8139cp
+    
+    A problem was reported that the tpm driver was interfereing with
+    networking on the 8139 chipset.  The tpm driver was using a hard coded
+    the memory address instead of the value the BIOS was putting the chip
+    at.  This was in the tpm_lpc_bus_init function.  That function can be
+    replaced with querying the value at Vendor specific locations.  This
+    patch replaces all calls to tpm_lpc_bus_init and the hardcoding of the
+    base address with a lookup of the address at the correct vendor
+    location.
+    
+    Signed-off-by: Kylene Hall <kjhall@us.ibm.com>
+    Signed-off-by: Chris Wright <chrisw@osdl.org>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
+
+commit 6fbf7fdb2672866ab8b464c686692553d9d3afe4
+Author: Ralf Baechle <ralf@linux-mips.org>
+Date:   Mon Jul 4 18:30:42 2005 +0100
+
+    [PATCH] SMP fix for 6pack driver
+    
+    Drivers really only work well in SMP if they actually can be selected.
+    This is a leftover from the time when the 6pack drive only used to be
+    a bitrotten variant of the slip driver.
+    
+    Signed-off-by: Ralf Baechle DL5RB <ralf@linux-mips.org>
+    Signed-off-by: Chris Wright <chrisw@osdl.org>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
+
+commit 8c87e7c245d326098adc6ed79382cd1ff6db6b51
+Author: David S. Miller <davem@davemloft.net>
+Date:   Tue Jul 5 15:07:44 2005 -0700
+
+    [PATCH] fix Shaper driver lossage in 2.6.12
+    
+    [SHAPER]: Switch to spinlocks.
+    
+    Dave, you were right and the sleeping locks in shaper were
+    broken. Markus Kanet noticed this and also tested the patch below that
+    switches locking to spinlocks.
+    
+    Signed-off-by: Christoph Hellwig <hch@lst.de>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+    Signed-off-by: Chris Wright <chrisw@osdl.org>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
+
+commit 8f399a7448e0b58eae969426f61b7e81d55d2639
+Author: john stultz <johnstul@us.ibm.com>
+Date:   Fri Jul 1 15:08:54 2005 +1000
+
+    [PATCH] ppc32: stop misusing ntps time_offset value
+    
+    As part of my timeofday rework, I've been looking at the NTP code and I
+    noticed that the PPC architecture is apparently misusing the NTP's
+    time_offset (it is a terrible name!) value as some form of timezone offset.
+    
+    This could cause problems when time_offset changed by the NTP code.  This
+    patch changes the PPC code so it uses a more clear local variable:
+    timezone_offset.
+    
+    Signed-off-by: John Stultz <johnstul@us.ibm.com>
+    Acked-by: Tom Rini <trini@kernel.crashing.org>
+    Cc: Benjamin Herrenschmidt <benh@kernel.crashing.org>
+    Signed-off-by: Andrew Morton <akpm@osdl.org>
+    Signed-off-by: Chris Wright <chrisw@osdl.org>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
+
+commit 08cfcb785b7163a62c01632dbe9f0650a9754e62
+Author: Patrick McHardy <kaber@trash.net>
+Date:   Tue Jul 12 13:58:27 2005 +0200
+
+    [PATCH] revert nf_reset change
+    
+    [NETFILTER]: Revert nf_reset change
+    
+    Revert the nf_reset change that caused so much trouble, drop conntrack
+    references manually before packets are queued to packet sockets.
+    
+    Adapted for 2.6.12 by Daniel Drake <dsd@gentoo.org>
+    
+    Signed-off-by: Phil Oester <kernel@linuxace.com>
+    Signed-off-by: Patrick McHardy <kaber@trash.net>
+    Signed-off-by: Chris Wright <chrisw@osdl.org>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
+
+commit 2ae54a329f48cb2b7d98856ceac2ad6b04d94c89
+Author: Alexander Nyberg <alexn@telia.com>
+Date:   Mon Jul 4 09:28:35 2005 +0200
+
+    [PATCH] If ACPI doesn't find an irq listed, don't accept 0 as a valid PCI irq.
+    
+    If ACPI doesn't find an irq listed, don't accept 0 as a valid PCI irq.
+    That zero just means that nothing else found any irq information either.
+    
+    Fixes http://bugme.osdl.org/show_bug.cgi?id=4824
+    
+    Signed-off-by: Chris Wright <chrisw@osdl.org>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
+

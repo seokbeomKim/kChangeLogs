@@ -1,0 +1,4062 @@
+
+Summary of changes from v2.5.64 to v2.5.65
+============================================
+
+<sds@epoch.ncsc.mil>
+	[PATCH] Add LSM hook to do_kern_mount
+	
+	This patch adds a security_sb_kern_mount hook call to the do_kern_mount
+	function.  This hook enables initialization of the superblock security
+	information of all superblock objects.  Placing a hook in do_kern_mount
+	was originally suggested by Al Viro.  This hook is used by SELinux to
+	setup the superblock security state and eliminated the need for the
+	superblock_precondition function.
+
+<sds@epoch.ncsc.mil>
+	[PATCH] Replace inode_post_lookup hook with d_instantiate hook
+	
+	This patch removes the security_inode_post_lookup hook entirely and
+	adds a security_d_instantiate hook call to the d_instantiate function
+	and the d_splice_alias function.  The inode_post_lookup hook was
+	subject to races since the inode is already accessible through the
+	dcache before it is called, didn't handle filesystems that directly
+	populate the dcache, and wasn't always called in the desired context
+	(e.g. for pipe, shmem, and devpts inodes).  The d_instantiate hook
+	enables initialization of the inode security information.  This hook
+	is used by SELinux and by DTE to setup the inode security state, and
+	eliminated the need for the inode_precondition function in SELinux.
+
+<sds@epoch.ncsc.mil>
+	[PATCH] allocate and free security structures for private files
+	
+	This patch adds a security_file_alloc call to init_private_file and
+	creates a close_private_file function to encapsulate the release of
+	private file structures.  These changes ensure that security
+	structures for private files will be allocated and freed
+	appropriately.  Per Andi Kleen's comments, the patch also renames
+	init_private_file to open_private_file to force updating of all
+	callers, since they will also need to be updated to use
+	close_private_file to avoid a leak of the security structure.  Per
+	Christoph Hellwig's comments, the patch also replaces the 'mode'
+	argument with a 'flags' argument, computing the f_mode from the flags,
+	and it explicitly tests f_op prior to dereferencing, as in
+	dentry_open().
+
+<sds@epoch.ncsc.mil>
+	[PATCH] Restore LSM hook calls to setpriority and setpgid
+	
+	This patch restores the LSM hook calls in setpriority and setpgid to
+	2.5.58.  These hooks were previously added as of 2.5.27, but the hook
+	calls were subsequently lost as a result of other changes to the code
+	as of 2.5.37.
+	
+	Ingo has signed off on this patch, and no one else has objected.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	ISDN: Fix up missed return value
+	
+	Spotted by Joe Perches.
+
+<sds@epoch.ncsc.mil>
+	[PATCH] LSM: Add LSM sysctl hook to 2.5.59
+	
+	This patch adds a LSM sysctl hook for controlling access to
+	sysctl variables to 2.5.59, split out from the lsm-2.5 BitKeeper tree.
+	SELinux uses this hook to control such accesses in accordance with the
+	security policy configuration.
+
+<sds@epoch.ncsc.mil>
+	[PATCH] LSM: Add LSM syslog hook to 2.5.59
+	
+	This patch adds the LSM security_syslog hook for controlling the
+	syslog(2) interface relative to 2.5.59 plus the previously posted
+	security_sysctl patch.  In response to earlier comments by Christoph,
+	the existing capability check for syslog(2) is moved into the
+	capability security module hook function, and a corresponding dummy
+	security module hook function is defined that provides traditional
+	superuser behavior.  The LSM hook is placed in do_syslog rather than
+	sys_syslog so that it is called when either the system call interface
+	or the /proc/kmsg interface is used.  SELinux uses this hook to
+	control access to the kernel message ring and to the console log
+	level.
+
+<davidm@tiger.hpl.hp.com>
+	ia64: Minor whitespace & formatting fixups in asm-ia64/sal.h.
+
+<davidm@tiger.hpl.hp.com>
+	ia64: Minor cleanups.
+
+<davidm@tiger.hpl.hp.com>
+	ia64: Make signal deliver work when the current register frame is
+		incomplete (as a result of a faulting mandatory RSE load).
+
+<davidm@tiger.hpl.hp.com>
+	ia64: Fix typo in #error message of page-fault handler.
+
+<eranian@hpl.hp.com>
+	[PATCH] ia64: perfmon patch for 2.5.59
+	
+	Here is the patch that matches the changes I made for RHAS w.r.t
+	perfmon and the O(1) scheduler. This fixes the deadlocks we were
+	seing in RHAS and therefore on 2.5 as well.
+	
+	The key change is that SIGPROF notifications are now delivered
+	in the perfmon kernel exit handler (called from entry.S).
+	At that point, we know none of the runqueue locks are held.
+	
+	I have run the same test suite I used on RHAS overnight and no
+	sign of deadlocks.
+
+<davidm@tiger.hpl.hp.com>
+	ia64: Sync up with 2.5.60.
+
+<davidm@tiger.hpl.hp.com>
+	ia64: Fix do_gettimeoffset() to not update last_nsec_offset with (potentially)
+		invalid values.
+
+<sds@epoch.ncsc.mil>
+	[PATCH] LSM: coding style fixups in sb_kern_mount
+	
+	This patch moves the error handling code for the sb_kern_mount hook call
+	out of line, per Christoph Hellwig's suggestion.
+
+<greg@kroah.com>
+	LSM: fix merge where we lost a prototype in security.h
+
+<kai@vaio.(none)>
+	ISDN: Resolve name clash in hisax
+	
+	isac_setup() was defined in two different modules and so clashed
+	with everything compiled into the kernel. The proper fix would
+	be to rather kill one of the duplicate drivers, but for now just
+	rename one symbol.
+	
+
+<kai@vaio.(none)>
+	ISDN/HiSax: Fix some warnings
+	
+	gcc 3.2 is asking for a little more const correctness...
+
+<kai@vaio.(none)>
+	ISDN: [PATCH] isdn_net_lib.c must include isdn_concap.h
+	
+	From Adrian Bunk:
+	
+	> With CONFIG_ISDN_X25 enabled I got the following compile error in 
+	> isdn_net_lib.c in 2.5.61:
+	> The following patch solved it for me:
+	
+	Additionally, disable CONFIG_ISDN_X25 in Kconfig, since it's still
+	badly broken.
+
+<kai@vaio.(none)>
+	ISDN/AVMB1: Fix compile w/o CONFIG_ISDN_DRV_AVMB1_B1PCIV4
+
+<kai@vaio.(none)>
+	ISDN: Fix compile error w/o CONFIG_ISDN_PPP_MP
+	
+	The proto argument is not used, so just remove it from ippp*_xmit()
+	calls - in particular we passed it to ippp_xmit() when
+	CONFIG_ISDN_PPP_MP was off, which never wanted it anyway, causing
+	a compile error.
+
+<kai@vaio.(none)>
+	ISDN: Fix hisax_fcpcipnp PnP
+	
+	Seems the PnP layer changed again, breaking hisax_fcpcipnp.
+	Fixed again (untested, though).
+
+<anton@samba.org>
+	ppc64: use fast version of mtmsrd when changing RI, from Milton Miller
+
+<anton@samba.org>
+	ppc64: remove extra clear of RI, we do it later on, from Milton Miller
+
+<davidm@wailua.hpl.hp.com>
+	ia64: Don't output backspaces in palinfo output.
+
+<mgreer@mvista.com>
+	PPC32: Fix our L2 / L3 cache updates for the bootloader.
+
+<louisk@cse.unsw.edu.au>
+	[PATCH] ia64: fsys-version of gettimeofday()
+	
+	This version executes in around 300 cycles on Itanium I (down from 900
+	or so for the original version), and so can be said to have
+	microsecond precision.
+
+<davidm@tiger.hpl.hp.com>
+	ia64: Fix fsys_gettimeofday() and tune it some more.
+
+<davidm@tiger.hpl.hp.com>
+	ia64: Add forgotten probe.w.fault checks in fsys_gettimeofday().
+
+<davidm@tiger.hpl.hp.com>
+	ia64: Fix formatting inconsistencies introduced by my
+		fsys_gettimeofday() patch.
+
+<stevef@smfhome1.austin.rr.com>
+	Remember to free mapping in all writepage paths
+
+<anton@samba.org>
+	ppc64: Fix some warnings in the ppc64 build, from Andrew Morton
+
+<bcrl@redhat.com>
+	[NET]: Make sure nr_frags is accurate on paged SKB allocation failure.
+
+<jmorris@intercode.com.au>
+	[IPSEC]: Add family argument to compile_policy.
+
+<bdschuym@pandora.be>
+	[EBTABLES]: Trivial changes and cleanups.
+
+<jmorris@intercode.com.au>
+	[NET]: Convert volatile char socket flags to real bitops mask, work by Pedro Hortas.
+
+<davem@nuts.ninka.net>
+	[IPSEC]: Use dst_hold unless assigning result to something.
+
+<jmorris@intercode.com.au>
+	[NET]: dst_clone --> dst_hold where appropriate.
+
+<manand@us.ibm.com>
+	[NET]: Move SKB header init to allocation time for better cache behavior.
+
+<ink@jurassic.park.msu.ru>
+	[PATCH] nautilus poweroff
+	
+	The power management unit on newer 1535D/D+ ALI bridges
+	(UP1100/UP1500) is quite different to 1543C one on UP1000.
+	Even though it has the same PCI id and revision number...
+	
+	This makes poweroff(8) work on UP1100 and UP1500.
+	
+	Ivan.
+
+<anton@samba.org>
+	ppc64: rework pci PHB probe code
+
+<anton@samba.org>
+	ppc64: add missing include
+
+<anton@samba.org>
+	ppc64: remove old irq balance code
+
+<davem@nuts.ninka.net>
+	[FRAMEBUFFER]: No need for check_var/set_par ops in SBUS fb drivers.
+
+<anton@samba.org>
+	ppc64: move pSeries specific fixup_bus out of generic code
+
+<anton@samba.org>
+	ppc64: really move pSeries_pcibios_fixup_bus this time
+
+<davem@nuts.ninka.net>
+	[SBUSFB]: Implement enough ioctls to get X working.
+
+<davem@nuts.ninka.net>
+	[SBUSFB]: Fix up ioctl helper changes.
+
+<j-nomura@ce.jp.nec.com>
+	[PATCH] ia64: CONFIG_NUMA build fix
+	
+	I had to apply the patch below to build with CONFIG_NUMA.
+
+<kenneth.w.chen@intel.com>
+	[PATCH] ia64: rwsem using atomic primitive
+	
+
+<kaos@sgi.com>
+	[PATCH] ia64: fix scratch-regs handling in kernel unwinder
+	
+	This patch has been running inside SGI for 2 months.  It
+	handles kernel stacks with multiple struct pt_regs, as found
+	while debugging the kernel.
+
+<davidm@tiger.hpl.hp.com>
+	ia64; Improve debug output from kernel unwinder.  Based on patch by
+		Keith Owens.
+
+<davidm@tiger.hpl.hp.com>
+	ia64: In kernel unwinder, replace dump_info_pt() with get_scratch_regs()
+		and reformat to make it fit in 100 columns.
+
+<bjorn_helgaas@hp.com>
+	[PATCH] ia64: iosapic: make pcat_compat system property
+	
+	Make pcat_compat a system property, not a per-IOSAPIC property.
+
+<bjorn_helgaas@hp.com>
+	[PATCH] ia64: iosapic: remove find_iosapic duplication
+	
+	emove IOSAPIC address and GSI base from external interrupt
+	registration interfaces.  This lets us remove acpi_find_iosapic(),
+	which is functionally similar to find_iosapic().
+
+<bjorn_helgaas@hp.com>
+	[PATCH] ia64: iosapic: simplify ISA IRQ init
+	
+	Simplify ISA IRQ init by taking advantage of iosapic_override_isa_irq(),
+	which already does what we need.
+
+<bjorn_helgaas@hp.com>
+	[PATCH] ia64: iosapic: self-documenting polarity/trigger arguments
+	
+	Make interrupt registration functions take named constants for
+	polarity and trigger mode.  Old -> new magic decoder ring:
+	polarity 0 -> IOSAPIC_POL_LOW(#defined to 1)
+	polarity 1 -> IOSAPIC_POL_HIGH(#defined to 0)
+	trigger 0  -> IOSAPIC_LEVEL(#defined to 1)
+	trigger 1  -> IOSAPIC_EDGE(#defined to 0)
+
+<bjorn_helgaas@hp.com>
+	[PATCH] ia64: iosapic: rationalize __init/__devinit
+	
+	Rationalize __init/__devinit attributes.  The noteworthy changes are
+	that
+	iosapic_system_init(),
+	iosapic_init(),
+	iosapic_register_platform_intr(), and
+	iosapic_override_isa_irq()
+	are __init (only called from ACPI __init functions), but
+	iosapic_lists[],
+	num_iosapic,
+	find_iosapic(),
+	register_intr(),
+	iosapic_register_intr(), and
+	acpi_register_irq()
+	are not because they may be used after init-time by modules.
+	
+	More detailed analysis:
+	
+	        iosapic_lists[], num_iosapic: normal, referenced by
+	                find_iosapic (normal)
+	                register_intr (normal)
+	                iosapic_init (__init)
+	
+	        pcat_compat: __initdata, referenced by
+	                iosapic_system_init (__init)
+	                iosapic_init (__init)
+	                iosapic_parse_prt (__init)
+	
+	        find_iosapic: normal, called by
+	                register_intr (normal)
+	
+	        register_intr: normal, called by
+	                iosapic_register_intr (normal), called by
+	                        acpi_register_irq (normal), called by
+	                                modules (=> can't be __init or __devinit)
+	                iosapic_register_platform_intr (__init)
+	                iosapic_override_isa_irq (__init)
+	                iosapic_parse_prt (__init)
+	
+	        iosapic_reassign_vector: __init, called by
+	                iosapic_register_platform_intr (__init), called by
+	                        acpi_parse_plat_int_src (__init)
+	
+	        iosapic_system_init: __init, called by
+	                acpi_parse_madt (__init)
+	
+	        iosapic_init: __init, called by
+	                acpi_parse_iosapic (__init)
+	
+	        iosapic_register_platform_intr: __init, called by
+	                acpi_parse_plat_int_src (__init)
+	
+	        iosapic_override_isa_irq: __init, called by
+	                acpi_parse_int_src_ovr (__init)
+	                iosapic_init (__init)
+	
+	        fixup_vector: __init, called by
+	                iosapic_parse_prt (__init), called by
+	                        acpi_pci_irq_init (__init)
+
+<davidm@tiger.hpl.hp.com>
+	ia64: Correct region_start calculation in kernel unwinder.
+
+<suresh.b.siddha@intel.com>
+	[PATCH] ia64: 1/2 fix for generic kernel
+	
+	Current 2.5 kernels are broken with CONFIG_IA64_GENERIC option. Two unused
+	members are still remaining in the structure, resulting in corruption of
+	structure elements during the MACHVEC_INIT initialization. Attached patch
+	fixes this problem.
+
+<suresh.b.siddha@intel.com>
+	[PATCH] ia64: 2/2 fix in machvec.h
+	
+	IA64 ABI specifies that globals > 8 bytes need to be aligned to 16 bytes.
+	gcc doesn't follow this convention. Current kernel code will fail to work with
+	a compiler which follows the ABI.
+	
+	size of structure ia64_machine_vector is > 8 bytes and not multiple of 16 bytes.
+	When we have CONFIG_IA64_GENERIC, each machine specific vector from different
+	object files gets linked into a user defined section(forming array of
+	structures).
+	
+	Now with a compiler conforming to ABI, there will be holes in this array
+	resulting in the code failure when it goes through this array of structures.
+	
+	Following patch will make the size of the structure to be multiple of 16 bytes
+	making both ABI confirming/non-conforming compilers happy.
+
+<jbarnes@sgi.com>
+	[PATCH] ia64: SN updates for mmzone.h
+	
+	Here's an update to the ia64 mmzone.h file that adds some SN2 specific
+	defines (which will probably have to be changed later, but it's a
+	start).
+
+<jbarnes@sgi.com>
+	[PATCH] ia64: SN update
+	
+	And here's the SN specific part of the update.  This should get an SN2
+	compile all the way to the link stage, where I still have some devfs
+	stuff to cleanup.
+
+<rohit.seth@intel.com>
+	[PATCH] ia64: HugeTLB Page patch for IA-64 2.5.60 kernel
+	
+	Please find attached a hugetlb page patch for IA-64 2.5.60 kernel .
+	Changes in generic files are mostly backported from 2.5.62 (to get
+	hugetlb support functioning properly).
+
+<rohit.seth@intel.com>
+	[PATCH] ia64: 2nd update for HugeTLB Page patch for IA-64 2.5.60 kernel
+	
+	Please find attached a small hugetlb page support update for 2.5.60
+	IA-64 kernel (+ my previous hugetlb page patch).  This patch adds the
+	HAVE_ARCH_HUGETLB_UNMAPPED_AREA define for IA-64 arch.
+	hugetlb_get_unmapped_area function is added in
+	arch/ia64/mm/hugetlbpage.c
+
+<peter@chubb.wattle.id.au>
+	[PATCH] ia64: Preemption patch against ~2.5.60
+	
+	Latest premption patch.
+
+<davidm@tiger.hpl.hp.com>
+	ia64: Minor formatting fixes for the preemption patch.
+
+<stevef@steveft21.austin.ibm.com>
+	Fix memory overwrite in readdir on large directories.  
+	Fix rename problem to netapp servers.  Add new mount parms
+	-ip and -port which are optionally passed in by the
+	cifs.mount mount helper
+
+<davidm@tiger.hpl.hp.com>
+	ia64: Fix ia32 sysinfo() emulation.
+
+<davidm@tiger.hpl.hp.com>
+	ia64: Fix SAL processor-log info handling.  Based on patch by
+		Keith Owens.
+
+<davidm@tiger.hpl.hp.com>
+	ia64: Implement _raw_write_trylock().  Based on patch by Joel Guillet.
+
+<davidm@tiger.hpl.hp.com>
+	ia64: Implement pcibios_prep_mwi() and define HAVE_ARCH_PCI_MWI to
+		ensure that PCI line-size gets programmed properly.  Based
+		on patch by Grant Grundler.
+
+<davem@redhat.com>
+	[PATCH] Fix time comparison typing bugs.
+	
+	Many places use inappropriate types for comparing jiffies,
+	int for example.  Fix those places up.
+
+<davem@nuts.ninka.net>
+	[SPARC64]: Fix cpufreq config deps.
+
+<Jeff.Wiedemeier@hp.com>
+	[PATCH] enable setting of marvel/titan agp->type
+	
+	Now that the agpgart support is in, this can be enabled.
+	
+	/jeff
+
+<greg@kroah.com>
+	[PATCH] USB: add support for Treo devices to the visor driver.
+	
+	Finally...
+
+<clemens@ladisch.de>
+	[PATCH] usb-midi.h: fixes for SC-8820/50
+	
+	 sync with Nagano's version:
+	 - protect vendors ids against multiple definitions
+	 - sort Roland device ids
+	 - fix SC-8850 cable bitmask
+	 - add quirk for the SC-8820
+	 - add quirk for the MOTU Fastlane
+
+<andre.breiler@null-mx.org>
+	[PATCH] io_edgeport.c diff to fix endianess bugs
+	
+	attached a fix for the io_edgeport usb serial driver
+	This diff fixes endianess issues which prevented the driver to work on
+	bigendian machines (e.g. sparc).
+
+<andmike@us.ibm.com>
+	[PATCH] Fix SCSI error handler abort case
+	
+	I had my list empty checks reversed if aborting and bus device reset
+	failed.  The condition that causes the error handler to run is still
+	unknown.
+
+<greg@kroah.com>
+	[PATCH] USB: added support for radio shack device to pl2303 driver.
+	
+	Thanks to gene_heskett@iolinc.net for the info for this.
+
+<levon@movementarian.org>
+	[PATCH] Fix oprofile on UP, small additional fix
+	
+	The below has been in -mm for a while, and has been tested on my UP
+	and 2-way machines.
+	
+	OProfile was completely unsafe on UP - a spinlock is no protection
+	against the NMI arriving and putting data into the buffer. Pretty stupid
+	bug. This fixes it by implementing reader/writer windows in the buffer
+	and removing the lock altogether. This patch was originally done by Will
+	Cohen.
+	
+	It also fixes the oops Dave Hansen saw on 2.5.62 SMP
+
+<mochel@osdl.org>
+	sysfs: Make sure root inode is executable and readable by everyone.
+
+<mochel@osdl.org>
+	driver model: fix platform_match()
+	
+	- Make it compare the name in struct platform_dev to the driver's name.
+	
+	From Dominik Brodowski
+
+<mochel@osdl.org>
+	sysfs: don't complain when sysfs can't register.
+	
+	During startup, sysfs won't succeed in registering with itself, because
+	it's not yet inititialized. This was causing an unnecessary error on boot.
+
+<mochel@osdl.org>
+	cpufreq: fix compile error.
+	
+	Use ->dev instead of ->intf.dev in struct cpufreq_policy. Introduced whilst
+	cleaning up part of the cpufreq code. 
+
+<miyazawa@linux-ipv6.org>
+	[IPSEC]: Add full ipv6 support.
+	
+	Credits also to Mitsuru Kanda <kanda@karaba.org>,
+	YOSHIFUJI Hideaki <yoshfuji@linux-ipv6.org>,
+	and Kunihiro Ishiguro.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	kbuild: Make build stop on vmlinux link error
+	
+	set -e is needed for each (continued) line.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	kbuild: Add some missing FORCE
+	
+	Those were missing, not particularly harmful, but still needed for
+	correctness.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	kbuild: Make per-cpu-check ignore __crc_ symbols.
+	
+	We warn when symbols end in __per_cpu, but aren't in the per-cpu section.
+	However, checksum symbols gave false positives.
+
+<sam@mars.ravnborg.org>
+	[PATCH] kbuild: Smart notation for non-verbose output
+	
+	Create a nice shorthand to enable the non-verbose output mode.
+	make V=1        => Gives verbose output (default)
+	make V=0        => Gives non-verbose output
+	
+	One of the reasons why people does not use KBUILD_VERBOSE=0 that
+	much is simply the typing needed.
+	This notation should make it acceptable to type it.
+	The usage of "make V=0" is restricted to the command line.
+	Anyone that wants to enable the non-verbose mode pr. default shall
+	set KBUILD_VERBOSE in the shell.
+
+<arnd@arndb.de>
+	[trivial] avoid a warning for each module on s390x
+	
+	s390x has a reference to _GLOBAL_OFFSET_TABLE_ in each module
+	that is resolved by the module loader. This patch prevents
+	modpost from emitting a warning about that symbol.
+
+<sam@mars.ravnborg.org>
+	[PATCH] kbuild: touch-module after successfull creation only
+	
+	On Mon, Mar 03, 2003 at 05:11:10PM -0500, Bill Davidsen wrote:
+	> scripts/Makefile.modinst:16: *** Uh-oh, you have stale module entries. You
+	messed with SUBDIRS, do not complain if something goes wrong.
+	
+	This happens if you have encountered a compile error in a module.
+	In this case you did not succeed the compilation of fs/binfmt_aout,
+	and therefore no .o file can be located.
+	kbuild assumes this is because you have messed with SUBDIRS, which is wrong.
+
+<davem@nuts.ninka.net>
+	[KERNEL]: Add typecheck macro for verifying types at compile time.
+
+<davem@nuts.ninka.net>
+	[JIFFIES]: Use typecheck in time_foo jiffies macros.
+
+<torvalds@home.transmeta.com>
+	Fix up some timeouts to use the proper types.
+	
+	(While "signed long" is the same in practice, it is technically
+	incorrect, and the new anal type-checker complains).
+
+<rmk@flint.arm.linux.org.uk>
+	[ARM] Remove set_mac_address from acorn drivers.
+	
+	Acorn Ethernet drivers provided a duplicate set_mac_address
+	implementation which reflects the generic ethernet version in
+	drivers/net/net_init.c.  Use the generic version instead.
+
+<rmk@flint.arm.linux.org.uk>
+	[ARM] Convert ecard.c shutdown/reboot to use driver model
+	
+	ecard.c used to use the reboot notifier to ensure that the expansion
+	cards are in the correct state for rebooting.  Use the driver model
+	shutdown method instead.
+
+<rmk@flint.arm.linux.org.uk>
+	[ARM] Always call schedule_tail() after a fork()
+
+<rmk@flint.arm.linux.org.uk>
+	[ARM] Always claim the timer IRQ using SA_INTERRUPT.
+
+<rmk@flint.arm.linux.org.uk>
+	[ARM] Add new kernel typedefs for __kernel_{timer,clockid}_t.
+
+<rmk@flint.arm.linux.org.uk>
+	[ARM] Add dummy set_pgd() implementation.
+
+<rmk@flint.arm.linux.org.uk>
+	[ARM] Make ARM's pci_controller_num dev argument appear to be used.
+	
+	This cuts down on the number of warnings during the build.
+
+<rmk@flint.arm.linux.org.uk>
+	[ARM] Kill old mkdep dependency hack.
+	
+	We include a header file in an indirect method, which mkdep didn't
+	understand.  Now that mkdep is gone, we don't need the hack to make
+	mkdep do the right thing.
+
+<rmk@flint.arm.linux.org.uk>
+	[ARM] Fix ARM ide.h
+	
+	Kill ide_* resource handling.  Add __ide_mm* macros to use our string
+	based mmio.
+
+<rmk@flint.arm.linux.org.uk>
+	[ARM] Make TLB instruction selection more fine-grained
+	
+	This eliminates some unnecessary branches and instructions in the
+	TLB flush macros where configurations allow for this to occur.
+
+<rmk@flint.arm.linux.org.uk>
+	[ARM] Update mach-types to latest vesion.
+
+<rmk@flint.arm.linux.org.uk>
+	[ARM] Ensure we preserve other CPSR bits when switching to SVC mode.
+
+<rmk@flint.arm.linux.org.uk>
+	[ARM] Power management updates
+	
+	This provides an element of core PM support to ARM, providing an APM
+	like user space interface, and separating the core PM support from
+	the SA1100 PM implementation.
+
+<rmk@flint.arm.linux.org.uk>
+	[ARM] Add better PM support to SA1111 and SA11x0.
+	
+	This follows our existing PM interfaces.
+
+<rmk@flint.arm.linux.org.uk>
+	[ARM] Clean up ARM PCI support (bios32.c)
+	
+	Eliminate have_isa_bridge - use isa_bridge instead.
+	Clean up PCI bus walking.
+	Clean up detection of fast back to back capability.
+	Ensure we set the bridge control register appropriately.
+	Pin swizzle functions are never called with pin == 0.
+
+<rmk@flint.arm.linux.org.uk>
+	[CPUFREQ] Update ARM CPUFREQ drivers
+	
+	A 4 patch set from Dominik Brodowski, tested and fixed up by rmk
+	for ARM.
+	
+	(1)
+	
+	- the system3.c cpufreq notifier couldn't possibly compile before because
+	      cpufreq_updateminmax has been undefined for ages.
+	- clean up sa1100fb.c notifier to specify exactly what's left TBD.
+	- double #include of cpufreq.c in drivers/pcmcia/sa1100_generic.c
+	
+	(2)
+	
+	Split up config symbols, add help text for CPU_FREQ_PROC_INTF
+	
+	(3)
+	
+	- update the Integrator CPUfreq driver so that it can get along with
+	  cpufreq policies.
+	- modularize Integrator CPUfreq driver (all it did with
+	  !CONFIG_CPU_FREQ was to print out some debug information)
+	
+	(4)
+	
+	- update the SA11x0 CPUfreq drivers so that they can get along with
+	  cpufreq policies and governors.
+	- update the cpufreq core so that cpufreq_get() returns something
+	  sensible during the first ->setpolicy or ->target call.
+
+<jmorris@intercode.com.au>
+	[IPV4]: Fix multicast route lookups.
+
+<laforge@netfilter.org>
+	[NETFILTER]: Fix ipv6 build.
+
+<ink@jurassic.park.msu.ru>
+	[PATCH] alpha pcibios_claim_console_setup fix
+	
+	pcibios_claim_console_setup() doesn't look behind PCI-PCI bridges.
+	
+	Noticed by Anton Blanchard.
+	
+	Ivan.
+
+<alan@lxorguk.ukuu.org.uk>
+	[NETFILTER]: Remove 2.0 and 2.2 stuff from netfilter.
+
+<bcrl@redhat.com>
+	[NET]: Simplify scm handling and sendmsg/recvmsg invocation, consolidate net compat syscalls.
+	
+	1) Pull scm argument from sendmsg/recvmsg, it is available
+	from I/O control block
+	2) Consolidate networking syscall compat call into net/compat.c
+	3) Change ops->{sendmsg,recvmsg}() code sequences into sock_{sendmsg,recvmsg}()
+
+<davidm@tiger.hpl.hp.com>
+	ia64: Make ia64_fetch_and_add() simpler to optimize so lib/rwsem.c
+		can be optimized properly.
+
+<rmk@flint.arm.linux.org.uk>
+	[ARM] CPUFREQ - allow ARM to work with userspace governor.
+	
+	Patch from Dominik Brodowski.
+	
+	This patch is necessary to update the ARM drivers so that they can
+	live with the new cpufreq governor "userspace" (which I sent to Linus a
+	moment ago).
+
+<davem@nuts.ninka.net>
+	[NET]: Do not duplicate verify_compat_iovec in sparc64 solaris module.
+
+<rmk@flint.arm.linux.org.uk>
+	[CPUFREQ] Make sa11x0_ppcr_to_freq return in units of kHz, not 100kHz.
+
+<torvalds@home.transmeta.com>
+	Make the "interactive bonus" work both ways - both the process
+	that is actually showing interactive behaviour (sleeping) and the
+	process that wakes up the interative process get a bonus.
+	
+	This means that processes that help interactive processes (usually
+	system daemons, and X11 in particular) will themselves get some bonus.
+	
+	The waker only gets whatever is left over from the "real" interactive
+	user, to avoid any bad behaviour.
+
+<mingo@elte.hu>
+	[PATCH] "interactivity changes", sched-2.5.64-A6
+	
+	This includes the following items:
+	
+	 - a new wakeup feature: SMART_WAKE_CHILD (now unconditional) [this is a
+	   reworked version of the wakeup changes from Andrea's tree.]
+	
+	 - scheduler parameter tunings (CHILD_PENALTY, MAX_TIMESLICE,
+	   STARVATION_LIMIT, MAX_SLEEP_AVG)
+	
+	 - activate_task() splitup to separate the interactivity-active variant
+	   from the task-queue variant => this fixes our statistics in some cases.
+	
+	 - finer-grained preemption: if priority is equal then the task with the
+	   longer pending timeslice wins.
+	
+	 - make it possible to disable sync-wakeups via SYNC_WAKEUPS (default:1)
+	
+	 - a naming cleanup (sleep_timestamp => last_run)
+	
+	 - fix up STARVATION_LIMIT usage so that a value of 0 is recognized as 'no
+	   starvation limit'.
+	
+	It also merges Linus' "priority boost backmerging"
+
+<davidm@tiger.hpl.hp.com>
+	ia64: Correct the value of siginfo.si_addr for SIGSEGV signals
+		triggered by NaT-page-consumption faults.
+
+<ambx1@neo.rr.com>
+	Manual Resource Setting Update
+	
+	This patch allows for partial setting of manual resources as needed by ALSA.
+	It does not change any existing APIs.
+
+<stern@rowland.harvard.edu>
+	[PATCH] USB: Patch for auto-sense cmd_len
+	
+	This patch fixes an oversight in usb-storage whereby the command length
+	and command buffer for an automatically-generated REQUEST-SENSE command
+	would not be initialized properly.
+
+<davidm@tiger.hpl.hp.com>
+	ia64: Hook up POSIX-timer syscalls.  Take advantage of ptrace_notify().
+
+<david-b@pacbell.net>
+	[PATCH] USB: track usb ch9 device state
+	
+	This patch merges the USB state definitions from the ARM Linux
+	code (inside the sa1100 driver) and uses them to track what can
+	be done with the device.  That replaces the recently added
+	"udev->present" flag with a more complete/standard state model.
+	
+	There are a few changes that might affect behavior if things
+	start to go really haywire:
+	
+	 - usb_set_address() and usb_set_configuration(), used while
+	   enumerating, handle some unlikely cases more correctly:
+	   don't allow setting address to zero (undefined behavior),
+	   and do allow un-configuring (config 0).  (Adds a FIXME
+	   for an existing set-configuration bug too.)
+	
+	 - usb_disconnect() flags the state change earlier (as soon
+	   as it's known).
+	
+	 - usb_submit_urb() works in the states where messaging is
+	   allowed, and also enforces the "unless configured, only
+	   control traffic is legal" rule.
+	
+	 - usb_unlink_urb() doesn't care any more about that state.
+	   (There seemed to be agreement that it must not matter.)
+	
+	This will help with some further cleanups in the complex of
+	issues relating to driver removal, device removal, config
+	changing (with driver unbind and rebind), reset, and so on.
+
+<greg@kroah.com>
+	[PATCH] USB: unfortunatly, we can't call usb_unlink_urb() right now all of the time.
+	
+	The host controllers have to be fixed up before we can safely take
+	out the check for dev->state.
+
+<rmk@flint.arm.linux.org.uk>
+	[ARM] Add generic SSP "PIO" mode driver
+	
+	Add SSP PIO driver - provides an interface for talking to
+	microcontrollers and such like connected to the SA1110's
+	SSP port.
+
+<davem@nuts.ninka.net>
+	[IPSEC]: Fix build when ipsec is disabled.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	do_mounts: Fix boot from ramdisk
+	
+	Russell King investigated a failure case I introduced: When booting
+	with "load_ramdisk=1", we use the kernel root= parameter to determine
+	from what device to get the contents to copy into a ramdisk and then
+	mount that ramdisk as root.
+	
+	For the copy to work, /dev/root needs to point to the device to load the
+	ramdisk from.
+
+<rddunlap@osdl.org>
+	[IPV4/IPV6]: ICMP cleanups.
+
+<hch@lst.de>
+	[PATCH] update fdomain pcmcia support
+	
+	get it to actually compile cleanly again, switch to scsi_add_host,
+	remove host list walking.
+
+<hch@lst.de>
+	[PATCH] update qlogic pcmcia support
+	
+	dito
+
+<willy@debian.org>
+	[PATCH] Remove naked GFP_DMA from drivers/scsi/sd.c
+	
+	This GFP_DMA can be GFP_KERNEL because sd_init_onedisk calls sd_spinup_disk
+	calls scsi_wait_req which can sleep.
+
+<willy@debian.org>
+	[PATCH] Remove naked GFP_DMA from drivers/scsi/sr.c
+	
+	In get_sectorsize(), we can already sleep in scsi_wait_req().
+	In get_capabilities(), we can use GFP_KERNEL because it is only called
+	from sr_attach() which already does a GFP_KERNEL allocation.
+
+<akpm@digeo.com>
+	[PATCH] i386 IRQ balancing cleanup
+	
+	General coding cleanups in io_apic.c:
+	
+	- make pending_irq_balance_apicid[] static
+	
+	- reorder several functions so that forward decls are not needed and so
+	  that `inline' actually works.
+	
+	- 80 col fixes.
+
+<akpm@digeo.com>
+	[PATCH] balance_irq lockup fix
+	
+	irqdesc_t.lock is taken from interrupts - it needs irq-safe locking from
+	process context.
+	
+	Also timer_irq_works() needs to use an unsigned long to hold a jiffies value
+	(Kai Bankett)
+
+<akpm@digeo.com>
+	[PATCH] Fix nfs oops during mount
+	
+	Patch from Trond Myklebust <trond.myklebust@fys.uio.no>
+	
+	This has been floating about for a while, and fixes the oops which people
+	keep on reporting.
+
+<akpm@digeo.com>
+	[PATCH] rtc lock ranking fix
+	
+	Patch from: Zwane Mwaikambo <zwane@linuxpower.ca>
+	
+	Fix up a possible AB/BA deadlock identified by Dawson Engler's latest toy.
+
+<akpm@digeo.com>
+	[PATCH] sk98lin 64-bit divide fix
+	
+	This driver is doing a division on a 64 bit valus which is identical to
+	"jiffies" and is asking for __udiv64.  Cast the 64-bit value back to long.
+
+<akpm@digeo.com>
+	[PATCH] cciss: fix initialization for PCI hotplug
+	
+	Patch from Stephen Cameron <steve.cameron@hp.com>
+	
+	* Fix driver to wait for firmware to indicate that it is ready.
+	  (Needed for PCI hotplug case, but for normal warm/cold reboot, by the
+	  time driver inits, firmware will already be ready.)
+
+<akpm@digeo.com>
+	[PATCH] export pfn_to_nid to modules
+	
+	Patch from Patricia Gaughen <gone@us.ibm.com>
+	
+	This function was recently uninlined for NUMAQ.  But it used to be a macro,
+	and modules need it.
+
+<akpm@digeo.com>
+	[PATCH] Reduced stack usage in random.c
+	
+	Patch from: Matthew Wilcox <willy@debian.org>
+	
+	Reduces stack use in random.c by 350 (or maybe 700) bytes by sharing a local
+	array between two functions.
+
+<akpm@digeo.com>
+	[PATCH] fix inode reclaim imbalance
+	
+	Well I thought we were shooting down unused inodes a bit aggressively.  With
+	30,000 inodes total and 1000 unused, the 1000 are getting reclaimed
+	instantly.
+	
+	shrink_icache_memory() needs to return the number of reclaimable inodes to
+	page reclaim, not the total number.
+
+<akpm@digeo.com>
+	[PATCH] remove __pgd_offset
+	
+	Patch from Dave Hansen <haveblue@us.ibm.com>
+	
+	__pgd_offset() and pgd_offset() are completely different functions.
+	__pgd_offset() is really just a helper to figure out which entry in a
+	pgd an address would fall into.   pgd_offset() does all the leg work and
+	actually fetches the real pgd entry.
+	
+	pgd_index() is a much saner name for what __pgd_offset() does.  In fact,
+	we do this:
+	#define __pgd_offset(address) pgd_index(address)
+	
+	The attached patch removes all instances of __pgd_offset and just
+	replaces them with pgd_index.
+	
+	Compiles with and without PAE on x86.
+
+<akpm@digeo.com>
+	[PATCH] remove __pmd_offset
+	
+	Patch from Dave Hansen <haveblue@us.ibm.com>
+	
+	Same thing as the __pgd_offset one, just for pmds this time to keep the
+	naming consistent.
+
+<akpm@digeo.com>
+	[PATCH] remove __pte_offset
+	
+	Patch from Dave Hansen <haveblue@us.ibm.com>
+	
+	ptes this time
+
+<akpm@digeo.com>
+	[PATCH] missed unlock_kernel() in ext3+htree
+	
+	Patch from Alex Tomas <bzzz@tmi.comex.ru>
+	
+	There's a missing unlock_kernel().
+
+<akpm@digeo.com>
+	[PATCH] reduce stack size: elf_core_dump()
+	
+	Patch from "Randy.Dunlap" <randy.dunlap@verizon.net>
+	
+	This patch reduces stack size in elf_core_dump() from over 0x400 (0x4a4 e.g.)
+	to less than 0x100 (0xb0 on a P4 with gcc 2.96).
+
+<akpm@digeo.com>
+	[PATCH] uninlining in fs/binfmt_elf.c
+	
+	uninline some functions which have multiple callsites.  A 5% reduction in
+	text size.
+
+<akpm@digeo.com>
+	[PATCH] ext3: fix error-path memory leak
+	
+	Fix an error-path memory leak in ext3_fill_super().
+
+<akpm@digeo.com>
+	[PATCH] fix ioremap off by one bug
+	
+	Patch from Andreas Klein <asklein@cip.physik.uni-wuerzburg.de>
+	
+	Fixes an off-by-one in ioremap() - local variable `last_addr' is *inclusive*
+	- it is the last byte of the mapping, not the usual (last byte + 1).
+
+<Andries.Brouwer@cwi.nl>
+	[PATCH] scsi_error fix
+	
+	imm.c: spelling
+	scsi.h: remove old and now incorrect comment
+	scsi_scan.c: remove superfluous final return
+	scsi_error.c: apart from similar trivialities the only change:
+	
+	    If a command fails (e.g. because it belongs to a newer
+	    SCSI version than the device), it is fed to
+	    scsi_decide_disposition(). That routine must return
+	    SUCCESS, unless the error handler should be invoked.
+	
+	    In the situation where host_byte is DID_OK, and message_byte
+	    is COMMAND_COMPLETE, and status is CHECK_CONDITION, there is
+	    no reason at all to invoke aborts and resets. The situation
+	    is normal. I see here UNIT ATTENTION, Power on occurred
+	    and ILLEGAL REQUEST, Invalid field in cdb.
+	
+	    The 2.5.64 code does not return SUCCESS, but it returns the
+	    return code of scsi_check_sense(), and that may be FAILED
+	    in case we do not have valid sense.
+
+<linux@brodo.de>
+	[PATCH] pcmcia: it works again!
+	
+	platform_device_register may only be called after all class-specific
+	device data is initialized, or else the class-type add_device call (which
+	enables the pcmcia sockets) will fail.
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] minor breakage fix from typo fixes
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] minor typo fix that got missed
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] remove 2.2 compatmac stuff from rio driver
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] exterminate 2.2 gunk from video stuff
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] look a typo 8)
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] more 2.0 crap
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] more 2.0/2.2 bits
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] another typo that escaped
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] fix aic7xxx aicasm build
+	
+	The -ldb has to be at the end sometimes
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] remove a pile of 2.0 and 2.2 support
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] filter more 2.2 junk
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] kill stdarg in intermezzo
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] missed patch - static not extern inline in cia
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] correct BUG doc
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] kill the now dead ide_ioreg_t
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] kill long unused macro
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] add serial port table for PC9800
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] correct BUG doc in parisc
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] remove unused beep macro on sh
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] Add ELF types for Hitach H8 series
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] remove 2.2 junk from efs
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] remove 2.2 bits fromw anpipe
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] remove 2.0 and 2.2 stuff from netfilter
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] add a new PCI quirk type for the ALi Magik series
+	
+	This chip needs latency and other setups to avoid a PCI/AGP deadlock
+	with tv cards
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] remove 2.0/2.2 stuff
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] remove 2.0/2.2 stuff from wanrouter
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] correct emu10k url
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] correct file names in comments in mm
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] clean up 2.2 stuff in wanrouter code
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] ALi it turns out has a 31bit audio device
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] update PCI quirks
+	
+	ALi Magik requires workarounds for TV chips
+	IDE controllers require proper handling in legacy mode
+	PXB must be disabled on C0 450NX or the IDE will corrupt memory
+	VIA northbridge devices require the interrupt line is written
+	NEC_CBUS_2/3 require ISA DMA workarounds
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] correct irq logic for x86
+	
+	We must not look for a PCI IRQ for a non native mode IDE device
+	We must write PCI_INTERRUPT_LINE for VIA
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] correct building of the old ide/hd.c driver
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] clean up all the console inits using an initcall variant
+	
+	Dave Woodhouse did this a while ago and its been kicking around in my
+	tree just fine. This gets rid of a lot of the init lists of functions
+	still left in the kernel by having an __init type array built up for the
+	consoles as well
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] bring ide-disk driver into line with 2.4.21pre
+	
+	This doesn't have the new -ac testing stuff from 2.4.21pre5-ac but it
+	has the stuff I now trust in it. This fixes the cache flush stuff and
+	also means ide-disk now should be safe shared IRQ
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] ide-dma
+	
+	This switches ide-dma to ide_execute_command and makes IDE DMA also happy
+	when running shared IRQ
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] switch ide-floppy to ide_execute_command
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] switch ide-io (core ioctls etc) to ide_execute_command
+	
+	Also fix the irq masking bug
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] add sensible names to the ide iops
+	
+	The outbsync one has further changes to come in the next batch to sort
+	out some platforms like PPC
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] remove spare cast
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] switch ide taskfile ioctls to ide_execute_command
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] fix wrong type and statics in amd ide
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] update via driver from 3.35-ac to 3.36
+
+<rmk@arm.linux.org.uk>
+	[PATCH] Separate out pci bus resource allocator
+	
+	- Separate out bus resource allocator (pci_bus_alloc_resource)
+	- Provide pci_enable_bridges to setup command register for all
+	  pci bridges.
+
+<rmk@arm.linux.org.uk>
+	[PATCH] Eliminate stack allocation of struct pci_dev...
+	
+	- Eliminate the stack allocation of a struct pci_dev, and make
+	  pci_scan_slot() take a bus and a devfn argument.
+	- Add "dev->multifunction" to indicate whether this is a multifunction
+	  device.
+	- Run header fixups before inserting the new pci device into any
+	  device lists or announcing it to the drivers.
+	- Convert some more stuff to use the list_for_each* macro(s).
+
+<rmk@arm.linux.org.uk>
+	[PATCH] Only add devices to bus->devices while scanning...
+	
+	  The pci_find* functions search using the following lists:
+	        bus->children   (for subordinate buses)
+	        pci_root_buses  (for all root buses)
+	        pci_devices     (for devices)
+	
+	  This leaves one list which we can add devices to without any drivers
+	  finding the new devices before we've finished with them.
+	
+	- initialise bus->node list head.
+	
+	- pci_scan_slot will scan the specified slot, and add the discovered
+	  devices to the bus->devices list only.  These devices will not
+	  appear on the global device list, and do not show in sysfs, procfs.
+	  pci_scan_slot returns the number of functions found.  If you want
+	  to find the devices, you have to scan bus->devices and look for
+	  devices where list_empty(&dev->global_list) is true.
+	
+	- new function "pci_bus_add_devices" adds newly discovered devices
+	  to the global device lists, and handles the sysfs and procfs
+	  stuff, making the devices available to drivers.  All our buses
+	  which have an empty list head are treated as "new" (since they
+	  are not attached to the parent buses list of children) and are
+	  also added.  Currently, no buses will be in this state when this
+	  function is called.
+	
+	- new function "pci_scan_child_bus" scans a complete bus, building
+	  a list of devices on bus->devices only, performing bus fixups
+	  via pcibios_fixup_bus() and scanning behind bridges.  It does
+	  make devices externally visible.
+	
+	- pci_do_scan_bus retains its original behaviour - ie, it scans
+	  and makes devices available immediately.
+
+<rmk@arm.linux.org.uk>
+	[PATCH] Convert setup-bus resource allocation to use bus->devices
+	
+	- Convert setup-bus.c resource allocation to scan bus->devices rather
+	  than bus->children.  As noted previously, newly discovered child
+	  buses will not be on the parents list of children buses, so when
+	  we're trying to assign resources, we need to scan the bus for
+	  devices with subordinate buses rather than using the list of children
+	  buses.
+
+<rmk@arm.linux.org.uk>
+	[PATCH] Fix up pci_scan_bridge and friends
+	
+	  Now we tackle pci_add_new_bus and pci_scan_bridge.  The hotplug code
+	  currently uses this, but I'd like it to die off; pci_scan_bridge()
+	  should be used to scan behind bridges.  This may mean hotplug needs
+	  some changes to pci_scan_bridge - if so, we need to find out what
+	  changes are required and fix it.
+	
+	  pci_alloc_child_bus() does what pci_add_new_bus() did, except it
+	  doesn't attach the new bus to the parents list of child buses.  The
+	  only way this bus can be reached from the parent bus is by scanning
+	  the parents devices list, and locating a device with a non-NULL
+	  subordinate bus.  The only code which should be doing this is the
+	  PCI code.
+	
+	  Since the new bus will have an empty list head for bus->node, we can
+	  detect unattached buses prety easily.  (see pci-3.diff.)
+	
+	  pci_scan_bridge() changes slightly - we use our new pci_scan_child_bus()
+	  function from pci-3.diff, which doesn't attach devices to the global
+	  tree.  This means callers of pci_scan_child_bus() and pci_scan_bridge()
+	  (ie, hotplug) will need to call pci_bus_add_devices().
+
+<hpa@transmeta.com>
+	[PATCH] bootsect removal
+	
+	This is the "boot sector removal" patch for i386 updated for Linux
+	2.5.63-bk7.  The only change against the 2.5.59 version is that the
+	FDOPTS Makefile variable, which lets one create a floppy image with
+	arbitrary kernel options, has been merged from the x86-64 version, and
+	the comments have been updated.
+	
+	The patch removes the in-kernel boot sector, which these days rarely
+	work correctly (it only supports up to 1 MB kernels, and only work on
+	legacy floppies -- not on IDE or USB devices, nor on any kind of
+	emulated devices like El Torito), replaces it with a placeholder stub,
+	and sets up the Makefile targets to create floppies or floppy images
+	using SYSLINUX.  The FDOPTS Makefile variable can be used to set
+	kernel command line options (thanks to a suggestion by Andi Kleen.)
+	
+	Note that the same change has already been applied to the x86-64
+	architecture.  The last hunk of the patch corrects a comment in that
+	architecture.
+
+<mochel@osdl.org>
+	sysfs: fix up directory removal, once and for all. 
+	
+	This patch was previously integrated, but dropped erroneously by a bk 
+	merge. 
+	
+	This fixes file cleanup during a sysfs directory removal by deleting files
+	from ->d_subdirs as they're iterated over, then checking if we can get a
+	reference on them.
+
+<mochel@osdl.org>
+	sysfs: Fix binary file handling.
+	
+	From Rusty Lynch:
+	
+	* makes sysfs cleanup the buffer->data allocated by the attribute write
+	functions
+	* fixes a bug that causes the kernel to oops when somebody attempts to
+	write to the file.
+
+<davidm@tiger.hpl.hp.com>
+	ia64: Fix several small bugs/omissions from the 2.5.64 sync.
+
+<anton@samba.org>
+	[PATCH] missing include
+	
+	list.h must now include stddef since it uses NULL.
+
+<torvalds@home.transmeta.com>
+	Fix "con_init()" function type and stale (and incorrect) declaration
+
+<torvalds@home.transmeta.com>
+	Fix a very theoretical race between the new RCU lookup and
+	concurrent renames in another directory.
+	
+	I doubt this can be triggered in practice, and the fix is
+	a bit heavy-handed, but let's see if numbers can show that
+	the simple fix doesn't show any real lock contention.
+
+<sfr@canb.auug.org.au>
+	[PATCH] ia64: compat_sys_futex() support
+	
+	ia 64 part of the patch.  This gives you a 32 bit version of sys_futex (hopefully).
+
+<jbarnes@sgi.com>
+	[PATCH] ia64: ACPI fix for no PCI
+	
+	Andy Grover told me this should be posted here.  It allows ACPI to
+	compile even with PCI turned off.  Patch against 2.5.60.
+
+<davidm@tiger.hpl.hp.com>
+	ia64: Minor formatting/whitespace fixes in ia64-version of acpi.c.
+
+<bjorn_helgaas@hp.com>
+	[PATCH] ia64: IA32 support without sysctl doesn't work
+	
+	Make CONFIG_SYSCTL control sys32_sysctl as well.  Based on a patch from Peter Chubb.
+
+<kai@vaio.(none)>
+	ISDN/HiSax: Introduce probe() functions
+	
+	Just separate the setup_*() functions of hisax subdrivers
+	into calls to *_probe() functions, a step towards using
+	standard initialization and modularization of hisax.
+
+<kai@vaio.(none)>
+	ISDN/HiSax: config.c cleanup
+	
+	Consolidate allocation / freeing of various data structures into
+	one function.
+
+<kai@vaio.(none)>
+	ISDN/HiSax: Remove unused ISDN_CHIP_* macros
+	
+	They were only defined, never used.
+
+<kai@vaio.(none)>
+	ISDN/HiSax: Get rid of CARD_* defines
+	
+	hisax.h defined a CARD_* macro for each CONFIG option, which
+	is totally unnecessary, just use the CONFIG option directly.
+
+<kai@vaio.(none)>
+	ISDN/HiSax: Remove amd7930.c
+	
+	This has been around for many years but was never finished. No
+	need to carry it on to yet another stable kernel.
+
+<willy@debian.org>
+	[PATCH] Some parisc updates for SCSI
+	
+	The config stanza for SCSI_ZALON was in the wrong place, so move it.
+	Make SCSI_NCR53C8XX conflict with SCSI_ZALON.
+	Give ncr53c8xx and sym53c8xx names
+	Fill in detach and release methods unconditionally.
+	Call pci_set_master() in sym53c8xx.
+	Both these drivers need interrupt.h, not sched.h
+
+<david@gibson.dropbear.id.au>
+	[PATCH] Squash warnings in usb-serial.c
+	
+	This squashes (gcc-3.2) "label and end of compound statement
+	deprecated" warnings in usb-serial.c.
+
+<david@gibson.dropbear.id.au>
+	[PATCH] Squash warning in ohci-pci.c on PowerBooks
+	
+	Apple PowerBooks want <asm/prom.h> in ohci-pci.c for the prototype of
+	pci_device_to_OF_node().  This patch adds it to the already present
+	list of PowerBook specific #includes:
+
+<mbligh@aracnet.com>
+	[PATCH] Fix NUMA scheduler problem after interactivity merge
+	
+	NODE_THRESHOLD got accidentally dropped in the interactive scheduler
+	changes merge. This puts it back.
+
+<mbligh@aracnet.com>
+	[PATCH] revert pfn_to_nid change.
+	
+	This change was wrong. pfn_to_nid is a macro.
+
+<zwane@linuxpower.ca>
+	[PATCH] noirqbalance still doesn't do anything
+	
+	This one simply sets TARGET_CPUS to cpu_callout_map instead of
+	cpu_online_map so that when we finally do boot we actually use the other
+	cpus for servicing interrupts.
+
+<mzyngier@freesurf.fr>
+	[PATCH] Fix fs/binfmt_elf.c build
+	
+	The stack reducing patch that recently went in prevent alpha from
+	building (missing some ELF_CORE_COPY_XFPREGS ifdefs). The excluded
+	patch fixes it.
+
+<mzyngier@freesurf.fr>
+	[PATCH] Fix arch/alpha/vmlinux.lds.S typos.
+	
+	The console initcall patch that went in contains a typo that prevents
+	alpha from building.
+
+<mingo@elte.hu>
+	[PATCH] NUMA scheduler breakage
+	
+	__activate_task() and wake_up_forked_process() should call
+	nr_running_inc(rq) rather than doing a rq->nr_running++.
+	
+	Noted by Rick Lindsley
+
+<hch@lst.de>
+	[PATCH] remove some braindamage from drivers/scsi/pcmcia/Kconfig
+	
+	It contains one user-selectable option that does nothing but hiding the
+	four pcmcia drivers if not seleted (although we have an extra menu for
+	them!) one one that does exactly nothing.  Remove those two.
+
+<green@namesys.com>
+	[PATCH] memleak in drivers/char/vt.c
+	
+	Seems there is a memleak on error exit path in drivers/char/vt.c, here's
+	the patch.  Found with help of smatch + enhanced unfree script.
+
+<mingo@elte.hu>
+	[PATCH] more "interactivity changes", sched-B2
+	
+	 - fix a (now-) bug in kernel/softirq.c, it did a wakeup outside any
+	   atomic regions, which falsely identified random processes as a
+	   non-atomic wakeup, and which causes random priority boost to be
+	   distributed.
+	
+	 - reset the initial idle thread's priority back to PRIO_MAX after doing
+	   the wakeup_forked_process() - correct preemption relies on this.
+	
+	 - update current->prio immediately after a backboost.
+	
+	 - clean up effective_prio() & sleep_avg calculations so that there are
+	   fewer RT-task special cases.  This has the advantage of the sleep_avg
+	   being maintained even for RT tasks - this could be advantegous for
+	   tasks that briefly enter/exit RT mode.
+
+<willy@debian.org>
+	[PATCH] fs/locks.c: fix bugs
+	
+	- Remove broken lock accounting
+	- Introduce __locks_delete_block()
+	- Stop using kdevname()
+	- Fix locks_remove_posix()
+
+<shemminger@osdl.org>
+	[PATCH] Turn off aio printk meant for debugging (2.5.64)
+	
+	The following messages are of interest only when debugging aio.
+	Otherwise, they are just console clutter.
+
+<mingo@elte.hu>
+	[PATCH] "interactivity changes", sched-2.5.64-B2
+	
+	This fixes the SMP runqueue locking bug when updating the wakers
+	priority.  It also includes:
+	
+	 - only update the priority and do a requeueing if the sleep average has
+	   changed. (this does not happen for pure CPU hogs or pure interactive
+	   tasks, so no need to requeue/recalc-prio in that case.) [All the
+	   necessary values are available at that point already, so gcc should
+	   have an easy job making this branch really cheap.]
+	
+	 - do not do a full task activation in the migration-thread path - that is
+	   supposed to be near-atomic anyway.
+	
+	 - fix up comments
+	
+	I solved the SMP locking bug by moving the requeueing outside of
+	try_to_wake_up().  It does not matter that the priority update is not
+	atomically done now, since the current process wont do anything
+	inbetween.  (well, it could get preempted in a preemptible kernel, but
+	even that wont do any harm.)
+
+<sam@mars.ravnborg.org>
+	kbuild: Do not clutter output with make -jN
+	
+	Added a new rule filechk used to check when a generated file
+	actually is changed. If there is no actual changes the file
+	is left without updating the timestamp.
+	When building a kernel from scratch two printouts occurs:
+	  CHK      file-to-generate
+	  UPD      file-to-generate
+	
+	The first line tell that kbuild checks the file, second line tell that
+	the file is being updated (or created).
+	On successive runs only the first line is printed.
+	Output is the same in verbose and non-verbose mode.
+	
+	This replaces the former update-if-changed which has been deleted.
+	generate-asm-offsets.h has been renamed as well.
+	All users are updated in next patch.
+	Output when generating compile.h follow above style
+
+<sam@mars.ravnborg.org>
+	kbuild/all arch: Use filechk rule for offsets generation
+	
+	Introduced filechk for all architectures that previously used
+	update-if-changed.
+	No longer add asmoffsets.h.tmp to CLEAN_FILES.
+	This is a private file to the filechk rule
+
+<stevef@smfhome1.austin.rr.com>
+	Fix oops in getdfs when null path passed in on mount.  Fix oops when changed readsize caused readpages problem.  Add support for altering rsize so can reduce pages read across net
+	below default of 4
+
+<davem@nuts.ninka.net>
+	[SPARC]: One too many chars in INIT_C_CC
+
+<greg@kroah.com>
+	gen_init_cpio: Add the ability to add files to the cpio image.
+
+<greg@kroah.com>
+	kbuild: handle any failures of the gen_init_cpio or initramfs image to stop the build.
+	
+	This also shows how to add files to the initramfs build, but is 
+	commented out.
+	
+	Patch originally done by Kai.
+
+<davem@nuts.ninka.net>
+	[FRAMEBUFFER]: Convert SBUS LEO driver to new APIs.
+
+<davem@nuts.ninka.net>
+	[SPARC64]: Use pci_remove_bus_device to delete, found by Ben Collins.
+
+<davem@nuts.ninka.net>
+	[SPARC64]: Update defconfig.
+
+<torvalds@home.transmeta.com>
+	Avoid warning due to missing return value
+
+<torvalds@home.transmeta.com>
+	Ignore initramfs cpio file
+
+<marcel@holtmann.org>
+	[SPARC64]: Translate AUTOFS_IOC_EXPIRE_MULTI ioctl.
+
+<davej@codemonkey.org.uk>
+	[CPUFREQ] fix cpufreq core breakage(s)
+	
+	- update two more cpufreq-related sysfs files to the new interface
+	  code
+	- always store the new, user-requested policy in another struct
+	  cpufreq_policy so that we can safely fall back to the old one in
+	  case something fails (this equals the behaviour before Pat's patch)
+	- the kobject which was registered in cpufreq_add_dev was inside a variable
+	  private to this function -- so the whole cpufreq sysfs interface returned
+	  -EINVAL.
+
+<davej@codemonkey.org.uk>
+	[CPUFREQ] fix userspace governor.
+	Let's put the sysfs file exported by the cpufreq userspace governor also
+	into the cpufreq/ - subdirectory of /sys/devices/sys/cpu0/.
+
+<davej@codemonkey.org.uk>
+	[CPUFREQ] remove unneeded code  
+	
+	- no cpufreq driver uses the frequency table helper "setpolicy" any more
+	  ("target" is much more appropriate for them anyways) - so remove
+	  that helper
+	- all cpufreq drivers use the advanced registration process, so some
+	  compatibility code can safely be removed. 
+
+<davej@codemonkey.org.uk>
+	[CPUFREQ] updated cpufreq ref-counting and locking scheme  
+	
+	This patch takes use of the now-working cpufreq_interface.kset and
+	cpufreq_policy.kobj to use reference counting within the cpufreq core
+	wherever this is more appropriate than the previous approach -- using one
+	semaphore. Additionally, the callbacks to the driver modules are protected
+	now.
+
+<davej@codemonkey.org.uk>
+	[CPUFREQ] add support for ICH4-M chipset in speedstep driver
+	
+	Intel ICH4-M soutbridges use exactly the same register interface for SpeedStep
+	as ICH2-M and ICH3-M southbridges -- which makes adding support for this  
+	bridge (almost) trivial
+
+<davej@codemonkey.org.uk>
+	[CPUFREQ] allow cpufreq drivers to export sysfs files
+	
+	This patch lets cpufreq drivers export per-CPU files in the cpufreq and
+	cpu-specific sysfs directory. As an example, a file
+	"scaling_available_frequencies" is added to the p4-clockmod.c driver.
+
+<davej@codemonkey.org.uk>
+	[CPUFREQ] update documentation
+	
+	The sysfs directory where the cpufreq-related files are stored changed due
+	to the new device interface code, so the documentation needs to be updated
+	accordingly. Also, add some information about the reference counting and the
+	exporting of sysfs files by the drivers.
+
+<davej@codemonkey.org.uk>
+	[CPUFREQ] Move pci define to pci_ids.h
+
+<davej@codemonkey.org.uk>
+	[WATCHDOG] amd7xx_tco updates from Zwane, and nuke EXPORT_NO_SYMBOLS
+
+<jejb@raven.il.steeleye.com>
+	Correct nested variable thinko in scsi_error.c
+
+<jejb@raven.il.steeleye.com>
+	Fix DMA to stack problem in scsi_error.c
+
+<jejb@raven.il.steeleye.com>
+	Fix loop problem in SCSI error handler sense collection
+	
+	Also remove previous work around so sense is collected now if the
+	driver doesn't do it automatically.
+	
+	Also fix a problem where the retries get reset when the command is
+	reissued (we only want the retries set when the command is first
+	created).
+
+<rml@tech9.net>
+	[PATCH] no need for kernel_flag on UP
+	
+	This is a minor cleanup.  We currently define and declare the BKL's
+	kernel_flag spinlock on either SMP or PREEMPT, which means a UP+PREEMPT
+	machine gets it.
+	
+	We only need the actual lock on SMP.
+
+<davem@nuts.ninka.net>
+	[SPARC64]: Make sure update_process_times runs inside of irq_{enter,exit} region.
+
+<rmk@flint.arm.linux.org.uk>
+	[SERIAL] Overhaul 8250_pci.c
+	
+	- Add local copy of flags for describing port characteristics.
+	- Add "quirk" handling to sort out board-specific initialisation,
+	  per-port setup, and finalisation.
+	- Remove quirk information from struct pci_board array, thereby
+	  making entries more generic.
+	- Initialise struct pci_board array using explicit indicies -
+	  adding to the readability, and making sure that the right entries
+	  are in the correct location in the table.
+	- Ensure we tell the serial layer to claim resources, and share
+	  interrupts.  PCI interrupts are sharable, and need to be so that
+	  multi-function cardbus cards will work.
+	- Only remap each PCI memory BAR once.
+	- Add pci serial driver to the tty devclass (this requires the patch
+	  to make tty_io.c register the tty devclass early.)
+	
+	Tested by CaT and myself.
+
+<mbligh@aracnet.com>
+	[PATCH] 1/6 Share common physnode_map code between NUMA-Q and Summit
+	
+	From Andy Whitcroft
+	
+	Share a common physnode_map structure between NUMA-Q and Summit.
+
+<mbligh@aracnet.com>
+	[PATCH] 2/6 Make CONFIG_NUMA work on non-numa machines.
+	
+	From Andy Whitcroft
+	
+	A few very simple changes in order to make CONFIG_NUMA work everywhere, so
+	the distros can build one common binary kernel for distributions.
+
+<mbligh@aracnet.com>
+	[PATCH] 3/6 Convert physnode_map to u8
+	
+	From Andy Whitcroft
+	
+	Convert physnode_map from an int to a u8 to save cachelines.
+
+<mbligh@aracnet.com>
+	[PATCH] 4/6 Fix the type of get_zholes_size for NUMA-Q
+	
+	From Andy Whitcroft
+	
+	Fix the type of get_zholes_size for NUMA-Q
+
+<mbligh@aracnet.com>
+	[PATCH] 5/6 Provide basic documentation for profiling
+	
+	People keep asking for this info, and Andrew asked me to put it under the
+	Documentation directory ... provides really simple instructions for taking
+	a profile so that users can report performance changes in a useful way.
+
+<mbligh@aracnet.com>
+	[PATCH] 6/6 cacheline align files_lock
+	
+	I'm getting a lot of cacheline bounce from .text.lock.file_table due to
+	false sharing of the cahceline. The following patch just aligns the lock
+	in it's own cacheline.
+
+<rmk@flint.arm.linux.org.uk>
+	[SERIAL] Update 8250_acorn.c
+	
+	Add resource-based addressing and ioremap support.  Ask the 8250
+	layer to handle the resources, and share IRQs.
+
+<jmorros@intercode.com.au>
+	[CRYPTO]: Move km_types out of header.
+
+<jmorris@intercode.com.au>
+	[TCP]: Commonize duplicated code into a new function, tcp_bucket_destroy.
+
+<jmorris@intercode.com.au>
+	[NET]: Nuke SO_BSDCOMPAT.
+
+<ahaas@airmail.net>
+	[NETFILTER]: C99 initializers for ipv6 netfilter.
+
+<ahaas@airmail.net>
+	[NETFILTER]: C99 initializers for ipv4 netfilter.
+
+<jmorris@intercode.com.au>
+	[CRYPTO]: Add encrypt_iv() and decrypt_iv() methods.
+
+<jmorris@intercode.com.au>
+	[CRYPTO]: Eliminate crypto_tfm.crt_ctx, from Adam Richter.
+
+<rmk@flint.arm.linux.org.uk>
+	[SERIAL] Add ttydriver->owner initialisation.
+
+<chas@locutus.cmf.nrl.navy.mil>
+	[ATM]: Get lec net_device names correct.
+
+<chas@locutus.cmf.nrl.navy.mil>
+	[ATM]: Obsolete some atm_vcc members.
+
+<rmk@flint.arm.linux.org.uk>
+	[SERIAL] Make tty->driver_data point at the uart_state structure.
+	
+	Since the uart_state structure is less volatile than uart_info, we
+	can safely place some semaphores in uart_state.
+
+<rmk@flint.arm.linux.org.uk>
+	[SERIAL] Make uart_tasklet_action take uart_state
+
+<davem@nuts.ninka.net>
+	[ATM]: Add missing $(obj) to driver makefile.
+
+<jmorris@intercode.com.au>
+	[CRYPTO]: Documentation updates.
+
+<rmk@flint.arm.linux.org.uk>
+	[SERIAL] Eliminate some more passing of struct uart_info.
+	
+	Replace uart_info argument for uart_change_speed, uart_startup,
+	uart_shutdown and uart_update_termios with a uart_state structure.
+	We no longer pass struct uart_info around to other functions.
+
+<akpm@digeo.com>
+	[PATCH] register_blkdev cleanups
+	
+	Patch from Andries.Brouwer@cwi.nl
+	
+	The following patch does the following:
+	
+	- static const char *blkdevs[MAX_BLKDEV]; disappears
+	- get_blkdev_list, (un)register_blkdev, __bdevname
+	  are moved from block_dev.c to genhd.c
+	- the third "fops" parameter of register_blkdev was unused;
+	  now removed everywhere
+	- zillions of places had printk("cannot get major") upon
+	  error return from register_blkdev; removed all of these
+	  and inserted a single printk in register_blkdev.
+	
+	Of course the reason for the patch is that one fixed size
+	array is eliminated.
+
+<akpm@digeo.com>
+	[PATCH] fix possible latency in balance_dirty_pages()
+	
+	Tasks which throttle in balance_dirty_pages() will loop until the amount of
+	dirty memory falls below the configured dirty_ratio.
+	
+	This exposes the possibility that one task could be stuck in there for
+	arbitrary periods of time due to page dirtying activity by other tasks.
+	
+	The patch changes the logic so that tasks will break out of the loop if they
+	have written enough pages, regardless of the current dirty memory limits.
+	
+	Here "enough" pages is 1.5x the number of pages which they just dirtied.
+	
+	If the amount of dirty memory in the machine happens to still exceed
+	dirty_ratio (say, due to MAP_SHARED activity) then the task will again
+	throttle after dirtying a single page.  But there is now an upper limit on
+	the time for which a single task will be captured in balance_dirty_pages().
+
+<akpm@digeo.com>
+	[PATCH] Implement sendfile() for NFS
+	
+	Patch from Trond Myklebust <trond.myklebust@fys.uio.no>
+	
+	Implement sendfile() for the NFS client.  This is required for loop-on-NFS
+	support.
+
+<akpm@digeo.com>
+	[PATCH] Allow VFS readahead to fall to zero
+	
+	Some workloads really, really want to have no readahead.  Databases which are
+	perfoming small synchronous I/Os against a file which has extremely poor
+	layout.  Any readahead at all is a lose here.
+	
+	But the current readahead code refuses to adapt that low.
+	
+	Fix it up so that we can indeed adaptively disable readahead altogether, and
+	do not start it again until we have seen max_readahead()'s worth of
+	consecutive reads.
+
+<akpm@digeo.com>
+	[PATCH] Make diskstats per-cpu using kmalloc_percpu
+	
+	Patch from Ravikiran G Thirumalai <kiran@in.ibm.com>
+	
+	Makes the disk stats on struct gendisk per-cpu.
+
+<akpm@digeo.com>
+	[PATCH] Fix vm_area_struct slab corruption
+	
+	Patch from Hugh Dickins <hugh@veritas.com>
+	
+	Hugh's patch fixes vm_area_struct slab corruption due to mremap's move_vma
+	mistaking how do_munmap splits vmas in one case.
+	
+	Neither of us are very happy with it - it is fragile, and obscure.  Hugh will
+	revisit this later, but for now it should fix up the potential memory
+	corruption.
+
+<akpm@digeo.com>
+	[PATCH] slab use-after-free detector
+	
+	Patch from Petr Vandrovec <vandrove@vc.cvut.cz>
+	
+	Modifies check_poison function to not only verify that last byte is
+	POISON_END, but also that all preceeding bytes are either POISON_BEFORE or
+	POISON_AFTER bytes.
+
+<akpm@digeo.com>
+	[PATCH] slab debug: track caller program counter
+	
+	Patch from Manfred Spraul <manfred@colorfullife.com>
+	
+	A patch that records the last kfree caller's program counter
+	and prints that if a poison check fails.
+
+<akpm@digeo.com>
+	[PATCH] slab debug: symbolic output in caller tracking
+	
+	use print_symbol() to decode the offender's program counter.
+
+<akpm@digeo.com>
+	[PATCH] Fix copy_page_range()'s handling of invalid pages
+	
+	Patch from Xavier Bru  <Xavier.Bru@bull.net>
+	
+	If copy_page_range encounters a pte which maps an invalid pageframe it will
+	proceed to try to add an rmap entry against that page.  This causes oopses
+	when an application which has mapped an IO device via /dev/mem forks.
+	
+	Fix that up by correctly skipping the page_add_rmap() for these pte's.
+
+<akpm@digeo.com>
+	[PATCH] move CONFIG_SWAP around
+	
+	Patch from Tom Rini <trini@kernel.crashing.org>
+	
+	Take CONFIG_SWAP out of the top-level menu into the general setup menu.  Make
+	it dependent on CONFIG_MMU and common to all architectures.
+
+<akpm@digeo.com>
+	[PATCH] fix div-by-zero in bonding.c
+	
+	Patch from: Shmulik Hen <hshmulik@intel.com>
+	
+	The following patch fixes a division by zero bug in the bonding module that
+	happens when transmitting through a bond with no slaves, in the XOR bonding
+	mode.
+
+<akpm@digeo.com>
+	[PATCH] usercopy checks in old_readdir()
+	
+	Fix up some unchecked copy_to_user()s
+
+<akpm@digeo.com>
+	[PATCH] hugetlb unmap_vmas() SMP && PREEMPT fix
+	
+	Patch from Kevin Pedretti <pedretti@ieee.org>
+	
+	The unmap_vmas() logic is designed to chew away at all the pages without
+	holding off preemption for too long.  But with CONFIG_SMP=y and
+	CONFIG_PREEMPT=y the number of pages which we batch up between rescheduling
+	opportunities is not a multiple of HPAGE_SIZE.  So unmap_vmas() ends up
+	calling unmap_hugepage_range() with a poorly aligned&sized region, and it
+	goes BUG.
+	
+	Fix that up by ensuring that we always work across hugepage regions in
+	HPAGE_SIZE chunks.
+
+<akpm@digeo.com>
+	[PATCH] ext2: fix error-path double-free
+	
+	Fix a double-kfree on an ext2 error path.  Reported by Oleg Drokin.
+
+<akpm@digeo.com>
+	[PATCH] fix memory leak in load_elf_binary()
+	
+	- Fix an error-path leak of memory and a dentry in load_elf_binary()
+	  (spotted by Oleg Drokin).
+	
+	- Tidy up the handling of bad executable images: return -ENOEXEC rather
+	  than 0.  (We've committed suicide anyway, so probably nobody gets to see
+	  this).
+	
+	- Fix up the logic in load_aout_interp().  It gets itself all set up to
+	  return -ENOEXEC but there is in fact no path by which it can do this.  Just
+	  return ~0UL on errors, like load_elf_interp().
+
+<akpm@digeo.com>
+	[PATCH] Extended attribute sharing and debug macro typo fixes
+	
+	Patch from Andreas Gruenbacher <agruen@suse.de>
+	
+	Tony Dziedzic has found two bugs in the extended attributes code. Patches with
+	explanations are attached.
+	
+	1: Extended attribute sharing on ext2/ext3 not working
+	
+	   The mb_cache_entry_insert function constantly returns an -EBUSY error
+	   instead of 0, which causes the xattr cache that is needed by the xattr
+	   sharing mechanism on ext2/ext3 to not share anything.  This patch fixes
+	   the problem.  (It is possible that after applying this fix we will hit
+	   bugs in code that wasn't used before.)
+	
+	2: Oops in one of the xattr debug statements: The old_bh variable is NULL
+	   if an inode that previously had no EA's assigned would share an EA block
+	   with another inode.  (This was hidden by the xattr sharing bug).
+
+<akpm@digeo.com>
+	[PATCH] protect 'action' in show_interrupts
+	
+	Patch from Zwane Mwaikambo <zwane@linuxpower.ca>
+	
+	On SMP or preemptible kernels, every instance of show_interrupts() is oopsily
+	racy wrt request_irq() and free_irq().
+	
+	Fix that up by taking the irq_desc_t's lock while walking the action list.
+
+<akpm@digeo.com>
+	[PATCH] i386 show_interrupts() fix
+	
+	show_interrupts() is accidentally modifying the incoming seq_file pointer.
+	It goes oops if seq_printf() returns non-zero.
+
+<akpm@digeo.com>
+	[PATCH] fix SMP lockup in eepro100 with ethtool on unused
+	
+	Patch from Jason Lunz <lunz@falooley.org>
+	
+	When support for the GSET and SSET ethtool ioctls was added to eepro100.c in
+	2.4.20, the tx lock was overloaded to serialize their use.  Unfortunately,
+	this lock is only initialized in dev->open(), causing ethtool to deadlock the
+	machine when used on an unconfigured eepro100 interface.
+	
+	The fix is to initialize the spinlock at probe time.
+
+<akpm@digeo.com>
+	[PATCH] Larger buffer for /proc/interrupts display
+	
+	Patch from Zwane Mwaikambo <zwane@linuxpower.ca>
+	
+	Scale the buffer which is used for accumulating the /proc/interrupts output.
+	On large SMP it overflows.
+
+<akpm@digeo.com>
+	[PATCH] Disable the "Unknown IO_APIC" message
+	
+	This message is the source of 90% of the traffic on linux-smp and is now
+	starting to fill up kernel bugzilla.
+	
+	Nobody has ever actually done anything about it and the message is wasting
+	people's time.  Ingo acked this change.
+
+<akpm@digeo.com>
+	[PATCH] raw.c: dev_t cleanup and oops fix
+	
+	Patch from Andries.Brouwer@cwi.nl
+	
+	The next patch in the dev_t series eliminates the last applied use
+	of MAX_BLKDEV - only the definition in major.h remains.
+	
+	Sneaky as I am, I combine this patch with the fix for an Oops:
+	On open, raw_open does
+		filp->f_dentry->d_inode->i_mapping =
+			bdev->bd_inode->i_mapping;
+	storing a pointer to bdev stuff.
+	But on release this pointer stayed, the block device is not
+	referenced anymore and disappears, and the next open references
+	undefined stuff.
+	I checked, and this can actually cause an Oops - scenario:
+	
+	  # raw /dev/raw/raw12 /dev/hdf
+	  # dd if=/dev/raw/raw12 of=/dev/null bs=512 count=1
+	  # raw /dev/raw/raw12 0 0
+	  # dd if=/dev/raw/raw12 of=/dev/null bs=512 count=1
+	
+	Oops.
+	
+	More precisely the problem is that dentry_open does
+	file_ra_state_init(&f->f_ra, inode->i_mapping);
+	And file_ra_state_init uses mapping->backing_dev_info->ra_pages.
+	Ugly, to use so much information about the inode even before
+	the inode has been opened.
+	
+	In the patch below I reset i_mapping upon release of the raw device.
+	
+	akpm: I fixed a typo and exported default_backing_dev_info to GPL modules for
+	this.
+
+<akpm@digeo.com>
+	[PATCH] missing spin_unlock() in sysfs_remove_dir()
+	
+	missing spin_unlock() in sysfs_remove_dir()
+
+<akpm@digeo.com>
+	[PATCH] rpc_delete_timer race fix
+	
+	Patch from Ulrich Weigand <weigand@immd1.informatik.uni-erlangen.de>
+	
+	Fix a race wherein timer_pending() returns false, but the timer handler is
+	actually running on another CPU.  We need to call del_timer_sync()
+	regardless, so we wait for completion of the handler.
+
+<akpm@digeo.com>
+	[PATCH] remove compile warning from serial console initcall
+	
+	Patch from: "Martin J. Bligh" <mbligh@aracnet.com>
+	
+	This tiny patch removes the new compiler warning from my build - the new
+	console_initcall mechanism seems to require int from console_init ...  I made
+	serial8250_console_init look like con_init
+
+<akpm@digeo.com>
+	[PATCH] revert the "remove kernel_flag" patch
+	
+	With CONFIG_SMP=n, CONFIG_PREEMPT=y, CONFIG_DEBUG_SPINLOCK=y we get many
+	undefined refs to kernel_flag.
+	
+	This is because spinlock debugging works on uniprocessor kernels now, and it
+	stores state inside the spinlock structure to do this.
+	
+	Having working spinlock debugging on UP kernels seems more important than
+	saving four bytes, so...
+
+<akpm@digeo.com>
+	[PATCH] fix a warning in eepro100.c
+	
+	Remove the unneeded forward declaration of eepro100_remove_one().
+	
+	It is defeating the __attribute__(unused) tag on the definition of
+	eepro100_remove_one() and is causing a "defined but not used" warning.
+
+<mbligh@aracnet.com>
+	[PATCH] NUMA scheduler fixup
+	
+	From: Ingo Molnar <mingo@elte.hu>
+	
+	This cleans up the NUMA scheduler to have separate triggers for idle
+	and busy rebalance ratio, preventing some complex interactions where
+	idle cpus can cause busy ones to busy rebalance more often. The core
+	functionality of this patch is rebalace_tick().
+	
+	Tested in -mjb tree for over 1 month ... no problems at all found -
+	retested on top of 64-bk3 with new scheduler updates.
+
+<rmk@flint.arm.linux.org.uk>
+	[SERIAL] Add per-port semaphore.
+	
+	Add a per-port semaphore to protect against simultaneous opens,
+	closes, hangups, and the like.  This removes the need for the
+	UIF_CLOSING flag, as well as the extra tests and wait queues.
+	
+	Disable the old PM code for now - it is incompatible with the
+	per-port semaphore.
+
+<rmk@flint.arm.linux.org.uk>
+	[SERIAL] Remove remaining notifier-based PM support.
+
+<rmk@flint.arm.linux.org.uk>
+	[SERIAL] Four bug fixes
+	
+	- Preserve per-port flags which are not modifyable from user space.
+	- Only allow DTR, RTS, OUT1 and OUT2 to be controlled from user space.
+	- Don't put the console port into sleep mode when closing a port.
+	- Ensure that we wake up people waiting on modem status changes when
+	  we receive a hangup.
+
+<rmk@flint.arm.linux.org.uk>
+	[SERIAL] Prevent multiple calls to tty_{un,}register_device()
+	
+	There were a couple of cases where we call tty_register_device()
+	multiple times for the same port, notibly when ports are discovered
+	via 8250_pci, 8250_pnp or 8250_cs modules.  With devfs configured,
+	this causes a warning.  Don't call tty_register_device() multiple
+	times.
+
+<levon@movementarian.org>
+	[PATCH] fix oprofile on x86 > 1 counter
+	
+	Without this we have a choice between dropping lots of counter events
+	for counters > 0, or getting dazed and confused.  This brings it inline
+	with the 2.4 module code.  Tested on my 2-way.
+	
+	Also fix a typo from Steven Cole, and remove some unnecessary code
+
+<ak@muc.de>
+	[PATCH] Fast path context switch - microoptimize FPU reload
+	
+	Following some changes on x86-64.
+	
+	When cpu_has_fxsr is defined to 1 like in many kernels unlazy_fpu can
+	collapse to three instructions. For that inlining is a very good idea.
+	Otherwise it's 10 instructions or so, which can be still inlined.
+	
+	We don't need the lock prefix to test our local thread flags state.
+	Unfortunately test_thread_flag currently always uses test_bit which
+	has a LOCK on SMP, but that's unnecessary. LOCK is costly on P4,
+	so it's a good idea to avoid it.
+	
+	Work around this for now by testing directly. Better would be
+	probably to define __set_bit for all architectures to not guarantee
+	atomicity and then always use that for local thread_info accesses
+	in linux/thread_info.h
+
+<torvalds@home.transmeta.com>
+	Fix up i387 task switching bug introduced by Andi Kleen's patch
+	to speed it up - use the proper bitmask for clearing "used-fpu"
+	state.
+
+<sam@mars.ravnborg.org>
+	kbuild: Use targets := to tell kbuild about additional targets
+	
+	EXTRA_TARGETS served several purposes before:
+	1) List targets to be build (built-in only)
+	2) Inform kbuild of targets within the makefile
+	
+	Mixing the above are causing confusion, so for now on
+	targets :=
+	is used to inform kbuild about targets in a Makefile - that it otherwise
+	did not know about.
+	
+	kbuild uses the "targets :=" information to:
+	a) read the dependency file .target.cmd
+	b) delete the target file during make clean
+
+<green@linuxhacker.ru>
+	[VLAN]: Fix memory leak in procfs handling.
+
+<sam@mars.ravnborg.org>
+	kbuild: Introduced extra-y, as replacement for EXTRA_TARGETS
+	
+	EXTRA_TARGETS has been overloaded with functionality.
+	This is now split in two:
+	targets := list targets kbuild did not know of otherwise
+	extra-y := list targets to be build when not building modules only.
+	extra-y is mainly used to list .o files that is not to be included
+	in the fnal built-in.o file for a directory.
+
+<anton@samba.org>
+	ppc64: handle 8 byte loads and stores atomically in xmon
+
+<ambx1@neo.rr.com>
+	Interface Changes
+	
+	A few minor revisions.  Simpifies a few commands and adds config mode 
+	information.
+
+<torvalds@home.transmeta.com>
+	Fix nanosleep() problem noticed by Todd Mokros <tmokros@neo.rr.com>.
+	
+	If we raced on a timer expire, we'd get a negative timeout and think
+	that is was a _huge_ positive timeout. 
+
+<torvalds@home.transmeta.com>
+	Cache the MSR_IA32_SYSENTER_CS value in the per-CPU TSS (using
+	the otherwise unused cpl1 entry for SS), so that we can avoid
+	re-loading it on task switches if it doesn't change.
+
+<ambx1@neo.rr.com>
+	PnP Card Serivice Revisions
+	
+	This set of changes addresses the following issues with the existing card 
+	service implementation:
+	
+	1.) Only one driver can be bound to a card.
+	2.) repetive code is required for pnp_request_card_device and other 
+	functions
+	
+	This patch will make the card services usable by ALSA.
+
+<ambx1@neo.rr.com>
+	ALS100 Updates
+	
+	Updates the als100 driver to use the pnp apis.  Includes resource config
+	templates.
+
+<ambx1@neo.rr.com>
+	OSS SB driver Updates
+	
+	Compatibility update for the latest changes.
+
+<ambx1@neo.rr.com>
+	Aditional Card Service Changes
+	
+	Fixes many issues that were discovered after testing.  Also cleans up the
+	card service code and fixes the card_drvdata bug in which only one driver
+	at a time could have driver data.
+
+<davej@codemonkey.org.uk>
+	[CPUFREQ] Fix documentation typos.
+
+<davej@codemonkey.org.uk>
+	[CPUFREQ] powernow-k7 lazy voltage setting.
+
+<torvalds@home.transmeta.com>
+	Move "used FPU status" into new non-atomic thread_info->status field.
+	
+	This allows us to avoid having to use atomic updates for the lazy FP
+	status setting, since we don't have to worry about other CPU's racing
+	on the fields.
+	
+	Also, fix x86 FP state after fork() by making sure the FP is unlazied
+	_before_ we copy the state information. Otherwise, if a process did a
+	fork() while holding the FP state lazily in the registers, the child
+	would incorrectly unlazy bogus state.
+
+<shaggy@shaggy.austin.ibm.com>
+	JFS: Fix hang while flushing outstanding transactions under heavy load
+	
+	During syncbarrier recovery, when JFS is waiting for all outstanding
+	transactions to complete before allowing new ones to start, there was a
+	window where a new transaction starts, but is not committed when JFS thought
+	it could stop flushing the journal to disk.  This caused the log_SYNCBARRIER
+	flag to not be reset, and no new transactions are allowed to start.
+	
+	This is fixed by using the log->active field to determine when to reset the
+	log_FLUSH flag.
+
+<kraxel@bytesex.org>
+	[PATCH] v4l: video-buf update
+	
+	This patch is a update for the video-buf mm helper module.  It has
+	some minor bugfixes and a number of signed/unsigned cleanups to make
+	gcc 3.3 happy.
+
+<rddunlap@osdl.org>
+	[SNMP]: Fix SNMP_STAT_{USR,BH}PTR.
+
+<sam@mars.ravnborg.org>
+	kbuild: build-targets replaced with always
+	
+	The former name "kbuild-targets" did not give the user the intuitive feeling
+	that this target will be build regards less of any dependencies
+	no matter if we compile modules or not.
+	The new name "always" imply that this will be build always, and
+	tus is more informative.
+	Fixed the few users of build-targets, and added a warning in Makefile.build
+
+<sam@mars.ravnborg.org>
+	kbuild: Updated Documentation/kbuild/makefiles.txt
+	
+	1) export-objs no longer needed
+	2) build-targets replaced by always
+	3) EXTRA_TARGETS is replaced by extra-y, for the part used to list .o files
+	4) introduced targets := to list additional targets for kbuild
+	5) documented OBJCOPYFLAGS_$@
+
+<greg@kroah.com>
+	LSM: restore d_instantiate function that got lost in the mege.
+
+<trini@kernel.crashing.org>
+	PPC32: Fix a typo in modular IDE support on Motorola LoPEC.
+
+<trini@kernel.crashing.org>
+	PPC32: Fix building of the Motorola LoPEC and CONFIG_DUMMY_CONSOLE
+
+<torvalds@home.transmeta.com>
+	Remove <asm-i386/xor.h>'s own home-made FPU begin/end macros,
+	use the real ones instead.
+
+<torvalds@home.transmeta.com>
+	Use a fixed per-cpu SYSENTER_MSR_ESP value by having the sysenter
+	entry routine load the real ESP0 off that per-cpu stack. Make this
+	even faster by putting the sysenter stack in the per-CPU TSS, so
+	that we can use the tss->esp0 value directly (which we have to
+	update on task switches anyway).
+	
+	CAREFUL! This needs very subtle code for debug and NMI exceptions,
+	to make sure we don't run with the sysenter stack in any real kernel
+	code!
+
+<kuznet@ms2.inr.ac.ru>
+	[IPV4]: Fix deadlock in IGMP locking.
+
+<willy@debian.org>
+	[PATCH] neaten fs/locks.c a little
+	
+	 - Fix my email address to one which reaches me ;-)
+	 - Remove timer.h include as we don't use timers.
+	 - Add module.h.
+	 - Sort includes alphabetically.
+	 - Move EXPORT_SYMBOL from ksyms.c to locks.c.
+	 - Simplify locks_conflict().
+
+<akpm@digeo.com>
+	[PATCH] revert "noirqbalance still doesn't do anything"
+	
+	This recent patch caused Nick Piggin's 2xPIII VIA686B chipset machine into an
+	interrupts-off lockup during IDE probing.
+	
+	We don't really know why - it might be because an interrupt is delivered to a
+	secondary which doesn't expect it.
+	
+	I have a second patch from Zwane which solves the same problem in a different
+	way, but until that's had some wider testing I suggest we just back off the
+	original.
+
+<hpa@transmeta.com>
+	[PATCH] Fix $(src) versus $(obj)
+	
+	This fixes a bunch of "src" versus "obj" confusions that apparently
+	existed in my bootsect removal patch.  How embarrassing...
+
+<hch@lst.de>
+	[PATCH] i2c-core.c procfs updates
+	
+	Cleanup the i2c procfs code a bit (less ifdef mess), partially based
+	on the lm_sensors CVS code.
+
+<hch@lst.de>
+	[PATCH] remove devfs_only()
+	
+	Rationale:  devfs_only does nothing but disabling {un,}register_blkdev
+	and {un,}register_chrdev.  {un,}register_blkdev already do nothing but
+	adding it's name argument to a lookup table for the __bdevname and
+	/proc/device output so this use is already bogus.  The disabling of
+	the character device per-major arrays can work in practice but is
+	useless as any driver relying on it can't be used on non-devfs systems.
+
+<ak@muc.de>
+	[PATCH] x86-64 updates for 2.5.64-bk3
+	
+	Make x86-64 boot again after the INITIAL_JIFFIES changes
+	and some bug fixes. Also some work for NPTL.
+	
+	 - Merge with i386/2.5.64-bk3
+	 - Fix memory leak in copy_thread
+	 - arch_prctl uses GDT for base if possible. Cleanup.
+	 - clone supports bases >32bit for SETTLS etc. %fs hardcoded now.
+	 - new ptrace support for 64bit TLS
+	 - Disable (set|get)_thread_* for 64bit processes.
+	 - Audit arch/x86_64 for jiffies wrap issues.
+	 - Fix initial jiffies problem (that caused hanging kernels)
+	 - FIx a few 32bit emulation bugs (sigaltstack, sigqueue)
+	 - Some cleanup from Pavel
+	 - Should compile again as UP
+	 - Shrink size a bit by not putting exception tables into object files.
+	 - Fix compilation with gcc 3.3 :- force inlining when needed
+	 - Work around 2.5.64-bk3 console init bug.
+	 - Fix some alignments in assembly code
+
+<torvalds@home.transmeta.com>
+	Use cond_sched() instead of manual expansion of it.
+
+<akpm@digeo.com>
+	[PATCH] ACPI suspend/resume locking fix
+	
+	Patch from Andreas Mohr <andi@rhlx01.fht-esslingen.de>
+	
+	Need to retake the spinlock in __pdflush() before continuing.
+
+<akpm@digeo.com>
+	[PATCH] fix typo in init/Kconfig
+
+<akpm@digeo.com>
+	[PATCH] pnp warning fix
+	
+	The pnp_request_card_device() stub should return NULL, not -ENODEV.
+
+<akpm@digeo.com>
+	[PATCH] fix console ordering default
+	
+	The conversion of the console registration to an initcall-style thing has
+	broken lots of people's setups.  It is now dependent upon linkage order and
+	if you have both CONFIG_VT_CONSOLE and CONFIG_SERIAL_CONSOLE, no boot
+	messages come out on the screen because the kernel is selecting the serial
+	console first.
+	
+	It can be fixed by specifying console=tty0, but nobody is doing that.
+	
+	We can fix it up by placing drivers/char/ in front of drivers/serial/ in
+	linkage order.
+
+<akpm@digeo.com>
+	[PATCH] work around gcc-3.x inlining bugs
+	
+	Force inlining even when gcc-3.x is too confused to do it for us.
+
+<akpm@digeo.com>
+	[PATCH] NCPFS memleak fix
+	
+	Patch from Petr Vandrovec <vandrove@vc.cvut.cz>
+	Reported by Oleg Drokin.
+	
+	    In NCP_IOC_SETOBJECTNAME handler, we allocated space (newname pointer),
+	    copy stuff from userspace to there and then assign userspace
+	    pointer to our internal structure, whoops!
+
+<akpm@digeo.com>
+	[PATCH] Memleak in Windows Logical Disk Manager partition
+	
+	Patch from Oleg Drokin <green@linuxhacker.ru>
+	
+	   Not freeing allocated memory on error exit path.
+
+<akpm@digeo.com>
+	[PATCH] Fix memleak in ircomm_core
+	
+	Patch from Oleg Drokin <green@linuxhacker.ru>
+	
+	There seems to be a memleak on error exit path.
+
+<akpm@digeo.com>
+	[PATCH] Force cache alignment of task_structs
+	
+	I enabled the advanced use-after-free detector for large slab objects and the
+	kernel oopsed.  This is because that debug code adds things at the head of
+	the slab objects, and the kernel will die if task_structs are not
+	well-aligned.
+	
+	The way to tell the slab allocator that it is not allowed to misalign objects
+	from this slab is SLAB_MUST_HWCACHE_ALIGN.
+
+<akpm@digeo.com>
+	[PATCH] ext3: error handling robustness
+	
+	Fix a couple of ext3 error handling routines to not assume that the
+	superblock has valid journal and buffer_head pointers.  These functions are
+	called during mount and unmount and that may not be true.
+	
+	This should fix the oops which Zwane saw when mounting a corrupt filesystem.
+
+<akpm@digeo.com>
+	[PATCH] ext2: fix directory handling bug
+	
+	Patch from Dave Miller.  Fixes a very long-standing bug.
+	
+	If a process has an fd open against a now-removed directory, lookups on that
+	fd will end up calling ext2_find_entry() against a zero-length directory.
+	
+	When this happens ext2_find_entry() will, on the first pass through the loop,
+	set `kaddr' to page_address(page) - 20.  Things get confused and the "zero
+	length directory entry" warning triggers.
+	
+	This only happens on 64-bit machines, because ext2_last_byte() is returning
+	an unsigned (32-bit) value, and the arithmetic works out OK for 32-bit
+	machines.
+	
+	So we change ext2_find_entry() to bale out immediately if the directory is
+	zero-length.  All other directory-walking functions do this, but
+	ext2_find_entry() forgot to, due to the search-from-the-last-place
+	optimisation.
+
+<davej@codemonkey.org.uk>
+	[CPUFREQ] More typos.
+
+<rmk@flint.arm.linux.org.uk>
+	[SERIAL] Add new device model based power management infrastructure.
+	
+	Add uart_suspend_port(), uart_resume_port() which are responsible
+	for suspending/resuming one UART port.  Low level drivers are
+	expected to call this from their device model suspend and resume
+	methods.
+
+<sfr@canb.auug.org.au>
+	[PATCH] compat_sys_fcntl{,64} Generic part
+	
+	This patch creates compat_sys_fcntl{,64}.  The diffstat for the whole
+	patch set is below, but this is just the generic part, the architecture
+	specific parts will follow.
+	
+	This patch also removes struct flock64 from all the 64 bit architectures
+	(except parisc).
+
+<sfr@canb.auug.org.au>
+	[PATCH] compat_sys_fcntl{,64} x86_64 part
+	
+	Here is the x86_64 part of the patch with Andi's blessing.
+
+<sfr@canb.auug.org.au>
+	[PATCH] compat_sys_fcntl{,64} s390x part
+	
+	Here is the s390x part of the patch with Martin's blessing.
+
+<sfr@canb.auug.org.au>
+	[PATCH] compat_sys_fcntl{,64} parisc part
+	
+	Here is the parisc part of the patch with Willy's blessing.
+
+<mzyngier@freesurf.fr>
+	[PATCH] EISA/sysfs update
+	
+	Here is the latest round of EISA/sysfs update.
+	
+	 - Add documentation,
+	 - Add support for per EISA-id driver data,
+	 - Move virtual_root device to a platform device,
+	 - Update CREDITS.
+
+<gerg@snapgear.com>
+	[PATCH] include unistd.h in m68knommu 68360 entry code
+	
+	Include asm/unistd.h to get the NR_syscalls definition in the
+	m68knommu 68360 interrupt entry code.
+
+<gerg@snapgear.com>
+	[PATCH] include unistd.h in m68knommu 68328 entry code
+	
+	Include asm/unistd.h to get the NR_syscalls definition in the
+	m68knommu 68328 interrupt entry code.
+
+<gerg@snapgear.com>
+	[PATCH] include errn0.h in m68knommu 68328 interrupt setup code
+	
+	Include errno.h in the m68knommu 68328 specific interrupt setup code.
+	It needs a few E* types as return values.
+
+<gerg@snapgear.com>
+	[PATCH] m68knommu/ucdimm should use generic 68328 irq setup.
+	
+	This patch fixes the m68knommu ucdimm platform config to use the generic
+	68328 irq setup. All 68*328 family can use the same setup.
+
+<gerg@snapgear.com>
+	[PATCH] fix spelling in m68knommu Kconfig help
+	
+	This patch fixes a couple of spelling errors in the m68knommy Kconfig
+	help entries. Also makes CONFIG_HIGHPROFILE dependant on CONFIG_COLDFIRE,
+	since that feature is only implemented on ColdFIre based platforms.
+
+<gerg@snapgear.com>
+	[PATCH] m68knommu/de2 should use generic 68328 irq setup.
+	
+	This patch fixes the m68knommu de2 platform config to use the generic
+	68328 irq setup. All 68*328 family can use the same setup.
+
+<gerg@snapgear.com>
+	[PATCH] fix wrong argument prototype in m68knommu/68360 for interrupt handler
+	
+	Fix wrong argument prototype in m68knommu commproc.c.
+
+<gerg@snapgear.com>
+	[PATCH] include errno.h in m68knommu 68360 interrupt setup code
+	
+	Include errno.h in the m68knommu 68360 specific interrupt setup code.
+	It needs a few E* types as return values.
+
+<gerg@snapgear.com>
+	[PATCH] fix m68knommu/68VZ328 Makefile to traverse sub-dirs
+	
+	Fix m68knommu 68VZ328 Makefile to only traverse its sub-directories.
+	There is no local code files for it to compile.
+
+<gerg@snapgear.com>
+	[PATCH] fix m68knommu COMEM-lite PCI bios code
+	
+	This patch fixes up a lot of problems in the m68knommu architecture
+	CO-MEMlite PCI interface code. The code was seriously out of date,
+	not implementing many of the requried PCI bios support functions.
+	Also fixes many wrong function return types and arguments.
+
+<gerg@snapgear.com>
+	[PATCH] move common timer and vector code for m68knommu/ColdFire/5272
+	
+	This patch moves common ColdFire vector and timer procesing code from
+	the local per-processor config.c for the 5272 ColdFire sub-architecture.
+	All ColdFire CPU's have the same timer and basic vector setup, seems
+	crazy to repeat this code for each of 6 ColdFire CPU varients.
+	This patch also removes the reset button support, this is now moved to
+	a proper device driver, where it belongs.
+
+<gerg@snapgear.com>
+	[PATCH] fix m68knommu/68VZ328/de2 Makefile to compile local code files
+	
+	This patch fixes the m68knomu/68VZ328/de2 Makefile to build all its
+	local code files. Previously it relied on Makefiles above it to do
+	this. It should be done here.
+
+<gerg@snapgear.com>
+	[PATCH] fix m68knommu/68VZ328/ucdimm Makefile to compile local code files
+	
+	This patch fixes the m68knomu/68VZ328/ucdimm Makefile to build all its
+	local code files. Previously it relied on Makefiles above it to do
+	this. It should be done here.
+
+<gerg@snapgear.com>
+	[PATCH] call schedule_tail() in m68knommu return from fork code path
+	
+	This patch adds a call to schedule_tail() in the return from fork
+	post processing.
+
+<gerg@snapgear.com>
+	[PATCH] move common timer and vector code for m68knommu/ColdFire/5307
+	
+	This patch moves common ColdFire vector and timer procesing code from
+	the local per-processor config.c for the 5307 ColdFire sub-architecture.
+	All ColdFire CPU's have the same timer and basic vector setup, seems
+	crazy to repeat this code for each of 6 ColdFire CPU varients.
+	This patch also removes the reset button support, this is now moved to
+	a proper device driver, where it belongs.
+
+<gerg@snapgear.com>
+	[PATCH] fix m68knommu/68360 Kconfig wrong define
+	
+	This patch fixes a wrong m68knommu/68360 config define,
+	CONFIG_68630_SCC -> CONFIG_68360_SCC.
+
+<gerg@snapgear.com>
+	[PATCH] inline some mm functions for MMUless targets
+	
+	This patch is the last of the MMUless support changes to the mm system.
+	It inlines for MMUless targets the following functions:
+	
+		vmalloc_to_page()
+		follow_page()
+		remap_page_range()
+	
+	All of these return NULL for the non-MMU case. Doing the inline here
+	minimizes changes to assorted mm/ files. This patch was originally
+	from Christoph Hellwig.
+
+<gerg@snapgear.com>
+	[PATCH] include stddef.h in include/linux/list.h
+	
+	This patches add an include to stddef.h into include/linux/list.h.
+	It uses the NULL define.
+
+<gerg@snapgear.com>
+	[PATCH] fix m68knommu COMEM-lite PCI header code
+	
+	This patch fixes up the PCI bios header for the m68knommu COMEM-lite
+	PCI hardware support. Adds missing definitions, and a couple of trivial
+	inline functions here.
+
+<gerg@snapgear.com>
+	[PATCH] move common timer and vector code for m68knommu/ColdFire/5407
+	
+	This patch moves common ColdFire vector and timer procesing code from
+	the local per-processor config.c for the 5407 ColdFire sub-architecture.
+	All ColdFire CPU's have the same timer and basic vector setup, seems
+	crazy to repeat this code for each of 6 ColdFire CPU varients.
+
+<gerg@snapgear.com>
+	[PATCH] fix m68knommu/68328 serial driver to use work_struct
+	
+	This patches fixes the m68knommu 68328 serial driver header to use the
+	work_struct, not the obsoleted workqueue.
+
+<gerg@snapgear.com>
+	[PATCH] build m68knommu/ColdFire common vectors.c and timers.c
+	
+	This patch puts the new common ColdFire timers.c and vectors.c into
+	the build list (in the m68knommu architecture branch).
+
+<gerg@snapgear.com>
+	[PATCH] create common timer code for m68knommu/ColdFire processors
+	
+	This patch creates common timer setup and handling code for the m68knommu
+	ColdFire CPU sub-architecture. All 6 ColdFire CPU varients contain the
+	same hardware timers. Currently each sub-arch has its own timer code.
+	This reduces a lot of code duplication.
+
+<gerg@snapgear.com>
+	[PATCH] move common timer and vector code for m68knommu/ColdFire/5249
+	
+	This patch moves common ColdFire vector and timer procesing code from
+	the local per-processor config.c for the 5249 ColdFire sub-architecture.
+	All ColdFire CPU's have the same timer and basic vector setup, seems
+	crazy to repeat this code for each of 6 ColdFire CPU varients.
+
+<gerg@snapgear.com>
+	[PATCH] move common timer and vector code for m68knommu/ColdFire/5206e
+	
+	This patch moves common ColdFire vector and timer procesing code from
+	the local per-processor config.c for the 5206e ColdFire sub-architecture.
+	All ColdFire CPU's have the same timer and basic vector setup, seems
+	crazy to repeat this code for each of 6 ColdFire CPU varients.
+	This patch also removes the reset button support, this is now moved to
+	a proper device driver, where it belongs.
+
+<gerg@snapgear.com>
+	[PATCH] move common timer and vector code for m68knommu/ColdFire/5206
+	
+	This patch moves common ColdFire vector and timer procesing code from
+	the local per-processor config.c for the 5206 ColdFire sub-architecture.
+	All ColdFire CPU's have the same timer and basic vector setup, seems
+	crazy to repeat this code for each of 6 ColdFire CPU varients.
+
+<gerg@snapgear.com>
+	[PATCH] fix m68knommu/68360 serial driver to use work_struct
+	
+	This patches fixes the m68knommu 68360 serial driver to use the
+	work_struct, not the obsoleted workqueue.
+
+<axboe@suse.de>
+	[PATCH] Fix x86-64 build
+
+<hch@sgi.com>
+	[PATCH] fix kmem_cache_size() for new slab poisoning
+	
+	The new slab poisoning code broke kmem_cache_size(), it now returns
+	a too large size as the poisoning area after the object is includes.
+	XFS's kmem_zone_zalloc thus overwrites exactly that area and triggers
+	the new checks everytime such an object is freed again.
+	
+	I don't recommend using XFS on BK-current without this patch applied :)
+
+<hch@sgi.com>
+	[PATCH] remaining bits of DEVFS_FL_AUTO_DEVNUM
+	
+	Sorry, the devs_only() patch accidentally included the devfs-portion
+	of the DEVFS_FL_AUTO_DEVNUM patch.  This patch contains the remaining
+	parts.
+
+<hch@sgi.com>
+	[PATCH] remove regular file support from devfs
+	
+	It's the _device_ filesystem, so regular files are grossly misplaced
+	here.  Fortauntely only one driver actually tries to use it (microcode)
+	and it's works fine with  a regular miscdevice as well.
+
+<hch@sgi.com>
+	[PATCH] missing drivers/video/Makefile entry
+	
+	This somehow got lost in the uClinux merge.
+
+<hch@sgi.com>
+	[PATCH] i2c ID updates
+	
+	another bunch of IDs appeared in lm_sensors CVS lately..
+
+<hch@sgi.com>
+	[PATCH] update i2c algorithm drivers
+	
+	This one is from lm_sensors CVS and mostly cosmetic changes.  I it up a
+	bit to compile properly under latest 2.5.
+
+<hch@sgi.com>
+	[PATCH] i2c-core locking updates
+	
+	The old adap_lock and driver_lock could deadlock and there was a bunch
+	of stuff that was horribly racy.  The new locking scheme is from
+	lm_sensors CVS but I had to fix quite a few bugs to make this work.
+
+<rmk@flint.arm.linux.org.uk>
+	[SERIAL] Add sa1100 serial PM support using device model.
+
+<rmk@flint.arm.linux.org.uk>
+	[SERIAL] Add uart_console(port) macro.
+
+<mochel@osdl.org>
+	sysfs: fix BUG()s on directory creation and removal. 
+	
+	- Don't d_delete() files when removing a directory - they must still be 
+	  hashed when dput() reaps them, and it will __d_drop() them anyway.
+	
+	- Don't d_invalidate() the directory on removal. 
+	
+	- do simple_rmdir() after d_delete() on directory. 
+	
+	- Remove extra dput(), which was causing refcount to go negative, causing 
+	  an oops when someone tried to create the directory again.
+	
+	- Make sure we don't d_delete() or do extra dput() on file when updating, 
+	  either.
+
+<davej@codemonkey.org.uk>
+	[CPUFREQ] Yet another typo
+	From Steven Cole
+
+<mochel@osdl.org>
+	driver model: add bus_rescan_devices()
+	
+	From Ben Collins
+	
+	Used as manual trigger for device/driver binding, so drivers can claim 
+	devices that are present but failed to be bound. In case of ieee1394, this
+	can happen if two computers are attached to a device - the second one won't
+	be able to claim it until the first detaches. 
+	
+	Changed device_attach() to return 1 when a driver was bound to a device. 
+	Makes it so bus_rescan_devices() can return the number of devices attached.
+	Tested this with ieee1394 over a bus reset and it worked as expected.
+
+<rmk@flint.arm.linux.org.uk>
+	[SERIAL] Add PCI serial power management support.
+
+<Andries.Brouwer@cwi.nl>
+	[PATCH] some more NAND flash IDs
+
+<davej@codemonkey.org.uk>
+	[CPUFREQ] Yet more typos
+
+<sfr@canb.auug.org.au>
+	[COMPAT]: Sparc64 part of fcntl changes.
+
+<uzi@uzix.org>
+	[SPARC64]: Fix warning during uniprocessor build of US3 cpufreq.
+
+<uzi@uzix.org>
+	[SPARC64]: Need to export up_clock_tick on uniprocessor.
+
+<ahaas@airmail.net>
+	[NETFILTER]: Really apply the ipv4 C99 patches this time. :-)
+
+<davej@codemonkey.org.uk>
+	[CPUFREQ] Fix formatting of 'nothing' output.
+
+<davej@codemonkey.org.uk>
+	[CPUFREQ] powernow_decode_bios can be static
+
+<davej@codemonkey.org.uk>
+	[CPUFREQ] Fix signed comparison warning in powernow-k7
+
+<davej@codemonkey.org.uk>
+	[CPUFREQ] fix signed comparison warnings for longhaul
+
+<greg@kroah.com>
+	[PATCH] USB: added support for the palm M100
+	
+	Thanks to C Falconer <cf@avonside.school.nz> for the information.
+
+<baldrick@wanadoo.fr>
+	[PATCH] USB speedtouch: send path optimization
+	
+	Write multiple cells in one function call, rather than one cell per
+	function call.  Under maximum send load, this reduces cell writing
+	CPU usage from 0.0095% to 0.0085% on my machine.  A 10% improvement! :)
+
+<greg@kroah.com>
+	[PATCH] USB: fix up a comment in usb_unlink()
+	
+	Thanks to David for pointing this out.
+
+<davej@codemonkey.org.uk>
+	[CPUFREQ] Drop FSB scaling from VIA longhaul driver.
+	This was incomplete, and never worked 100% on every system, and is
+	better off dead than half-baked, as it makes the driver a lot simpler,
+	and removes the possibility of someone being confused why it doesn't
+	work on their particular hardware.
+
+<greg@kroah.com>
+	[PATCH] USB: Added support for the Sony Clie NZ90V device.
+	
+	Thanks to Martin Brachtl <brachtl@redgrep.cz> for the information.
+
+<elenstev@mesatop.com>
+	[PATCH] Documentation spelling cleanup
+	
+	This patch fixes spelling errors in the Documentation directory and was
+	extensively reviewed by the following people: Dan Kegel, David
+	Woodhouse, Joe Perches, Jared Daniel J.  Smith, Michael Hayes, and
+	Steven Cole
+
+<akpm@digeo.com>
+	[PATCH] unplugging fix
+	
+	Patch from Neil Brown <neilb@cse.unsw.edu.au>
+	
+	Allow auto-unplugging to work for devices that do it themselves.
+	
+	Auto-unplugging - and blk_unplug_work in particular - assumes that the device
+	uses "generic_unplug_device" for unplugging, but some devices don't.  md
+	crashes.
+	
+	So blk_unplug_work should use ->unplug_fn
+
+<rmk@flint.arm.linux.org.uk>
+	[SERIAL] Add Xircom RBM56G PCI ID
+
+<rmk@flint.arm.linux.org.uk>
+	[SERIAL] Only update the console termios cflag once
+
+<paulus@samba.org>
+	PPC32: Add a thread-pointer argument to the clone syscall, make a prepare_to_copy().
+	
+	The thread-pointer argument gets copied to R2 in the child in copy_thread() if
+	the CLONE_SETTLS flag is set.  Adding a prepare_to_copy simplifies the copy_thread
+	logic since we don't have to do the extra copy of fpu/altivec state to the child.
+
+<kraxel@bytesex.org>
+	[PATCH] v4l: crunch MIN/MAX macros.
+	
+	This patch deletes the MIN/MAX macros from audiochip.h
+	and fixes all users of these macros to use the kernels
+	min/max macros instead.
+
+<kraxel@bytesex.org>
+	[PATCH] v4l: create include/media
+	
+	This patch creates a new include directory include/media, populates
+	it with a few files header files and fixups the affected drivers to
+	compile with the new directory layout.
+	
+	The directory is intented to be used for (kernel-internal) header files
+	of the media drivers (which are sitting below drivers/media).  For now
+	the video-buf.h (mm helper), tuner.h (tv/radio tuner) and audiochip.h
+	(tv sound decoder drivers) header files are moved.  Some more header
+	files from the dvb folks will likely follow.
+
+<torvalds@home.transmeta.com>
+	Error out for the case of a gcc-2.96 compiler with CONFIG_FRAME_POINTER
+	set. A few versions of gcc-2.96 generate seriously incorrect code.
+
+<mgreer@mvista.com>
+	PPC32: Fix a problem with 'next' and 'step' type KGDB commands.
+
+<trini@kernel.crashing.org>
+	PPC32: Replace 2 inline functions with their normal macro equivalents
+
+<anton@samba.org>
+	ppc64: add/remove config.h where necessary
+
+<greg@kroah.com>
+	i2c: add bus driver for ALI15x3 devices
+	
+	This is from the i2c CVS tree.
+
+<greg@kroah.com>
+	i2c: get i2c-ali15x3 driver to actually bind to a PCI device.
+
+<greg@kroah.com>
+	i2c: add bus driver for Intel 801 devices
+	
+	This is from the i2c CVS tree.
+
+<greg@kroah.com>
+	i2c: get i2c-i801 driver to actually bind to a PCI device.
+
+<greg@kroah.com>
+	i2c: add bus driver for Intel PIIX4 devices
+	
+	This is from the i2c CVS tree.
+
+<greg@kroah.com>
+	i2c: get i2c-piix4 driver to actually bind to a PCI device.
+
+<greg@kroah.com>
+	i2c: i2c-piix4.c: Clean up the ibm dma scan logic
+	
+	Also export the is_unsafe_smbus variable, which is needed.
+
+<greg@kroah.com>
+	i2c: add i2c sysfs bus support.
+
+<jgarzik@redhat.com>
+	[hw_random] shuffle files in preparation for hw_random driver update
+	
+	Delete drivers/char/i810_rng.c, superceded.
+	Rename Doc/i810_rng.txt to Doc/hw_random.txt.
+	Rename drv/char/amd768_rng.c to drv/char/hw_random.c.
+
+<jgarzik@redhat.com>
+	[hw_random] update amd768_rng driver to be modular; add Intel support
+	
+	Take Alan's amd768_rng driver, recently renamed to hw_random.c,
+	and convert it's very-simple structure to support multiple
+	types of hardware RNG.  Integrate Intel i8xx (ICH) RNG support.
+
+<axboe@suse.de>
+	[PATCH] remove redundant local_irq_disable in bio_kmap_irq()
+
+<jgarzik@redhat.com>
+	[ia32] cpu capabilities cleanups and additions
+	
+	* Add support for new Centaur(VIA) and Intel cpuid feature bits,
+	  expanding the x86_capability array by two.
+	* (cleanup) Move cpu setup for newer Via C3 cpus into its own
+	  function, init_c3()
+	* Add support for RNG control msr on VIA Nehemiah
+	* export X86_FEATURE_XSTORE and cpu_has_xstore macros so that
+	  kernel code may easily test for cpu support of the new
+	  "xstore" instruction.
+
+<jgarzik@redhat.com>
+	[hw_random] add support for VIA Nehemiah RNG ("xstore" instruction)
+
+<jgarzik@redhat.com>
+	[hw_random] fixes and cleanups
+	
+	* s/Via/VIA/
+	* allow multiple simultaneous open(2)s of the chrdev.  This allows
+	us to eliminate some code, without modifying the core code (rng_dev_read)
+	at all.
+	* s/__exit// in ->cleanup ops, to eliminate link error
+
+<greg@kroah.com>
+	driver core: Export the legacy_bus structure for drivers to use.
+
+<greg@kroah.com>
+	i2c: add driver model support to i2c adapter drivers
+
+<anton@samba.org>
+	ppc64: compat_sys_fcntl from Stephen Rothwell, remove socketcall emulation
+
+<green@angband.namesys.com>
+	reiserfs: Correctly free all the allocated memory if open of the journal failed.
+	  Also added \n to some error messages.
+
+<david-b@pacbell.net>
+	[PATCH] USB ohci:  "registers" sysfs file
+	
+	> This exhibits a build error when OHCI_VERBOSE_DEBUG is enabled:
+	
+	Odd, I guess the build I tested was when that was enabled
+	without first enabling debugging.  The fix is trivial.
+
+<henning@meier-geinitz.de>
+	[PATCH] USB: Fix crash in read/write/ioctl in scanner driver
+	
+	Used kobject reference counting to free the scn struct when the device
+	is closed and disconnected. Avoids crashes when writing to a
+	disconnected device. (Thanks to Greg KH).
+	
+	I've also changed irq_scanner to avoid submitting new URBs when the
+	old one returned with an error. Without this change irq_scanner gets
+	called ever and ever again after a disconnect while open.
+
+<johannes@erdfelt.com>
+	[PATCH] uhci-hcd.c 2.5 finish completions in correct order
+	
+	Here's the 2.5 version of the patch to uhci.c to finish completions in
+	the correct order.
+
+<green@linuxhacker.ru>
+	[PATCH] Memleak in KOBIL USB Smart Card Terminal Driver
+	
+	   There is a memleak on error exit path in KOBIL USB Smart Card Terminal
+	   Driver in both current 2.4 and 2.5.
+	   See the patch.
+	   Found with help of smatch + enhanced unfree script.
+
+<msdemlei@cl.uni-heidelberg.de>
+	[PATCH] USB: Patch for DSBR-100 driver
+	
+	I since you are  listed as the maintainer of the USB subsystem and
+	I can't really see who else applies, I'm sending you a patch to my
+	driver for the DSBR-100 USB radio.  This is mainly code cosmetics
+	(fixed ugly missing spaces after commas I inherited from the
+	aztech driver, some constants moved to preprocessor symbols), but
+	there's one technical change: I used to stop the radio when my
+	file descriptor was closed.  Petr Slansky <slansky@usa.net>
+	pointed out that the other radio drivers don't do that, so
+	now I just let the radio run.
+
+<green@linuxhacker.ru>
+	[PATCH] USB: more Edgeport USB Serial Converter driver stuff
+
+<elenstev@mesatop.com>
+	[PATCH] USB: spelling fixes for drivers/usb
+	
+	This spelling and typo cleanup patch was reviewed by Mike Hayes and
+	Jared Daniel J. Smith.
+
+<green@linuxhacker.ru>
+	[PATCH] USB: memleak in Edgeport USB Serial Converter driver
+
+<greg@kroah.com>
+	[PATCH] USB: fixup from previous io_ti.c patch
+
+<greg@kroah.com>
+	[PATCH] USB: added support for Ericsson data cable to pl2303 driver.
+	
+	Thanks to kai.engert@gmx.de for the needed information
+
+<akpm@digeo.com>
+	[PATCH] remove scsi_eh_retry_cmd
+	
+	Compile warnings are useful...
+
+<hch@lst.de>
+	[PATCH] fix possible NULL pointer dereference in scsi_scan.c
+	
+	If the sdev allocation fails and q is non-null we could dereference
+	sdev->request_queue.  While at it reformat the function to use
+	goto-based cleanup - that's much easier to parse.
+
+<luben@splentec.com>
+	scsi_softirq queue is now list_head, eliminate bh_next
+	
+	The following patch gets rid of softscsi_data struct and
+	array for the more manageable
+	static struct list_head done_q[NR_CPUS] __cacheline_aligned;
+	
+	Thus, scsi_cmnd::bh_next is eliminated, since it was used only
+	in the scsi softirq processing code.
+	
+	The comments are updated.
+	
+	80 chars per line for the affected functions: scsi_done()
+	and scsi_softirq().
+	
+	Eliminated is the double loop in scsi_softirq() -- this is
+	better handled in do_softirq() and gives the system a ``breather''.
+	(There are pros and cons for either side and if you guys
+	think that it was better with the double loop, I'll change it and
+	resubmit the patch.)
+
+<wrlk@riede.org>
+	fix jiffies compare warning in osst
+	
+	On 2003.03.11 14:13 Christoph Hellwig wrote:
+	> 
+	> --- 1.39/drivers/scsi/osst.c	Sun Feb  2 17:50:23 2003
+	> +++ edited/drivers/scsi/osst.c	Mon Mar 10 14:35:46 2003
+	> @@ -777,7 +777,7 @@
+	>  #define OSST_POLL_PER_SEC 10
+	>  static int osst_wait_frame(OS_Scsi_Tape * STp, Scsi_Request ** aSRpnt, int curr, int minlast, int to)
+	>  {
+	> -	long	startwait     = jiffies;
+	> +	unsigned long startwait = jiffies;
+	>  	char  * name          = tape_name(STp);
+	>  #if DEBUG
+	>  	char	notyetprinted = 1;
+	> @@ -1288,7 +1288,7 @@
+	>  	int             logical_blk_num  = ntohl(STp->buffer->aux->logical_blk_num) 
+	>  						- (nframes + pending - 1) * blks_per_frame;
+	>  	char          * name             = tape_name(STp);
+	> -	long		startwait        = jiffies;
+	> +	unsigned long	startwait        = jiffies;
+	>  #if DEBUG
+	>  	int		dbg              = debugging;
+	>  #endif
+	> @@ -1477,7 +1477,7 @@
+	>  	int		expected  = 0;
+	>  	int		attempts  = 1000 / skip;
+	>  	int		flag      = 1;
+	> -	long		startwait = jiffies;
+	> +	unsigned long	startwait = jiffies;
+	>  #if DEBUG
+	>  	int		dbg       = debugging;
+	>  #endif
+	> -
+	
+	There are five functions that use jiffies. You fixed three of them.
+	If this change is done (and that's fine with me) it should be done
+	with this patch:
+
+<alexey@technomagesinc.com>
+	[PATCH] Re: hot scsi disk resize
+	
+	Hi!
+	
+	Here is new version of the patch. All procfs-related stuff has been removed.
+	One may rescan device size writing something to /sysfs/.../<scsi device>/rescan:
+	
+	root@zefir:~# echo 1 >/sysfs/bus/scsi/devices/0\:0\:1\:0/rescan
+	root@zefir:~# dmesg
+	scsi0:A:1:0: Tagged Queuing enabled.  Depth 64
+	scsi: host 0 channel 0 id 1 lun16384 has a LUN larger than allowed by the host adapter
+	SCSI device sda: 2097152 512-byte hdwr sectors (1074 MB)
+	SCSI device sda: drive cache: write through
+	 sda: unknown partition table
+	Attached scsi disk sda at scsi0, channel 0, id 1, lun 0
+	SCSI device sda: 125829120 512-byte hdwr sectors (64425 MB)
+	root@zefir:~#
+
+<markh@osdl.org>
+	[PATCH] aacraid driver for 2.5
+	
+	This changes the cmd_per_lun element of the aacraid Scsi_Host_Template
+	to 1.  The larger number is not needed and exceeds the depth limit for
+	scsi_adjust_queue_depth.  Also updated struct initializers.
+
+<dougg@torque.net>
+	[PATCH] scsi_debug in 2.5.64
+	
+	Here is a second attempt to patch scsi_debug in
+	2.5.64 . My reference version was out of sync in
+	my previous posting.
+	
+	Changelog:
+	   - add recovered error injection (this is a bit
+	     different to the patch proposed by Kurt Garloff)
+	   - fix flakiness in scsi_cmnd::result when errors
+	     are being injected
+	   - fix medium error injection
+	   - make "every_nth" writeable in sysfs
+	   - small re-arrangement of error flags in "opts"
+	   - clean up some of the naming
+	
+	Updated http://www.torque.net/sg/sdebug25.html
+	
+	This patch does not include Mike Anderson's sysfs
+	probe() cleanup.
+	
+	In 2.5.64 scsi error handling is flaky and sysfs is
+	especially flaky in 2.5.64-bk3. I'll send some finding
+	to the list when things stabilize a bit. [For anyone
+	who is bored, try following the tortured sequence
+	of scsi commands generated by the block/sd/mid-level
+	layers in response to a persistent medium error.]
+
+<randy.dunlap@verizon.net>
+	[PATCH] reduce stack in qlogicfc.c
+	
+	This is a start on reducing the stack usage in qlogicfc.c::
+	isp2x00_make_portdb().  I think that the stack reduction portion
+	of it is fine, but I'm concerned about the function returning
+	early due to kmalloc() failure, without making the port database.
+	
+	[reduces stack from 0xc38 to 0x34 bytes (P4 UP, gcc 2.96)]
+	
+	Can anyone suggest way(s) to have the isp2x00_make_portdb() function
+	called over and over again until it gets its job done?
+	Or does anyone even still use this driver?
+
+<dougg@torque.net>
+	[PATCH] sg version 3.5.28 for lk 2.5.64
+	
+	Changelog:
+	   - remove hosts, host_strs and host_hdr from sg's
+	     procfs interface **
+	   - add sysfs interface for allow_dio, def_reserved_size
+	     and version ***
+	   - switch boot time and module parameters to Rusty's
+	     moduleparam.h interface. This means, for example,
+	     the boot time "sg_def_reserved_size" parameter
+	     changes to "sg.def_reserved_size".
+	
+	
+	** Christoph moved the host listing functionality into
+	    a more central sysfs position (i.e. not dependent on
+	    sg). However scsi_debug is the only LLD that I can
+	    get to post any "host" info under the new arrangement.
+	
+	    Should devices, device_strs and device_hdrs also be
+	    moved out of sg's procfs interface?
+	
+	*** I find sg's "debug" in its procfs interface very
+	     useful for debugging (sg itself amongst other things).
+	     However it does not seem suitable for sysfs. Should
+	     it move?
+
+<neilb@cse.unsw.edu.au>
+	[PATCH] md: Missing mddev_put in md resync code
+	
+	Whenever a ITERATE_MDDEV loop is exitted abnormally
+	we need to mddev_put the current mddev.  There was
+	one point in md_do_sync where we didn't so use counts
+	became wrong.
+
+<neilb@cse.unsw.edu.au>
+	[PATCH] md: Convert /proc/mdstat to use seq_file
+	
+	From: Angus Sawyer <angus.sawyer@dsl.pipex.com>
+	
+	Mainly straightforward convert of sprintf -> seq_printf.  seq_start and
+	seq_next modelled on /proc/partitions.  locking/ref counting as for
+	ITERATE_MDDEV.
+	
+	pos == 0 -> header
+	pos == n -> nth mddev
+	pos == 0x10000 -> tail
+
+<neilb@cse.unsw.edu.au>
+	[PATCH] md: C99 initiailzers for xor.h
+	
+	From: Art Haas <ahaas@airmail.net>
+	
+	This patch converts the file to use C99 initializers.
+
+<neilb@cse.unsw.edu.au>
+	[PATCH] md: Opencode flush_curr_signals in md.c
+	
+	It is (now) too trivial to even have an inline.
+
+<neilb@cse.unsw.edu.au>
+	[PATCH] md: Tidy up recovery_running flags in md
+	
+	Md uses ->recovery_running and ->recovery_err to keep track of the
+	status or recovery.  This is rather ad hoc and race prone.
+	
+	This patch changes it to ->recovery which has bit flags for various
+	states.
+
+<neilb@cse.unsw.edu.au>
+	[PATCH] md: Include asm-i386/387.h in asm-i386/xor.h
+	
+	It is needed for kernel_fpu_*
+
+<neilb@cse.unsw.edu.au>
+	[PATCH] md: Remove md_recoveryd thread for md
+	
+	The md_recoveryd thread is responsible for initiating and cleaning
+	up resync threads.
+	This job can be equally well done by the per-array threads
+	for those arrays which might need it.
+	
+	So the mdrecoveryd thread is gone and the core code that
+	it ran is now run by raid5d, raid1d or multipathd.
+	
+	We add an MD_RECOVERY_NEEDED flag so those daemon don't have
+	to bother trying to lock the md array unless it is likely
+	that something needs to be done.
+	
+	Also modify the names of all threads to have the number of
+	md device.
+
+<neilb@cse.unsw.edu.au>
+	[PATCH] md: Fulltime delayed 'safe_mode' for md
+	
+	From: Angus Sawyer <angus.sawyer@dsl.pipex.com>
+	
+	If there are no writes for 20 milliseconds, write out superblock
+	to mark array as clean.  Write out superblock with
+	dirty flag before allowing any further write to succeed.
+	
+	If an md thread gets signaled with SIGKILL, reduce the
+	delay to 0.
+	
+	
+	Also tidy up some printk's and make sure writing the
+	superblock isn't noisy.
+
+<neilb@cse.unsw.edu.au>
+	[PATCH] md: Fix bad interaction between sync checkpointing and recovery
+	
+	Md devices (raid1/raid5) can resync or recover.
+	There are similar but importantly different.
+	resync happens after an unclean shutdown
+	recovery happens when a failed drive is being replaced by a hot spare.
+	
+	The sync-checkpoint code confused the two somewhat and this causes
+	problems.
+	
+	This patch makes sure "recovery_cp" only relates to resync,
+	not recovery.
+	It also fixes a small problem with recording spares in
+	the superblock.
+
+<neilb@cse.unsw.edu.au>
+	[PATCH] md: Allow components of MD raid array to have data start at offset from start of device.
+	
+	Normally the data stored on a component of a RAID array is stored
+	from the start of the device.  This patch allows a per-device
+	data_offset so the data can start elsewhere. This will allow
+	RAID arrays where the metadata is at the head of the device
+	rather than the tail.
+
+<neilb@cse.unsw.edu.au>
+	[PATCH] md: Allow md to select between superblock formats
+	
+	The code to understand a specific superblock format is
+	already highly localised in md.  This patch defines a
+	user-space interface for selecting which superblock format
+	to use, and obeys that selection.
+	
+	Md currently has a concept of 3 version numbers:
+	 A major version number
+	 A minor version number
+	 A patch version number
+	
+	There historically seems to be some confusion about whether
+	these refer to a version of the superblock layout,
+	or a version of the software.
+	
+	We will now define that:
+	   the "major_version" defines the superblock handler.
+	      '0' is the current superblock format.  All new formats
+	          will need new numbers.
+	   the "minor_version" can specify minor variations in the
+	      superblock, such as different location on the device
+	   the "patch_version" will be used to indicate new extenstions
+	      to the software.. patch_version=1 will mean multiple superblock
+	      support.
+	
+	A superblock version number is selected by specifing major_version
+	in SET_ARRAY_INFO ioctl.
+	
+	This patch:
+	  Updates Documentation/md.txt with details of new interface.
+	  Generalises desc_nr handling and makes sure that an array never
+	  has two devices with the same desc_nr.
+	  makes sure mddev->major_version is always valid and is 0 by default.
+	  uses mddev->major_version to select superblock handlers.
+	  Modifies set_array_info to just record version number if raid_disks==0
+	  Makes sure max_disks is always set correctly.
+	  Determines device size when reading superblock, or a hot-add/add-new.
+
+<neilb@cse.unsw.edu.au>
+	[PATCH] md: Add new superblock format for md
+	
+	Superblock format '1' resolves a number of issues with
+	superblock format '0'.
+	It is more dense and can support many more sub-devices.
+	It does not contains un-needed redundancy.
+	It adds a few new useful fields
+
+<neilb@cse.unsw.edu.au>
+	[PATCH] kNFSd: Fix exit-without-free bug in nfsd
+
+<neilb@cse.unsw.edu.au>
+	[PATCH] kNFSd: Fix race in svcsock.c
+	
+	From: Trond Myklebust <trond.myklebust@fys.uio.no>
+	
+	
+	knfsd needs to disable soft interrupts when calling
+	csum_partial_copy_to_xdr().
+	
+	At the moment there's a nasty conflict between the RPC server and
+	client. The problem arises when you get to xdr_partial_copy_from_skb()
+	(and the kmap_atomic()); the RPC client can end up calling the same
+	function from a ->data_ready() soft interrupt, and corrupt any data
+	the knfsd process may have copied.
+
+<neilb@cse.unsw.edu.au>
+	[PATCH] kNFSd: Fix deadlock problem in lockd.
+	
+	nlmsvc_lock calls nlmsvc_create_block with file->f_sema
+	held.
+	nlmsvc_create_block calls nlmclnt_lookup_host which might
+	call nlm_gc_hosts which might, eventually, try to claim
+	file->f_sema for the same file -> deadlock.
+	
+	nlmsvc_create_block does not need any protection under
+	any lock as lockd is single-threaded and _create_block
+	only plays with internal data structures.
+	
+	So we release the f_sema before calling in, and make sure
+	it gets claimed again afterwards.
+
+<neilb@cse.unsw.edu.au>
+	[PATCH] kNFSd: Assort fixes to nfsd auth cache stuff.
+	
+	1/ call cache_fresh when replacing a cache entry (instead of only
+	  when updating) so that up-calls waiting on the replaced entry continue.
+	
+	2/ in svcauth_unix_accept, don't put the verifier until all tests have
+	   succeeded.
+	
+	3/ calculate size of request-being-deferred correctly.
+
+<neilb@cse.unsw.edu.au>
+	[PATCH] kNFSd: Rename NFSEXP_CROSSMNT to NFSEXP_NOHIDE
+	
+	becase nohide is the user-space visible name
+	for the flag, and we are about to define a real
+	CROSSMNT.
+
+<neilb@cse.unsw.edu.au>
+	[PATCH] kNFSd: Introduce CROSSMNT flag for knfsd
+	
+	Now that we have working up-calls to userspace,
+	CROSSMNT makes sense.
+	If CROSSMNT is set for an export, and we too a
+	LOOKUP which crosses a mountpoint, we initiate an
+	upcall to find out if and how that filesystem
+	is exported.
+
+<jt@bougret.hpl.hp.com>
+	[PATCH] export platform_bus_type
+
+<hch@lst.de>
+	[PATCH] fix OOPS in i2c sysctl registration
+	
+	I had to rewrite the code from scratch to understand what it does,
+	but at least it doesn't OOPS anymore on boot..
+
+<hch@lst.de>
+	[PATCH] fix up the i2c locking changes
+	
+	There was one place where we missed an unlock, in addition some more
+	code cleanups.
+
+<hch@lst.de>
+	[PATCH] switch over /proc/bus/i2c to seq_file interface
+
+<rmk@flint.arm.linux.org.uk>
+	[TTY] Register tty devclass before use.
+	
+	Register the tty devclass with sysfs before tty drivers initialise -
+	sysfs requires structures to be registered before use.  This is
+	required for the previous serial csets, as well as any drivers which
+	are initialising using __initcall() or module_init().
+
+<paulus@samba.org>
+	PPC32: Better check for when we should expand the stack.
+
+<paulus@samba.org>
+	PPC32: Set max_pfn correctly.
+
+<paulus@samba.org>
+	PPC32: Make sure interrupts are disabled in IPI handlers.
+
+<paulus@samba.org>
+	PPC32: Don't reregister existing /proc/irq entries.
+
+<torvalds@home.transmeta.com>
+	Revert duplicate <linux/stddef.h> addition.
+
+<anton@samba.org>
+	ppc64: remove -finline-limit now that we force inlines
+
+<zippel@linux-m68k.org>
+	[PATCH] restore old config behaviour for dependencies on 'm'
+	
+	This restores the old config behaviour for dependencies on 'm',
+	such entries are only activ if CONFIG_MODULES is enabled as well.
+
+<zippel@linux-m68k.org>
+	[PATCH] menu structure fix
+	
+	A menu entry was possibly inserted to high in the menu hierarchie if
+	the previous entry was a derived config symbol.
+
+<zippel@linux-m68k.org>
+	[PATCH] add menuconfig support
+	
+	This adds the support for the menuconfig keyword, which allows to define
+	a config symbol and a submenu with a single step, e.g. instead of
+	
+		menu "SCSI device support"
+	
+		config SCSI
+			tristate "SCSI device support"
+	
+	this is now enough:
+	
+		menuconfig SCSI
+			tristate "SCSI device support"
+
+<zippel@linux-m68k.org>
+	[PATCH] add menuconfig support to the front ends
+	
+	This adds the support for the menuconfig to the front ends.
+	qconf also has now an ".." entry to make it more obvious
+	how to get to a parent menu.
+
+<zippel@linux-m68k.org>
+	[PATCH] gtk front end
+	
+	This adds the gtk front end by Romain Liévin <roms@tilp.info>
+
+<randy.dunlap@verizon.net>
+	[PATCH] update filesystems config. menu
+	
+	This is Robert PJ Day's patch that updates the filesystems
+	config menu.  It had become a bit ad hoc (jumbled:) and this
+	patch attempts to arrange it more logically.
+
+<randy.dunlap@verizon.net>
+	[PATCH] typos only
+	
+	No code changes; still builds OK.
+
+<kai@vaio.(none)>
+	kbuild: Fix output when linking vmlinux
+	
+	make's line continuation without explicit backslashes is a mystery
+	to me, and in this case, vmlinux got linked, but the linker command
+	was not written to the screen. Works again now.
+
+<dougg@torque.net>
+	scsi_debug version 1.68 mark III
+	
+	Changelog since version 1.68 mark II:
+	  - merge Mike Anderson's probe() cleanup
+	     - num_devs is now "per host"
+	     - num_devs is sysfs writeable
+	  - add slave_alloc skeleton code
+	
+	So to simulate 154 disks (for example) one might use:
+	  # modprobe scsi_debug add_host=11 num_devs=14
+	
+	With max_luns at its default value of 2, 14 is the
+	maximum number of devices per host scsi_debug will
+	respond to (i.e. 7 targets, each with 2 lus).
+	
+	Documentation updated at:
+	http://www.torque.net/sg/sdebug25.html
+
+<jejb@raven.il.steeleye.com>
+	revert fs/block_dev.c change for hot resize: breaks initrd
+
+<rmk@flint.arm.linux.org.uk>
+	[PCI] pci-6 - Fix scanning of non-zero functions
+	
+	Fix breakage in pci-3 - we scanned all functions if function 0 was not
+	present.  This causes some host bridges to lock up when scanning devfn
+	255 on PPC machines.
+
+<rmk@flint.arm.linux.org.uk>
+	[PCI] pci-7: Remove second argument to pcibios_update_resource()
+	
+	Patch from Ivan Kokshaysky
+	
+	remove the "parent" or "root" second argument to
+	pcibios_update_resource().  This highlights the following
+	architectures doing something wrong in their implementation:
+	
+	        - ia64
+	        - mips it8172
+	        - mips "generic mips boards"
+	        - mips64 "generic mips boards"
+	        - mips64 IP27
+
+<rmk@flint.arm.linux.org.uk>
+	[PCI] pci-8: pci_resource_to_bus()
+	
+	Convert pcibios_fixup_pbus_ranges() into something more generic, namely
+	pcibios_resource_to_bus() - we are really trying to convert resources
+	to something to program into bus registers for bridge windows, and in
+	fact, PCI device BARs.
+	
+	This is necessary since some architectures, namely Alpha, ARM and PARISC
+	have an offset between PCI addressing and host-based addressing, so
+	resources need to be adjusted when read or when written back to the bus.
+	
+	We provide a generic version in asm-generic/pci.h, which most
+	architectures use.
+	
+	This patch finds the following architectures with something to think
+	consider:
+	
+	        - ppc, ppc64
+	                adjusts resources for devices, but not buses.
+			This is inconsistent, and leads to improperly
+			programmed windows/BARs.
+	
+	PPC people (Anton) has a replacement PCI resource implementation
+	which should do the right thing.
+
+<rmk@flint.arm.linux.org.uk>
+	[PCI] pci-9: Kill per-architecture pcibios_update_resource()
+	
+	Kill pcibios_update_resource(), replacing it with pci_update_resource().
+	pci_update_resource() uses pcibios_resource_to_bus() to convert a
+	resource to a device BAR - the transformation should be exactly the
+	same as the transformation used for the PCI bridges.
+	
+	pci_update_resource "knows" about 64-bit BARs, but doesn't attempt to
+	set the high 32-bits to anything non-zero - currently no architecture
+	attempts to do something different.  If anyone cares, please fix; I'm
+	going to reflect current behaviour for the time being.
+	
+	Ivan pointed out the following architectures need to examine their
+	pcibios_update_resource() implementation - they should make sure that
+	this new implementation does the right thing.  #warning's have been
+	added where appropriate.
+	
+		ia64
+		mips
+		mips64
+	
+	This cset also includes a fix for the problem reported by AKPM where
+	64-bit arch compilers complain about the resource mask being placed
+	in a u32.
+
+<rmk@flint.arm.linux.org.uk>
+	[PCI] pci-10: Miscellaneous cleanups to probe.c
+	
+	Miscellaneous cleanups to probe.c:
+	        - make code/comments wrap before column 80.
+	        - remove extraneous space.
+
+<rmk@flint.arm.linux.org.uk>
+	[PCI] pci-11: use u32 for bus numbers/latency not unsigned long
+	
+	pci_read_config_dword() takes a u32 pointer, not unsigned long.
+
+<rmk@flint.arm.linux.org.uk>
+	[PCI] pci-12: Add #defines for cardbus specifics
+	
+	Pull out the bits of cardbus configuration - the secondary latency
+	timer, and the number of bus numbers we reserve.
+
+<rmk@flint.arm.linux.org.uk>
+	[PCI] pci-13: unuse pci_do_scan_bus()
+	
+	In an attempt to "unuse" pci_do_scan_bus() so it can be eventually
+	killed, make pci_scan_bus_parented() call the new pci_scan_child_bus()
+	and pci_bus_add_devices().  The only remaining callers are the
+	hotplug drivers.
+	
+	Eventually, pci_bus_add_devices() will be removed from this function -
+	it is intended that architectures should call this after they have
+	done any setups and fixups to the scanned bus.
+	
+	It is legal to call pci_bus_add_devices() on a bus which has already
+	had this function called, so architectures could update today.
+
+<rmk@flint.arm.linux.org.uk>
+	[PCI] pci-14: Add the Mobility Electronics EV1000 PCI device numbers.
+
+<rmk@flint.arm.linux.org.uk>
+	[PCI] pci-15: Fix setup-bus.c resource sizing.
+	
+	Patch from Ivan Kokshaysky
+	
+	This fixes long standing typo ('size' instead of 'r_size') which causes
+	overestimate of the bridge memory ranges calculated in pbus_size_mem().
+	For example, if we have a device with one 1Mb and one 2Mb memory ranges
+	behind the bridge, calculated size and alignment of the bridge memory
+	window will be 4Mb and 2Mb respectively, while the correct values are
+	3Mb and 1Mb.
+
+<mingo@elte.hu>
+	[PATCH] sched-2.5.64-bk10-C4
+	
+	This fixes a fundamental (and long-standing) bug in the sleep-average
+	estimator which is the root cause of the "contest process_load" problems
+	reported by Mike Galbraith and Andrew Morton, and which problem is
+	addressed by Mike's patch.
+	
+	The bug is the following: the sleep_time code in activate_task()
+	over-estimates the true sleep time by 0.5 jiffies on average (0.5 msecs
+	on recent 2.5 kernels).  Furthermore, for highly context-switch
+	intensive and CPU-intensive workloads it means a constant 1 jiffy
+	over-estimation.  This turns the balance of giving and removing ticks
+	and nils the effect of the CPU busy-tick, catapulting the task(s) to
+	highly interactive status - while in reality they are constantly burning
+	CPU time.
+	
+	The fix is to round down sleep_time, not to round it up.  This slightly
+	under-estimates the sleep time, but this is not a real problem, any task
+	with a sleep time in the 1 jiffy range will see timekeeping granularity
+	artifacts from various parts of the kernel anyway.  We could use rdtsc
+	to estimate the sleep time, but i think that's unnecessary overhead.
+	
+	The fixups in Mike's scheduler patch (which is in -mm8) basically work
+	around this bug.  The patch below definitely fixes the contest-load
+	starvation bug, but it remains to be seen what other effects it has on
+	interactivity.  In any case, this bug in the estimator is real and if
+	there's any other interactivity problem around then we need to deal with
+	it ontop of this patch.
+	
+	This bug has been in the O(1) scheduler from day 1 on basically, so i'm
+	quite hopeful that a number of interactivity complaints are fixed by
+	this patch.
+
+<mingo@elte.hu>
+	[PATCH] sched-2.5.64-bk10-D0
+	
+	This removes/fixes a few whitespaces and removes the MAX_PRIO setting in
+	the init task path which is unnecessary and which might even lead to
+	bugs - MAX_PRIO is outside the valid range and technically the init
+	thread is not an idle thread yet at this point.
+
+<gerg@snapgear.com>
+	[PATCH] fix spelling in m68knommu comem PCI support code
+
+<gerg@snapgear.com>
+	[PATCH] fix spelling in m68knommu signal.c
+
+<gerg@snapgear.com>
+	[PATCH] add support to m68knommu linker script for console init section
+	
+	Also fix some spelling.
+
+<randy.dunlap@verizon.net>
+	[PATCH] fsmenu update
+	
+	As requested by Andrew, this moves the hugetlbfs config option
+	into the Pseudo filesystems section near tmpfs.
+
+<akpm@digeo.com>
+	[PATCH] fix devfs oops
+	
+	The recent (untested?) "cleanup" removed a null-pointer test.
+
+<akpm@digeo.com>
+	[PATCH] Fix mem= options
+	
+	Patch from "Randy.Dunlap" <rddunlap@osdl.org>
+	
+	Reverts the recent alteration of the format of the `mem=' option.  This is
+	because `mem=' is interpreted by bootloaders and may not be freely changed.
+	
+	Instead, the new functionality to set specific memory region usages is
+	provided via the new "memmap=" option.
+	
+	The documentation for memmap= is added, and the documentation for mem= is
+	updated.
+
+<akpm@digeo.com>
+	[PATCH] fix the fix for unmap_vmas & hugepages
+	
+	Patch from Kevin Pedretti <pedretti@ieee.org>
+	
+	The previous fix for unmapping hugetlb regions could still produce incorrect
+	alignments if the munmap request covers multiple VMA's.
+	
+	Fix it by always unmapped the entire hugepage VMA inside the inner loop.
+
+<akpm@digeo.com>
+	[PATCH] Early writeback initialisation
+	
+	Patch from Anders Gustafsson <andersg@0x63.nu>
+	
+	We're getting a division-by-zero in the writeback code during early rootfs
+	population, because writeback has not yet been initialised.
+	
+	Fix that by performing an explicit initialisation rather than relying on
+	initcall ordering.
+
+<akpm@digeo.com>
+	[PATCH] Fix memleak in e100 driver
+	
+	Patch from Oleg Drokin <green@linuxhacker.ru>
+	
+	    There is a memleak in e100 driver from intel, both in 2.4 and 2.5
+	    e100_ethtool_gstrings does not free "strings" variable if it cannot
+	    copy it to userspace.
+
+<akpm@digeo.com>
+	[PATCH] Ext2/3 noatime and dirsync fixes
+	
+	Patch from "Theodore Ts'o" <tytso@mit.edu>
+	
+	I recently noticed a bug in ext2/3; newly created inodes which inherit
+	the noatime flag from their containing directory do not respect noatime
+	until the inode is flushed from the inode cache and then re-read later.
+	This is because the code which checks the ext2 no-atime attribute and
+	then sets the S_NOATIME in inode->i_flags is present in
+	ext2_read_inode(), but not in ext2_new_inode().
+	
+	I fixed this in 2.4, and then found an even worse bug in the 2.5 code;
+	the DIRSYNC flag is completely ignored *except* in the case where a
+	directory is newly created using mkdir and its parent directory has the
+	DIRSYNC flag.  S_DIRSYNC doesn't get set in the ext2_new_inode() or the
+	ext2_ioctl() paths (which is used by chattr).
+	
+	This patch centralizes the code which translates the ext2 flags in the
+	raw ext2 inode to the appropriate flag values in inode->i_flags in a
+	single location.  This fixes the bug, makes things cleaner, and also
+	removes 30 lines of code and 128 bytes of compiled x86 text in the
+	bargain.
+
+<akpm@digeo.com>
+	[PATCH] ext2: block allocation fix
+	
+	Patch from Alex Tomas <bzzz@tmi.comex.ru>
+	
+	There is a logic error in ext2_new_block().  If we manage to reserve some
+	blocks in the final blockgroup, local variable `bit' will be equal to
+	sbi->s_groups_count and we erroneously assume that the allocation failed.
+	
+	Fix that up by testing local variable `group_alloc' instead.
+
+<akpm@digeo.com>
+	[PATCH] kiocbClear should use clear_bit instead of set_bit
+	
+	Patch from: Suparna Bhattacharya <suparna@in.ibm.com>
+	
+	Just an obvious fix.
+	The kiocbClearX macros were doing a set_bit !
+	They should be calling clear_bit.
+	Ran into this now that I'm actually using kiocbClearKicked.
+
+<akpm@digeo.com>
+	[PATCH] initialise inode->i_rdev
+	
+	From latest -aa kernels.
+
+<akpm@digeo.com>
+	[PATCH] AFFS fixes
+	
+	Patch from Roman Zippel <zippel@linux-m68k.org>
+	
+	- remove lock_kernel() (It was buggy too - there are at present two missing
+	  unlock_kernel()s)
+	
+	- fixes a bitmap corruption problem.
+
+<akpm@digeo.com>
+	[PATCH] fix raid0 oops
+	
+	raid0 doesn't have a thread, so md_wakeup_thread() derefs NULL.
+	
+	Neil may end up doing this differently, but meanwhile....
+
+<akpm@digeo.com>
+	[PATCH] miropcm20-rds.c compile fixes
+	
+	Patch from Adrian Bunk <bunk@fs.tum.de>
+	
+	It would be nice if everyone would try to compile the patched files
+	before submitting patches...
+
+<kai@tp1.ruhr-uni-bochum.de>
+	kbuild: Fix asm/offset.h generation
+	
+	gen-asm-offsets, the most common user of the new filechk function, needs
+	to be fed input from $< (the first prerequisite).
+
+<axboe@suse.de>
+	[PATCH] honor hard barrier in deadline
+	
+	Previously, we only honored barriers wrt merging. Really honor them now,
+	move all pending requests to dispatch list and add the hard barrier at
+	the back.
+
+<axboe@suse.de>
+	[PATCH] extra tokens after endif
+
+<Andries.Brouwer@cwi.nl>
+	[PATCH] fix affs/super.c
+	
+	Mounting a non-affs filesystem as affs crashes the kernel.
+	The reason is the
+		sbi = kmalloc(sizeof(struct affs_sb_info), GFP_KERNEL);
+		memset(sbi, 0, sizeof(*AFFS_SB));
+	where the second sizeof is 1, so that sbi is not zeroed at all.
+	
+	Also, avoid a warning for printk of sector_t in amigaffs.h.
+
+<roland@redhat.com>
+	[PATCH] signal fix for wedge on multithreaded core dump
+	
+	This is a fix made almost a month ago, during the flurry of signal changes.
+	I didn't realize until today that this hadn't made it into 2.5.  Sorry
+	about the delay.
+	
+	This fix is necessary to avoid sometimes wedging in uninterruptible sleep
+	when doing a multithreaded core dump triggered by a process signal (kill)
+	rather than a trap.  You can reproduce the problem by running your favorite
+	multithreaded program (NPTL) and then using "kill -SEGV" on it.  It will
+	often wedge.  The actual fix could be just a two line diff:
+	
+	+                       if (current->signal->group_exit)
+	+                               goto dequeue;
+	
+	after the group_exit_task check.  That is the fix that has been used in
+	Ingo's backport for weeks and tested heavily (well, as heavily as core
+	dumping ever gets tested, but it's been in our production systems).
+	
+	But I broke the hair out into a separate function.  The patch below has the
+	same effect as the two-liner, and no other difference.  I have tested
+	2.5.64 with this patch and it works for me, though I haven't beat on it.
+	
+	The way the wedge happens is that for a core-dump signal group_send_sig_info
+	does a group stop of other threads before the one thread handles the fatal
+	signal.  If the fatal thread gets into do_coredump and coredump_wait first,
+	then other threads see the group stop and suspend with SIGKILL pending.
+	All other fatal cases clear group_stop_count, so this is the only way this
+	ever happens.  Checking group_exit fixes it.  I didn't make do_coredump
+	clear group_stop_count because doing it with the appropriate ordering and
+	locking doesn't fit the organization that code.
+
+<torvalds@penguin.transmeta.com>
+	Linux 2.5.65
+

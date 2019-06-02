@@ -1,0 +1,1173 @@
+
+Summary of changes from v2.5.14 to v2.5.15
+============================================
+
+<mochel@segfault.osdl.org> (02/04/15 1.447.14.6)
+	Move arch/i386/kernel/pci-*.c to arch/i386/kernel/pci/; prepare for further cleanups
+
+<mochel@segfault.osdl.org> (02/04/16 1.447.14.7)
+	Further split/cleanup of x86 PCI code
+
+<mochel@segfault.osdl.org> (02/04/16 1.447.14.8)
+	Further break-up-age
+	Make ACPI PCI IRQ routing work a bit better...
+
+<mochel@segfault.osdl.org> (02/04/16 1.447.14.9)
+	Split drivers/pci/pci.c into smaller, bite-size chunks
+
+<mochel@segfault.osdl.org> (02/04/16 1.447.14.10)
+	don't enable debug in arch/i386/kernel/pci/
+
+<mochel@segfault.osdl.org> (02/04/16 1.447.26.3)
+	Fix NUMA compile after PCI cleanup
+
+<kai@tp1.ruhr-uni-bochum.de> (02/04/26 1.447.52.1)
+	Move the IPv6 symbols into the ipv6 module
+	
+	Currently, we're trying to export the IPv6 modules from netsyms.c,
+	which can't work when netsyms is built-in, but IPv6 is modular. Fix is to
+	move the IPv6 symbols to the ipv6 module. Actually, netsyms.c could use a
+	lot more of this kind of untangling.
+	
+	Also, move exporting the secure_*v6* symbols to drivers/char/random.c, 
+	since that's where they're defined.
+	
+	The reason why things worked before is that the ipv6 module doesn't have
+	a EXPORT_NO_SYMBOLS directive, so _all_ of its symbols where exported by
+	modutils.
+	
+
+<trini@bill-the-cat.bloom.county> (02/04/30 1.447.66.1)
+	PPC32: Minor cleanups to the i8259 and OpenPIC code.  From myself and
+	Hollis Blanchard.
+
+<trini@bill-the-cat.bloom.county> (02/04/30 1.447.66.2)
+	PPC32: Modify the OpenPIC code to allow for all combinations of sense
+	and polarity of IRQs.  Update the machines in CONFIG_ALL_PPC for this change.
+
+<trini@bill-the-cat.bloom.county> (02/04/30 1.447.66.3)
+	PPC32: Update Motorola LoPEC support to match recent changes.
+
+<trini@bill-the-cat.bloom.county> (02/05/01 1.447.66.4)
+	PPC32: Modify openpic_get_irq() to call i8259_irq() for cascaded IRQs.  This
+	requires that i8259_init() be called with the real address where PCI
+	interrupt-acknowledge transactions will be generated.
+
+<trini@bill-the-cat.bloom.county> (02/05/02 1.447.79.1)
+	PPC32: define some important magic constants.
+
+<trini@bill-the-cat.bloom.county> (02/05/02 1.447.79.2)
+	Fix building of CONFIG_XMON && !CONFIG_MAGIC_SYSRQ
+
+<vojtech@twilight.ucw.cz> (02/05/03 1.447.80.1)
+	This fixes a possible buffer overflow in hid-core.c in case a
+	device would have very long string descriptors (vendor and device
+	name.)
+
+<vojtech@twilight.ucw.cz> (02/05/03 1.447.80.2)
+	Fix for the previous fix. hid->name is 128 bytes, not 64 bytes long.
+
+<acme@conectiva.com.br> (02/05/03 1.447.77.2)
+	net/ipv4/arp.c:
+	- htons cleanups
+	- remove duplicated code
+	- apply CodingStyle
+
+<kai@tp1.ruhr-uni-bochum.de> (02/05/04 1.513.6.1)
+	drivers/net/Makefile cleanup
+	
+	Group selecting subdirs and linking them together. (Doesn't change
+	the link order)
+
+<kai@tp1.ruhr-uni-bochum.de> (02/05/04 1.513.6.2)
+	Link drivers/net/* from drivers/net/Makefile
+	
+	Group knowledge about building objects and linking them together
+	instead of splitting it between the top-level Makefile and
+	the per-directory Makefiles.
+	
+	This change tries to keep the link order the same as it was, at least
+	as far as possible. One critical point is that we now link
+	the pcmcia / wireless netdrivers before the pcmcia subsystem.
+	However, the pcmcia subsystem is initialized via a late_initcall(),
+	so this shouldn't make a difference.
+	
+	drivers/net/Makefile looks a bit long now, but that can be improved
+	a lot, patch yet to come.
+
+<kai@tp1.ruhr-uni-bochum.de> (02/05/04 1.513.7.1)
+	Documentation/kbuild/makefiles.txt polish
+	
+	Some improvements to the wording by Toshiyasu Morita.
+
+<rob@osinvestor.com> (02/05/04 1.369.106.40)
+	Sparc32 sun4c:
+	- In sun4c_pmd_set, actually set the thing.
+	- In ld_mmu_sun4c, pmd_set no longer BTFIXUPCALL_NOP.
+
+<davem@nuts.ninka.net> (02/05/05 1.447.77.3)
+	net/core/neighbour.c: Delete ancient ASSERT_WL debugging.
+
+<jmorris@intercode.com.au> (02/05/05 1.513.1.37)
+	Tigon3: Handle Netgear GA302T correctly.
+
+<davem@nuts.ninka.net> (02/05/05 1.369.106.41)
+	Sparc64 updates:
+	- Implement changes for pfn_to_page et al.
+	- Update defconfig.
+
+<davem@nuts.ninka.net> (02/05/05 1.369.106.42)
+	Sparc64: Implement pfn_pte.
+
+<davem@nuts.ninka.net> (02/05/06 1.369.106.43)
+	Sparc64: Fix thinko in page_to_pfn
+
+<davem@nuts.ninka.net> (02/05/06 1.369.106.44)
+	Sparc64: Update ioctl32 for bluetooth updates.
+
+<aia21@cantab.net> (02/05/06 1.513.10.1)
+	NTFS: Fix compilation on 2.5.14 ({set_,clear_,}buffer_async was renamed
+	to {set_,clear_,}buffer_async_read).
+
+<oliver@neukum.name> (02/05/06 1.513.4.3)
+	[PATCH] USB printer freeing minors in probe error path
+	
+	fix a failure to free a minor in the error path of probe
+
+<david-b@pacbell.net> (02/05/06 1.513.4.4)
+	[PATCH] PATCH ehci -- interrupt xfer requeue
+	
+	The fix basically removes a bit-complement that shouldn't have
+	been there.  (Plus related simplification.)  That changed the PID,
+	so that (for one example) only the first hub plug/unplug event could
+	work.  So it's essential for anyone using high speed hubs.
+	
+	I'm still not quite sure why this hasn't affected more testing, but
+	that's life ... :)
+
+<axboe@suse.de> (02/05/06 1.513.12.1)
+	[PATCH] tcq initialization fix
+	
+	Transposed the last two arguments to memset, causing a slab poisoned
+	kernel not to use tagging correctly... Brown paper bag stuff.
+
+<dalecki@evision-ventures.com> (02/05/06 1.513.12.2)
+	[PATCH] 2.5.14 IDE 55
+	
+	 - Update HPT374 driver carried over from 2.4.xx series by Andrew Morton.
+	   Resync it with the recent host chip driver changes, or better the
+	   introduction of an API at all.
+	
+	 - Consolidate the handling of device ID byte order in one place.
+	   This was spotted and patched by Bartomiej onierkiewicz.
+	
+	 - Eliminate CONFIG_BLK_DEV_IDEPCI - it's duplicating the functionality of the
+	   already present and fine CONFIG_PCI flag and if we are a PCI host, we are
+	   indeed very likely to need host chip support anyway.
+	
+	 - Remove some redundant info about the model and channel number from
+	   /proc/ide. Remove the binary entries not helpful to the user, and not used
+	   by any program and redundant to corresponding ioctls.
+	
+	 - Properly return udma_read and udma_write values in taskfile.
+	
+	 - Only initialize XXX_udma to the default handlers if it has not been
+	   initialized by the host chip initialization.
+	
+	I have enabled spin lock debugging and can see that on device
+	flush the spin locks get wrong counts... no problems elsewher ethus
+	far. I will re check them next time around.
+
+<hch@infradead.org> (02/05/06 1.513.10.3)
+	[PATCH] small filemap.c/pagemap.h cleanups
+	
+	 - remove page_cache_entry - I think it never ever was actually used.
+	 - remmove wake_up_page (as in 2.4) - never used
+	 - remove misleading comment ontop of pagemap.h
+	 - make wait_on_page* directly call wait_on_page_bit
+	 - some reordering and additional comments in pagemap.h
+
+<davem@nuts.ninka.net> (02/05/06 1.369.106.45)
+	soft-fp fix:
+	- When converting from integer to float, rounding is done
+	incorrectly due to off-by-one shift in conversion
+
+<acme@brinquedo.oo.ps> (02/05/06 1.513.13.1)
+	- remove spurious spaces and tabs at end of lines
+	- make sure if, while, for, switch has a space before the opening '('
+	- make sure no line has more than 80 chars
+	- move initializations to the declaration line where possible
+	- bitwise, logical and arithmetic operators have spaces before and after,
+	  improving readability of complex expressions
+	- remove uneeded () in returns
+	- other minor cleanups
+
+<greg@kroah.com> (02/05/06 1.513.14.2)
+	add back NCR53c810 PCI quirk code from davej that was lost in the merge
+
+<greg@kroah.com> (02/05/06 1.513.14.3)
+	hand merge of davej's x86 pci-pc janitor work
+
+<kai@tp1.ruhr-uni-bochum.de> (02/05/06 1.513.17.1)
+	ISDN: CAPI cleanup: register/release
+	
+	Introduce register_appl() / release_appl() which are basically equivalent 
+	to open()/close() for net_device's.
+	
+	Remove the registered() / released() callbacks and do the work immediately
+	instead.
+
+<greg@kroah.com> (02/05/06 1.513.14.4)
+	PCI hotplug update 
+	
+	include file location changed due to pci changes
+
+<kai@tp1.ruhr-uni-bochum.de> (02/05/06 1.513.17.2)
+	ISDN: CAPI maintain driver MOD_USE_COUNT
+	
+	Apart from the indentation changes, add an owner field to the hardware
+	driver struct and use that to automatically inc/dec the module use count
+	on register_appl()/release_appl()
+
+<kai@tp1.ruhr-uni-bochum.de> (02/05/06 1.513.17.3)
+	ISDN: CAPI cleanup
+	
+	Remove unused header file.
+
+<kai@tp1.ruhr-uni-bochum.de> (02/05/06 1.513.17.4)
+	ISDN: CAPI: use <linux/list.h> lists
+	
+	
+
+<kai@tp1.ruhr-uni-bochum.de> (02/05/06 1.513.17.5)
+	ISDN: export callbacks directly
+	
+	Just EXPORT_SYMBOL() the callbacks, instead of passing them to the
+	drivers in a struct.
+
+<kai@tp1.ruhr-uni-bochum.de> (02/05/06 1.513.17.6)
+	ISDN: CAPI: alloc struct capi_ctr dynamically
+	
+	First step in actually having the hardware drivers alloc this as part
+	of their per-controller data.
+
+<oliver@neukum.name> (02/05/06 1.513.4.5)
+	[PATCH] usage count handling during disconnect
+	
+	in usb.c during disconnect handling a reference to a driver is passed
+	after the module usage count is decremented. In theory this is a race.
+
+<greg@kroah.com> (02/05/06 1.513.11.3)
+	USB pl2303 driver
+	
+	added support for another pl2303 device thanks to lutz rothhardt
+
+<neilb@cse.unsw.edu.au> (02/05/07 1.513.10.4)
+	[PATCH] PATCH - kNFSd - Remove flowcontrol problems with lockd/tcp
+	
+	The sunrpc/tcp layer currently allocates some resources linearly with
+	number of server threads.  This causes problems when there are very
+	small numbers of threads (e.g. lockd with one thread), so this patch
+	adds a small constant to the number of threads before calculating
+	resoures to allocate.
+	
+	This patch also provide proper upper-limits for the response sizes for
+	lockd requests, so resources are not over-allocated.
+	
+	Together these resolve problems with heavy lockd load over tcp.
+
+<neilb@cse.unsw.edu.au> (02/05/07 1.513.10.5)
+	[PATCH] PATCH - kNFSd in 2.5.14 - Two small changes to nfsd/nfssvc.c
+	
+	1/ Return correct error code if nfs server creation fails
+	2/ Increase limit on number of nfsd threads
+	
+	   There is no real justification for stopping a sysadmin
+	   from running lots and lots of nfsd threads, so we raise the
+	   imposed limit from 128 to 8192... maybe it should just go away...
+
+<neilb@cse.unsw.edu.au> (02/05/07 1.513.10.6)
+	[PATCH] PATCH - kNFSd in 2.5.14 - Tidy up comments in expfs.c
+	
+	Chris Wright <chris@wirex.com>  suggested these to limit to 80
+	columns and such.
+
+<neilb@cse.unsw.edu.au> (02/05/07 1.513.10.7)
+	[PATCH] PATCH - kNFSd in 2.5.14 - Add a kernel_lock in d_splice_alias
+	
+	d_move wants the kernel to be locked, so
+	d_splice_alias now takes that lock.
+
+<neilb@cse.unsw.edu.au> (02/05/07 1.513.10.8)
+	[PATCH] PATCH - kNFSd/ext3 in 2.5.14 - export_operations support for ext3
+	
+	This patch converts ext3 to use the new export_operations for
+	exporting a filesystem.
+	In particular it
+	 - defines "ext3_get_parent" to do a lookup(".."),
+	 - calls d_splice_alias when ext3_lookup finds something,
+	   so that build a dcache path from the bottom up works, and
+	 - sets sb->s_export_op to point to an (almost empty)
+	   export_operations structure.  The fact that it is mostly empty
+	   means that the default lookup operations are used, which match the
+	   previous approach (i.e. use iget, and then check the generation
+	   number).
+
+<neilb@cse.unsw.edu.au> (02/05/07 1.513.10.9)
+	[PATCH] PATHC - kNFSd/reiserfs in 2.5.14 - Convert reisferfs to use export_operations
+	
+	This patch converts reiserfs to use the new export_operations
+	interface for exporting a filesystem instead of the old
+	fh_to_dentry and dentry_to_fh.
+	Essentially it:
+	
+	  - renamed reiserfs_dentry_to_fh to reiserfs_encode_fh
+	  - split reiserfs_fh_to_dentry into reiserfs_get_dentry
+	    and reiserfs_decode_fh
+	  - calls d_splice_alias from reiserfs_lookup so that building
+	    a dcache path from the bottom works well
+	  - addes reiserfs_get_parent to do a lookup of ".." without going
+	    through the VFS interfaces.
+	  - sets sb->s_export_op to be an appropriately initialised
+	    struct export_operations
+	
+	This has been tested and works.
+
+<neilb@cse.unsw.edu.au> (02/05/07 1.513.10.10)
+	[PATCH] PATCH - kNFSd/FAT in 2.5.14 - Add export_operations support for FAT
+	
+	This actually contains a lot of code that is never used,
+	as we don't currently attempt to load an inode that isn't
+	in cache, so the fat_get_parent is never actually reached.
+	However it is there (and should be right) incase some brave
+	soul does decide to enhance fat_get_dentry accordingly.
+
+<dalecki@evision-ventures.com> (02/05/07 1.513.10.11)
+	[PATCH] 2.5.14 IDE 56
+	
+	 - Push poll_timeout down from the hwgroup to the channel. We are resetting the
+	   channel and not a whole hwgroup. This way using multiple pdc202xxx cards
+	   should magically start to work with multiple performance and resets will no
+	   longer lock the system.
+	
+	 - Updates for PDC4030 by Peter Denison <peterd@marshadder.uklinux.net>.
+	
+	 - Make ide_raw_taskfile don't care about request buffers. They where always
+	   NULL.
+	
+	 - Port set multi mode count over from the special setting interface to
+	   ide_raw_taskfile. Fix errors in the corresponding interrupt handler in one go
+	   as well. It turned out that this is precisely the same code as in
+	   task_no_data_intr, so we can nuke it altogether. And finally we have found
+	   some problems with the set_pio_mode() command which can fail with -EBUSY -
+	   this is in esp. probably *very* common during boot hdparm usage those days!
+	   (OK it was masked by reportig too early that it finished...  Crap Crap utter
+	   crap it was!!!) Right now hdparm should just be extendid to properly
+	   sync and retry on   -EBUSY and everything should be fine.
+	
+	   And now the 1 Milion EUR question for everybody who loves to put driver
+	   settings in to /proc:
+	
+	   How the hell could echo > /proc/ide/ide0/settings blah blah blah blah handle
+	   properly cases like -EIO, -EBUSY and so on??? Having the possibility o do it
+	   does not mean that it is a good idea to use it.
+	
+	   OK. After realizing the simple fact that quite a lot of low level hardware
+	   manipulating ioctls may require assistance in usage from proper logic which is
+	   *very* unlikely to be implemented in a bash (for me preferable still ksh) I
+	   have made my mind up.
+	
+		/proc/ide will be nuked.
+	
+	 - Execute the recalibration for error recovery on precisely the same request as
+	   the one which failed.
+	
+	 - Remove set geometry.  It's crap by means of standard specification. Because:
+	
+	   1. We rely on the existence of the identify command anyway.
+	
+	   2. This command was obsoleted *before* the identify command existed as far
+	   as I can see.
+	
+	   2. I'm able to have a look at what other ATA/ATAPI drivers in the wild do:
+	   They don't do it.
+	
+	 - Just call tuneproc in set_pio_mode() directly - we are already behind the rq
+	   queue there.
+	
+	 - After we have uncovered the broken logics behind the whole ioctl handling we
+	   now just have made ide_spin_wait_hwgroup() waiting for a proper somehow
+	   longer timeout before giving up. This was previously just hiding the broken
+	   concept of setting ioctl values through /proc/ide/ideX/settings - now it just
+	   really helps hdparm to not to give up too early. (It shouldn't probably play
+	   wreck havock on the global driver spin lock as well. I will look in to this
+	   later.)
+	
+	 - Scrap the non necessary, to say the least, disabling of interrupts for 3,
+	   read it again please, 3 seconds, on the local CPU inside
+	   ide_spin_wait_hwgroup().  Spin lock handling needs checking there badly as I
+	   see now as well...
+	
+	Hey apparently any "special" requests are gone. We now have only
+	to deal with REQ_DEVICE_ACB and REQ_DEVICE_CMD. One of them is still too
+	much and will be killed.
+
+<dalecki@evision-ventures.com> (02/05/07 1.513.10.12)
+	[PATCH] 2.5.14 IDE 57
+	
+	Nuke /proc/ide. For explanations why, please see the frustrated comments in the
+	previous change log. If one still don't see why it wasn't a good thing,
+	well please just take a look at the following:
+	
+	Kernel size before:
+	
+	    text    data     bss     dec     hex filename
+	1716049  403968  470252 2590269  27863d vmlinux
+	
+	Kernel size after:
+	
+	    text    data     bss     dec     hex filename
+	1680993  403488  470124 2554605  26faed vmlinux
+	
+	2% of overall size! And this is not exactly an minimalistic setup.
+
+<dalecki@evision-ventures.com> (02/05/07 1.513.10.13)
+	[PATCH] IDE 58
+	
+	 - m68k fixes by Roman Zippel.
+	
+	 - CDROM PIO mode fix by Osamu Tamita.
+	   (You are true "Hawk-eye" hovering over my head! Respect - and many Thanks.)
+	
+	 - Virtualize the udma_enable method as well to help ARM and PPC people.  Please
+	   please if you would like to have some other methods virtualized in a similar
+	   way - just tell me or even better do it yourself at the end of ide-dma.c.
+	   I *don't mind* patches.
+	
+	 - Fix the pmac code to adhere to the new API. It's supposed to work again.
+	   However this is blind coding... I give myself 80% chances for it to work ;-).
+
+<davej@suse.de> (02/05/07 1.513.10.14)
+	[PATCH] region handling cleanup
+	
+	Done by William Stinson.
+	Adds error handling to request_region() calls,
+	and converts some old check_region() calls too.
+
+<davej@suse.de> (02/05/07 1.513.10.15)
+	[PATCH] region handling cleanup
+	
+	Done by William Stinson.
+	Adds error handling to request_region() calls,
+	and converts some old check_region() calls too.
+
+<davej@suse.de> (02/05/07 1.513.10.16)
+	[PATCH] region handling cleanup
+	
+	Done by William Stinson.
+	Adds error handling to request_region() calls,
+	and converts some old check_region() calls too.
+
+<davej@suse.de> (02/05/07 1.513.10.17)
+	[PATCH] capabilities for mtrr driver.
+	
+
+<davej@suse.de> (02/05/07 1.513.10.18)
+	[PATCH] DMI update.
+	
+	Another Sony for the apm blacklist.
+
+<davej@suse.de> (02/05/07 1.513.10.19)
+	[PATCH] region handling cleanup
+	
+	Done by William Stinson.
+	Adds error handling to request_region() calls,
+	and converts some old check_region() calls too.
+
+<davej@suse.de> (02/05/07 1.513.10.20)
+	[PATCH] motioneye driver update.
+	
+	Syncs up with Stelians latest
+
+<davej@suse.de> (02/05/07 1.513.10.21)
+	[PATCH] update NBD URL
+	
+
+<davej@suse.de> (02/05/07 1.513.10.22)
+	[PATCH] check various return codes in advantechwdt.
+	
+	Adds missing checks. Probably another from William Stinson
+
+<davej@suse.de> (02/05/07 1.513.10.23)
+	[PATCH] region handling cleanup
+	
+	Done by William Stinson.
+	Adds error handling to request_region() calls,
+	and converts some old check_region() calls too.
+
+<davej@suse.de> (02/05/07 1.513.10.24)
+	[PATCH] IA64 ZX1 AGPGart support.
+	
+	From 2.4
+
+<davej@suse.de> (02/05/07 1.513.10.25)
+	[PATCH] CREDITS update
+	
+
+<davej@suse.de> (02/05/07 1.513.10.26)
+	[PATCH] region handling cleanup
+	
+	Done by William Stinson.
+	Adds error handling to request_region() calls,
+	and converts some old check_region() calls too.
+
+<davej@suse.de> (02/05/07 1.513.10.27)
+	[PATCH] typo.
+	
+
+<davej@suse.de> (02/05/07 1.513.10.28)
+	[PATCH] VIA quirk update.
+	
+	Brings up to date with the quirk in 2.4
+	This makes sure we only apply it on the right chipsets,
+	and adjusts the bits that get poked depending on which we find.
+
+<davej@suse.de> (02/05/07 1.513.10.29)
+	[PATCH] sonypi update
+	
+	Syncs up with latest from Stelian
+
+<davej@suse.de> (02/05/07 1.513.10.30)
+	[PATCH] prefetching too far in mem copies
+	
+	This patch from 2.4 makes sure we don't prefetch past the
+	end of a range to be copied (in case its at the end of a memrange)
+	i386 case looks safe already, we just weren't optimal for the last
+	chunk to be copied.
+	
+	Andi. same change needed for x86-64.
+	
+	    Dave.
+
+<davej@suse.de> (02/05/07 1.513.10.31)
+	[PATCH] region handling cleanup
+	
+	Done by William Stinson.
+	Adds error handling to request_region() calls,
+	and converts some old check_region() calls too.
+
+<davej@suse.de> (02/05/07 1.513.10.32)
+	[PATCH] documentation for Cyrix IRQ routing
+	
+
+<davej@suse.de> (02/05/07 1.513.10.33)
+	[PATCH] simplify wdt285 copying.
+	
+	copy_to_user already does the relevant checking.
+
+<davej@suse.de> (02/05/07 1.513.10.34)
+	[PATCH] typo in z2ram driver
+	
+
+<davej@suse.de> (02/05/07 1.513.10.35)
+	[PATCH] PNPBIOS / floppy conflict.
+	
+	The PNPBIOS driver and the floppy driver both fight over reservation
+	of the floppy port. This patch makes things friendly again.
+	As the comment suggests, this fix could be done better, but until
+	someone steps forward to fix this, this is the best we have.
+
+<davej@suse.de> (02/05/07 1.513.10.36)
+	[PATCH] NCR5380 update.
+	
+	From 2.4
+	- Lindented
+	- Add Docbook comments
+	- Remove duplicate MODULE_LICENSE tag
+
+<davej@suse.de> (02/05/07 1.513.10.37)
+	[PATCH] dmasound update.
+	
+	The largest part of the OSS update from 2.4
+	Various changelog entries scattered throughout the patch.
+
+<torvalds@home.transmeta.com> (02/05/07 1.513.10.39)
+	Re-apply Dave's VIA quirk update from 2.4.x
+	after the manual merge of the PCI re-organization
+	removed it.
+
+<ink@jurassic.park.msu.ru> (02/05/07 1.513.18.1)
+	[PATCH] Fix missing #includes
+	
+	There are missing #includes which will break compilation on some non-x86
+	platforms. With following patch this compiles and works on alpha.
+	
+	Ivan.
+
+<dougg@torque.net> (02/05/07 1.513.10.40)
+	[PATCH] aha1542 update
+	
+	This ISA scsi adapter still seems to be popular
+	given the number of people that supply patches
+	for it collected in Dave's tree.
+	
+	The latest patch was from William Stinson (first item):
+	  - request_region cleanup
+	  - removal of old scsi error handling (leaving newer version)
+	  - scatterlist::address replaced
+	  - host_lock replacing io_request_lock
+	
+	
+	Doug Gilbert
+	
+	P.S. This is a transfer from Dave's tree. It runs fine for
+	me on a dual Celeron SMP box.
+
+<dougg@torque.net> (02/05/07 1.513.10.41)
+	[PATCH] osst update
+	
+	This is the OnStream variant of the st driver that
+	has been in Dave's tree for some time.
+	
+	The change looks like it is from Willem Riede (osst@riede.org)
+	and that it has been forwarded ported from lk 2.4 .
+
+<dougg@torque.net> (02/05/07 1.513.10.42)
+	[PATCH] sg update
+	
+	Here is one fix and one enhancement to the scsi generic (sg)
+	driver in 2.5.14
+	Changelog:
+	    - off by one fix for last scatter gather element
+	    - if possible compact kiobuf_map into scatter gather list
+
+<kai@tp1.ruhr-uni-bochum.de> (02/05/07 1.513.17.7)
+	ISDN: CAPI: alloc struct capi_appl dynamically
+	
+	First step in having the users alloc this as part of the state info
+	they have to maintain anyway.
+
+<zippel@linux-m68k.org> (02/05/07 1.513.10.43)
+	[PATCH] m68k: AFFS update [1/20]
+	
+	- sizeof changes from Kernel Janitor Project
+	- several bug fixes found with fsx
+
+<zippel@linux-m68k.org> (02/05/07 1.513.10.44)
+	[PATCH] m68k: atari updates [2/20]
+	
+	Some compile fixes.
+
+<zippel@linux-m68k.org> (02/05/07 1.513.10.45)
+	[PATCH] m68k: bitops update [3/20]
+	
+	Add __clear_bit/__ffs/sched_find_first_bit.
+
+<zippel@linux-m68k.org> (02/05/07 1.513.10.46)
+	[PATCH] m68k: add cacheflush.h [4/20]
+	
+	This moves several cache flush function into cacheflush.h.
+
+<mochel@segfault.osdl.org> (02/05/07 1.513.14.6)
+	Move arch/i386/kernel/pci/ to arch/i386/pci/
+
+<zippel@linux-m68k.org> (02/05/07 1.513.10.47)
+	[PATCH] m68k: config.in update [5/20]
+	
+	Update to the latest config.in.
+
+<zippel@linux-m68k.org> (02/05/07 1.513.10.48)
+	[PATCH] m68k: license updates [7/20]
+	
+	Add missing license tags.
+
+<zippel@linux-m68k.org> (02/05/07 1.513.10.49)
+	[PATCH] m68k: hp300 update [8/20]
+	
+	compile fix
+
+<zippel@linux-m68k.org> (02/05/07 1.513.10.50)
+	[PATCH] m68k: remove hwclk_time/gettod [9/20]
+	
+	- replace hwclk_time with rtc_time
+	- use hwclk instead of gettod to set initial time
+
+<zippel@linux-m68k.org> (02/05/07 1.513.10.51)
+	[PATCH] m68k: idle update [10/20]
+	
+	Fix idle functions.
+
+<zippel@linux-m68k.org> (02/05/07 1.513.10.52)
+	[PATCH] m68k: add missing include [11/20]
+	
+	Add missing include files.
+
+<zippel@linux-m68k.org> (02/05/07 1.513.10.53)
+	[PATCH] m68k: Rename KTHREAD_SIZE [12/20]
+	
+	This patch renames KTHREAD_SIZE into THREAD_SIZE, similiar to all other archs.
+
+<zippel@linux-m68k.org> (02/05/07 1.513.10.54)
+	[PATCH] m68k: math-emu updates [13/20]
+	
+	Compile fixes
+
+<zippel@linux-m68k.org> (02/05/07 1.513.10.55)
+	[PATCH] m68k: rename p_pptr [14/20]
+	
+	Rename p_pptr into parent.
+
+<zippel@linux-m68k.org> (02/05/07 1.513.10.56)
+	[PATCH] m68k: readd lost proc functions [15/20]
+	
+	These function were removed by a "cleanup", but they are still used.
+
+<zippel@linux-m68k.org> (02/05/07 1.513.10.57)
+	[PATCH] m68k: rlimits update [16/20]
+	
+	Update INIT_RLIMITS.
+
+<zippel@linux-m68k.org> (02/05/07 1.513.10.58)
+	[PATCH] m68k: seq_file fixes [17/20]
+	
+	update some proc functions to use the seq_file interface
+
+<zippel@linux-m68k.org> (02/05/07 1.513.10.59)
+	[PATCH] m68k: add tlbflush.h [18/20]
+	
+	Move several tlb functions into tlbflush.h.
+
+<zippel@linux-m68k.org> (02/05/07 1.513.10.60)
+	[PATCH] m68k: add show_trace/show_trace_task [19/20]
+	
+	extract show_trace()/show_trace_task() out of dump_stack().
+
+<zippel@linux-m68k.org> (02/05/07 1.513.10.61)
+	[PATCH] m68k: zorro updates [20/20]
+	
+	- small compile fixes
+	- id update
+	- add asm-ppc/zorro.h
+
+<zippel@linux-m68k.org> (02/05/07 1.513.10.62)
+	[PATCH] m68k: driver updates [6/20]
+	
+	- kdev_t fixes
+	- bio fixes
+	- other cleanups and compile fixes
+
+<greg@kroah.com> (02/05/07 1.513.18.2)
+	Move arch/i386/kernel/pci/ to arch/i386/pci/
+
+<vandrove@vc.cvut.cz> (02/05/07 1.513.10.63)
+	[PATCH] NLS: Invalid koi8-ru return values
+	
+	During my lurking around NLS code I found that KOI8-RU returns character
+	code instead of length of character for two characters.
+	
+						Petr Vandrovec
+
+<vandrove@vc.cvut.cz> (02/05/07 1.513.10.64)
+	[PATCH] NLS: Allow user to select 1:1 mapping
+	
+	This allows user to select 'default' encoding, which has defined mapping
+	for each of 255 byte values, so one can use it as a fallback when it
+	finds filesystem with unknown encoding (EBCDIC for example) just to get
+	characters through filesystem.
+	
+					Petr Vandrovec
+
+<mochel@segfault.osdl.org> (02/05/07 1.513.19.1)
+	PCI Update: Fix oops on boot w/ ACPI enabled
+
+<ink@jurassic.park.msu.ru> (02/05/07 1.513.10.65)
+	[PATCH] 2.5.14: New PCI allocation code (alpha, arm, parisc) [1/2]
+	
+	This changes PCI resource allocation algorithm to 3 passes vs.
+	current 2 passes. Extra pass is used for calculation of required
+	size and alignment of PCI buses behind PCI-PCI bridges. After
+	that, in the pass #3, these buses get allocated like regular
+	PCI devices. This gives tighter PCI IO and memory packing -
+	for instance, this fixes allocation problems on certain alphas
+	with very small (112Mb) PCI memory range. Also, the new code
+	- will allow mixed approach to resource allocation:
+	  architecture can keep BIOS settings for some devices,
+	  and re-allocate resources for others, including improperly
+	  initialized bridges;
+	- makes prefetchable ranges support much simpler;
+	- allows sizing of IO and memory ranges for the host
+	  bridges, which might be very useful in some situations.
+	
+	It was tested on various alphas; I haven't heard any complaints
+	from rmk and rth, so probably all of this is ok. :-)
+	
+	Part 1:
+	- for all archs, 4th argument (align) added to
+	  pcibios_align_resource (and its callers).
+	  It's necessary because this function will be called for
+	  bus resources as well, and in this case size != alignment.
+	- for several archs, dead/bogus code removed from
+	  pcibios_fixup_pbus_ranges().
+
+<ink@jurassic.park.msu.ru> (02/05/07 1.513.10.66)
+	[PATCH] 2.5.14: New PCI allocation code (alpha, arm, parisc) [2/2]
+	
+	Summary of changes:
+	- alpha, arm: code related to PCI-PCI bridges from pcibios_fixup_bus()
+	  removed - now it's generic;
+	- pdev_sort_resource: sort resources all together, no matter IO or memory;
+	- pbus_assign_resources_sorted: ditto;
+	- pci_bridge_check_ranges, pci_setup_bridge: changed for prefetch support;
+	- pbus_size_io, pbus_size_mem: core stuff; tested with randomly generated
+	  sets of resources;
+	- pbus_size_bridges: pass #2 (pass #1 is PCI probing, common for all archs);
+	- pbus_assign_resources: pass #3.
+	
+	Ivan.
+
+<ink@jurassic.park.msu.ru> (02/05/07 1.513.10.67)
+	[PATCH] fixes for PCI reorg changes
+	
+	There are missing #includes which will break compilation on some non-x86
+	platforms. With following patch this compiles and works on alpha.
+
+<sfr@canb.auug.org.au> (02/05/07 1.513.10.68)
+	[PATCH] USE_STANDARD_AS_RULE in i386 arch Makefiles
+	
+	In Rules.make, a comment says:
+	
+	# Old makefiles define their own rules for compiling .S files,
+	# but these standard rules are available for any Makefile that
+	# wants to use them.  Our plan is to incrementally convert all
+	# the Makefiles to these standard rules.  -- rmk, mec
+	
+	This patch does that for the i386 arch Makefiles.
+
+<hoho@binbash.net> (02/05/07 1.513.10.69)
+	[PATCH] suser() -> capable() checks
+	
+	  Trivial patch to change some instances of suser() and fsuser() to
+	proper capable() checks.
+
+<akpm@zip.com.au> (02/05/07 1.513.10.70)
+	[PATCH] Fix: writing to the swap space
+	
+	Ah.  That's some left-over code.  Reads will be OK, but writes will be
+	unexpectedly asynchronous.  Nothing in the kernel uses that function for
+	writes so it didn't show up.
+
+<torvalds@home.transmeta.com> (02/05/07 1.513.10.72)
+	Update kernel version
+
+<david-b@pacbell.net> (02/05/07 1.513.11.4)
+	[PATCH] USB usbnet driver update
+	
+	    - generalizes/cleans keventd support to also handle
+	        * rx stalls (and usb 2.0 transaction translator unplug)
+	        * rx memory shortfalls (latent bug Oliver noticed)
+	        * cleanup on device disconnect (quiesce first)
+	    - merges Brad's patch to use the IEEE802 "locally assigned" bit
+	    - fixes a couple minor bugs on error paths (leak, bogus diagnostic)
+	    - updates some comments
+
+<greg@kroah.com> (02/05/07 1.513.14.9)
+	PCI hotplug drivers
+	
+	change due to moved location of i386's pci.h
+
+<kai@tp1.ruhr-uni-bochum.de> (02/05/07 1.513.17.8)
+	ISDN: CAPI remove NCCI up/down notification
+	
+	Applications really ought to take care of maintaing the state themselves,
+	instead of cheating by listening to controller private messages.
+
+<kai@tp1.ruhr-uni-bochum.de> (02/05/07 1.513.17.9)
+	ISDN: CAPI fix new "ncci up"
+	
+	There's actually two cases when a new NCCI is created:
+	outgoing and incoming connections (had missed the latter)
+
+<greg@kroah.com> (02/05/07 1.513.11.5)
+	USB Config.in and Makefile minor changes
+	
+	sync up with -dj tree
+
+<greg@kroah.com> (02/05/07 1.513.11.6)
+	USB ohci driver update
+	
+	add PMAC changes found in -dj tree
+
+<greg@kroah.com> (02/05/07 1.513.11.7)
+	USB
+	
+	minor -dj tree updates.
+
+<david-b@pacbell.net> (02/05/07 1.513.11.8)
+	[PATCH] PATCH 2.5.14 -- ehci misc fixes
+	
+	    - Report better errors, and in one case the correct one.
+	    - Adds strategic wmb() calls
+	    - Claims the right (scaled) ISO bandwidth
+	    - Uses non-CVS version ID
+	
+	This will likely resolve that Archos MP3 Jukebox issue, where "-104"
+	(-ECONNRESET) was appearing mysteriously.
+
+<mochel@segfault.osdl.org> (02/05/07 1.513.14.10)
+	Re-add check for valid acpi routing information, instead of assuming it works
+
+<davem@nuts.ninka.net> (02/05/07 1.369.106.46)
+	Sparc64: Fix pfn_foo macros and add descriptive commentary
+	above explaining the {phys,pfn}_base stuff.
+
+<laforge@gnumonks.org> (02/05/07 1.513.20.1)
+	Netfilter ipt_ULOG fix:
+	- If timers were pending during module unload, we would OOPS.
+
+<colin@gibbs.dhs.org> (02/05/07 1.513.21.1)
+	copy_mm fix:
+	- If dup_mmap fails we will try to destroy_context before
+	init_new_context occurs.  Platforms with non-trivial
+	init_new_context can explode because of this.  The fix
+	is to invoke init_new_context before dup_mmap.
+
+<grundler@cup.hp.com> (02/05/07 1.513.20.2)
+	Tigon3 fix:
+	- Fix typo in setting MR_LP_ADV duplex flags.
+
+<kai@tp1.ruhr-uni-bochum.de> (02/05/08 1.513.15.3)
+	Link drivers/char/* from drivers/char/Makefile
+	
+	Link the subdirs of drivers/char from drivers/char/Makefile instead the
+	top-level Makefile. 
+	
+	Link order changes slightly, shouldn't case any problems, though.
+	
+	Fix drivers/char/pcmcia/Config.in.
+	
+	Cleanup drivers/char/pcmcia/Makefile.
+	
+	Fix rio build rules in drivers/char/Makefile.
+
+<kai@tp1.ruhr-uni-bochum.de> (02/05/08 1.513.15.4)
+	Fix compile time warning in serial.c
+
+<kai@tp1.ruhr-uni-bochum.de> (02/05/08 1.513.15.5)
+	Cleanup drivers/fusion/* build
+	
+	Don't shortcut from drivers/Makefile to 
+	drivers/message/{fusion,i2o}/Makefile, but use intermediate
+	drivers/message/Makefile.
+	
+	Cleanup drivers/message/fusion/Config.in and get rid of unnecessary
+	CONFIG_FUSION_BOOT.
+
+<kai@tp1.ruhr-uni-bochum.de> (02/05/08 1.513.15.6)
+	Remove PCMCIA backwards compatibility rule.
+	
+	Old pcmcia-cs versions expect the pcmcia modules in 
+	/lib/modules/`uname -r`/pcmcia, so we symlinked them for compatibility.
+	According to the comment, the generation of these links should have
+	been removed in 2.4, so it's definitely time for it to go now.
+
+<kai@tp1.ruhr-uni-bochum.de> (02/05/08 1.513.15.7)
+	Cleanup drivers/pcmcia/Makefile
+	
+	Use the usual list-based approach. Still not too nice.
+
+<kai@tp1.ruhr-uni-bochum.de> (02/05/08 1.513.15.8)
+	Cleanup drivers/pcmcia/Makefile part 2
+	
+	Adding some more flexibility to Config.in (Allow for core built-in but
+	socket driver modular) cleans up the Makefile as well ;-)
+
+<kai@tp1.ruhr-uni-bochum.de> (02/05/08 1.513.15.9)
+	Fix cut'n'paste error in drivers/message/Makefile
+
+<kai@tp1.ruhr-uni-bochum.de> (02/05/08 1.513.15.10)
+	Fix the Makefile cleanups
+	
+
+<torvalds@penguin.transmeta.com> (02/05/08 1.513.1.40)
+	Add SIGURG to list of ignore-by-default signals
+
+<torvalds@penguin.transmeta.com> (02/05/08 1.513.1.41)
+	Fix makefile errors
+
+<paulus@quango.ozlabs.ibm.com> (02/05/09 1.516)
+	Update the Config.help for ppc32.  References to 486s and pentiums aren't
+	really helpful here. :)
+
+<paulus@quango.ozlabs.ibm.com> (02/05/09 1.517)
+	PPC32: Rename ppc_defs.h to asm-offsets.h to ease the transition to kbuild-2.5 later.
+
+<davem@nuts.ninka.net> (02/05/08 1.369.106.47)
+	Soft-fp fix:
+	- Fix handling of implicit 1 bit of fraction part when converting
+	from int to float.  We cannot handle it properly unless we
+	defer implicit 1 bit handling till after rounding as
+	rounding may move where the implicit 1 bit is in
+	the final converted integer.
+
+<davem@nuts.ninka.net> (02/05/08 1.369.106.48)
+	Sparc64: Make use of USE_STANDARD_AS_RULE.
+
+<davem@nuts.ninka.net> (02/05/08 1.369.106.49)
+	Sparc64: Enter KERNEL_DS when invoking do_sigaltstack with
+	kernel pointers.
+
+<davem@nuts.ninka.net> (02/05/08 1.513.21.2)
+	SLAB: When using get_user on kernel pointers, enter KERNEL_DS.
+
+<paulus@samba.org> (02/05/09 1.519)
+	PPC32: This changeset adds preemptible kernel support for ppc32
+	and also streamlines the exception entry/exit code by not saving
+	all the GPRs on the common exceptions (system call, external
+	interrupt and decrementer).
+
+<paulus@samba.org> (02/05/09 1.520)
+	Define pfn_to_page, page_to_pfn, pte_pfn, pfn_pte for ppc32.
+
+<paulus@samba.org> (02/05/09 1.521)
+	PPC32: minor cosmetic changes, eliminate compile warnings
+
+<davem@nuts.ninka.net> (02/05/09 1.513.21.3)
+	drivers/usb/net/rtl8150.c: Include linux/init.h
+
+<paulus@samba.org> (02/05/09 1.522)
+	PPC32: fix serial clock for embedded EP405 board.
+
+<paulus@samba.org> (02/05/09 1.523)
+	PPC32: remove some compiler warnings, xmon update
+
+<paulus@samba.org> (02/05/09 1.524)
+	PPC32: powermac update from Ben Herrenschmidt.
+	This adds support for recent powermac models and fixes a few bugs.
+
+<davem@nuts.ninka.net> (02/05/09 1.513.1.45)
+	Sparc64: Make pcibios_init a subsys_initcall.
+
+<davem@nuts.ninka.net> (02/05/09 1.513.1.46)
+	Sparc64: Keep totalram_pages equal to num_physpages.
+
+<robert.olsson@data.slu.se> (02/05/09 1.513.20.3)
+	IPV4: Add statistics for route cache GC monitoring.
+
+<davem@nuts.ninka.net> (02/05/09 1.513.1.47)
+	Sparc: Kill references to buffermem_pages.
+
+<paulus@nanango.paulus.ozlabs.org> (02/05/09 1.525)
+	PPC32: add SIGURG to the list of signals ignored by default
+
+<paulus@nanango.paulus.ozlabs.org> (02/05/09 1.526)
+	PPC32: add a subsys_initcall so pcibios_init gets called
+
+<davem@nuts.ninka.net> (02/05/09 1.513.1.48)
+	asm-sparc64/thread_info.h: Include asm/page.h even if __ASSEMBLY__
+
+<shaggy@austin.ibm.com> (02/05/09 1.513.22.1)
+	[PATCH] Fix JFS file system corruption
+	
+	JFS: Flush dirty metadata to disk when remounting from read-write
+	to read-only.  Also fix umount ordering to make sure metadata is
+	written before journal closed.
+	
+	With Andrew Morton's recent changes, JFS is no longer writing much
+	of its dirty metadata when remounting from read-write to read-only.
+	This causes severe file system corruption.  A JFS root file system
+	will be corrupted on shutdown.
+	
+	This patch fixes the problem by explicitly writing the dirty metadata
+	before the journal is closed.  It also fixes the ordering so that
+	the dirty metadata is completely written before the journal is closed
+	for the normal unmount case as well.
+
+<anton@samba.org> (02/05/09 1.513.22.2)
+	[PATCH] acenic driver and 867 MHz G4 sound problems
+	
+	Fix acenic driver
+
+<greg@kroah.com> (02/05/09 1.513.23.1)
+	moved the pci_alloc_consistent() and pci_free_consistent() functions back
+	into arch/i386/kernel as they are needed even if CONFIG_PCI is not enabled.
+
+<davej@suse.de> (02/05/09 1.513.22.3)
+	[PATCH] list macro conversion.
+	
+	Use listwalking macro..
+
+<davej@suse.de> (02/05/09 1.513.22.4)
+	[PATCH] swap file missing error check
+	
+	Found by Andries Brouwer a while back iirc.
+
+<davej@suse.de> (02/05/09 1.513.22.5)
+	[PATCH] ptrace bug
+	
+	We weren't incrementing the address when walking a processes
+	address space.  From 2.4
+
+<davej@suse.de> (02/05/09 1.513.22.6)
+	[PATCH] HP ZX1 AGP/DRM support.
+	
+	From 2.4
+
+<paulus@samba.org> (02/05/09 1.513.22.8)
+	[PATCH] fix drivers/scsi/sd.c for ppc32
+	
+	This patch fixes the compile errors in sd_find_target, which is only
+	used on 32-bit PPC systems, and changes the ifdef around from
+	CONFIG_PPC to CONFIG_PPC32 since ppc64 doesn't need this routine.
+
+<paulus@samba.org> (02/05/09 1.513.22.9)
+	[PATCH] fix drivers/pci/Makefile for PPC
+	
+	On 32-bit PPC we don't need setup-bus.o but we do need setup-irq.o.
+	This patch changes drivers/pci/Makefile to reflect that.
+
+<sfr@canb.auug.org.au> (02/05/09 1.513.22.10)
+	[PATCH] Directory Notification Fix
+	
+	This patch fixes directory notification so that notifications get
+	cancelled when a process exits.  This make dnotify MUCH more stable and
+	usable :-)
+
+<greg@kroah.com> (02/05/09 1.513.24.1)
+	IBM PCI Hotplug driver
+	
+	update the ibm pci hotplug driver to the latest version.  Contains lots of
+	small bugfixes and added features for new hardware.
+
+<greg@kroah.com> (02/05/09 1.513.24.2)
+	PCI Hotplug core
+	
+	removed pcihpfs_statfs(), as it's not used anymore.
+
+<dalecki@evision-ventures.com> (02/05/09 1.528)
+	[PATCH] 2.5.14 IDE 59
+	
+	Basically PCI driver handling reorganization. This is one step further
+	ahead toward the goal of fully modularized host chip drivers.
+	
+	 - Adjust ide-scsi to the new error handling. Just don't try any device
+	   resets there.
+	
+	 - Add unmasking of IRQ per default to the PMac PCI code.
+	
+	 - Split up the crap table from ide-pci. Let the corresponding drivers do
+	   registration of the functions they provide. This small change makes
+	   this patch rather big.
+	
+	 - Hard-code the number of ports requested for DMA engines. They are always
+	   precisely 8 on PCs. If you hove something different to deal with,
+	   well then please just provide your own init_dma method.
+	
+	 - Remove the HDIO_GETGEO_BIG ioctl. Patch by Andries Brouwer. Applies
+	   unmodified.
+	
+	 - Make ON_BOARD be equal 0, so we can spare ourself some typing in structure
+	   initialization.
+	
+	 - Normalize the terminology in the host chip drivers. It will make spotting
+	   the tons of common code found there later easier.
+

@@ -1,0 +1,289 @@
+commit b8f212953417021b3b92a250babacca6dd7784ea
+Author: Chris Wright <chrisw@osdl.org>
+Date:   Fri Aug 5 00:04:37 2005 -0700
+
+    Linux 2.6.12.4
+
+commit 2d0c661b972f94baa8fd5f80b3f49e76056fdf79
+Author: Dave Jones <davej@redhat.com>
+Date:   Sat Jul 30 21:30:30 2005 +0100
+
+    [PATCH] Fix powernow oops on dual-core athlon
+    
+    Date: Thu, 28 Jul 2005 16:38:21 +0000 (-0700)
+    Subject: powernow-k8 requires that a data structure for
+    X-Git-Tag: v2.6.13-rc4
+    X-Git-Url: http://www.kernel.org/git/gitweb.cgi?p=linux/kernel/git/torvalds/linux-2.6.git;a=commitdiff;h=03938c3f1062b0f279a0ef937a471d4db83702ed
+    
+    powernow-k8 requires that a data structure for
+    each core be created in the _cpu_init function
+    call.  The cpufreq infrastructure doesn't call
+    _cpu_init for the second core in each processor.
+    Some systems crashed when _get was called with
+    an odd-numbered core because it tried to
+    dereference a NULL pointer since the data
+    structure had not been created.
+    
+    The attached patch solves the problem by
+    initializing data structures for all shared
+    cores in the _cpu_init function.  It should
+    apply to 2.6.12-rc6 and has been tested by
+    AMD and Sun.
+    
+    Signed-off-by: Mark Langsdorf <mark.langsdorf@amd.com>
+    Signed-off-by: Dave Jones <davej@redhat.com>
+    Signed-off-by: Chris Wright <chrisw@osdl.org>
+
+commit 31278a7db3987f5d1b487f11637096e1169582d1
+Author: Tommy Christensen <tommy.christensen@tpack.net>
+Date:   Sat Jul 30 21:25:10 2005 +0100
+
+    [PATCH] Fix early vlan adding leads to not functional device
+    
+    X-Git-Url: http://www.kernel.org/git/gitweb.cgi?p=linux/kernel/git/torvalds/linux-2.6.git;a=commitdiff;h=f4637b55ba960d9987a836617271659e9b7b0de8
+    
+    [VLAN]: Fix early vlan adding leads to not functional device
+    
+    OK, I can see what's happening here. eth0 doesn't detect link-up until
+    after a few seconds, so when the vlan interface is opened immediately
+    after eth0 has been opened, it inherits the link-down state. Subsequently
+    the vlan interface is never properly activated and are thus unable to
+    transmit any packets.
+    
+    dev->state bits are not supposed to be manipulated directly. Something
+    similar is probably needed for the netif_device_present() bit, although
+    I don't know how this is meant to work for a virtual device.
+    
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+    Signed-off-by: Chris Wright <chrisw@osdl.org>
+
+commit 685dd5ff54ea9b3333df75427bd91d9601813c23
+Author: Blaisorblade <blaisorblade@yahoo.it>
+Date:   Sat Jul 30 21:07:02 2005 +0200
+
+    [PATCH] sys_get_thread_area does not clear the returned argument
+    
+    CC: <stable@kernel.org>
+    
+    sys_get_thread_area does not memset to 0 its struct user_desc info before
+    copying it to user space...  since sizeof(struct user_desc) is 16 while the
+    actual datas which are filled are only 12 bytes + 9 bits (across the
+    bitfields), there is a (small) information leak.
+    
+    This was already committed to Linus' repository.
+    
+    Signed-off-by: Paolo 'Blaisorblade' Giarrusso <blaisorblade@yahoo.it>
+    Signed-off-by: Chris Wright <chrisw@osdl.org>
+
+commit 60372783e59079bdfd3ba0477e1907669249a489
+Author: Andrew Morton <akpm@osdl.org>
+Date:   Thu Jul 28 11:02:26 2005 -0700
+
+    [PATCH] Fw: [PATCH] bio_clone fix
+    
+    [PATCH] bio_clone fix
+    
+    Fix bug introduced in 2.6.11-rc2: when we clone a BIO we need to copy over the
+    current index into it as well.
+    
+    It corrupts data with some MD setups.
+    
+    See http://bugzilla.kernel.org/show_bug.cgi?id=4946
+    
+    Huuuuuuuuge thanks to Matthew Stapleton <matthew4196@gmail.com> for doggedly
+    chasing this one down.
+    
+    Acked-by: Jens Axboe <axboe@suse.de>
+    Cc: <linux-raid@vger.kernel.org>
+    Cc: <dm-devel@redhat.com>
+    Signed-off-by: Andrew Morton <akpm@osdl.org>
+    Signed-off-by: Linus Torvalds <torvalds@osdl.org>
+    Signed-off-by: Chris Wright <chrisw@osdl.org>
+
+commit e7cd6bfe6c56856eecb79a8cfd3d60599a8b280f
+Author: Herbert Xu <herbert@gondor.apana.org.au>
+Date:   Tue Jul 26 16:40:31 2005 -0700
+
+    [PATCH] Fix possible overflow of sock->sk_policy
+    
+    [XFRM]: Fix possible overflow of sock->sk_policy
+    
+    Spotted by, and original patch by, Balazs Scheidler.
+    
+    Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+    Signed-off-by: Chris Wright <chrisw@osdl.org>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
+
+commit 1541b785b9c11b639ba5f60f4c5de5bff235f7d8
+Author: Patrick McHardy <kaber@trash.net>
+Date:   Fri Jul 22 09:35:51 2005 +0200
+
+    [PATCH] Wait until all references to ip_conntrack_untracked are dropped on unload
+    
+    [NETFILTER]: Wait until all references to ip_conntrack_untracked are dropped on unload
+    
+    Fixes a crash when unloading ip_conntrack.
+    
+    Signed-off-by: Patrick McHardy <kaber@trash.net>
+    Signed-off-by: Chris Wright <chrisw@osdl.org>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
+
+commit 634823cdc51b1cacba504b29d6de9a25e1ee41af
+Author: Patrick McHardy <kaber@trash.net>
+Date:   Fri Jul 22 09:35:43 2005 +0200
+
+    [PATCH] Fix potential memory corruption in NAT code (aka memory NAT)
+    
+    [NETFILTER]: Fix potential memory corruption in NAT code (aka memory NAT)
+    
+    The portptr pointing to the port in the conntrack tuple is declared static,
+    which could result in memory corruption when two packets of the same
+    protocol are NATed at the same time and one conntrack goes away.
+    
+    Signed-off-by: Patrick McHardy <kaber@trash.net>
+    Signed-off-by: Chris Wright <chrisw@osdl.org>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
+
+commit 2311be883f42fad2170ce288cfa477dc0ddb97be
+Author: Patrick McHardy <kaber@trash.net>
+Date:   Fri Jul 22 09:35:34 2005 +0200
+
+    [PATCH] Fix deadlock in ip6_queue
+    
+    [NETFILTER]: Fix deadlock in ip6_queue
+    
+    Already fixed in ip_queue, ip6_queue was missed.
+    
+    Signed-off-by: Patrick McHardy <kaber@trash.net>
+    Signed-off-by: Chris Wright <chrisw@osdl.org>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
+
+commit 4717ecd49ce5c556d38e8c7b6fdc9fac5d35c00e
+Author: Patrick McHardy <kaber@trash.net>
+Date:   Mon Jul 18 06:52:50 2005 +0200
+
+    [PATCH] Fix signedness issues in net/core/filter.c
+    
+    This is the code to load packet data into a register:
+    
+                            k = fentry->k;
+                            if (k < 0) {
+    ...
+                            } else {
+                                    u32 _tmp, *p;
+                                    p = skb_header_pointer(skb, k, 4, &_tmp);
+                                    if (p != NULL) {
+                                            A = ntohl(*p);
+                                            continue;
+                                    }
+                            }
+    
+    skb_header_pointer checks if the requested data is within the
+    linear area:
+    
+            int hlen = skb_headlen(skb);
+    
+            if (offset + len <= hlen)
+                    return skb->data + offset;
+    
+    When offset is within [INT_MAX-len+1..INT_MAX] the addition will
+    result in a negative number which is <= hlen.
+    
+    I couldn't trigger a crash on my AMD64 with 2GB of memory, but a
+    coworker tried on his x86 machine and it crashed immediately.
+    
+    This patch fixes the check in skb_header_pointer to handle large
+    positive offsets similar to skb_copy_bits. Invalid data can still
+    be accessed using negative offsets (also similar to skb_copy_bits),
+    anyone using negative offsets needs to verify them himself.
+    
+    Thanks to Thomas Vögtle <thomas.voegtle@coreworks.de> for verifying the
+    problem by crashing his machine and providing me with an Oops.
+    
+    Signed-off-by: Patrick McHardy <kaber@trash.net>
+    Signed-off-by: Chris Wright <chrisw@osdl.org>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
+
+commit 691162d638928856e23f21d122aa39de47a494e4
+Author: Siddha, Suresh B <suresh.b.siddha@intel.com>
+Date:   Fri Jul 15 19:17:44 2005 -0700
+
+    [PATCH] x86_64 memleak from malicious 32bit elf program
+    
+    malicious 32bit app can have an elf section at 0xffffe000.  During
+    exec of this app, we will have a memory leak as insert_vm_struct() is
+    not checking for return value in syscall32_setup_pages() and thus not
+    freeing the vma allocated for the vsyscall page.
+    
+    Check the return value and free the vma incase of failure.
+    
+    Signed-off-by: Suresh Siddha <suresh.b.siddha@intel.com>
+    Signed-off-by: Chris Wright <chrisw@osdl.org>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
+
+commit e0b02eec6f8371d993c4aca134d728d3510f7c8a
+Author: Michal Ostrowski <mostrows@watson.ibm.com>
+Date:   Thu Jul 14 16:46:26 2005 -0700
+
+    [PATCH] rocket.c: Fix ldisc ref count handling
+    
+    If bailing out because there is nothing to receive in rp_do_receive(),
+    tty_ldisc_deref is not called.  Failure to do so increases the ref count=20
+    and causes release_dev() to hang since it can't get the ref count to 0.
+    
+    Signed-off-by: Michal Ostrowski <mostrows@watson.ibm.com>
+    Signed-off-by: Andrew Morton <akpm@osdl.org>
+    Signed-off-by: Chris Wright <chrisw@osdl.org>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
+
+commit 50eb930a92e7070f6a110789245398bff4061059
+Author: Andrew Vasquez <andrew.vasquez@qlogic.com>
+Date:   Thu Jul 14 16:40:04 2005 -0700
+
+    [PATCH] qla2xxx: Correct handling of fc_remote_port_add() failure case.
+    
+    Correct handling of fc_remote_port_add() failure case.
+    
+    Immediately return if fc_remote_port_add() fails to allocate
+    resources for the rport.  Original code would result in NULL
+    pointer dereference upon failure.
+    
+    Reported-by: Michael Reed <mdr@sgi.com>
+    
+    Signed-off-by: Andrew Vasquez <andrew.vasquez@qlogic.com>
+    Signed-off-by: Chris Wright <chrisw@osdl.org>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
+
+commit ab998a6790272b6f45a63d9ef763efd435eae23a
+Author: Tom Rini <trini@kernel.crashing.org>
+Date:   Wed Jul 13 11:49:55 2005 -0700
+
+    [PATCH] kbuild: build TAGS problem with O=
+    
+    For inclusion into 2.6.12.stable, extracted from current Linus git:
+    
+    [PATCH] kbuild: build TAGS problem with O=
+    
+      make O=/dir TAGS
+    
+      fails with:
+    
+        MAKE   TAGS
+      find: security/selinux/include: No such file or directory
+      find: include: No such file or directory
+      find: include/asm-i386: No such file or directory
+      find: include/asm-generic: No such file or directory
+    
+      The problem is in this line:
+      ifeq ($(KBUILD_OUTPUT),)
+    
+    KBUILD_OUTPUT is not defined (ever) after make reruns itself.  This line is
+    used in the TAGS, tags, and cscope makes.
+    
+    Signed-off-by: George Anzinger <george@mvista.com>
+    Cc: Sam Ravnborg <sam@ravnborg.org>
+    Signed-off-by: Andrew Morton <akpm@osdl.org>
+    Signed-off-by: Linus Torvalds <torvalds@osdl.org>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
+

@@ -1,0 +1,137 @@
+commit 888009361479802d0dfb9e1ca38ecaf6bc07e720
+Author: Chris Wright <chrisw@osdl.org>
+Date:   Wed Jun 29 16:00:53 2005 -0700
+
+    Linux 2.6.12.2
+
+commit 1b1f8246322cf10429b1a06924e93423af2bb2ee
+Author: David S. Miller <davem@davemloft.net>
+Date:   Sun Jun 26 15:35:08 2005 -0700
+
+    [PATCH] Fix two socket hashing bugs.
+    
+    1) netlink_release() should only decrement the hash entry
+       count if the socket was actually hashed.
+    
+       This was causing hash->entries to underflow, which
+       resulting in all kinds of troubles.
+    
+       On 64-bit systems, this would cause the following
+       conditional to erroneously trigger:
+    
+    	err = -ENOMEM;
+    	if (BITS_PER_LONG > 32 && unlikely(hash->entries >= UINT_MAX))
+    		goto err;
+    
+    2) netlink_autobind() needs to propagate the error return from
+       netlink_insert().  Otherwise, callers will not see the error
+       as they should and thus try to operate on a socket with a zero pid,
+       which is very bad.
+    
+       However, it should not propagate -EBUSY.  If two threads race
+       to autobind the socket, that is fine.  This is consistent with the
+       autobind behavior in other protocols.
+    
+       So bug #1 above, combined with this one, resulted in hangs
+       on netlink_sendmsg() calls to the rtnetlink socket.  We'd try
+       to do the user sendmsg() with the socket's pid set to zero,
+       later we do a socket lookup using that pid (via the value we
+       stashed away in NETLINK_CB(skb).pid), but that won't give us the
+       user socket, it will give us the rtnetlink socket.  So when we
+       try to wake up the receive queue, we dive back into rtnetlink_rcv()
+       which tries to recursively take the rtnetlink semaphore.
+    
+    Thanks to Jakub Jelink for providing backtraces.  Also, thanks to
+    Herbert Xu for supplying debugging patches to help track this down,
+    and also finding a mistake in an earlier version of this fix.
+    
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+    Signed-off-by: Chris Wright <chrisw@osdl.org>
+
+commit 1ef0867a529b222b8ff659d68140df8d5d6a45f2
+Author: Linus Torvalds <torvalds@ppc970.osdl.org>
+Date:   Sat Jun 25 11:16:41 2005 -0700
+
+    [PATCH] ACPI: Make sure we call acpi_register_gsi() even for default PCI interrupt assignment
+    
+    ACPI: Make sure we call acpi_register_gsi() even for default PCI interrupt assignment
+    
+    That's the part that keeps track of the ELCR register, and we want to
+    make sure that the PCI interrupts are properly marked level/low.
+    
+    Signed-off-by: Chris Wright <chrisw@osdl.org>
+
+commit 2e8e121926ee6d15151c8e57ddce97275213c5b2
+Author: Linus Torvalds <torvalds@ppc970.osdl.org>
+Date:   Fri Jun 24 16:01:24 2005 -0700
+
+    [PATCH] Add "memory" clobbers to the x86 inline asm of strncmp and friends
+    
+    Add "memory" clobbers to the x86 inline asm of strncmp and friends
+    
+    They don't actually clobber memory, but gcc doesn't even know they
+    _read_ memory, so can apparently re-order memory accesses around them.
+    
+    Which obviously does the wrong thing if the memory access happens to
+    change the memory that the compare function is accessing..
+    
+    Verified to fix a strange boot problem by Jens Axboe.
+    
+    Signed-off-by: Chris Wright <chrisw@osdl.org>
+
+commit 26b1062c23e46c111f5e86bc8ce4d5007805b51a
+Author: Mitch Williams <mitch.a.williams@intel.com>
+Date:   Tue Jun 21 13:21:42 2005 -0700
+
+    [PATCH] e1000: fix spinlock bug
+    
+    This patch fixes an obvious and nasty bug where we could exit the transmit
+    routine while holding tx_lock.
+    
+    Signed-off-by:  Mitch Williams <mitch.a.williams@intel.com>
+    Signed-off-by:  Chris Wright <chrisw@osdl.org>
+
+commit 986bd4301425ab01934f8efe08ed9433b45492bb
+Author: Hugh Dickins <hugh@veritas.com>
+Date:   Wed Jun 22 14:02:41 2005 +0100
+
+    [PATCH] fix remap_pte_range BUG
+    
+    Out-of-tree user of remap_pfn_range hit kernel BUG at mm/memory.c:1112!
+    It passes an unrounded size to remap_pfn_range, which was okay before
+    2.6.12, but misses remap_pte_range's new end condition.  An audit of
+    all the other ptwalks confirms that this is the only one so exposed.
+    
+    Signed-off-by: Hugh Dickins <hugh@veritas.com>
+    Signed-off-by: Chris Wright <chrisw@osdl.org>
+
+commit 906aa4d200854cf01f683195945f4618f8881e9a
+Author: Andrew Vasquez <andrew.vasquez@qlogic.com>
+Date:   Thu Jun 9 17:21:28 2005 -0700
+
+    [PATCH] qla2xxx: Pull-down scsi-host-addition to follow board initialization.
+    
+    Return to previous held-logic of calling scsi_add_host() only
+    after the board has been completely initialized.  Also return
+    pci_*() error-codes during probe failure paths.
+    
+    This also corrects an issue where only lun 0 is being scanned for
+    a given port.
+    
+    Signed-off-by: Andrew Vasquez <andrew.vasquez@qlogic.com>
+    Signed-off-by: James Bottomley <James.Bottomley@SteelEye.com>
+    Signed-off-by: Chris Wright <chrisw@osdl.org>
+
+commit 49bbb3966e86d560752f1624c6ab31bd147441d1
+Author: Mika Kukkonen <mikukkon@gmail.com>
+Date:   Sat Jun 18 23:22:28 2005 +0300
+
+    [PATCH] Fix typo in drivers/pci/pci-driver.c
+    
+    The git commit 794f5bfa77955c4455f6d72d8b0e2bee25f1ff0c
+    accidentally suffers from a previous typo in that file
+    (',' instead of ';' in end of line). Patch included.
+    
+    Signed-off-by: Mika Kukkonen <mikukkon@iki.fi>
+    Signed-off-by: Chris Wright <chrisw@osdl.org>
+

@@ -1,0 +1,65 @@
+final:
+ - David Miller: sparc/scsi scatterlist fixes
+ - Martin Mares: PCI ids, email address update
+ - David Miller: revert TCP hash optimizations that need more checking
+ - Ivan Kokshaysky/Richard Henderson: alpha update (atomic_dec_and_lock etc)
+ - Peter Anvin: cramfs/zisofs missing pieces
+
+pre8:
+ - Andrea: fix races in do_wp_page, free_swap_and_cache
+ - me: clena up page dirty handling
+ - Tim Waugh: parport IRQ probing and documentation fixes
+ - Greg KH: USB updates
+ - Michael Warfield: computone driver update
+ - Randy Dunlap: add knowledge about some new io-apics
+ - Richard Henderson: alpha updates
+ - Trond Myklebust: make readdir xdr verify the reply packet
+ - Paul Mackerras: PPC update
+ - Jens Axboe: make cpqarray and cciss play nice with the request layer
+ - Massimo Dal Zotto: SMM driver for Dell Inspiron 8000
+ - Richard Gooch: devfs symlink deadlock fix
+ - Anton Altaparmakov: make NTFS compile on sparc
+ 
+pre7:
+ - me: reinstate "delete swap cache on low swap" code
+ - David Miller: ksoftirqd startup race fix
+ - Hugh Dickins: make tmpfs free swap cache entries proactively
+
+pre6:
+ - me: remember to bump the version number ;)
+ - Hugh Dickins: export "free_lru_page()" for modules
+ - Jeff Garzik: don't change nopage arguments, just make the last a dummy one
+ - David Miller: sparc and net updates (netfilter, VLAN etc)
+ - Nikita Danilov: reiserfs cleanups
+ - Jan Kara: quota initialization race
+ - Tigran Aivazian: make the x86 microcode update driver happy about
+   hyperthreaded P4's
+ - me: shrink dcache/icache more aggressively
+ - me: fix up oom-killer so that it actually works
+
+pre5:
+ - Andrew Morton: remove stale UnlockPage
+ - me: swap cache page locking update
+
+pre4:
+ - Mikael Pettersson: fix P4 boot with APIC enabled
+ - me: fix device queuing thinko, clean up VM locking
+
+pre3:
+ - René Scharfe: random bugfix
+ - me: block device queuing low-water-marks, VM mapped tweaking.
+
+pre2:
+ - Alan Cox: more merging
+ - Alexander Viro: block device module race fixes
+ - Richard Henderson: mmap for 32-bit alpha personality
+ - Jeff Garzik: 8139 and natsemi update
+
+pre1:
+ - Michael Warfield: computone serial driver update
+ - Alexander Viro: cdrom module race fixes
+ - David Miller: Acenic driver fix
+ - Andrew Grover: ACPI update
+ - Kai Germaschewski: ISDN update
+ - Tim Waugh: parport update
+ - David Woodhouse: JFFS garbage collect sleep

@@ -1,0 +1,146 @@
+
+Summary of changes from v2.6.11.4 to v2.6.11.5
+==============================================
+
+<ralf@linux-mips.org>
+	[PATCH] NetROM locking
+	
+	Fix deadlock in NetROM due to double locking.  I was sent the patch by
+	Alan and have doublechecked it.  This bug hits Net/ROM users really hard.
+	It's accepted by DaveM - but just too late to make it into 2.6.11.
+	
+	Signed-off-by: Ralf Baechle <ralf@linux-mips.org>
+	Signed-off-by: Chris Wright <chrisw@osdl.org>
+	Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
+
+<dsd@gentoo.org>
+	[PATCH] Fix stereo mutes on Surround volume control
+	
+	As of 2.6.11, I have no output out of the rear right speaker of my 4.1
+	surround sound setup. I am using snd-intel8x0 based on a Realtek ALC650F chip
+	on an nvidia motherboard.
+	
+	A gentoo user with completely different hardware also ran into this:
+	http://bugs.gentoo.org/84276
+	
+	2.6.11-mm3 fixes this problem and I've identified the specific fix, which is
+	already in the ALSA development tree. An ALSA developer asked me to submit the
+	fix for 2.6.11.x when I'd found it, so here it is :)
+	
+	--
+	AC97 Codec
+	Fix stereo mutes on Surround volume control.
+	
+	Signed-off-by: Takashi Iwai <tiwai@suse.de>
+	Signed-off-by: Chris Wright <chrisw@osdl.org>
+	Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
+
+<dilinger@debian.org>
+	[PATCH] Possible AMD8111e free irq issue
+	
+	It seems to me that if in the amd8111e_open() fuction dev->irq isn't
+	zero and the irq request succeeds it might not get released anymore.
+	
+	Specifically, on failure of the amd8111e_restart() call the function
+	returns -ENOMEM without releasing the irq. The amd8111e_restart()
+	function can fail because of various pci_alloc_consistent() and
+	dev_alloc_skb() calls in amd8111e_init_ring() which is being
+	called by amd8111e_restart.
+	
+	1374     if(dev->irq ==0 || request_irq(dev->irq, amd8111e_interrupt, SA_SHIRQ,
+	1375                      dev->name, dev))
+	1376         return -EAGAIN;
+	
+	Signed-off-by: Jeff Garzik <jgarzik@pobox.com>
+	Signed-off-by: Chris Wright <chrisw@osdl.org>
+	Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
+
+<kaber@trash.net>
+	[PATCH] Fix crash while reading /proc/net/route
+	
+	[IPV4]: Fix crash while reading /proc/net/route caused by stale pointers
+	
+	Signed-off-by: Patrick McHardy <kaber@trash.net>
+	Signed-off-by: David S. Miller <davem@davemloft.net>
+	Signed-off-by: Chris Wright <chrisw@osdl.org>
+	Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
+
+<davem@davemloft.net>
+	[PATCH] [IPSEC]: Fix __xfrm_find_acq_byseq()
+	
+	This function, as it's name implies, is supposed to only
+	return IPSEC objects which are in the XFRM_STATE_ACQ
+	("acquire") state.  But it returns any object with the
+	matching sequence number.
+	
+	This is wrong and confuses IPSEC daemons to no end.
+	
+	[XFRM]: xfrm_find_acq_byseq should only return XFRM_STATE_ACQ states.
+	
+	Signed-off-by: Patrick McHardy <kaber@trash.net>
+	Signed-off-by: Chris Wright <chrisw@osdl.org>
+	Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
+
+<shemminger@osdl.org>
+	[PATCH] : Fix check for underflow
+	
+	http://bugme.osdl.org/show_bug.cgi?id=4279
+	Summary: When I try to start vpnc the net/core/skbuff.c:91 crash
+	
+	This check is wrong, gcc optimizes it away:
+	
+	                if ((len -= sizeof(pi)) > len)
+				return -EINVAL;
+	
+	This could be responsible for the BUG. If len is 2 or 3 and TUN_NO_PI
+	isn't set it underflows. alloc_skb() allocates len + 2, which is 0 or
+	1 byte. skb_reserve tries to reserve 2 bytes and things explode in
+	skb_put.
+	
+	[TUN]: Fix check for underflow
+	
+	Signed-off-by: Patrick McHardy <kaber@trash.net>
+	Signed-off-by: Chris Wright <chrisw@osdl.org>
+	Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
+
+<hugh@veritas.com>
+	[PATCH] tasklist left locked
+	
+	On 4-way SMP, about one reboot in twenty hangs while killing processes:
+	exit needs exclusive tasklist_lock, but something still holds read_lock.
+	do_signal_stop race case misses unlock, and fixing it fixes the symptom.
+	
+	Signed-off-by: Hugh Dickins <hugh@veritas.com>
+	Acked-by: Roland McGrath <roland@redhat.com>
+	Signed-off-by: Chris Wright <chrisw@osdl.org>
+	Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
+
+<dilinger@debian.org>
+	[PATCH] Possible VIA-Rhine free irq issue
+	
+	It seems to me that in the VIA Rhine device driver the requested irq might
+	not be freed in case the alloc_ring() function fails. alloc_ring()
+	can fail with a ENOMEM return value because of possible
+	pci_alloc_consistent() failures.
+	
+	Updated to CodingStyle.
+	
+	Signed-off-by: Jeff Garzik <jgarzik@pobox.com>
+	Signed-off-by: Chris Wright <chrisw@osdl.org>
+	Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
+
+<khc@pm.waw.pl>
+	[PATCH] Fix kernel panic on receive with WAN Hitachi SCA HD6457x
+	
+	Another patch for 2.6.11.x: already in main tree, fixes kernel panic on
+	receive with WAN cards based on Hitachi SCA/SCA-II: N2, C101, PCI200SYN.
+	The attached patch fixes NULL pointer dereference on RX.
+	
+	Signed-off-by: Krzysztof Halasa <khc@pm.waw.pl>
+	Acked-by: Jeff Garzik <jgarzik@pobox.com>
+	Signed-off-by: Chris Wright <chrisw@osdl.org>
+	Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
+
+<gregkh@suse.de>
+	Linux 2.6.11.5
+

@@ -1,0 +1,71 @@
+-final:
+ - Andrea Arkangeli: raw-io fixes
+ - Johannes Erdfelt: USB updates
+ - reiserfs update
+ - Al Viro: fsync/umount race fix
+ - Rusty Russell: netfilter sync
+
+-pre8:
+ - Al Viro: fix d_flags race between low-level fs and VFS layer.
+ - David Miller: sparc updates
+ - S390 update
+
+-pre7:
+ - Johannes Erdfelt: USB updates
+ - David Howells: more rw-sem stuff
+ - David Miller: network callback cleanups and fixes
+ - Jan Harkes: make Coda use the proper VFS layer interfaces, so that it can use
+   "non-traditional-unix" filesystems without inode numbers for backing store.
+
+-pre6:
+ - Chris Mason: daemonize reiserfs commit thread
+ - Alan Cox: syncup (AFFS might even work, and official VIA workarounds)
+ - Jeff Garzik: network driver updates
+ - Paul Mackerras: PPP update
+ - David Howells: more rw-sem cleanups, updates. Slowly getting somewhere.
+
+-pre5:
+ - Mike Phillips: olympic driver update
+ - Alan Cox: continued resyncing (lots of small stuff, big NTFS merge from Anton)
+ - Martin Dalecki: cleanup (remove unused and unnecessary get_hardblocksize)
+ - Chris Mason: fix potential reiserfs journal overflow
+ - Jeff Garzik: network driver updates
+ - David Miller: sparc fixes, some network cleanups
+
+-pre4:
+ - David Miller: sparc rw semaphores moved over
+ - Alan Cox: yet more resyncs
+ - NIIBE Yutaka: Super-H driver update
+ - David Howells: more rw-sem cleanups, updates
+ - USB updates
+ - Al Viro: filesystem init cleanup
+
+-pre3:
+ - Hui-Fen Hsu: sis900 driver update
+ - NIIBE Yutaka: Super-H update
+ - Alan Cox: more resyncs (ARM down, but more to go)
+ - David Miller: network zerocopy, Sparc sync, qlogic,FC fix, etc.
+ - David Miller/me: get rid of various drivers hacks to do mmap
+   alignment behind the back of the VM layer. Create a real
+   protocol for it.
+
+-pre2:
+ - Ingo Molnar/Al Viro: don't use bforget() on ext2 (and minix) metadata
+   where we may not be the only owner of the buffer! FS corruption.
+ - Andi Kleen: IPv6 packet re-assembly fix.
+ - David Howells: fix up rwsem implementation
+ - Alan Cox: more merging (S/390 down, ARM to go).
+ - Jens Axboe: LVM and loop fixes
+
+-pre1:
+ - Bob Tracy: Cyrix MTRR setup fix (don't make it twice as big as asked
+   for)
+ - Trond Myklebust: rpciod needs to be PF_MEMALLOC to avoid deadlocks on
+   memory allocation when writing out NFS data under low memory conditions.
+   Fix up BKL and RPC interactions.
+ - Jeff Garzik: tulip network driver update
+ - fix truncate to call down to the filesystem with the kernel lock.
+ - David Mosberger: ia64 update
+ - David Mosberger: simplify ELF program header generation.
+ - Alan Cox: merge from -ac series
+ - Jeff Garzik: make serial.c recognize modem devices properly

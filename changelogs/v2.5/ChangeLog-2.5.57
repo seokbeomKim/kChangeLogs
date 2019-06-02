@@ -1,0 +1,1304 @@
+
+Summary of changes from v2.5.56 to v2.5.57
+============================================
+
+<kai@tp1.ruhr-uni-bochum.de>
+	ISDN/HiSax: Separate out some common code from B-Channel receive
+	
+	Now that a lot of duplicated xmit code is shared, start on the receive
+	path: Share code which reads a fragment from the FIFO and merges it
+	into the currently received frame.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	ISDN/HiSax: Further simplify *_empty_fifo() for B-Channel
+	
+	Most drivers had ->read_fifo already, so we could call it from
+	common code, so just add read_fifo to the ones which were still
+	missing it and there we go.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	ISDN: Share RME/RPF B-channel IRQ handling
+	
+	Again, receive message end / receive pool full are similar enough to
+	easily share common code.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	ISDN/HiSax: Move the now shared fields
+	
+	Since we now use former HSCX specific fields in common code, they
+	get moved out of bcs->hw.hscx and into bcs directly.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	ISDN/HiSax: Remove duplicated HSCX handling
+
+<kai@tp1.ruhr-uni-bochum.de>
+	ISDN/HiSax: Shared bc_open/close()
+	
+	Another bunch of duplicated code is gone..
+
+<kai@tp1.ruhr-uni-bochum.de>
+	ISDN/HiSax: Move BC_SetStack/BC_Close
+	
+	Since we now have a per B-channel driver ops structure, start
+	populating it.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	ISDN/HiSax: Share D-channel receive code
+	
+	Basically the same changes which happened to the B-channel code
+	earlier.
+
+<mochel@osdl.org>
+	Add documentation for porting bus drivers to new driver model.
+
+<mochel@osdl.org>
+	sysfs: hardcode file size of regular files to PAGE_SIZE. 
+	
+	This makes the files easily accessible in some graphical file browsers (since
+	they can automatically handle regular files with a size > 0).
+	
+	Though not all files have a size that large, that is the size that we allocate
+	for reading and writing, so it makes sense.
+
+<mochel@osdl.org>
+	network devices: move kobject registration earilier to better handle error.
+	
+	Moved to just after the last other thing that can fail in register_netdevice().
+
+<anton@samba.org>
+	ppc64: remove flush_icache_page, based on same work in ppc32
+
+<mochel@osdl.org>
+	network devices: make sure kobjects always get unregistered.
+	
+	Third time's a charm..
+	
+	This moves the kobject_unregister() call to after the out: label, making 
+	sure it always gets unregistered. It wasn't if
+	
+		if (dev->features & NETIF_F_DYNALLOC)
+	
+	was true (which it is for PPP devices), causing re-registration of devices
+	to fail. 
+	
+
+<anton@samba.org>
+	ppc64: exception handler update
+
+<anton@samba.org>
+	ppc64: add get/put_compat_timespec from Stephen Rothwell
+
+<mochel@osdl.org>
+	sysfs: Improve read/write buffer filling/flushing semantics.
+	
+	These are sysfs internal changes only, though they have positive external 
+	effects. 
+	
+	A new data type (struct sysfs_buffer) is defined to describe and maintain
+	state of the data for an attribute file. This object is allocated and 
+	initialized when the file is opened. It contains a page-sized buffer that
+	is allocated during the first read or write. 
+	
+	For read(), the buffer is filled when it is allocated by calling the 
+	attribute's show() method. This only happens when a read occurs from offset
+	0 in the file. For all read()s, the portion of the file requested is copied
+	to userspace. This finally fixes a long-standing bug in partial read()s.
+	
+	For write(), the buffer is filled when it is allocated by copying the user-
+	supplied buffer from userspace into it. This buffer is then passed to the
+	attribute's store() method. This is not much different than what was present
+	before.
+	
+	Note that partial-writes are not-supported. There is no way to know if a 
+	user process is doing a partial write, and has more buffer to write. So, we
+	take the easy route and assume that the entire buffer is passed during the
+	first write.
+
+<mochel@osdl.org>
+	sysfs: remove count and off parameters from sysfs_ops methods. 
+	
+	The previous sysfs change implies that the show() and store() methods in 
+	struct sysfs_ops are called only once, during the first read() or write().
+	This means that off is always 0, and count should always be PAGE_SIZE, to
+	fill or clear the entire buffer in one shot.
+	
+	Therefore, those parameters can be removed from all attribute read/write 
+	methods. 
+	
+	This changeset removes them from the definition and fixes sysfs to deal
+	with that appropriately. 
+
+<mochel@osdl.org>
+	sysfs: fix up block and partition sysfs callbacks. 
+	
+	Remove @count and @off parameters from all show() and store() methods for
+	sysfs attribute files.
+
+<mochel@osdl.org>
+	sysfs: fixup bus, class, and driver attribute methods.
+	
+	Remove @count and @off parameters from show() and store() methods.
+
+<mochel@osdl.org>
+	sysfs: fix up device attribute read/write methods.
+	
+	Remove @off and @count from the sysfs_ops, and the core attribute methods.
+
+<mochel@osdl.org>
+	sysfs: fixup PCI sysfs files.
+	
+	Remove @count and @off parameters from show() methods.
+
+<mochel@osdl.org>
+	sysfs: fix up SCSI sysfs files.
+	
+	Remove @count and @off parameters from show() and store() callbacks.
+
+<mochel@osdl.org>
+	sysfs: fixup USB sysfs files.
+	
+	Remove @count and @off from show() and store() methods.
+
+<mochel@osdl.org>
+	sysfs: fixup PCI pool sysfs file.
+	
+	- Remove @count and @off parameters from show() method.
+
+<mochel@osdl.org>
+	sysfs: Fix up SCSI sg sysfs files.
+	
+	- Remove @count and @off parameters from show() methods.
+
+<mochel@osdl.org>
+	sysfs: Fix up PNP sysfs files.
+	
+	- Remove @count and @off parameters from show() and store() methods.
+
+<mochel@osdl.org>
+	sysfs: Fix up EDD sysfs files.
+	
+	- Remove @count and @off parameters from show() and store() callbacks.
+
+<mochel@osdl.org>
+	sysfs: fixup subsystem attributes.
+	
+	- Remove @count and @off from the show() and store() methods.
+
+<mochel@osdl.org>
+	kobject.c fix compile when DEBUG is defined.
+	
+	- From Greg k-h
+
+<mochel@osdl.org>
+	PCI: make PCI_LEGACY_PROC depend on PCI
+	
+	- From Rolf Eike Beer.
+
+<mochel@osdl.org>
+	driver model: add some more error checking.
+	
+	- From Hal Duston
+
+<mochel@osdl.org>
+	driver model: make sure all debugging defaults to off.
+
+<mochel@osdl.org>
+	driver model: remove extra error check during driver binding.
+	
+	Some of the error checks added in last changeset caused unwanted behavior 
+	(like panicking on boot). 
+	
+	This removes the checks of bus_match() in driver_attach().
+
+<rvinson@mvista.com>
+	PPC32: Fix host bridge programming on Adirondack "K2" boards.
+
+<rvinson@mvista.com>
+	PPC32: Explicitly control store-gathering on MPC10x host bridges.
+	
+	This change alters the behavior of the "MCP10x Store Gathering
+	Enable" option.  Previously, selecting this option would enable
+	store gathering, while not selecting the option would leave the
+	firmware-provided state. In short, there was no way to disable
+	store gathering if the firmware had left it enabled. This caused
+	problems with the Adaptec 2940U2W when run in 8240 and 8245
+	Sandpoint systems. The new code will disable store gathering unless
+	the user requests it.
+
+<mporter@cox.net>
+	PPC32: Use timing workaround for DS1743 RTC chip.
+
+<rmk@flint.arm.linux.org.uk>
+	[ARM] Remove CPU manufacturer string.
+	
+	The CPU ID no longer contains sufficient information to reliably
+	determine the manufacturer of a specific part.  To prevent #ifdef
+	madness appearing in the per-CPU support files, it is better to
+	remove the CPU manufacturer string entirely.
+
+<mochel@osdl.org>
+	kobject: make sure we remove kobject from list if kobject_add() failes.
+	
+	Originally from Louis Zhang.
+
+<mochel@osdl.org>
+	sysfs: make sure we drop all the references on dentrys we acquire.
+	
+	None of the file deletions were dropping the referencees to dentrys that 
+	were acquired via the internal helper get_dentry(). This adds the missing
+	dput()s (and comments) to fix that.
+	
+	Also, this adds a dget() on the directory and each file that's being removed
+	in sysfs_remove_dir(), (and associated dput()s) to guarantee the references
+	stay valid over the duration. 
+	
+	Originally reported by Mika Penttilä.
+
+<sds@epoch.ncsc.mil>
+	[PATCH] 2.5.52-lsm-{dummy,ipc}.patch
+	
+	This patch adds the remaining System V IPC hooks, including the inline
+	documentation for them in security.h.  This includes a restored
+	sem_semop hook, as it does seem to be necessary to support fine-grained
+	access.
+	
+	All of these System V IPC hooks are used by SELinux.  The SELinux System
+	V IPC access controls were originally described in the technical report
+	available from http://www.nsa.gov/selinux/slinux-abs.html, and the
+	LSM-based implementation is described in the technical report available
+	from http://www.nsa.gov/selinux/module-abs.html.
+
+<sds@epoch.ncsc.mil>
+	[PATCH] CREDITS patch
+	
+	The attached patch against 2.5.55 updates my CREDITS entry for my current email
+	address.
+
+<mochel@osdl.org>
+	sysfs: return correct error when opening RO file for writing.
+	
+	Should be -EACCESS, rather than -EPERM.
+	
+	From Paul Larson.
+
+<rmk@flint.arm.linux.org.uk>
+	[ARM] Update sa1100fb to new fbcon API and device model
+	
+	This brings sa1100fb up to date with 2.5.54.
+
+<mochel@osdl.org>
+	driver model: fix typo in drivers/base/sys.c.
+	
+	From Vitezslav Samel.
+
+<mochel@osdl.org>
+	driver model docs: convert driverfs references to sysfs references.
+	
+	From Rusty Lynch.
+
+<rmk@flint.arm.linux.org.uk>
+	[ARM] Fix consistent_alloc()
+	
+	The old consistent memory allocator, which sat behind
+	dma_coherent_alloc() and pci_consistent_alloc() was completely unable
+	to handle allocations from interrupt context because we traditionally
+	used ioremap, which in turn:
+	  - allocates memory using GFP_KERNEL for the vm_struct
+	    and the page tables themselves.
+	  - calls get_vm_area, which uses write_lock, and therefore
+	    is unsafe to call from interrupt context.
+	
+	In order to address this issue, a new consistent_alloc() which avoids
+	the above issues has been implemented.  Essentially, we set aside
+	a section of the kernel VM space, and pre-allocate page tables to
+	cover this area.  We allocate "consistent" memory within this region.
+	
+	The handling of the allocation is designed to be generic; it should
+	be possible to replace the vmalloc(), ioremap() and module_alloc()
+	without too much hastle, but that would clearly be a 2.7 thing at
+	this stage.
+
+<zwane@holomorphy.com>
+	[PATCH] fix compile warning in mm/slab.c __slab_error
+
+<linux@brodo.de>
+	[PATCH] cpufreq: new p4-m stepping 7
+	
+	Add support for mobile Pentium IV processors with stepping 7.
+
+<linux@brodo.de>
+	[PATCH] cpufreq: #defines update
+	
+	Make gcc-2.91.66 happy. Noted by Andrew Morton - thanks.
+
+<linux@brodo.de>
+	[PATCH] cpufreq: frequency table helpers
+	
+	This patch adds "frequency table helpers" to kernel/cpufreq.c and
+	updates some drivers to use them.
+	
+	Most CPU frequency scaling methods only support a few static
+	frequencies. In these drivers a lot of duplicated code existed in the
+	->setpolicy and ->verify calls.
+	
+	Please note that this in no way changes the behaviour of cpufreq or of
+	the ->setpolicy or ->verify calls. These "frequency table helpers"
+	aren't for drivers which either only support policies (longrun) or
+	really many frequency states (ARM, gx-suspmod).
+
+<mochel@osdl.org>
+	sysfs: update documentation.
+
+<rmk@flint.arm.linux.org.uk>
+	[ARM] __put_user, __get_user cleanups and fixups
+	
+	This fixes the ARM __put_user implementation.  The gcc folk have
+	agreed that the %Qn and %Rn register notation in asm() statements
+	should become official, and have been in all compilers which can
+	be used to build the ARM kernel.
+	
+	In addition, we remove some historical gunk from when put_user()
+	and get_user() was inlined on ARM.
+
+<zwane@holomorphy.com>
+	[PATCH] setup default dma_mask for cardbus devices
+	
+	Devices hanging off a cardbus bridge don't get a default dma mask which
+	causes problems later when doing pci_alloc_consistent.
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] 3c501 - fix end of small packet clearing
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] fix padding for 3c505
+	
+	All backports from the 2.4 code
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] fix padding for 3c507
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] fix padding for 3c523
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] fix padding for 7990 lance
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] fix padding for 8139too
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] fix padding on 8390 based devices
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] fix padding on at1700
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] fix padding on atp
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] fix padding on de600
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] fix padding on de620
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] fix padding on ni5010
+	
+	Still needs some other updates for 2.5 but this squashes the security
+	stuff as per 2.4
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] fix ethernet padding on ni52
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] fix ethernet padding on ni65
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] fix ethernet padding on axnet_cs
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] fix ethernet padding on sgiseeq
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] fix ethernet padding on sk_g16
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] fix ethernet padding on sun3lance
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] fix ips compile failure
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] add missing Nvidia PCI idents
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] add skb_pad/skb_padto functionality
+	
+	This is the stuff in 2.4 which DaveM has been over so I hope is ok for 2.5.
+	It provides a simple API for driver writers with hardware that doesn't
+	do packet padding to say 'make sure n bytes beyond the data is all clear'
+	for DMA etc.
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] padto - fix 3c527 using skb_padto
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] padto - fix 82596 using skb_padto
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] padto - fix a2065 using padto
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] padto -f ix am79c961 using padto
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] padto - fix ariadne using skb_padto
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] padto - fix atarilance using padto
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] padto - fix bagetlance using padto
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] padto - fix declance using skb_padto
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] padto - fix depca using skb_padto
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] padto - fix eepro using skb_padto
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] padto - fix epic100 using skb_padto
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] padto - fix eexpress using skb_padto
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] padto - fix fmv18xusing skb_padto
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] padto  fix eth16i using skb_padto
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] padto - fix hp100.c using skb_padto, fix warning
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] fix lance using skb_padto
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] fix lp486e using skb_padto
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] fix lasi_82596 using skb_padto
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] fix ray_cs using skb_padto
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] fix fmvj18x_cs using skb_padto
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] fix xirc2ps using skb_padto
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] fix seeq8005 using skb_padto
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] fix r8169 using skb_padto
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] fix smc9194 using skb_padto
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] fix sun3_82586 using skb_padto
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] fix wavelan.c using skb_padto
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] fix znet using skb_padto
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] fix yellowfin with skb_padto
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] fix typo in esp driver
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] turn off fdomain debug
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] fix typo in NCR53C9x
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] fix ixj typos
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] add SF16FRM2 ident as per 2.4
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] fix ali1541 typo
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] fix m68k typo
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] fix rpc-cache typo
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] fix rio typo
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] fix 64bit cleanness on adma100
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] fix 64bit cleanness on aec62xx
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] update the AMD IDE driver and teach it the Nvidia variant
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] fix 32/64bit cleanness on cyrix chipsets
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] fix 64bit cleanness on hpt34x chipset
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] fix 64bit cleanness on hpt366, report overclocking error
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] fix 64bit cleanness in promise ide
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] remove nvidia driver (obsoleted by amd driver)
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] fix 64bit cleanness in intel Piix driver
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] fix 64bit cleanness in pdca
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] fix 64bit cleanness in Natsemi SCx200 IDE
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] fix 64bit cleanness on slc90e66 IDE
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] fix 64bit cleanness on serverworks ide
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] fix pci ide cleanness problem, make printk clearer
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] remove dead config choices from AMD update
+
+<neilb@cse.unsw.edu.au>
+	[PATCH] Reorganise sock init in rpcsvc to avoid races.
+	
+	If one of the callback (e.g. data ready) is called
+	before socket setup is complete, oops may occur.
+	
+	With this patch, socket is kept SK_BUSY until all is
+	ready to avoid this.
+	
+	Also some code is moved around to make it cleaner.
+
+<neilb@cse.unsw.edu.au>
+	[PATCH] Tidy up closing of RPC server tcp connections to avoid races
+
+<neilb@cse.unsw.edu.au>
+	[PATCH] Some tidyup of svc_authenticate
+	
+	We encode that status in the return value.
+	
+	Also, don't pass 'proc' parameter to ->accept, as it is
+	implicit in rqstp.
+
+<neilb@cse.unsw.edu.au>
+	[PATCH] Fix nfsd checking for read-only filesystem.
+	
+	Currently nfsd only worries about read-only exports for
+	directories and files, which allows device special files
+	to be chmodded (for example).
+	
+	This patch extends the test to cover all files, but is careful
+	to avoid it when an IRIX client is doing an write-permission test
+	against a pre-existing device special file.
+
+<neilb@cse.unsw.edu.au>
+	[PATCH] Avoid hang when multiple raids on shared drives are trying to sync.
+	
+	I think this is finally right:
+	 - we always wake_up when curr_resync decreases.
+	 - we wait for the other guys curr_resync to be less than ours
+	 - if we ever wait for someone who might yield, we start checking
+	   again from the start.
+
+<neilb@cse.unsw.edu.au>
+	[PATCH] UMEM: disable irq when calling plugging functions.
+	
+	blk_plug_device and blk_remove_plug want irqs_disabled,
+	so we give it to them.
+
+<neilb@cse.unsw.edu.au>
+	[PATCH] Change hash_mem to an inline function.
+	
+	Implementing hash_str as hash_mem(..., strlen()) is actually quite slow,
+	so create a separate hash_str.
+	
+	Now hash_mem has only one call site, and both are quite small, so we make them
+	both inline.
+
+<miles@lsi.nec.co.jp>
+	[PATCH] Include <asm/posix_types.h> in the v850's asm/stat.h
+	
+	This is needed by some includers of <asm/stat.h>.
+
+<miles@lsi.nec.co.jp>
+	[PATCH] Define `read_barrier_depends' on v850
+
+<miles@lsi.nec.co.jp>
+	[PATCH] Small update to arch/v850/README
+
+<miles@lsi.nec.co.jp>
+	[PATCH] Update v850 module support for 2.5.55
+
+<miles@lsi.nec.co.jp>
+	[PATCH] Add __gpl_ksymtab section to v850 linker script
+
+<miles@lsi.nec.co.jp>
+	[PATCH] Add support for ROM kernel on v850 AS85EP1 target
+
+<perex@suse.cz>
+	Linux PnP Support 0.94
+	
+	(Adam Belay)            -use list_del instead of list_del_init in some areas
+	                        -introduce pnp capability and status flags
+	                        -remove static resource setting, I did some research and found that only
+	                         PnPBIOS supports it, therefore it is better to implememt this in the
+	                         PnPBIOS protocol itself. (it appears ACPI doesn't use this)
+	                        -Remove pnp_dev_has_driver and use PNP_ATTACHED instead, this is necessary
+	                         because a card driver only has rights over a device that it requests.
+	                        -added card_for_each_dev macro
+	                        -undo isapnp protocol changes, the pnp layer was designed to handle cards
+	                         and devices on the same protocol and I feel they should not be seperated.
+	(Pual Laufer)           -Fix remove driver bug in pnp card services
+	(Adam Richter)          -Fix a potential oops in id registration functions
+
+<mingo@elte.hu>
+	[PATCH] ptrace-fix-2.5.56-A0
+	
+	This patch from Roland McGrath fixes a threading related ptrace bug:
+	PTRACE_ATTACH should not stop everybody for each thread attached.
+
+<akpm@digeo.com>
+	[PATCH] turn i_shared_lock into a semaphore
+	
+	i_shared_lock is held for a very long time during vmtruncate() and causes
+	high scheduling latencies when truncating a file which is mmapped.  I've seen
+	100 milliseconds.
+	
+	So turn it into a semaphore.  It nests inside mmap_sem.
+	
+	This change is also needed by the shared pagetable patch, which needs to
+	unshare pte's on the vmtruncate path - lots of pagetable pages need to
+	be allocated and they are using __GFP_WAIT.
+	
+	The patch also makes unmap_vma() static.
+
+<akpm@digeo.com>
+	[PATCH] simplify and generalise cond_resched_lock
+	
+	cond_resched_lock() _used_ to be "if this is the only lock which I am holding
+	then drop it and schedule if needed".
+	
+	However with the i_shared_lock->i_shared_sem change, neither of its two
+	callsites now need those semantics.  So this patch changes it to mean just
+	"if needed, drop this lock and reschedule".
+	
+	This allows us to also schedule if CONFIG_PREEMPT=n, which is useful -
+	zap_page_range() can run for an awfully long time.
+	
+	The preempt and non-preempt versions of cond_resched_lock() have been
+	unified.
+
+<akpm@digeo.com>
+	[PATCH] replace `typedef mmu_gather_t' with `struct mmu_gather'
+	
+	In the next patch I wish to add to mm.h prototypes of functions which take an
+	mmu_gather_t* argument.   To do this I must either:
+	
+	a) include tlb.h in mm.h
+	
+	   Not good - more nested includes when a simple forward decl is sufficient.
+	
+	b) Add `typedef struct free_pte_ctx mmu_gather_t;' to mm.h.
+	
+	   That's silly - it's supposed to be an opaque type.
+	
+	   or
+	
+	c) Remove the pesky typedef.
+	
+	   Bingo.
+
+<akpm@digeo.com>
+	[PATCH] Don't reverse the VMA list in touched_by_munmap()
+	
+	touched_by_munmap() returns a reversed list of VMA's.  That makes things
+	harder in the low-latency-page-zapping patch.
+	
+	So change touched_by_munmap() to return a VMA list which is in the original
+	order - ascending virtual addresses.
+	
+	Oh, and rename it to <hugh>detach_vmas_to_be_unmapped()</hugh>.  It now
+	returns nothing, because we know that the VMA we passed in is the head of the
+	to-be-unmapped list.
+
+<akpm@digeo.com>
+	[PATCH] low-latency pagetable teardown
+	
+	Pagetable teardown can hold page_table_lock for extremely long periods -
+	hundreds of milliseconds.  This is pretty much the final source of high
+	scheduling latency in the core kernel.
+	
+	We fixed it for zap_page_range() by chunking the work up and dropping the
+	lock occasionally if needed.  But that did not fix exit_mmap() and
+	unmap_region().
+	
+	So what this patch does is to create an uber-zapper "unmap_vmas()" which
+	provides all the vma-walking, page unmapping and low-latency lock-dropping
+	which zap_page_range(), exit_mmap() and unmap_region() require.  Those three
+	functions are updated to call unmap_vmas().
+	
+	It's actually a bit of a cleanup...
+
+<akpm@digeo.com>
+	[PATCH] Fix an SMP+preempt latency problem
+	
+	Here is spin_lock():
+	
+	#define spin_lock(lock) \
+	do { \
+	        preempt_disable(); \
+	        _raw_spin_lock(lock); \
+	} while(0)
+	
+	
+	Here is the scenario:
+	
+	CPU0:
+		spin_lock(some_lock);
+		do_very_long_thing();	/* This has cond_resched()s in it */
+	
+	CPU1:
+		spin_lock(some_lock);
+	
+	Now suppose that the scheduler tries to schedule a task on CPU1.  Nothing
+	happens, because CPU1 is spinning on the lock with preemption disabled.  CPU0
+	will happliy hold the lock for a long time because nobody has set
+	need_resched() against CPU0.
+	
+	This problem can cause scheduling latencies of many tens of milliseconds on
+	SMP on kernels which handle UP quite happily.
+	
+	
+	This patch fixes the problem by changing the spin_lock() and write_lock()
+	contended slowpath to spin on the lock by hand, while polling for preemption
+	requests.
+	
+	I would have done read_lock() too, but we don't seem to have read_trylock()
+	primitives.
+	
+	The patch also shrinks the kernel by 30k due to not having separate
+	out-of-line spinning code for each spin_lock() callsite.
+
+<akpm@digeo.com>
+	[PATCH] misc fixes
+	
+	- Fix error-path mem leak in __vfs_follow_link() (From a recent AC->2.4
+	  patch)
+	
+	- Make drivers/net/aironet4500_proc.c:driver_lock static.
+
+<akpm@digeo.com>
+	[PATCH] fix set_page_dirty vs truncate&free races
+	
+	set_page_dirty() is racy if the caller has no reference against
+	page->mapping->host, and if the page is unlocked.  This is because
+	another CPU could truncate the page off the mapping and then free the
+	mapping.
+	
+	Usually, the page _is_ locked, or the caller is a user-space process which
+	holds a reference on the inode by having an open file.
+	
+	The exceptional cases are where the page was obtained via
+	get_user_pages().  The patch changes those to lock the page around the
+	set_page_dirty() call.
+
+<akpm@digeo.com>
+	[PATCH] inline 1,2 and 4-byte copy_*_user operations
+	
+	The patch arranges for constant 1, 2 and 4-byte copy_*_user() invokations to
+	be inlined.
+	
+	It's hard to tell really, but the AIM9 creat_clo, signal_test and dir_rtns_1
+	numbers went up by 3%-9%, which is to be expected.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	ISDN/HiSax: Introduce per-card init function
+	
+	Linux normally uses separate callbacks instead of a multiplexing
+	function like "cardmsg". So start to break that into pieces.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	ISDN/HiSax: Move interrupt function to per-card struct
+	
+	Since we now have a per-card ops struct, use it to provide the
+	irq handler function, too.
+	
+	Some drivers actually drive more than one specific hardware card,
+	instead of having "switch (cs->subtyp)" scattered around, we rather
+	aim at having different card_ops structures which just provide the
+	right functions for the hardware. Of course, this patch is only the
+	beginning of that separation, but allows for some cleaning already.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	ISDN/HiSax: Introduce methods for reset/test/release/
+	
+	This mostly finishes splitting up the multiplexing ->cardmsg.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	ISDN/HiSax: Move open/close of D-channel stack -> dc_l1_ops
+	
+	Same change which happened for the B-channel earlier.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	ISDN/HiSax: Share some common D-channel init code
+	
+	Again, just killing some duplicated code.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	ISDN/HiSax: Share interrupt handler for ISAC/HSCX cards
+	
+	Except for a minor performance penalty, using the same IRQ handler
+	for cards which used the same code anyway seems perfectly natural...
+
+<kai@tp1.ruhr-uni-bochum.de>
+	ISDN/HiSax: Clean up the various IPAC IRQ handlers
+	
+	Just renaming and introducing some helpers makes them look very similar
+	to each other..
+
+<kai@tp1.ruhr-uni-bochum.de>
+	ISDN/HiSax: Generate D/B channel access functions for IPAC
+	
+	IPAC is basically a combined HSCX/ISAC chip, so we can generate
+	the D- and B-channel access functions knowing how to access the IPAC.
+	  
+	For performance reasons, this happens in a macro.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	ISDN/HiSax: Share IPAC IRQ handler
+	
+	All IRQ handlers for IPAC based cards were basically the same (not
+	a big surprise, since the chip is the same), so we can share
+	the IRQ handler.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	ISDN/HiSax: Clean up the gazel subdriver
+	
+	Instead of having "switch (subtype)" in just about every function,
+	rather use separate functions and invoke the right one using
+	the now existing struct card_ops infrastructure.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	ISDN/HiSax: Add missing __devexit_p()
+
+<kai@tp1.ruhr-uni-bochum.de>
+	ISDN: isdn-tty driver not HZ aware
+	
+	From: Christian Borntraeger <linux@borntraeger.net>
+	  
+	This patch makes isdn_tty HZ aware.
+	The first change changes 3000 jiffies (now 3 seconds) to 30 seconds according to
+	the comment.
+	I dont know, if the second change (schedule_timeout(50);) has to be half a
+	second but this was the value used in 2.4.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	ISDN: remove kernel 2.0 code
+	
+	From: Adrian Bunk <bunk@fs.tum.de>
+	
+	The patch below removes #if'd kernel 2.0 code from
+	drivers/isdn/divert/divert_init.c.
+
+<rmk@flint.arm.linux.org.uk>
+	[ARM] CPUFREQ updates from Dominik
+	
+	cpu-sa11x0: CPUFREQ_ALL_CPUS shouldn't be passed as argument to
+	cpufreq_notify_transition() any more, but the exact CPU number.
+	
+	mach-integrator: cpufreq_notify_transition() isn't called -- which
+	means that the transition notifiers are not informed. This patch adds
+	these callbacks. Also, CPUFREQ_ALL_CPUS can't passed to
+	cpufreq_driver->set_policy any longer, so some code can safely be
+	removed.
+
+<anton@samba.org>
+	ppc64: remove mmu_gather_t
+
+<rmk@flint.arm.linux.org.uk>
+	[ARM] Add __gpl_ksymtab section to linker script
+
+<rmk@flint.arm.linux.org.uk>
+	[ARM] Invalidate TLB before and after setting up page tables
+
+<rmk@flint.arm.linux.org.uk>
+	[ARM] Update ARM documentation
+	
+	Add 00-INDEX and booting documentation, remove obsolete DMA
+	documentation.
+
+<rmk@flint.arm.linux.org.uk>
+	[ARM] Update DMA usage in Acorn SCSI drivers
+	
+	Remove the pci_dma functionality from the Acorn SCSI drivers, and
+	replace with the new DMA API, passing in the generic struct device.
+
+<rmk@flint.arm.linux.org.uk>
+	[ARM] Ensure that dev->dma_mask is initialised for Acorn cards.
+
+<rmk@flint.arm.linux.org.uk>
+	[ARM] Add support for the StrongARM-11x0 watchdog.
+	
+	Add sa1100_wdt watchdog support.
+
+<rmk@flint.arm.linux.org.uk>
+	[ARM] Update extable.c for 2.5.55 exception table / module changes.
+
+<rmk@flint.arm.linux.org.uk>
+	[ARM] Make CONFIG_SERIO_RPCKBD default to y for Acorn platforms.
+
+<rmk@flint.arm.linux.org.uk>
+	[ARM] Remove set_irq_type, sa1111 driver names are lower case.
+	
+	set_irq_type is redundant for many SA1111 drivers.  The active edge
+	is setup by the core SA1111 code for the common case.
+	
+	SA1111 driver names are lower case.  Make the sa1111 ohci driver
+	reflect this.
+
+<bgerst@didntduck.org>
+	[PATCH] x86 page table initialization fix
+	
+	At bootup, one_page_table_init() pulls the rug out from under the kernel
+	by installing a new page table before setting it up.  With big TLB's, it
+	can go unnoticed, but a 486 has a small TLB so any miss will cause a
+	triple fault and reset.
+
+<torvalds@home.transmeta.com>
+	Re-instate the SA_RESTORER functionality, since it seems that some
+	programs still depend on it and in fact do install a different signal
+	restorer than the standard kernel version.
+
+<torvalds@home.transmeta.com>
+	Make MOD_[INC|DEC]_USE_COUNT a true no-op for built-in modules.
+	
+	This also avoids the nasty warnings that nobody seems to bother
+	to fix.
+
+<torvalds@home.transmeta.com>
+	Modern gcc's don't like labels without a statement.
+	
+	Add empty statements to avoid warning.
+
+<rmk@flint.arm.linux.org.uk>
+	[ARM] Fix Jornada720 sa1100-flash.c support, update to C99 initialisers
+
+<rmk@flint.arm.linux.org.uk>
+	[ARm] Fix ARM exception table fixups for 2.5.55 updates.
+
+<rmk@flint.arm.linux.org.uk>
+	[ARM] Bring sa1100_ir.c up to date wrt new DMA and device subsystems.
+	
+	Update sa1100_ir to use new dma-mapping subsystem.  Register a
+	system device for the SIR/FIR uart port, and a device driver for
+	this driver.
+
+<torvalds@home.transmeta.com>
+	Fix typo in the network driver pad fixes for a2065 driver.
+	
+	Noted by Maciej Rozycki <macro@ds2.pg.gda.pl>.
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] Add compaq triflex IDE from 2.4.21pre into 2.5
+	
+	Author:  Torben Mathiasen
+	
+	Driver for Compaq Triflex IDE - older bus mastering IDE found on Compaq
+	WS5000 and similar systems.
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] Update 2.5 PIIX driver to match 2.4 PIIX
+	
+	This adds knowledge of the relevant Intel errata
+	
+	-	450NX rev B0 we must not do IDE DMA
+	-	450NX rev C0 we must ensure restreaming is off or risk corruption
+	-	ICH0-ICH2 have a data corrupting hardware bug in the old old MWDMA0
+		mode, so we avoid MWDMA0 on such devices
+
+<rml@tech9.net>
+	[PATCH] add explicit Pentium II support
+	
+	This separates the "PPro/Celeron/Pentium-II" compile option into "PPro"
+	and "Pentium-II/Celeron" options.
+	
+	This allows us to explicitly support the Pentium II and Celeron,
+	specifically adding the `-march' option for the chip and enabling the
+	unaligned copy optimizations.  PPro support remains unchanged.
+	
+	This patch is by Luuk van der Duim with some changes by me (primarily to
+	also support the pre-Coppermine Celeron chips, since those use Pentium
+	II cores).  This patch has been in 2.5-mm for awhile and Andrew ack'ed
+	this submission.
+
+<vanl@megsinet.net>
+	[PATCH] 2.5.56, isapnp_init level
+	
+	In 2.5.50 the level of isapnp_init was moved to after apci.  Since it is
+	now after net_dev_init, ISA PNP NICS fail to initialized at boot.
+	
+	This fix allows ISA PNP NIC cards to work during net_dev_init, and still
+	leaves isapnp_init after apci_init.
+
+<vanl@megsinet.net>
+	[PATCH] 2.5.56, isapnp cards not found
+	
+	This patch allows isapnp cards to be detected now.  Seems around 2.5.54,
+	a change in isapnp_build_device_list changed:
+	
+		card->protocol = &isapnp_protocol;
+		 to
+		card->protocol = &isapnp_card_protocol;
+	
+	This patch adapts isapnp_init to the above change.
+
+<vanl@megsinet.net>
+	[PATCH] 2.5.56, ne2k compiles and works
+	
+	This patch makes the ne.c compile and ISA pnp ne2k work after
+	changes in 2.5.54 for PNP broke it.
+	
+	 a. use pnp_dev instead of pci_dev
+	 b. convert to appropriate pnp_*()'s
+	 c. check -1 instead of 0 for invalid IRQ
+
+<perex@suse.cz>
+	[PATCH] PnP update - drivers
+	
+		this patch must be applied after PnP patch v0.94. It contains my
+	small cleanups of PnP code and I tried to rewrite almost all ISA PnP
+	drivers to new PnP subsystem except sound drivers (ALSA & OSS).
+	
+	  PnP update
+	    - separated dev->resource to dev->io_resource and dev->mem_resource
+	    - added pnp_*_valid() macros
+	    - added status member to pnp_card structure
+	    - added pnp_device_attach/detach functions
+	    - added pnpc_attach/detach functions
+	    - moved pnp_find_card() and pnp_find_dev() functions to isapnp.h
+	    - updated IDE/gameport/ISDN/network/scsi/radio/telephone drivers
+	      to latest PnP code
+
+<kai@tp1.ruhr-uni-bochum.de>
+	ISDN/HiSax: Simplified request_region() etc.
+	
+	This patch introduces, private to the HiSax driver, new helper functions
+	request_io/mmio(), which correspond to request_region()/
+	request_mem_region() but also are verbose about failures and keep track
+	of the allocated regions, so unwinding in case of errors is automatic.
+	  
+	Additionally, request_mmio() will also ioremap() the region.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	ISDN/HiSax: Convert remaining ioremap() to request_mmio()
+	
+	These users didn't bother doing request_mem_region() at all before
+	ioremapping, which is now automatically done using request_mmio()
+	instead.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	ISDN/HiSax: Remove superfluous #ifdef CONFIG_PCI
+	
+	Subdrivers which only drive PCI cards can have the dependency on
+	CONFIG_PCI moved to Kconfig, removing some ugly #ifdefs.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	ISDN/HiSax: Remove empty ->cardmsg
+	
+	A lot of the subdrivers don't do anything in their ->cardmsg function
+	anymore, so we just remove those and make the callers check for NULL.
+	
+	Also, add ops->bc_{,de}activate() for the drivers which want to be notified
+	of B-Channel activation.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	ISDN/HiSax: Unify LED handling
+	
+	Share the code to display line status via LEDs and get rid of the
+	remaining ->cardmsg() users.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	ISDN/HiSax: Remove superfluous card type checks
+	
+	We use card->typ to decide which subdriver to call, so there's
+	no need at all for the subdriver to check again that card->typ is correct.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	ISDN/HiSax: Move chipset init code into *_setup() functions
+	
+	This is just again moving some common code into shared places,
+	let the chip-specific driver check the versions instead of having
+	every card-specific driver do so.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	ISDN/HiSax: Fix some of the new PnP stuff
+	
+	I appreciate the adaption of the ISDN drivers to the new PnP layer
+	(though I don't know why it was actually necessary to break the old
+	ISAPnP so late in the cycle), but the gratuitious changes to the coding
+	style were not exactly necessary. So revert things to the
+	"if (retval) goto err_unwind;" style and fix a couple of other compile
+	time errors.
+
+<rusty@rustcorp.com.au>
+	[PATCH] Place __gpl_ksymtab section in all linker scripts
+	
+	Explicitly place the __gpl_ksymtab section for every arch.  RMK
+	pointed out that some archs will place it really badly otherwise.
+
+<torvalds@home.transmeta.com>
+	Always assign bus numbers for cardbus. Firmware often doesn't do it right.
+
+<roland@redhat.com>
+	[PATCH] PTRACE_GET_THREAD_AREA
+	
+	Add ptrace support for getting and setting the THREAD_AREA of the
+	thread being debugged on x86.
+
+<rusty@rustcorp.com.au>
+	[PATCH] Remove dup __gpl_ksymtab in arm file
+	
+	Russell's patch beat mine in, and unfortunately didn't conflict, so
+	armv has two __gpl_ksymtab sections.
+	
+	Revert mine.
+
+<rusty@rustcorp.com.au>
+	[PATCH] Fix strlen_user usage in module.c
+	
+	strlen_user returns 0 on error, not an error number, and otherwise
+	returns the length including the NUL byte.  Found by Andi Kleen.
+
+<rusty@rustcorp.com.au>
+	[PATCH] v850 obsolete params fix
+	
+	Since these are just symbols in the module object, they need symbol name
+	munging to find the symbol from the parameter name.
+
+<sfr@canb.auug.org.au>
+	[PATCH] compat_sys_[f]statfs - generic part
+	
+	This patch creates compat_sys_statfs and compat_sys_fstatfs. This is just
+	the generic part of the patch. Specific archs will follow.
+
+<sfr@canb.auug.org.au>
+	[PATCH] compat_sys_[f]statfs - s390x part
+	
+	Here is the s390x part. Others will go through the respective maintainers.
+
+<anton@samba.org>
+	ppc64: zero extend all 6 parameters in 32 bit syscall path
+
+<anton@samba.org>
+	ppc64: compat_sys_[f]statfs, from Stephen Rothwell
+
+<sfr@canb.auug.org.au>
+	[COMPAT] compat_sys_[f]statfs - sparc64 part
+
+<andersg@0x63.nu>
+	[TCP]: Dont tcp_listen_unlock unless it was locked.
+
+<bdschuym@pandora.be>
+	[ebtables] use Rustys new module scheme in ebtables.c, vs 2.5.56
+	- use /* */ instead of //
+	- change my mail alias
+	- remove MOD_DEC_USE_COUNT and MOD_INC_USE_COUNT
+	- use try_module_get (and check result) and module_put instead of
+	  __MOD_INC_USE_COUNT and __MOD_DEC_USE_COUNT
+	- add \n in init/exit messages
+
+<rol@as2917.net>
+	[IPV4]: Allow route.c to build without procfs enabled.
+
+<zaitcev@redhat.com>
+	[SUNZILOG]: Get serial console et al. working once more.
+	- Make sure R9 is really loaded
+	- Make sure IS_CONS flag is handled properly.
+
+<davem@nuts.ninka.net>
+	[SUNZILOG]: Fix spinlock access in previous changes.
+
+<davem@nuts.ninka.net>
+	[COMPAT]: fs/compat.c needs linux/vfs.h for asm/statfs.h
+
+<Dale.Farnsworth@mvista.com>
+	PPC32: Fix copy_from_user to copy as much as possible.
+	
+	copy_from_user is supposed to transfer as much data as is
+	valid and then to return the number of bytes not tranferred.
+	That's how it works on x86.  On ppc it can be as much as 15
+	bytes short.
+	
+	I initially saw the problem with the mount system call.
+	
+	Note that the fifth argument to mount is an address 8 bytes from the end
+	of user data space.  There is a null byte at that address, since no mount
+	options are being passed.
+	
+	In the kernel, sys_mount() allocates a page for the options and
+	does copy_from_user(new_page, 0x1005eff8, PAGE_SIZE).  copy_from_user
+	should copy 8 bytes and return (PAGE_SIZE-8).  Instead, on ppc it reads
+	8 bytes, faults, writes no bytes, and returns PAGE_SIZE, which causes the
+	EFAULT to be erroneously reported.
+
+<paulus@samba.org>
+	PPC32: Change struct free_pte_ctx to struct mmu_gather.
+	
+	A couple of occurrences of struct free_pte_ctx in include/asm-ppc/tlb.h
+	got missed in akpm's patch - this fixes them.
+
+<bgerst@didntduck.org>
+	[PATCH] Fix PnP BIOS fault handling
+	
+	Check for PnP BIOS in all fault paths, not just in do_trap().
+
+<torvalds@home.transmeta.com>
+	Get rid of endless loop in PnP-enabled ne.c
+
+<rml@tech9.net>
+	[PATCH] P4-based Celeron comments
+	
+	As you mentioned, we do not correctly identify the P4-based Celeron in
+	the kernel configuration help.  Unfortunately, Intel has called all
+	Celeron products simply "Celeron", so we call these "P4-based Celerons".
+
+<torvalds@home.transmeta.com>
+	Linux v2.5.57
+

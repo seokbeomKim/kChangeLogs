@@ -1,0 +1,514 @@
+
+Summary of changes from v2.5.37 to v2.5.38
+============================================
+
+<davidm@tiger.hpl.hp.com>
+	ia64: Minor cleanups.
+
+<davidm@tiger.hpl.hp.com>
+	ia64: First draft of perfmon sampling-interval randomization support.
+
+<davidm@tiger.hpl.hp.com>
+	ia64: Make sure register-backing store gets mapped with the right PTE protection bits.
+		This is a fix for a performance-bug reported by Jack Steiner.
+
+<davidm@tiger.hpl.hp.com>
+	ia64: Fix return path of signal delivery for sigaltstack() case.
+
+<davidm@tiger.hpl.hp.com>
+	ia64: Fix narrow window during which signal could be delivered with only the memory
+		stack switched over to the alternate signal stack.
+
+<davidm@tiger.hpl.hp.com>
+	Fix edge-triggered IRQ handling.  See Linus's cset 1.611 for details.
+
+<davidm@tiger.hpl.hp.com>
+	ia64: Fix comment in arch/ia64/kernel/signal.c.
+
+<davidm@tiger.hpl.hp.com>
+	ia64: Fix x86 struct ipc_kludge (reported by R Sreelatha, fix proposed by
+		Dave Miller).
+
+<efocht@ess.nec.de>
+	[PATCH] Remove global semaphore_lock for ia64, similar to i386 change for 2.5.25
+	
+
+<davidm@tiger.hpl.hp.com>
+	ia64: Preserve f11-f15 around calls into firmware.  Patch by John Marvin.
+
+<eranian@hpl.hp.com>
+	[PATCH] ia64: perfmon update
+	
+	Here is what I got so far on perfmon for 2.5.31. It includes:
+	
+	- your randomization patch with some rework to make it visible to user.
+	  (your existing program does not need to change or recompilation).
+	
+	- 3 error conditions cleanups, a missing unlock fix
+	
+	- copy_*user() replaced with __copy_*_user() or get/put user when appropriate.
+	  (This gives us a 15% speed improvement on PFM_READ_PMDS).
+	
+	- sys_perfmonctl(), only check for read-only OR read-write arguments
+	  (read and write are not separated anymore)
+	
+	- Non 64-bit overflow do not reset hardware pmd to zero anymore: not needed
+	
+	- incorporated changes from 2.4.18/9: debug registers when used are
+	  all restored on ctxsw in.
+	
+	- added automatic reset on inheritance, no more PMU specific knowledge.
+
+<davidm@tiger.hpl.hp.com>
+	ia64: Dont execute srlz.d needlessly (reported by Chris Ruemmler).
+
+<davidm@tiger.hpl.hp.com>
+	ia64: Fix typo in perfmon.c.  (Patch by Stephane Eranian.)
+
+<fenghua.yu@intel.com>
+	[PATCH] Optimize __ia64_save_fpu() and __ia64_load_fpu() for Itanium 2.
+	
+
+<davidm@tiger.hpl.hp.com>
+	ia64: Sync up with 2.5.35+.  Add ia64-specific huge page support (by Rohit Seth).
+		Support new clone2() functionality (CLONE_SETTLS, CLONE_SETTID, & CLONE_CLEARTID).
+
+<davidm@tiger.hpl.hp.com>
+	ia64: Make include/asm-ia64/suspend.h non-empty (suggested by Keith Owens).
+
+<eranian@hpl.hp.com>
+	[PATCH] perfmon cleanup patch
+	
+	This patch includes:
+	        - nasty macro bug fix for  PMC_IS_MONITOR()
+	        - pfm_stats is now per CPU
+	        - pmu_owners[] is not cache line aligned to avoid false sharing
+	        - cleanup in /proc/perfmon
+	        - rewritten pfm_write_pmcs(), pfm_write_pmds() with correct semantics
+	        - all copy_*user() are gone
+	        - we do not walk the tasklist in UP mode for system-wide: now
+	          unified with SMP
+
+<shaggy@kleikamp.austin.ibm.com>
+	JFS: Avoid parallel allocations within the same allocation group
+	
+	When large files are writting in parallel, allocating the space for
+	these files within the same allocation group can cause severe
+	fragmentation of the files.  By keeping track of open, growing files
+	within an allocation group, we can force other new allocations into
+	a different allocation group to avoid this.
+
+<shaggy@kleikamp.austin.ibm.com>
+	JFS: Slightly relax allocation group reservation
+	
+	Minor change that got missed in the last changeset.  If opening a
+	non-empty file for writing, don't assume we're allocating new space.
+	If the file is grown, we'll take care of it then.
+
+<davidm@tiger.hpl.hp.com>
+	ia64: Add arch/ia64/mm/hugetlbpage.c by Rohit Seth.
+
+<davidm@tiger.hpl.hp.com>
+	ia64: A few huge page fixes (patch by Rohit Seth).
+
+<eranian@hpl.hp.com>
+	[PATCH] Fix bug in pfm_write_pmds().
+	
+	I found a bug in the new pfm_write_pmds() routine in 2.5.35.
+	Sampling does not work unless you apply the attached patch.
+
+<agrover@groveronline.com>
+	ACPI: change a non-critical debug message to a lower output level
+
+<felipewd@terra.com.br>
+	Add support for get-MII-data ioctls in 8139cp net driver
+
+<jgarzik@mandrakesoft.com>
+	Add new MII lib functions mii_check_link, mii_check_media.
+	Use them in 8139cp.
+
+<davidm@tiger.hpl.hp.com>
+	ia64: Fix zx1-platform support.
+
+<elenstev@mesatop.com>
+	Link eepro100 net driver with mii module, fixing static build
+
+<davidm@tiger.hpl.hp.com>
+	ia64: Sync with 2.5.37.
+
+<torvalds@home.transmeta.com>
+	Don't try to attach a driver to a pci device that already has one.
+
+<axboe@suse.de>
+	[PATCH] IDE fixes
+	
+	starting from 2.5.35 IDE stopped working on my alphas because of
+	following problems:
+	
+	- ide_hwif_configure() ignores BARs for IDE base/control registers
+	  and assumes legacy 0x1f0/0x170 ports, unless controller reports
+	  native PCI mode (ProgIf bits 0 and 2).
+	
+	  This is incorrect, as there are quite a few IDE chips operating
+	  in "semi-legacy" mode, i.e. legacy interrupts, but functional
+	  BAR0-3, like cy82c693 and ali5229. I guess Andre could give a lot
+	  more examples. :-)
+	
+	  This happens to work on i386 simply because BIOS usually assigns
+	  legacy values to BAR0-3, but we can't rely on it.
+	
+	  Just checking respective resource->start for zero should work in
+	  all cases.
+	
+	- ide_pci_check_iomem(): resource->flags == 0 means "unconfigured" as well.
+	  Thus we avoid false positives.
+	
+	- Apparently cut'n'paste typo in cy82c693.c - wrong PCI IDs.
+
+<mochel@osdl.org>
+	[PATCH] Adding driver model support in IDE
+	
+	This adds the basic driver model support for the IDE subsystem.
+	
+	Basically, it registers the controllers and devices with the driver
+	model core, which puts them in the device tree and gets them a directory
+	in driverfs.  The driverfs layout looks like this (on my workstation):
+	
+		[mochel@cherise mochel]$ tree -d /sys/root/pci0/
+		/sys/root/pci0/
+		|-- 00:00.0
+		|-- 00:01.0
+		|   `-- 01:00.0
+		|-- 00:02.0
+		|   `-- 02:1f.0
+		|       `-- 03:00.0
+		|-- 00:1e.0
+		|   `-- 04:04.0
+		|-- 00:1f.0
+		|-- 00:1f.1
+		|   |-- ide0
+		|   |   |-- 0.0
+		|   |   `-- 0.1
+		|   `-- ide1
+		|       |-- 1.0
+		|       `-- 1.1
+	
+	The drive bus IDs (the directory names)  are created using this:
+	
+		sprintf(bus_id,"%u.%u",hwif->index,unit);
+	
+	which should give each drive a unique name for the entire system, right?
+	
+	I've also created a struct bus_type for IDE, which gives ide a directory
+	in the driverfs bus/ directory. The layout of that is:
+	
+		[mochel@cherise mochel]$ tree -d /sys/bus/ide/
+		/sys/bus/ide/
+		|-- devices
+		|   |-- 0.0 -> ../../../root/pci0/00:1f.1/ide0/0.0
+		|   |-- 0.1 -> ../../../root/pci0/00:1f.1/ide0/0.1
+		|   |-- 1.0 -> ../../../root/pci0/00:1f.1/ide1/1.0
+		|   `-- 1.1 -> ../../../root/pci0/00:1f.1/ide1/1.1
+		`-- drivers
+	
+	Those are symlinks under devices/ (which is why the drive names must be
+	unique..). When drivers are registered with the IDE core, they should also
+	be passed through the core, which will give them a directory in the
+	drivers/ directory just above.
+	
+	In general, there is a bit of code that can be cleaned up, and some
+	explicit calls removed, because of the way the driver model core works.
+	Most of these are pretty simple, and barring any objections, I will
+	implement and send them to you.
+
+<vandrove@vc.cvut.cz>
+	Fix NCP_IOC_SETOBJECTNAME ioctl in ncpfs.
+
+<vandrove@vc.cvut.cz>
+	Fix bigendian problems in ncpfs.
+
+<shaggy@kleikamp.austin.ibm.com>
+	JFS: swsusp support
+
+<vandrove@vc.cvut.cz>
+	Add support for text mount option string to ncpfs.
+
+<shaggy@kleikamp.austin.ibm.com>
+	JFS: Put legacy OS/2 extended attributes in "os2." namespace
+	
+	Existing OS/2 extended attributes are stored without a namespace
+	prefix.  To avoid polluting the linux namespace, prepend "os2." when
+	listing the EAs but store "os2." EA names without the prefix.
+	
+	Also disallow setting extended attributes that don't begin with
+	"user." or "os2."
+
+<agrover@groveronline.com>
+	ACPI: Add include to provide PREFIX (Adrian Bunk)
+
+<agrover@groveronline.com>
+	ACPI: Re-enable compilation of ACPI subordinate drivers as modules
+	(Bjoern A. Zeeb)
+
+<vandrove@vc.cvut.cz>
+	ncpfs: Proper handling of watchdog packets. 
+	ncpfs: Add support for packet signatures when using TCP transport.
+
+<shaggy@kleikamp.austin.ibm.com>
+	JFS: Fix compiler errors in xattr.c
+	
+	Fix errors due to header differences between mainline kernel and
+	acl.bestbits.org patches.
+
+<vandrove@vc.cvut.cz>
+	ncpfs: Verify packet signatures on replies.
+
+<vandrove@vc.cvut.cz>
+	ncpfs: Pass unknown packets from server to userspace daemon. Now we can
+	deliver server messages to logged-in users even with UDP or TCP transport.
+
+<rml@tech9.net>
+	[PATCH] schedule() in_atomic() check
+	
+	This makes the in_atomic() check in schedule() actually work.  You
+	merged the PREEMPT_ACTIVE bits, we just need to handle the exit() case
+	correctly.
+
+<torvalds@kiwi.transmeta.com>
+	Fix vm86 system call interface to entry.S. This has been broken
+	since the thread_info support went in (early July), and can cause
+	lockups at X startup etc.
+
+<davidm@tiger.hpl.hp.com>
+	ia64: Reorganize initialization sequence a bit.
+
+<jt@hpl.hp.com>
+	Fix wavelan_cs net driver build
+
+<jt@hpl.hp.com>
+	update irda nsc-ircc driver:
+	o [FEATURE] Cleanly change speed back to 9600bps
+	o [CORRECT] Change speed under spinlock/irq disabled
+	o [CORRECT] Make sure interrupt handlers don't mess irq mask
+	o [CORRECT] Don't change speed if we haven't fully finished to Tx
+
+<jt@hpl.hp.com>
+	More __FUNCTION__ cleanups for IrDA
+
+<davem@redhat.com>
+	[PATCH] missing unlock_kernel
+	
+	I discovered this while auditing a large part of the remaining
+	lock_kernel users in the 2.5.x tree.
+
+<jgarzik@mandrakesoft.com>
+	Fix more IrDA __FUNCTION__ breakage.  It now builds, yay.
+
+<davidm@tiger.hpl.hp.com>
+	ia64: Switch over to using ACPI PCI support routines.  This gets rid of much of the
+		code-duplication that existed between ACPI and the ia64 IOSAPIC code.
+		To make this work, the Makefiles had to be re-organized to ensure that
+		the ACPI subsystem is initialized before PCI (even though both are called
+		via subsys-initcalls).
+
+<viro@math.psu.edu>
+	[PATCH] gendisk for pcd
+	
+	pcd switched to use of gendisk
+
+<viro@math.psu.edu>
+	[PATCH] gendisk for cdu31a
+	
+	cdu31a switched to use of gendisk
+
+<viro@math.psu.edu>
+	[PATCH] gendisk for cm206
+	
+	cm206 switched to use of gendisk, failure path in module_init cleaned up
+
+<viro@math.psu.edu>
+	[PATCH] gendisk for mcd
+	
+	mcd switched to use of gendisk, failure path in module_init cleaned up
+
+<viro@math.psu.edu>
+	[PATCH] gendisk for mcdx
+	
+	mcdx switched to use of gendisk
+
+<viro@math.psu.edu>
+	[PATCH] gendisk for sbpcd
+	
+	sbpcd switched to use of gendisk
+
+<viro@math.psu.edu>
+	[PATCH] devfs handling for cdroms moved to register_disk()
+	
+	devfs-related stuff moved from cdrom.c and cdrom drivers to register_disk();
+	new flag (GENHD_FL_CD) marks gendisks that need such treatment.
+
+<viro@math.psu.edu>
+	[PATCH] misc cleanups
+	
+	assorted minor cleanups
+
+<viro@math.psu.edu>
+	[PATCH] gendisk for jsflash
+	
+	jsflash switched to use of gendisk
+
+<viro@math.psu.edu>
+	[PATCH] gendisk for mtdblock_ro
+	
+	mtdblock_ro switched to use of gendisk, both mtdblock.c and mtdblock_ro.c
+	slightly cleaned up.
+
+<viro@math.psu.edu>
+	[PATCH] crapectomy in pf.c - part 1
+	
+	beginning of macroectomy in pf.c: RR and WR macros replaced with saner
+	inlines a-la pcd.c
+
+<viro@math.psu.edu>
+	[PATCH] Lindent pf.c
+	
+	pf.c fed through lindent
+
+<viro@math.psu.edu>
+	[PATCH] gendisk for pf.c
+	
+	pf switched to use of gendisk and cleaned up - we pass pointers to structures
+	instead of minors now.
+
+<viro@math.psu.edu>
+	[PATCH] switch to add_disk()
+	
+	Almost all callers of add_gendisk() were immediately followed by
+	register_disk(disk, mk_kdev(disk->major,disk->first_minor),
+		      1<<disk->minor_shift, disk->fops, something);
+	The only exception (DAC960.c) massaged to that form.
+	New helper (add_disk(disk)) introduced and aforementioned sequence
+	replaced with
+		set_capacity(disk, something);
+		add_disk(disk);
+
+<viro@math.psu.edu>
+	[PATCH] removal of bogus exports
+	
+	partition_name() moved from md.c to partitions/check.c; disk_name() is not
+	exported anymore; partition_name() takes dev_t instead of kdev_t.
+
+<viro@math.psu.edu>
+	[PATCH] beginning of probe_disk() and gendisks for floppy
+	
+	That's a tricky one and large part of that stuff is temporary - it will be
+	replaced as soon as we have gendisks for all block devices and get sane
+	refcounting for gendisks.
+		* we add per-major lists of gendisks; get_gendisk() looks into
+	appropriate list instead of looking through the list of all gendisks.
+		* we allow driver to override that search - it can call
+	blk_set_probe(major, probe) and then gendisk will call probe(minor).
+	blk_set_probe(major, NULL) restores the default behaviour.
+		* floppy.c switched to use of gendisks; we have one gendisk per
+	disk and let floppy_find(minor) return the right one.
+		Note that final mechanism will involve a similar construction
+	but floppy.c is actually the least interesting application - places
+	where it will really play will include stuff like loading the right
+	high-level driver when we open /dev/hdX, etc.  And it won't be major-based...
+
+<viro@math.psu.edu>
+	[PATCH] gendisk for swim3
+	
+	swim3 switched to use of gendisk
+
+<viro@math.psu.edu>
+	[PATCH] gendisk for loop
+	
+	loop switched to use of gendisk
+
+<viro@math.psu.edu>
+	[PATCH] gendisk for aztcd
+	
+	aztcd switched to use of gendisk; missing initcall restored (aztcd_init()
+	and friends used to be called directly from blk_dev_init(); apparently
+	the first step of bio merge had killed these calls but left module_init() in
+	these drivers under #ifdef MODULE).
+
+<viro@math.psu.edu>
+	[PATCH] gendisk for gscd
+	
+	gscd switched to use of gendisk; missing initcall restored
+
+<viro@math.psu.edu>
+	[PATCH] gendisk for optcd
+	
+	optcd switched to use of gendisk; missing initcall restored
+
+<viro@math.psu.edu>
+	[PATCH] gendisk for sjcd
+	
+	sjcd switched to use of gendisk; missing initcall restored
+
+<viro@math.psu.edu>
+	[PATCH] gendisk for sonycd
+	
+	sonycd switched to use of gendisk; missing initcall restored
+
+<viro@math.psu.edu>
+	[PATCH] gendisk for stram
+	
+	stram switched to use of gendisk
+
+<viro@math.psu.edu>
+	[PATCH] gendisk for rd
+	
+	rd switched to use of gendisk
+
+<viro@math.psu.edu>
+	[PATCH] gendisk for nbd
+	
+	nbd switched to use of gendisk
+
+<viro@math.psu.edu>
+	[PATCH] gendisk for xpram
+	
+	xpram switched to use of gendisk
+
+<viro@math.psu.edu>
+	[PATCH] gendisk for acorn floppy
+	
+	acorn floppy switched to use of gendisk
+
+<viro@math.psu.edu>
+	[PATCH] gendisk for swim_iop
+	
+	swim_iop switched to use of gendisk
+
+<torvalds@home.transmeta.com>
+	Don't do a 64-bit divide when a simple shift will do..
+
+<fletch@aracnet.com>
+	[PATCH] free_area_init_node fix (for non discontigmem direct use)
+	
+	Some idiot (OK, it was me) broke free_area_init_node for
+	non discontigmem systems that call it directly (eg sparc64),
+	during a recent cleanup, thus invoking the wrath of DaveM.
+	
+	I know Dave sent you a patch yesterday, but I think the BUG
+	statement in it will break anyone who just uses free_area_init
+	(eg any PC). So here's a portion of Dave's patch that should
+	fix things for everyone I think. Unfortunately my non-NUMA
+	test box is borked right now, but it just removes the BUG
+	statement from what he tested, and it's so simple that even
+	I couldn't screw this up (famous last words).
+	
+	This code really needs some more cleanup work, but this will
+	fix it for now so everyone can do their work ...
+
+<torvalds@home.transmeta.com>
+	Avoid confusion "mount" and "fsck" - don't show things like
+	floppies and CD's in /proc/partitions.
+
+<torvalds@home.transmeta.com>
+	Linux v2.5.38
+

@@ -1,0 +1,1057 @@
+
+Summary of changes from v2.5.16 to v2.5.17
+============================================
+
+<kai@tp1.ruhr-uni-bochum.de>
+	Don't implicitly export all symbols
+	
+	In the old days, we used to export all symbols from a module by default.
+	We still do so, unless
+	o either exported symbols are explicitly listed in EXPORT_SYMBOL()
+	o or EXPORT_NO_SYMBOLS
+	is given.
+	
+	This patches changes the default of 'export all symbols' to 'export no
+	symbols' for all files which are not listed in $(export-objs) in
+	the relevant Makefile.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	Move arch specific options to their Makefile
+	
+	The ROOT_DEV, SVGA_MODE and RAMDISK variables are i386/x86_64
+	specific, so move them to arch/$(ARCH)/boot/Makefile, this
+	is where they are used.
+	
+	They still can be overridden on the command line like before,
+	though I doubt anybody is still using them.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	Move DocBook stuff out of top-level Makefile
+	
+	The targets {sgml,ps,pdf,html} docs work as before, but
+	the handling is now completely in Documentation/DocBook/Makefile.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	Remove assembler rules from top-level Makefile
+	
+	Nobody is building files from the top-level Makefile anyway, and
+	if they were, they should use the standard assembler rules 
+	provided by Rules.make
+
+<kai@tp1.ruhr-uni-bochum.de>
+	top-level Makefile cleanup
+	
+	Group related things together, like building vmlinux,
+	building modules, generating dependency, configuration, etc.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	Remuve some cruft from top-level Makefile
+	
+
+<kai@tp1.ruhr-uni-bochum.de>
+	Add scripts to generate include/linux/{version,compile}.h
+	
+	Also, put the #define UTS_MACHINE ... from the command line into
+	the header as well.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	Makefile cleanup: Don't rebuild init/version.o on each build
+	
+	init/version.o includes include/linux/compile.h. As compile.h was
+	regenerated each time make was run, init/version.o was recompiled each
+	time.
+	
+	To avoid this, use the following solution: Generate a temporary new
+	compile.h, and only replace the old one if the new one is different.
+	
+	We consider the files different if more than just date/time changed, since
+	otherwise we would have to rebuild every time anyway.
+	
+	Still, the two files turned out to be different all the time, as we put
+	a generation number into them which is incremented at each invocation of 
+	"make". The generation number update is now only done when the kernel
+	config changes, which makes more sense, anyway.
+	
+	So, the UTS_VERSION and generation number now relate to the time the 
+	kernel was configured, not the time the actual "make vmlinux" was run, 
+	which should be fine.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	Small Rules.make cleanup
+	
+	Add some comments to explain the magic, use $(if), which will
+	be needed for other places anyway.
+	
+	That means we up the make requirements to 3.78, which is a couple of
+	years old, so basically anybody should have it already.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	Rules.make cleanup: introduce c_flags, a_flags
+
+<kai@tp1.ruhr-uni-bochum.de>
+	Rules.make: Use variables for commands
+
+<kai@tp1.ruhr-uni-bochum.de>
+	Rules.make: check for changed command line
+
+<kai@tp1.ruhr-uni-bochum.de>
+	Rules.make: Remove special rule for $(export-objs)
+	
+	We can now remove the extra rule for $(export-objs) and instead
+	just use
+	
+	$(export-objs): export_flags := -DEXPORT_SYMTAB
+	
+	to set a variable $(export_flags) for targets listed in $(export-objs)
+
+<kai@tp1.ruhr-uni-bochum.de>
+	IA64: Use standard AS rule
+
+<kai@tp1.ruhr-uni-bochum.de>
+	Make AFLAGS_KERNEL use consistent with CFLAGS_KERNEL
+	
+	CFLAGS_KERNEL is automatically added to the command line for compiling
+	objects which will be linked into vmlinux. (As opposed to objects which
+	will be in modules, where MODFLAGS is added).
+	
+	AFLAGS_KERNEL was not added automatically, now it is:
+	
+	AFLAGS_KERNEL is now automatically added to the command line for assembling
+	objects which will be linked into vmlinux.
+	
+	Note: this change is a no-op for all archs except IA64, since
+	[AC]FLAGS_KERNEL is not used there at all.
+	
+	At the same time, remove two assembling rules from two arch/ia64 
+	subdirectories which don't contain any assembler sources at all.
+	
+	Also, add an @ in front of the ugly
+		make CFLAGS=".." AFLAGS=".." -C subdir
+	command, make will print its "Entering directory ..." line, so 
+	we get that information anyway.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	x86_64: Use standard AS rule
+
+<kai@tp1.ruhr-uni-bochum.de>
+	Fix arch/alpha/boot AS rule
+	
+	arch/alpha/boot does not include Rules.make, so it can't use
+	the assembler rule provided there ;(
+
+<kai@tp1.ruhr-uni-bochum.de>
+	Fix a typo in drivers/pcmcia/Makefile
+
+<kai@tp1.ruhr-uni-bochum.de>
+	ISDN: Remove remaining MOD_{INC,DEC}_USE_COUNT from CAPI drivers
+	
+	During module init, we're safe from getting unloaded, so there's no
+	need to fiddle with the use count.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	ISDN: Export CAPI user interface directly
+	
+	Why pass the callbacks via a struct when we can just call them directly?
+
+<kai@tp1.ruhr-uni-bochum.de>
+	ISDN: CAPI: Move the notification callback
+	
+	The callback to be notified of added/removed controllers is
+	logically per application.
+	
+	This will be replaced by the standardized mechanism anyway, so the
+	temporary capi20_set_callback will fortunately vanish later.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	ISDN: CAPI: Remove capi_interface_user etc.
+	
+	It's not used anymore, registering/unregistering just happens
+	on a per-application basis.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	ISDN: Have the CAPI application alloc struct capi_appl
+	
+	Inside the kernel, we rather go the standard way than converting
+	to/from indices to the actual data structs all the time.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	ISDN: CAPI: Pass struct capi_appl * instead of index
+	
+	Now that we have the struct capi_appl *, let's pass this around
+	instead of just an index which would mean another useless lookup.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	ISDN: CAPI use struct capi20_appl * in signal callback
+	
+	Instead of passing an opaque handle, pass the actual struct capi20_appl,
+	which is now known to the applications. Applications can store
+	a pointer to the private data into struct capi20_appl::private.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	ISDN: CAPI: Get rid of capi_signal mechanism
+	
+	On arrival of a new message, kernelcapi used to call
+	capi20_appl::signal(), which, from the application, would call back
+	to capi20_get_message(). So we rather just push the message down
+	directly, saving this detour.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	ISDN: CAPI: Remove duplicate statistics
+	
+	No need to maintain statistics twice.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	ISDN: AVM T1 ISA CAPI controller fix
+	
+	Pass the jumpered cardnr as parameter.
+
+<dmccr@us.ibm.com>
+	[PATCH] Thread group exit problem reappeared
+	
+	A long time ago there was thread group code that at exit time tried to
+	reparent a task to another task in the thread group.  I discovered a major
+	race condition in this code, and submitted a patch that removed it.  This
+	patch was accepted in, I think, 2.4.12.  The code reappeared in 2.4.18 and
+	sometime in the 2.5 tree before 2.5.15, breaking applications that use
+	thread groups.
+	
+	As part of chasing this down, I figured out a way to remove the race
+	condition while still preserving this behavior.  I've attached a patch
+	against 2.5.15 that fixes it.
+
+<hch@infradead.org>
+	[PATCH] cleanup read/write
+	
+	Currently sys_read/sys_pread and sys_write/sys_pwrite basically contain
+	lots of duplication of the same checks/code.
+	
+	This moves all that into vfs_read/vfs_write helpers that have the same
+	prototypes as the read/write file operations.  In addition I have
+	choosen to export these interfaces to module so people doing inkernel
+	file reading/writing can use these instead of duplicating the checks
+	(which is very likely to be done wrong).
+
+<mason@suse.com>
+	[PATCH] reiserfs iput deadlock fix
+	
+	This patch5 changes reiserfs_new_inode to end the transaction on errors
+	(like -ENOSPC), so that it can call iput without deadlocking against the
+	journal.
+
+<mason@suse.com>
+	[PATCH] reiserfs bitops warnings
+	
+	This fixes reiserfs compile warnings for a few bitops calls.
+
+<neilb@cse.unsw.edu.au>
+	[PATCH] Increase snd buffer size for UDP
+	
+	I under-allocated the space that RPC needs for transmit on a UDP
+	socket.   We need lots of space to be allowed (though we may not use
+	much) so that a lack of un-commited transmit space will not cause new
+	requests to be blocked.
+
+<neilb@cse.unsw.edu.au>
+	[PATCH] Change MD Superblock IO to go straight to submit_bio
+	
+	The current code hits the page cache for the block device
+	which requires memory allocation which can sometimes cause
+	a deadlock (if it blocks the raid5d thread).
+	
+	This code takes the page that holds the superblock, and
+	passes it to submit_bh in a suitable bio wrapper.
+
+<neilb@cse.unsw.edu.au>
+	[PATCH] Tidy up raid5 code
+	
+	- remove md_ prefix from some calls that used to be
+	  defined in md_compatability.h
+	
+	- remove "raid5_" prefix from some static functions,
+	  in line with recent changes to raid1.c
+	
+	?? should cpu_has_mmx be moved to in processor.h ?
+
+<neilb@cse.unsw.edu.au>
+	[PATCH] Initial md/raid5 support for 2.5 (with bio)
+	
+	With this patch raid5 works.  There is still some more
+	work to though.
+	
+	- uses bio instead of buffer_head
+	- stripe cache is now a fixed size.
+	   If read requests are smaller, we read the whole block anyway
+	   If write reqeusts are smaller, we pre-read.
+	- stripe_head is now variable sized with an array of structures at
+	  the end.  We allocate extra space depending on how many devices
+	  are in the array.
+	  stripe_head has it's very own slab cache.
+	- store and use bdev for each device in array
+	
+	by-passing the cache for reads is currently disabled.  I need to
+	think through the implications (and implementation) of allowing
+	large bion that are larger than the stripe cache to go directly
+	to the device (if it isn't failed of-course).
+
+<hch@infradead.org>
+	[PATCH] Small cleanup of nfsd export checks
+	
+	Separate checks for !FS_REQUIRES_DEV and missing fsid option
+	and missing export operations, second check for missing export
+	operations and a small cleanup as side effect.
+
+<hch@infradead.org>
+	[PATCH] kNFSd cleanup of nfsd_open
+	
+	This patch makes nfsd_open use init_private_file to initilize
+	the file pointer the caller had allocated on stack.  In addition
+	a number of small cleanups:
+	
+	 - format comments to be readable on 80char ANSI terminal
+	 - don't fop_get (and fop_put in nfsd_close), out file already
+	   is a reference to the inode so they can't go away.
+	 - don't decrement f_count on failure - it won't be checked anyway
+	 - don't check for filp->f_op n nfsd_close, it can't be NULL
+
+<acme@conectiva.com.br>
+	fs/intermezzo/ext_attr.c
+	fs/intermezzo/kml.c
+	fs/intermezzo/psdev.c
+	
+		- fix copy_{to,from}_user error handling (thans to Rusty for pointing this out)
+
+<acme@conectiva.com.br>
+	drivers/sound/*.c
+	
+		- fix copy_{to,from}_user error handling (thanks to Rusty for pointing this out)
+
+<kai@tp1.ruhr-uni-bochum.de>
+	Makefile: fix merge
+
+<kai@tp1.ruhr-uni-bochum.de>
+	Update /BitKeeper/etc/ignore
+	
+	.<object>.flags are gone, but we have .<object>.cmd instead now and
+	surely don't want to add the to the repository.
+
+<acme@conectiva.com.br>
+	drivers/isdn/*.c
+	
+		- fix copy_{to,from}_user error handling (thanks to Rusty for pointing this out)
+
+<acme@conectiva.com.br>
+	drivers/usr/*.c
+	
+		- fix copy_{to,from}_user error handling (thanks to Rusty for pointing this out)
+
+<kai@tp1.ruhr-uni-bochum.de>
+	kbuild: Fix object-specific CFLAGS_foo.o
+	
+	Make CFLAGS_foo.o work also when generating preprocessed (.i) and
+	assembler (.s) files.
+	  
+	Same for AFLAGS_foo.o.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	Small fix for net/irda/Makefile
+	
+	This Makefile would add irlan/irlan.o to $(obj-m) when selected as
+	modular, which is wrong. The module will get compiled just fine after
+	descending into that subdirectory anyway (whereas in the current
+	directory we have no idea how to build it).
+
+<kai@tp1.ruhr-uni-bochum.de>
+	kbuild: Suppress printing of '$(MAKE) -C command' line
+	
+	Don't print the actual command to call make in a subdir, make will
+	print 'Entering directory <foo>' anyway, so we don't lose that
+	information.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	kbuild: Use $(CURDIR)
+	
+	Not a big change, but make provides the current directory,
+	so why not use it ;-)
+
+<acme@conectiva.com.br>
+	- sound/{core,pci}/*.c
+	
+		- fix copy_{to,from}_user error handling (thanks to Rusty for pointing this out)
+
+<akpm@zip.com.au>
+	[PATCH] reduce lock contention in do_pagecache_readahead
+	
+	Anton Blanchard has a workload (the SDET benchmark) which is showing some
+	moderate lock contention in do_pagecache_readahead().
+	
+	Seems that SDET has many threads performing seeky reads against a
+	cached file.  The average number of pagecache probes in a single
+	do_pagecache_readahead() is six, which seems reasonable.
+	
+	The patch (from Anton) flips the locking around to optimise for the
+	fast case (page was present).  So the kernel takes the lock less often,
+	and does more work once it has been acquired.
+
+<akpm@zip.com.au>
+	[PATCH] check for dirtying of non-uptodate buffers
+	
+	- Add a debug check to catch people who are marking non-uptodate
+	  buffers as dirty.
+	
+	  This is either a source of data corruption, or sloppy programming.
+	
+	- Fix sloppy programming in ext3 ;)
+
+<akpm@zip.com.au>
+	[PATCH] i_dirty_buffers locking fix
+	
+	This fixes a race between try_to_free_buffers' call to
+	__remove_inode_queue() and other users of b_inode_buffers
+	(fsync_inode_buffers and mark_buffer_dirty_inode()).  They are
+	presently taking different locks.
+	
+	The patch relocates and redefines and clarifies(?) the role of
+	inode.i_dirty_buffers.
+	
+	The 2.4 definition of i_dirty_buffers is "a list of random buffers
+	which is protected by a kernel-wide lock".  This definition needs to be
+	narrowed in the 2.5 context.  It is now
+	
+	"a list of buffers from a different mapping, protected by a lock within
+	that mapping".  This list of buffers is specifically for fsync().
+	
+	As this is a "data plane" operation, all the structures have been moved
+	out of the inode and into the address_space.  So address_space now has:
+	
+	list_head private_list;
+	
+	     A list, available to the address_space for any purpose.  If
+	     that address_space chooses to use the helper functions
+	     mark_buffer_dirty_inode and sync_mapping_buffers() then this list
+	     will contain buffer_heads, attached via
+	     buffer_head.b_assoc_buffers.
+	
+	     If the address_space does not call those helper functions
+	     then the list is free for other usage.  The only requirement is
+	     that the list be list_empty() at destroy_inode() time.
+	
+	     At least, this is the objective.  At present,
+	     generic_file_write() will call generic_osync_inode(), which
+	     expects that list to contain buffer_heads.  So private_list isn't
+	     useful for anything else yet.
+	
+	spinlock_t private_lock;
+	
+	     A spinlock, available to the address_space.
+	
+	     If the address_space is using try_to_free_buffers(),
+	     mark_inode_dirty_buffers() and fsync_inode_buffers() then this
+	     lock is used to protect the private_list of *other* mappings which
+	     have listed buffers from *this* mapping onto themselves.
+	
+	     That is: for buffer_heads, mapping_A->private_lock does not
+	     protect mapping_A->private_list!  It protects the b_assoc_buffers
+	     list from buffers which are backed by mapping_A and it protects
+	     mapping_B->private_list, mapping_C->private_list, ...
+	
+	     So what we have here is a cross-mapping association.  S_ISREG
+	     mappings maintain a list of buffers from the blockdev's
+	     address_space which they need to know about for a successful
+	     fsync().  The locking follows the buffers: the lock in in the
+	     blockdev's mapping, not in the S_ISREG file's mapping.
+	
+	     For address_spaces which use try_to_free_buffers,
+	     private_lock is also (and quite unrelatedly) used for protection
+	     of the buffer ring at page->private.  Exclusion between
+	     try_to_free_buffers(), __get_hash_table() and
+	     __set_page_dirty_buffers().  This is in fact its major use.
+	
+	address_space *assoc_mapping
+	
+	    Sigh.  This is the address of the mapping which backs the
+	    buffers which are attached to private_list.  It's here so that
+	    generic_osync_inode() can locate the lock which protects this
+	    mapping's private_list.  Will probably go away.
+	
+	
+	A consequence of all the above is that:
+	
+	    a) All the buffers at a mapping_A's ->private_list must come
+	       from the same mapping, mapping_B.  There is no requirement that
+	       mapping_B be a blockdev mapping, but that's how it's used.
+	
+	       There is a BUG() check in mark_buffer_dirty_inode() for this.
+	
+	    b) blockdev mappings never have any buffers on ->private_list.
+	       It just never happens, and doesn't make a lot of sense.
+	
+	reiserfs is using b_inode_buffers for attaching dependent buffers to its
+	journal and that caused a few problems.  Fixed in reiserfs_releasepage.patch
+
+<akpm@zip.com.au>
+	[PATCH] fix dirty page management
+	
+	This fixes a bug in ext3 - when ext3 decides that it wants to fail its
+	writepage(), it is running SetPageDirty().  But ->writepage has just put
+	the page on ->clean_pages().  The page ends up dirty, on ->clean_pages
+	and the normal writeback paths don't know about it any more.
+	
+	So run set_page_dirty() instead, to place the page back on the dirty
+	list.
+	
+	And in move_from_swap_cache(), shuffle the page across to ->dirty_pages
+	so that it's eligible for writeout.  ___add_to_page_cache() forgets to
+	look at the page state when deciding which list to attach it to.
+	
+	All SetPageDirty() callers otherwise look OK.
+
+<akpm@zip.com.au>
+	[PATCH] reiserfs locking fix
+	
+	reiserfs is using b_inode_buffers and fsync_buffers_list() for
+	attaching dependent buffers to its journal.  For writeout prior to
+	commit.
+	
+	This worked OK when a global lock was used everywhere, but the locking
+	is currently incorrect - try_to_free_buffers() is taking a different
+	lock when detaching buffers from their "foreign" inode.  So list_head
+	corruption could occur on SMP.
+	
+	The patch implements a reiserfs_releasepage() which holds the
+	journal-wide buffer lock while it runs try_to_free_buffers(), so all
+	those list_heads are protected.  The lock is held across the
+	try_to_free_buffers() call as well, so nobody will attach one of this
+	page's buffers to a list while try_to_free_buffers() is running.
+
+<akpm@zip.com.au>
+	[PATCH] larger b_size, and misc fixlets
+	
+	Miscellany.
+	
+	- make the printk in buffer_io_error() sector_t-aware.
+	
+	- Some buffer.c cleanups from AntonA: remove a couple of !uptodate
+	  checks, and set a new buffer's b_blocknr to -1 in a more sensible
+	  place.
+	
+	- Make buffer_head.b_size a 32-bit quantity.  Needed for 64k pagesize
+	  on ia64.  Does not increase sizeof(struct buffer_head).
+
+<akpm@zip.com.au>
+	[PATCH] dirty inode management
+	
+	Fix the "race with umount" in __sync_list().  __sync_list() no longer
+	puts inodes onto a local list while writing them out.
+	
+	The super_block.sb_dirty list is kept time-ordered.  Mappings which
+	have the "oldest" ->dirtied_when are kept at sb->s_dirty.prev.
+	
+	So the time-based writeback (kupdate) can just bale out when it
+	encounters a not-old-enough mapping, rather than walking the entire
+	list.
+	
+	dirtied_when is set on the *first* dirtying of a mapping.  So once the
+	mapping is marked dirty it strictly retains its place on s_dirty until
+	it reaches the oldest end and is written out.  So frequently-dirtied
+	mappings don't stay dirty at the head of the list for all time.
+	
+	That local inode list was there for livelock avoidance.  Livelock is
+	instead avoided by looking at each mapping's ->dirtied_when.  If we
+	encounter one which was dirtied after this invokation of __sync_list(),
+	then just bale out - the sync functions are only required to write out
+	data which was dirty at the time when they were called.
+	
+	Keeping the s_dirty list in time-order is the right thing to do anyway
+	- so all the various writeback callers always work against the oldest
+	data.
+
+<akpm@zip.com.au>
+	[PATCH] pdflush exclusion infrastructure
+	
+	Collision avoidance for pdflush threads.
+	
+	Turns the request_queue-based `unsigned long ra_pages' into a structure
+	which contains ra_pages as well as a longword.
+	
+	That longword is used to record the fact that a pdflush thread is
+	currently writing something back against this request_queue.
+	
+	Avoids the situation where several pdflush threads are sleeping on the
+	same request_queue.
+	
+	This patch provides only the infrastructure for the pdflush exclusion.
+	This infrastructure gets used in pdflush-single.patch
+
+<akpm@zip.com.au>
+	[PATCH] pdflush exclusion
+	
+	Use the pdflush exclusion infrastructure to ensure that only one
+	pdlfush thread is ever performing writeback against a particular
+	request_queue.
+	
+	This works rather well.  It requires a lot of activity against a lot of
+	disks to cause more pdflush threads to start up.  Possibly the
+	thread-creation logic is a little weak: it starts more threads when a
+	pdflush thread goes back to sleep.  It may be better to start new
+	threads within pdlfush_operation().
+	
+	All non-request_queue-backed address_spaces share the global
+	default_backing_dev_info structure.  So at present only a single
+	pdflush instance will be available for background writeback of *all*
+	NFS filesystems (for example).
+	
+	If there is benefit in concurrent background writeback for multiple NFS
+	mounts then NFS would need to create per-mount backing_dev_info
+	structures and install those into new inode's address_spaces in some
+	manner.
+
+<akpm@zip.com.au>
+	[PATCH] writeback tuning
+	
+	Tune up the VM-based writeback a bit.
+	
+	- Always use the multipage clustered-writeback function from within
+	  shrink_cache(), even if the page's mapping has a NULL ->vm_writeback().  So
+	  clustered writeback is turned on for all address_spaces, not just ext2.
+	
+	  Subtle effect of this change: it is now the case that *all* writeback
+	  proceeds along the mapping->dirty_pages list.  The orderedness of the page
+	  LRUs no longer has an impact on disk scheduling.  So we only have one list
+	  to keep well-sorted rather than two, and churning pages around on the LRU
+	  will no longer damage write bandwidth - it's all up to the filesystem.
+	
+	- Decrease the clustered writeback from 1024 pages(!) to 32 pages.
+	
+	  (1024 was a leftover from when this code was always dispatching writeback
+	  to a pdflush thread).
+	
+	- Fix wakeup_bdflush() so that it actually does write something (duh).
+	
+	  do_wp_page() needs to call balance_dirty_pages_ratelimited(), so we
+	  throttle mmap page-dirtiers in the same way as write(2) page-dirtiers.
+	  This may make wakeup_bdflush() obsolete, but it doesn't hurt.
+	
+	- Converts generic_vm_writeback() to directly call ->writeback_mapping(),
+	  rather that going through writeback_single_inode().  This prevents memory
+	  allocators from blocking on the inode's I_LOCK.  But it does mean that two
+	  processes can be writing pages from the same mapping at the same time.  If
+	  filesystems care about this (for layout reasons) then they should serialise
+	  in their ->writeback_mapping a_op.
+	
+	  This means that memory-allocators will writeback only pages, not pages
+	  and inodes.  There are no locks in that writeback path (except for request
+	  queue exhaustion).  Reduces memory allocation latency.
+	
+	- Implement new background_writeback function, which when kicked off
+	  will perform writeback until dirty memory falls below the background
+	  threshold.
+	
+	- Put written-back pages onto the remote end of the page LRU.  It
+	  does this in the slow-and-stupid way at present.  pagemap_lru_lock
+	  stress-relief is planned...
+	
+	- Remove the funny writeback_unused_inodes() stuff from prune_icache().
+	  Writeback from wakeup_bdflush() and the `kupdate' function now just
+	  naturally cleanses the oldest inodes so we don't need to do anything
+	  there.
+	
+	- Dirty memory balancing is still using magic numbers: "after you
+	  dirtied your 1,000th page, go write 1,500".  Obviously, this needs
+	  more work.
+
+<akpm@zip.com.au>
+	[PATCH] ext2: preread inode backing blocks
+	
+	When ext2 creates a new inode, perform an asynchronous preread against
+	its backing block.
+	
+	Without this patch, many-file writeout gets stalled by having to read
+	many individual inode table blocks in the middle of writeback.
+	
+	It's worth about a 20% gain in writeback bandwidth for the many-file
+	writeback case.
+	
+	ext3 already reads the inode's backing block in
+	ext3_new_inode->ext3_mark_inode_dirty, so no change is needed there.
+	
+	A backport to 2.4 would make sense.
+
+<akpm@zip.com.au>
+	[PATCH] improved I/O scheduling for indirect blocks
+	
+	Fixes a performance problem with many-small-file writeout.
+	
+	At present, files are written out via their mapping and their indirect
+	blocks are written out via the blockdev mapping.  As we know that
+	indirects are disk-adjacent to the data it is better to start I/O
+	against the indirects at the same time as the data.
+	
+	The delalloc pathes have code in ext2_writepage() which recognises when
+	the target page->index was at an indirect boundary and does an explicit
+	hunt-and-write against the neighbouring indirect block.  Which is
+	ideal.  (Unless the file was dirtied seekily and the page which is next
+	to the indirect was not dirtied).
+	
+	This patch does it the other way: when we start writeback against a
+	mapping, also start writeback against any dirty buffers which are
+	attached to mapping->private_list.  Let the elevator take care of the
+	rest.
+	
+	The patch makes a number of tuning changes to the writeback path in
+	fs-writeback.c.  This is very fiddly code: getting the throughput
+	tuned, getting the data-integrity "sync" operations right, avoiding
+	most of the livelock opportunities, getting the `kupdate' function
+	working efficiently, keeping it all least somewhat comprehensible.
+	
+	An important intent here is to ensure that metadata blocks for inodes
+	are marked dirty before writeback starts working the blockdev mapping,
+	so all the inode blocks are efficiently written back.
+	
+	The patch removes try_to_writeback_unused_inodes(), which became
+	unreferenced in vm-writeback.patch.
+	
+	The patch has a tweak in ext2_put_inode() to prevent ext2 from
+	incorrectly droppping its preallocation window in response to a random
+	iput().
+	
+	
+	Generally, many-small-file writeout is a lot faster than 2.5.7 (which
+	is linux-before-I-futzed-with-it).  The workload which was optimised was
+	
+		tar xfz /nfs/mountpoint/linux-2.4.18.tar.gz ; sync
+	
+	on mem=128M and mem=2048M.
+	
+	With these patches, 2.5.15 is completing in about 2/3 of the time of
+	2.5.7.  But it is only a shade faster than 2.4.19-pre7.  Why is 2.5.7
+	so much slower than 2.4.19?  Not sure yet.
+	
+	Heavy dbench loads (dbench 32 on mem=128M) are slightly faster than
+	2.5.7 and significantly slower than 2.4.19.  It appears that the cause
+	is poor read throughput at the later stages of the run.  Because there
+	are background writeback threads operating at the same time.
+	
+	The 2.4.19-pre8 write scheduling manages to stop writeback during the
+	latter stages of the dbench run in a way which I haven't been able to
+	sanely emulate yet.  It may not be desirable to do this anyway - it's
+	optimising for the case where the files are about to be deleted.  But
+	it would be good to find a way of "pausing" the writeback for a few
+	seconds to allow readers to get an interval of decent bandwidth.
+	
+	tiobench throughput is basically the same across all recent kernels.
+	CPU load on writes is down maybe 30% in 2.5.15.
+
+<akpm@zip.com.au>
+	[PATCH] fix ext3 buffer-stealing
+	
+	Patch from sct fixes a long-standing (I did it!) and rather complex
+	problem with ext3.
+	
+	The problem is to do with buffers which are continually being dirtied
+	by an external agent.  I had code in there (for easily-triggerable
+	livelock avoidance) which steals the buffer from checkpoint mode and
+	reattaches it to the running transaction.  This violates ext3 ordering
+	requirements - it can permit journal space to be reclaimed before the
+	relevant data has really been written out.
+	
+	Also, we do have to reliably get a lock on the buffer when moving it
+	between lists and inspecting its internal state.  Otherwise a competing
+	read from the underlying block device can trigger an assertion failure,
+	and a competing write to the underlying block device can confuse ext3
+	journalling state completely.
+
+<akpm@zip.com.au>
+	[PATCH] fix ext3 race with writeback
+	
+	The ext3-no-steal patch has exposed a long-standing race in ext3.  It
+	has been there all the time in 2.4, but never triggered until some
+	timing change in the ext3-no-steal patch exposed it.  The race was not
+	present in 2.2 because 2.2's bdflush runs inside lock_kernel().
+	
+	The problem is that when ext3 is shuffling a buffer between journalling
+	lists there is a small window where the buffer is marked BH_dirty.
+	Aonther CPU can grab it, mark it clean and write it out.  Then ext3
+	puts the buffer onto a list of buffers which are expected to be dirty,
+	and gets confused later on when the buffer turns out to be clean.
+	
+	The patch from Stephen records the expected dirtiness of the buffer in
+	a local variable, so BH_dirty is not transiently set while ext3
+	shuffles.
+
+<akpm@zip.com.au>
+	[PATCH] remove PG_launder
+	
+	Removal of PG_launder.
+	
+	It's not obvious (to me) why this ever existed.  If it's to prevent
+	deadlocks then I'd like to know who was performing __GFP_FS allocations
+	while holding a page lock?
+	
+	But in 2.5, the only memory allocations which are performed when the
+	caller holds PG_writeback against an unsubmitted page are those which
+	occur inside submit_bh().  There will be no __GFS_FS allocations in
+	that call chain.
+	
+	Removing PG_launder means that memory allocators can block on any
+	PageWriteback() page at all, which reduces the risk of very long list
+	walks inside pagemap_lru_lock in shrink_cache().
+
+<acme@conectiva.com.br>
+	drivers/block/*.c
+	
+	  - fix copy_{to,from}_user error handling, thanks to Rusty for
+	    pointing this out on lkml
+
+<acme@conectiva.com.br>
+	drivers/char/*
+	
+		- fix copy_{to,from}_user error handling, thanks to Rusty to pointing this out on lkml
+
+<jaharkes@cs.cmu.edu>
+	[PATCH] iget_locked  [1/6]
+	
+	Fix a race in iget4. The fs specific data that is used to find an inode
+	should be initialized while still holding the inode lock.
+	
+	It adds a 'set' callback function that should be a non-blocking FS
+	provided function which initializes the private parts of the inode so
+	that the 'test' callback function can correctly match new inodes.
+	
+	Touches all filesystems that use iget4 (Coda/NFS/ReiserFS).
+
+<jaharkes@cs.cmu.edu>
+	[PATCH] iget_locked  [2/6]
+	
+	Now we introduce iget_locked and iget5_locked. These are similar to
+	iget, but return a locked inode and read_inode has not been called. So
+	the FS has to call read_inode to initialize the inode and then unlock
+	it with unlock_new_inode().
+	
+	This patch is based on the icreate patch from the XFS group, i.e.
+	it is pretty much identical except for function naming.
+
+<jaharkes@cs.cmu.edu>
+	[PATCH] iget_locked  [3/6]
+	
+	Convert existing filesystems (Coda/NFS/ReiserFS) that currently use
+	iget4 to iget5_locked.
+
+<jaharkes@cs.cmu.edu>
+	[PATCH] iget_locked  [4/6]
+	
+	Now that we have no more users of iget4 we can kill the function and the
+	associated read_inode2 callback (i.e. the 'reiserfs specific hack').
+	
+	Document iget5_locked as the replacement for iget4 in filesystems/porting.
+
+<jaharkes@cs.cmu.edu>
+	[PATCH] iget_locked  [5/6]
+	
+	This patch starts taking i_ino dependencies out of the VFS. The FS
+	provided test and set callbacks become responsible for testing and
+	setting inode->i_ino.
+	
+	Because most filesystems are based on 32-bit unique inode numbers
+	several functions are duplicated to keep iget_locked as a fast path. We
+	can avoid unnecessary pointer dereferences and function calls for this
+	specific case.
+
+<jaharkes@cs.cmu.edu>
+	[PATCH] iget_locked  [6/6]
+	
+	As of the last patch the inode_hashtable doesn't really need to be
+	indexed by i_ino anymore, the only reason we still have to keep the
+	hashvalue and i_ino identical is because of insert_inode_hash.
+	
+	If at some point a FS specific getattr method is implemented it will be
+	possible to completely remove any use of i_ino by the VFS.
+
+<jack@suse.cz>
+	[PATCH] [1/13] quota-1-newlocks
+	
+	  This patch adds dq_dup_ref to struct dquot. Functions altering just usage of
+	quota take just this duplicated reference, inodes, quotactl() helpers take real
+	dq_count reference. dqput() blocks if there are some duplicated references and
+	put reference is last 'real one'. This way is assured that quota IO is not
+	done from functions altering quota usage (quota structure is written on last dqput()).
+
+<jack@suse.cz>
+	[PATCH] [2/13] quota-2-formats
+	
+	This patch removes most format dependent code from dquot.c and quota.h
+	and puts calls of callback functions instead.
+
+<jack@suse.cz>
+	[PATCH] [3/13] quota-3-register
+	
+	  This patch implements list 'quota_formats' with registered quota formats
+	and functions register_quota_format() and unregister_quota_format() for
+	manipulating the list.
+
+<jack@suse.cz>
+	[PATCH] [4/13] quota-4-getstats
+	
+	  This patch moves reporting of quota statistics from Q_GETSTATS call to
+	/proc/fs/quota. Also reporting of registered quota formats is added.
+
+<jack@suse.cz>
+	[PATCH] [5/13] quota-5-space
+	
+	This patch implements accounting of used space in bytes.
+
+<jack@suse.cz>
+	[PATCH] [6/13] quota-6-bytes
+	
+	This patch implements counting of used space in inodes in bytes.
+	New field i_bytes is added and used space modulo 512 is kept in
+	it (rest is still kept in i_blocks). Functions manipulating both
+	i_blocks and i_bytes are implemented (inode_add_bytes(), inode_sub_bytes()
+	and inode_set_bytes()). Filesystems allocating only in whole blocks
+	can safely ignore i_bytes field and continue using i_blocks...
+
+<jack@suse.cz>
+	[PATCH] [7/13] quota-7-quotactl
+	
+	This is probably the largest chunk in quota patches. It removes old quotactl interface
+	and implements new one. New interface should not need arch specific conversions so they
+	are removed. All quota interface stuff is moved to quota.c so we can
+	easily separate things which should be compiled even if quota is disabled (mainly
+	because XFS needs some interface even if standard VFS quota is disabled).
+	Callbacks to filesystem on quota_on() and quota_off() are implemented (needed by Ext3),
+	quota operations callbacks are now set in super.c on superblock initialization and
+	not on quota_on(). This way it starts to make sense to have callbacks on alloc_space(),
+	alloc_inode() etc. as filesystem can override them on read_super(). This will be used
+	later for implementing journalled quota.
+
+<jack@suse.cz>
+	[PATCH] [8/13] quota-8-format1
+	
+	Implementation of old quota format. All the code for old format is now in
+	quota_v1.c. Code mostly remained the same as in older kernels (just minor
+	changes were needed to bind it with quota interface).
+
+<jack@suse.cz>
+	[PATCH] [9/13] quota-9-format2
+	
+	Implementation of new quota format. The code is almost the same
+	as in -ac versions of kernel. All the code for new format is in
+	quota_v2.c
+
+<jack@suse.cz>
+	[PATCH] [10/13] quota-10-inttype
+	
+	Remove use of 'short' in parameters of functions. 'int' is used instead.
+
+<jack@suse.cz>
+	[PATCH] [11/13] quota-11-sync
+	
+	Implemented proper syncing of dquots - ie. also global information
+	about quota files are synced. We find info to sync by walking through
+	all superblocks...
+
+<jack@suse.cz>
+	[PATCH] [12/13] quota-12-compat
+	
+	This patch implements configurable backward compatible quota interface.
+	Maybe this isn't needed in 2.5 but as some people want to use patches
+	in 2.4 where it's necessary I have implemented it.
+
+<jack@suse.cz>
+	[PATCH] [13/13] quota-13-ioctl
+	
+	This patch implements ioctl() for getting space used by file.
+	I agree it's ioctl() abuse, it doesn't work on links and has
+	other ugly properties. Better would be to change 'struct stat'
+	but changing it just due to this is overkill and it will take
+	some time before there will be enough changes which will provoke
+	yet another struct stat :). So this is temporary solution...
+	If you don't like it, simply reject it. The function it provides
+	is not fundamental...
+	
+	So that should be all patches. Any comments (or decision about
+	including/not including) welcome.
+									Honza
+
+<hch@infradead.org>
+	[PATCH] get rid of <linux/locks.h>
+	
+	The lock.h header contained some hand-crafted lcoking routines from
+	the pre-SMP days.  In 2.5 only lock_super/unlock_super are left,
+	guarded by a number of completly unrelated (!) includes.
+	
+	This patch moves lock_super/unlock_super to fs.h, which defined
+	struct super_block that is needed for those to operate it, removes
+	locks.h and updates all caller to not include it and add the missing,
+	previously nested includes where needed.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	Fix ext2 compilation
+	
+	Removal of locks.h broke the build due to missing definition of capable()
+	and current.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	Fix some compiler warnings
+	
+	Fix some trivial variable/functions/label defined (static) but not used
+	warnings.
+
+<torvalds@penguin.transmeta.com>
+	Fix OSS API emulation when sound is compiled as a module
+
+<torvalds@penguin.transmeta.com>
+	Update kernel version to 2.5.17
+
+<jhammer@us.ibm.com>
+	[PATCH] ips for 2.5
+	
+	ips driver update ( version 5.10.13-BETA )
+
+<kai@tp1.ruhr-uni-bochum.de>
+	kbuild: Standardize building of init/*
+	
+	There's no good reason to build the objects in init/ explicitly from
+	the top-level Makefile. Instead, handle init/ like every other
+	subdir, which also provides the automatic checks for a changed
+	command line etc.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	kbuild: Remove generated .<object>.cmd files on 'make clean'
+
+<kai@tp1.ruhr-uni-bochum.de>
+	kbuild: Speed up vmlinux build
+	
+	The recursive build used to do the following: On entering a directory,
+	we would first call make in the subdirectories listed in $(subdir-y),
+	and then call make in the current directory again, with the target
+	'all_targets'.
+	
+	The second invocation was used to make sure that the subdir makes completed
+	before trying to build the O_TARGET/L_TARGET in the current dir, since
+	this would link in objects in these subdirectories.
+	
+	However, using correct dependencies achieves the same, i.e. just
+	make the objects in $(obj-y) which are not in the local subdirectory
+	depend on 'sub_dirs', which is the rule to descend into subdirs.
+	
+	This patch actually halves the time "make vmlinux" takes when there's
+	nothing to do (which makes sense, as we save half of the make invocations)
+
+<torvalds@penguin.transmeta.com>
+	New makefiles generate .*.cmd files, not .*.flags files
+
+<torvalds@home.transmeta.com>
+	Clean up %cr3 loading on x86, fix lazy TLB problem
+
+<torvalds@home.transmeta.com>
+	Fix double i_writecount handling (Tony Luck)
+
+<david@gibson.dropbear.id.au>
+	[PATCH] Missing init.h in drivers/pci/power.c
+	
+	This adds a #include to drivers/pci/power.c to define __init.  At least
+	on PPC4xx this fixes compile problems.
+
+<torvalds@home.transmeta.com>
+	Make generic TLB shootdown friendlier to non-x86 architectures
+

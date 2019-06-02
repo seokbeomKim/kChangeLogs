@@ -1,0 +1,1355 @@
+
+Summary of changes from v2.5.17 to v2.5.18
+============================================
+
+<davem@nuts.ninka.net>
+	Sparc: Use dma_addr_t and size_t in sparc32 DMA function args.
+
+<davem@nuts.ninka.net>
+	IPv4: Make pkt_too_big debug msg more informative.
+
+<colin@gibbs.dhs.org>
+	Sparc: Do not BUG in srmmu_pte_alloc_one.
+
+<colin@gibbs.dhs.org>
+	include/asm-sparc/pgalloc.h: In pmd_alloc_one, dont BUG just return NULL
+
+<davem@nuts.ninka.net>
+	drivers/net/sunlance.c: Make init_block_dvma a dma_addr_t
+
+<ch@hpl.hp.com>
+	[ARM PATCH] 1133/1: Small fixes for BadgePAD 4 pcmcia support.
+	
+	
+	- default CF Vcc is 3.3V (33).
+	- add headers to make 2.5 happy
+	- remove unused static
+	
+	Please apply to 2.4. and 2.5.
+	
+	Christopher Hoover
+	mailto:ch@murgatroid.com
+	mailto:ch@hpl.hp.com
+	
+
+<ch@hpl.hp.com>
+	[ARM PATCH] 1136/1: missing include in badge4.c
+	
+	missing include in badge4.c
+	
+	Christopher Hoover
+	mailto:ch@murgatroid.com
+	mailto:ch@hpl.hp.com
+	
+
+<borisitk@fortunet.com>
+	[ARM PATCH] 1146/1: Fix complilation bug in 2.5.10-rmk1 for jffs
+	
+	This is patch 1004/1 done how you wanted it.
+	 
+	Files affected:
+	 
+	include/asm-arm/unistd.h
+
+<ch@hpl.hp.com>
+	[ARM PATCH] 1137/1: additional defines for SA-1111 OHCI
+	
+	
+	
+	Christopher Hoover
+	mailto:ch@murgatroid.com
+	mailto:ch@hpl.hp.com
+	
+
+<rmk@flint.arm.linux.org.uk>
+	[ARM] 2.5.15 PCI cleanups/fixups
+	
+	2.5.15 removes the pcibios_init() call from the generic PCI layer to
+	the architecture layers.  This allows us to clean up the ARM PCI
+	layer by moving the machine specific PCI initialisation from
+	arch/arm/kernel/bios32.c to the machine specific files.
+	
+	We also fix a bug in the resource flags in the iop310 initialisation.
+
+<rmk@flint.arm.linux.org.uk>
+	[ARM] 2.5.15 random fixups:
+	
+	- Add SIGURG to ignored signal list.
+	- Ensure PFN_TO_NID is always defined on clps711x.
+	- Machine specific fixups take struct tag not param_struct.
+	- Fix pfn_valid() for non-discontigmem case.
+	- Make PTRACE_* available to all.
+	- Add PTRACE_SETOPTIONS.
+
+<kuznet@ms2.inr.ac.ru>
+	tcp_input.c: Really make sure rto = 3*rtt, found by Pasi Sarolahti
+
+<simonb@lipsyncpost.co.uk>
+	Tigon3: Add Netgear GA320T support.
+
+<davem@nuts.ninka.net>
+	Tigon3: Fix typo in netgear ga320t support changes.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	Fix UTS_MACHINE
+	
+	Remove the default for UTS_MACHINE, it gets set in
+	include/linux/compile.h, just as UTS_RELEASE.
+	
+	(noticed by David Gibson)
+
+<kai@tp1.ruhr-uni-bochum.de>
+	Fix building .i / .s files for testing
+	
+	E.g. make arch/i386/kernel/process.[is] used to work at least
+	in the cases where the object wouldn't need any additional command
+	line flags defined in the local subdir.
+	
+	Get back this behavior, I think I know how to do this correctly, too,
+	but that's for later.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	kbuild: Make USE_STANDARD_AS_RULE default
+
+<ccaputo@alt.net>
+	net/core/sock.c: Fix typo in sysctl_{w,m}mem_default init.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	kbuild: Stop immediately on error
+	
+	This patch restores the previous behavior of stopping the build
+	immediately on error (unless the -k option is given to make)
+	
+	Before this patch, we would do the echo command no matter if the
+	compile failed, thus returning success always.
+	
+	(Jan Harkes)
+
+<kai@tp1.ruhr-uni-bochum.de>
+	kbuild: aic7xxx firmware build should not overwrite shipped files
+	
+	o Add dependencies on generated files explicitly to the
+	  aic7xxx Makefile - These cannot be figured out
+	  automatically
+	 
+	o Rename the precompiled firmware files to 
+	  shipped_aic7xxx_{reg,seq}.h, so that we don't overwrite 
+	  shipped files when regenerating the firmware
+
+<hch@infradead.org>
+	[PATCH] buffermem_pages removal (1/5)
+	
+	With all work done by akpm in 2.5 Linus no more has a buffer cache
+	in the traditional sense.  Still we try to keep estimates about
+	what would be the buffer cache size by keeping the number of pages
+	indexed by block device inodes.  This is broken not only because the
+	old buffercache was also used for file data which is nowdays not
+	hashed to block device inodes and thus makes every user of this data
+	assume wrong numbers.  Second is is possible to use block device
+	pages not through the buffer_head interface (i.e. userspace
+	block device nodes, possibly JFS also soon).  In addition the atomic_t
+	used for this bookkepping (buffermem_pages) causes cacheline bouncing
+	on larger machines.
+	
+	This is the first patch of a series to get rid of it.  It removes the
+	useless output of supposedly buffer pages in show_mem(), which is used
+	by the magic sysrq key code.
+
+<hch@infradead.org>
+	[PATCH] buffermem_pages removal (2/5)
+	
+	Remove buffermem_pages showing from sgi serial code (debug only).
+
+<hch@infradead.org>
+	[PATCH] buffermem_pages removal (3/5)
+	
+	This one is a bit more controveral as it may break stupid userlevel
+	programs:  remove the 'Buffers' field from /proc/meminfo and make
+	the Cached field show the full pagecache size instead of subtracting
+	the block-device backed pages.
+	
+	All /proc/meminfo-using programs I have (free, top) still work fine.
+
+<hch@infradead.org>
+	[PATCH] buffermem_pages removal (4/5)
+	
+	This is the most discussion-worthy patch of the series:  Change the
+	meaning of si_meminfo->bufferram from "all pages in pagecache
+	backed by block devices" to "all pages in pagecache".
+	
+	In the header/manpage is is documented as "Memory used by buffers",
+	but as the buffercache is gone I think the new meaning fits the
+	intention from pre-pagecache days much better.
+
+<hch@infradead.org>
+	[PATCH] buffermem_pages removal (5/5)
+	
+	No more users of buffermem_pages are left, remove it.
+	While at it also remove some orphaned externs around it in swap.h
+
+<rusty@rustcorp.com.au>
+	[PATCH] Futex update.
+	
+	This changes futex semantics to a simple "sleep if this address
+	equals this value" interface, which is more convenient for building
+	other primitives.  It also adds a timeout value.
+	
+	Example library can be found at:
+	   http://www.kernel.org/pub/linux/kernel/people/rusty/futex-2.0.tar.gz
+
+<rusty@rustcorp.com.au>
+	[PATCH] Tasklet cleanup
+	
+	This makes tasklet_vec and tasklet_hi_vec static inside softirq.c, and
+	makes them __per_cpu_data.
+
+<hch@infradead.org>
+	[PATCH] fix bitop warnings in parallel port generic driver
+	
+	pg tried to issue bitops on int, this fixes it to use an ulong instead.
+
+<hch@infradead.org>
+	[PATCH] fix sr compile warnings
+	
+	Remove an unused label and an unused variable.
+
+<hch@infradead.org>
+	[PATCH] bfs header move around + warning fix
+	
+	(Patch has been ACKed by the bfs maintainer)
+	
+	Now that bfs no more is included in the big unions in fs.h it makes
+	sense to move the contents of bfs_fs_i.h and bfs_fs_sb.h to a bfs-private
+	location.  I've created fs/bfs/bfs.h for that, also merging in bfs_defs.h.
+	
+	In addition I've changed si_imap to an unsigned long pointer as the bitops
+	now use that type explicitly.
+
+<mason@suse.com>
+	[PATCH] reiserfs 64 bit bug in get_virtual_node_size
+	
+	This patch fixes a problem with reiserfs on 64 bit machines.  Our
+	struct virtual_item is a different size there, and some calculations
+	that assume otherwise lead to this panic create_virtual_node:
+	
+	vs-8030: create_virtual_node: virtual node space consumed
+
+<torvalds@penguin.transmeta.com>
+	Move check_pgt_cache() to tlb_finish_mmu().
+	
+	It should be _after_ we have flushed the TLB.
+
+<shaggy@austin.ibm.com>
+	[PATCH] JFS external journal support
+	
+	Additional support for external journal.  We're basically adding uuid's
+	to both the file system and the journal to tie the two together.
+
+<shaggy@austin.ibm.com>
+	[PATCH] jfs_readdir does not need to grab BKL
+	
+
+<petkan@mastika.lnxw.com>
+	[PATCH] USB pegasus driver, new vendor and device id.
+	
+	new vendor and device ID
+
+<greg@kroah.com>
+	[PATCH] USB Makefile bug fix
+	
+	fixed problem with UHCI_HCD drivers set to 'y' were not causing the build
+	to go into the drivers/usb/host directory.
+
+<Andries.Brouwer@cwi.nl>
+	[PATCH] usb-storage
+	
+	Created the first of a series of usb-storage patches
+	this afternoon. Please find it below or on ftp.XX.kernel.org
+	under people/aeb/2.5.16-us-patch .
+	It removes 5% of the usb-storage code, but should, if I made
+	no mistake, not affect the behaviour of the code.
+	
+	(This is the introduction of raw_bulk.c to hold USB-bulk
+	and scatter-gather code that was repeated three-five times
+	in various drivers. The next patch is smartmedia.c.)
+
+<bgerst@didntduck.org>
+	[PATCH] cpu_has_mmx
+	
+	This patch takes the cpu_has_mmx macro introduced in the xor.h header
+	and puts it in the proper place.  It also converts the ov511 driver to
+	use the new macro.
+
+<bgerst@didntduck.org>
+	[PATCH] cpu_has_tsc
+	
+	This patch converts drivers/char/random.c and
+	drivers/input/joystick/analog.c to use the cpu_has_tsc macro.
+
+<bgerst@didntduck.org>
+	[PATCH] remaining cpu_has cleanups
+	
+	This patch cleans up the remaining direct tests against x86_capability.
+	      It moves the cpu_has_* macros to the more appropriate
+	cpufeature.h.  It also introduces the cpu_has() macro to test features
+	for individual cpus.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	kbuild: Regenerate include/linux/version.h only if necessary
+	
+	Before overwriting version.h, check if it actually changed - otherwise
+	we will unnecessarily rebuild a lot of files, as e.g. module.h depends
+	on version.h, and many files include module.h
+
+<kai@tp1.ruhr-uni-bochum.de>
+	kbuild: Restore build nr, improve vmlinux link
+	
+	People relied on the build generation number to find out if they actually
+	booted the right kernel, only incrementing it on config changes isn't
+	enough for them. So this patch goes back to the old behavior, only done
+	right this time:
+	
+	We now don't increment the generation number on every invocation of make, 
+	but on every link of vmlinux. At the same time, this patch fixes the
+	Makefile to only relink vmlinux if any of its prequisite object files
+	(or the command line) changed. Incrementing the version number
+	happens *after* we decided to relink vmlinux.
+
+<kuznet@ms2.inr.ac.ru>
+	tcp_recvmsg: Fix application bug induced races with MSG_PEEK and copied_seq.
+
+<jbglaw@lug-owl.de>
+	[PATCH] Update to srm_env.c driver (for Alpha arch.)
+	
+	Hi Linus!
+	
+	Please apply this patch. It updates the srm_env.c driver (to access
+	Alpha's SRM environment variables) to its current version (which is
+	already included in up-to-date 2.4.x kernels).
+	
+	MfG, JBG
+
+<pavel@ucw.cz>
+	[PATCH] suspend-to-{RAM,disk}
+	
+	Here's suspend-to-{RAM,disk} combined patch for
+	2.5.17. Suspend-to-disk is pretty stable and was tested in
+	2.4-ac. Suspend-to-RAM is little more experimental, but works for me,
+	and is certainly better than disk-eating version currently in kernel.
+	
+	Major parts are: process stopper, S3 specific code, S4 specific
+	code.
+
+<pavel@ucw.cz>
+	[PATCH] suspend-to-{RAM,disk} fixup
+	
+	Fix compile problem with suspending diabled
+
+<pavel@ucw.cz>
+	[PATCH] more suspend-to-{RAM,disk} fixes
+	
+	One more build fix, this time for !CONFIG_SOFTWARE_SUSPEND but
+	CONFIG_ACPI:
+	
+	I've choosen this solution for now, as it is safest for ACPI people.
+	I'll modify suspend.c so that freezing part can be included without
+	whole suspend-to-disk support being included.
+
+<rml@tech9.net>
+	[PATCH] get/put_cpu methods
+	
+	This implements a get_cpu() and matching put_cpu() to safely hand out
+	the current CPU to avoid preempt races.  Andrew and I have been bitching
+	about the need for such a method.
+	
+	I also went ahead and replaced an example of current explicit
+	preempt-off with the new methods, as a case in point.
+
+<pavel@ucw.cz>
+	[PATCH] One more fix for swsusp
+	
+	As andrew pointed out, it is bad idea to run_task_queue() when
+	spinlock is held. This fixes it (only could be triggered by user
+	pressing Magic-D). There's minor problem left where Magic-D could be
+	delayed/ignored under high load. I'll either fix that or kill Magic-D
+	support (with acpi, it is very easy to trigger swsusp by echo 4 >
+	/proc/acpi/sleep, so magic key is probably not neccessary any more).
+
+<rml@tech9.net>
+	[PATCH] remove preempt_disable from pdflush
+	
+	It seems by the comments the statements were only there to prevent the
+	thread from finding itself as TASK_RUNNING after a kernel preemption.
+	Since we reverted to the original preemption behavior (which does not do
+	that) it should be safe.  Looking over the code confirms - it seems to
+	not be doing anything evil and is properly locked otherwise.
+
+<torvalds@home.transmeta.com>
+	Make the pte unmapping atomic wrt other threads.
+
+<davem@nuts.ninka.net>
+	Sparc64 updates
+	- TLB infrastructure changes
+	- Make flush_tlb_pgtables not need to cook up
+	a dummy vma
+	- Update for do_fork return value change
+	- Update defconfig
+
+<kai@tp1.ruhr-uni-bochum.de>
+	Simplify linking/building objects in subdirectories
+	
+	New-style Makefiles have a nice way of declaring objects
+	which need to be built either built-in or as modules:
+	
+	        obj-$(CONFIG_EEPRO100) += eepro100.o
+	
+	However, handling objects in subdirectories, which need to be
+	built and linked is not as nice:
+	
+	        subdir-$(CONFIG_E100) += e100
+	
+	        ifeq ($(CONFIG_E100),y)
+	          obj-y += e100/built-in.o
+	        endif
+	
+	This means we descend into the subdirectory when building
+	vmlinux / modules, depending on CONFIG_XXX. When we are building
+	vmlinux we also need to link whatever has been built in the
+	subdirectory, so we add it to $(obj-y) at the appropriate place
+	(link order is important).
+	
+	Now, the extension below allows to rewrite the second case into
+	
+	         obj-$(CONFIG_E100) += e100/
+	
+	which looks much nicer ;-) Existing behavior is not changed, and the
+	only prerequisite to using the extension above is that the O_TARGET in
+	the subdir is named "built-in.o".
+
+<kai@tp1.ruhr-uni-bochum.de>
+	drivers/net: Simplify linking of subdirs
+	
+	Use the just introduced Rules.make extension to clean up 
+	drivers/net/*/Makefile.
+
+<beattie@beattie-home.net>
+	[PATCH] change USB scanner maintainer
+	
+	Add Maintainer for USB scanner
+
+<viro@math.psu.edu>
+	[PATCH] add proper ->getattr()
+	
+	 add proper ->getattr(), clean up do_getattr() and friends.
+
+<viro@math.psu.edu>
+	[PATCH] remove s390 procfs abuses
+	
+	massive crapectomy in s390 code - removed procfs abuses
+
+<viro@math.psu.edu>
+	[PATCH] kill ->i_op->revalidate()
+	
+	kill ->i_op->revalidate()
+
+<viro@math.psu.edu>
+	[PATCH] clean up readdir() for in-memory
+	
+	sane readdir() for ramfs-style filesystems
+
+<viro@math.psu.edu>
+	[PATCH] new helpers for /proc
+	
+	new helpers for seq_file - for cases where we don't have a non-trivial
+	iterator and just want to use seq_{printf,putc,...}.
+
+<viro@math.psu.edu>
+	[PATCH] rd.c blocksize handling
+	
+		Unlike other drivers, rd.c wants block size to be set once an
+	forever (for everybody else setting block size as high as possible and
+	letting filesystems change it with set_blocksize() is OK; rd.c treats
+	invalidate_buffers() as "kill the ramdisk contents".
+
+<dalecki@evision-ventures.com>
+	[PATCH] 2.5.17 IDE 65
+	
+	 - Apply cleanup of host chip drivers by Bartomiej Zonierkiewicz:
+	
+	     affected drivers - aec62xx.c, alim15x3.c, cmd64x.c, hpt34x.c, sis5513.c
+	
+	     new tuning scheme (wip) part 1:
+		- introduce ratemask()
+		- use ata_timing_mode()
+		- use ide_config_drive_speed() return value
+	
+	     forward port from convert.10:
+		- support for AEC6280, AEC6280R
+		- misc cleanups
+	
+	     I had to fix a small typo in sis5513 code...
+	
+	 - Add a new entry for an old VIA cell hiding as something new.
+	   (Pointed out by Kees Bakker.)
+	
+	 - Make the synchronization token active resident on the same level as the
+	   spin lock. They interact with each other.
+	
+	 - Synchronize with linux-2.5.17.
+	
+	 - HPT366 driver typo fix by Andries Brouwer.
+	
+	 - Export udma_tcq_enable() symbol right now. The blk_get_request() is undefined
+	   as well.
+
+<dalecki@evision-ventures.com>
+	[PATCH] 2.5.17 IDE 66
+	
+	 - Move ll_10byte_cmd_build to the only place where it's used: ide-cd.  The SCSI
+	   layer does have it's own implementation which additionally it's messing
+	   around with the hard_nr_sectors struct request value.  One should *not*
+	   provide "infrastructure" until its really used as such.
+	
+	   If anywhere this should reside in a file called ATAPI.
+	
+	 - Unfold the INIT_REQUEST macro from blk.h. This showed up plenty of duplicate
+	   checks for QUEUE_EMPTY. Clean them as well. Remove the over cautious
+	   major(CURRENT->rq_dev != MAJOR_NR) checks. During the last several years I
+	   never saw any report about it. Looking at the !CURRENT->bio it is clear that
+	   dereferencing NULL will provide the same kind of panic as the check.  Some
+	   comments around the code in question show nicely that indeed INIT_REQUEST
+	   was a good example of code obfuscation.
+	
+	 - A short look at RQ_INACTIVE shows that it is only used inside the scsi.c file
+	   and during the removal of devices. This shows that the many checks for
+	   RQ_INACTIVE are not necessary. Looking closer even shows that some of them
+	   did happen before checks for an empty queue. Plenty of drivers didn't care
+	   about it and the CD-ROM ones should be handled properly, because the
+	   most common drivers would fail as well. Comments indicate that this
+	   was an leftover from 1.3 days...
+
+<dalecki@evision-ventures.com>
+	[PATCH] 2.5.17 IDE 67
+	
+	 - Nuke COMMERIAL and similar spurious configuration options...
+	   The fact that every single default configuration option contained
+	   those bits makes this trivial patch appear rather big.
+
+<dalecki@evision-ventures.com>
+	[PATCH] 2.5.16 IDE 68
+	
+	 - Make the different ATAPI device type drivers use a unified packet command
+	   structure. We have to start to push them together.
+	
+	This patch is rather trivial in itself, but the plentora of code duplication it
+	is trying to fight against is making it unfortunately rather big...
+
+<dalecki@evision-ventures.com>
+	[PATCH] 2.5.17 IDE 69
+	
+	 - Apply small host chip driver cosmetics by Andrej xxx Panin
+	   and Vojtech Pavlik.
+	
+	 - Remove support for "disc recovery time". It could only supposedly
+	   help with really simplistic broken devices from the past,
+	   which didn't have moderately sophisticated controllers.
+	   And finally Vojtech voted for it as well... so I just trust him.
+	
+	 - Apply icside host chip driver and other ARM related updates by Russell King,
+	   which finally settle the "portability" work a bit, well hopefully.
+
+<viro@math.psu.edu>
+	[PATCH] (1/4) removal of BKL from d_move()
+	
+		OK, it turned out that since the last time I've done that audit
+	a couple new users of d_parent had appeared.  First, more crapectomy (strictly
+	speaking not necessary, but just look at that code - where the hell does IBM
+	find them?)
+
+<viro@math.psu.edu>
+	[PATCH] (2/4) d_move() BKL removal
+	
+		default encode_fh() doesn't take dparent_lock around messing
+	with dereferences of ->d_parent->d_inode->i_....  Fixed.
+
+<david-b@pacbell.net>
+	[PATCH] usbcore, remove urb->next
+	
+	Given the discussions of last week, this removes urb->next from
+	the USB core API.  This change simplifies the driver API by getting
+	rid of a superfluous feature (and related new-developer confusion),
+	gets rid of a hidden failure mode (drivers can now see resubmit
+	failures), lets us get rid of a HCD feature that isn't consistently
+	implemented, and so on.
+	
+	This will break some code.  There are ISO drivers that don't use
+	urb->next (like audio), but most video drivers do.  My patch #2
+	fixes one such driver.  My patch #3 fixes host controller drivers,
+	most of which were already converted.
+
+<david-b@pacbell.net>
+	[PATCH] cpia_usb, remove urb->next
+	
+	This is the 2.5 version of the sample driver patch I sent around
+	last week.  It updates one video driver to work with the updated
+	ISO API:  no urb->next (explicit resubmit, with error detection)
+	and explicit transfer interval (HCs must remove 1 msec limit).
+	
+	The 2.4 version is known to work, but usb video in 2.5 seems to
+	be a bit ill so this just fixes the compilation problem created
+	by the first of these patches.
+
+<david-b@pacbell.net>
+	[PATCH] hcds, remove urb->next
+	
+	This makes the hcds stop expecting urb->next to exist.
+	
+	        ehci-hcd ... remove obsolete sanity check
+	        usb-uhci-hcd ... remove code (wouldn't be called)
+	
+	Two "old style" drivers got updated too (uhci, usb-uhci)
+	so that folk can use them in case of problems with their
+	"new style" analogues.
+
+<david-b@pacbell.net>
+	[PATCH] audio, set urb->interval
+	
+	This sets urb->interval in two places it hadn't previously been set,
+	allowing things like SOX and XMMS to play through usb audio.
+	
+	Using this and the previous patches, I was able to verify playback
+	of some Ogg Vorbis encoded music using most of the 2.5.17 host
+	controller drivers.  However, "uhci-hcd" and "usb-uhci-hcd" did
+	not want to bind the audio driver:  reading the config descriptor
+	(in audio.c) stalled rather consistently.  That failure was seen
+	with the other USB 1.1 drivers too, but not as consistently.
+
+<dalecki@evision-ventures.com>
+	[PATCH] 2.5.17 dquota punishment
+	
+	Transform new quota code to use sysctl instead of /proc/fs.
+
+<hch@infradead.org>
+	[PATCH] split namei.h out of fs.h
+	
+	Currently fs.h is full of unrelated declarations and included in almost
+	any source file. Thus it makes sense to spilt certain aspects out that are
+	only used by few users.
+	
+	This patch starts with the namei/path lookup interface and splits it into
+	<linux/namei.h> which is now directly included by the 24 files that actually
+	need it.
+
+<greg@kroah.com>
+	USB build changes
+	
+	turned off the uhci.c and usb-uhci.c drivers in the build process to force people
+	to use the uhci-hcd and usb-uhci-hcd drivers.
+
+<torvalds@penguin.transmeta.com>
+	Make sw-suspend compile even without ACPI sleep support.
+
+<viro@math.psu.edu>
+	[PATCH] (3/4) BKL removal from d_move()
+	
+		nfsd_acceptable() calls permission() on a a dentry that is
+	not guaranteed to stay around (its child is pinned down, but there
+	is no promises that child won't move and nothing pins dentry itself).
+	Fixed, cleaned up.
+
+<rusty@rustcorp.com.au>
+	[PATCH] drivers/net/epic100.c: missing __devinit
+	
+	Andrey Panin <pazke@orbita1.ru>: drivers_net_epic100.c: missing __devinit:
+	  This patch adds missing __devinit modifier for read_eeprom() function.
+	  Patch against 2.5.9. Compiles, but untested.
+
+<rusty@rustcorp.com.au>
+	[PATCH] declance.c
+	
+	"Maciej W. Rozycki" <macro@ds2.pg.gda.pl>: [patch] 2.4.19-pre7: A few declance multicast updates:
+	  Hello,
+	
+	   It seems all Ethernet device drivers were bulk-converted to use the new
+	  common CRC functions.  I discovered declance used incorrect endianness to
+	  calculate the sum for its multicast filter and had a few alignment
+	  problems there.  I fixed these bugs in the MIPS/Linux CVS tree which is at
+	  2.4.18 now.  Here is the respective update for the official kernel.
+	
+	   The bugs make the filter non-functional.  Please apply.
+	
+	    Maciej
+
+<rusty@rustcorp.com.au>
+	[PATCH] drivers_net_sundance.c: missing __devinit
+	
+	Andrey Panin <pazke@orbita1.ru>: drivers_net_sundance.c: missing __devinit:
+	  this patch adds missing __devinit modifier to sundance.c network driver.
+	  Patch against 2.5.15. Compiles, but untested.
+
+<rusty@rustcorp.com.au>
+	[PATCH] printk() cleanup in ide-pnp.c
+	
+	Andrey Panin <pazke@orbita1.ru>: printk() cleanup in ide-pnp.c:
+	  Attached patch adds a few missing printk levels in ide-pnp.c file.
+
+<rusty@rustcorp.com.au>
+	[PATCH] Remove warning in fs/nfs/nfsroot.c
+	
+	David Gibson <david@gibson.dropbear.id.au>: TRIVIAL: Remove warning in fs_nfs_nfsroot.c:
+	  Linus, please apply.  The patch below removes a warning in
+	  fs/nfs/nfsroot.c by including a header file providing a prototype for
+	  in_aton().
+
+<rusty@rustcorp.com.au>
+	[PATCH] Fix order of #includes in init_version.c
+	
+	[UTS_MACHINE is now defined in the (generated) compile.h]
+	
+	David Gibson <david@gibson.dropbear.id.au>: [TRIVIAL PATCH] Fix order of #includes in init_version.c:
+	  Linus, please apply.  compile.h must be #included before uts.h, or
+	  uts.h will define UTS_MACHINE (incorrectly) which is then redefined in
+	  compile.h.
+
+<rusty@rustcorp.com.au>
+	[PATCH] DMA-mapping.txt typo fix
+	
+	Roger Luethi <rl@hellgate.ch>: DMA-mapping.txt: sg_dma_length() -> sg_dma_len():
+
+<rusty@rustcorp.com.au>
+	[PATCH] MIPS min/max replacement
+	
+	(Ralf said to send this straight to you)
+	
+	Rusty Russell <rusty@rustcorp.com.au>: Trivial MIPS baget patch to remove minmax macros:
+	  In favour of kernel.h one:
+
+<rusty@rustcorp.com.au>
+	[PATCH] MIPS min/max replacement II
+	
+	(Once again, Ralf said straight to you).
+	
+	Rusty Russell <rusty@rustcorp.com.au>: Trivial MIPS gt64120-pci patch to remove minmax macros:
+	  Also changes over to standard ALIGN macro:
+
+<rusty@rustcorp.com.au>
+	[PATCH] min/max elimination in netfilter.h
+	
+	Rusty Russell <rusty@rustcorp.com.au>: Trivial patch to remove minmax macros:
+	  Hi Harald,
+	  	The MIN & MAX etc. macros aren't used anywhere, and kernel.h
+	  has the new min & max anyway, which should be used.
+	
+	  Cheers,
+	  Rusty.
+
+<rusty@rustcorp.com.au>
+	[PATCH] sigio delivery fix
+	
+	Stephen Rothwell <sfr@canb.auug.org.au>: fix for sigio delivery:
+	  Hi Linus,
+	
+	  This patch means that we keep the upper 16 bits of the si_code
+	  field of the siginfo structure that is delivered with and SIGIOs.
+	  We need this so that the code that actually copies the siginfo_t
+	  out to user mode knows which part of the union to copy.  We currently
+	  get away with out this information because we always copy at least
+	  two ints worth of the union, but this s an ugly hack and I would
+	  like to tidy it up.
+	
+	  Comments?
+
+<rusty@rustcorp.com.au>
+	[PATCH] cris signal fix
+	
+	Stephen Rothwell <sfr@canb.auug.org.au>: small typo in signal code for cris, mips and mips64:
+	  Hi Linus,
+	
+	  This looks very obvious to me but I may be mistaken.
+	
+	  I haven't even attempted to build this as I don't have machines
+	  of any of the affected archs.
+	
+	
+	(Included in 2.4)
+
+<rusty@rustcorp.com.au>
+	[PATCH] serial typo
+	
+	(It's ttyS in every other message in the driver).
+	
+	Zwane Mwaikambo <zwane@linux.realnet.co.sz>: serial unload message:
+
+<rusty@rustcorp.com.au>
+	[PATCH] MIPS/MIPS64  signal fix
+	
+	(Included in 2.4)
+	
+	Stephen Rothwell <sfr@canb.auug.org.au>: small typo in signal code for cris, mips and mips64:
+	  Hi Linus,
+	
+	  This looks very obvious to me but I may be mistaken.
+	
+	  I haven't even attempted to build this as I don't have machines
+	  of any of the affected archs.
+	
+	  --
+	  Cheers,
+	  Stephen Rothwell                    sfr@canb.auug.org.au
+	  http://www.canb.auug.org.au/~sfr/
+
+<rusty@rustcorp.com.au>
+	[PATCH] smp_call_function doco fix
+	
+	Trivial patch update against 2.5.17:
+	dipankar@in.ibm.com: smp_call_function change:
+	  My earlier patch fixed only i386. As per Dave Miller's suggestion,
+	  I have fixed smp_call_function for other smp architectures too.
+	
+	  Description
+	  -----------
+	  Going by the documentation and use of _bh version of spin_lock(),
+	  smp_call_function() is allowed to be called from BH context,
+	  We can run into a deadlock with some locks if we do so.
+	  This because reader-writer locks can sometimes be used optimally
+	  by not disabling irqs while taking the reader side if only the
+	  reader side of the lock is taken from irq context.
+	
+	        CPU #0                                CPU #1
+	
+	        read_lock(&tasklist_lock)
+	                                         write_lock_irq(&tasklist_lock)
+	                                         [spins with interrupt disabled]
+	        [Interrupted by BH]
+	        smp_call_function() for BH
+	             handler
+	                                         [ doesn't take the IPI]
+	
+	  So, cpu #1 doesn't take the IPI and cpu #0 spinwaits
+	  for the IPI handler to start, resulting in a deadlock.
+	
+	  The last time I looked, I couldn't see smp_call_function() being
+	  called from BH context anywhere. So, there is no immediate problem.
+	  However it seems right to correct the documentation and also not
+	  disable BH while taking the call lock since it isn't necessary.
+	  This patch does exactly that.
+	
+	  Thanks
+	  --
+	  Dipankar Sarma  <dipankar@in.ibm.com> http://lse.sourceforge.net
+	  Linux Technology Center, IBM Software Lab, Bangalore, India.
+	
+	  smp_call_func-2.5.14-1.patch
+	  ----------------------------
+
+<rusty@rustcorp.com.au>
+	[PATCH] jiffies.h
+	
+	Trivial patch update against 2.5.17:
+	Tim Schmielau <tim@physik3.uni-rostock.de>: move jiffies from sched.h to it's own jiffies.h:
+	  Move 'jiffies' from sched.h to their own header.
+	  Then pull the sched.h dependency from 67 files that include sched.h for
+	  no apparent reason other than the jiffies declaration.
+	
+	  Move the time_[before,after}{_eq}() macros from timer.h to jiffies.h,
+	  since there are *no* files using them that don't also use jiffies.
+	
+	  Many more sched.h dependencies can be killed after capable(),
+	  request_irq(), and free_irq() are moved out of <linux/sched.h>.
+	
+	
+	  Tim Schmielau <tim@physik3.uni-rostock.de>
+
+<rusty@rustcorp.com.au>
+	[PATCH] arch/arm/kernel/via82c505.c
+	
+	(Included in 2.4)
+	johnpol@2ka.mipt.ru: 1) request_region:
+	  > 	Send them one at a time.  Last time I had to write a script to
+	  > mail them one at a time to myself.
+	
+	  Ooops, sorry... I've got a gluk...
+	
+	  > Thanks!
+	  > Rusty.
+	  > --
+	  >   Anyone who quotes me in their sig is an idiot. -- Rusty Russell.
+	
+	
+	  	Evgeniy Polyakov ( s0mbre )
+
+<rusty@rustcorp.com.au>
+	[PATCH] check_region elimination
+	
+	johnpol@2ka.mipt.ru: 18) request_region check, 11-20:
+	  here is one more trivial check.
+	
+	  So please test and apply.
+	
+	  	Evgeniy Polyakov ( s0mbre )
+
+<rusty@rustcorp.com.au>
+	[PATCH] check_region elimination
+	
+	Trivial patch update against 2.5.17:
+	johnpol@2ka.mipt.ru: 21) request_region check, 21-30:
+	  here is one more trivial check.
+	
+	  So please test and apply.
+	
+	  	Evgeniy Polyakov ( s0mbre )
+
+<rusty@rustcorp.com.au>
+	[PATCH] check_region elimination
+	
+	Trivial patch update against 2.5.17:
+	johnpol@2ka.mipt.ru: Re: 47) request_region check, 41-50:
+
+<rusty@rustcorp.com.au>
+	[PATCH] check_region elimination
+	
+	Trivial patch update against 2.5.17:
+	johnpol@2ka.mipt.ru: 23) request_region check, 21-30:
+	  here is one more trivial check.
+	
+	  So please test and apply.
+	
+	  	Evgeniy Polyakov ( s0mbre )
+
+<viro@math.psu.edu>
+	[PATCH] (4/) BKL removal in d_move()
+	
+		... is finally done.
+
+<viro@math.psu.edu>
+	[PATCH] md.c cleanup
+	
+		Removes dev_unit() and messing with kdev_t in match_dev_unit()
+
+<greg@kroah.com>
+	USB se401, remove urb->next usage
+	
+	Removed the use of the next field due to the change in the urb structure.
+
+<greg@kroah.com>
+	USB stv680, remove urb->next usage
+	
+	Removed the use of the next field due to the change in the urb structure.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	kbuild: Fix command line printing
+	
+	If our command line contains an ';', we'd only print half of
+	it and execute the other half - not good.
+
+<zippel@linux-m68k.org>
+	[PATCH] m68k mmu update
+	
+	This patch removes the quicklist support and updates m68k to the recent
+	page table and tlb interface changes.
+	It also includes some smaller cleanups:
+	- turn "extern inline" into "static inline"
+	- convert some macros into inline functions
+
+<mikpe@csd.uu.se>
+	[PATCH] possible fix for broken floppy driver, take 2
+	
+	Here is an updated patch for the floppy driver which got broken in
+	2.5.13. "read block 0 on ->revalidate()" is now implemented through
+	the bio interface, following a suggestion by Christoph Hellwig.
+	
+	I still cannot explain why block_dev.c's ->bd_block_size change
+	caused data corruption, but removing that code fixes the floppy
+	driver and doesn't seem to cause any problems on my test box.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	drivers/pnp/pnpbios_core.c: Warning fix
+
+<kai@tp1.ruhr-uni-bochum.de>
+	kbuild: Fix warning when .version doesn't exist yet
+
+<rmk@flint.arm.linux.org.uk>
+	[ARM] Fixups for GCC 3.x:
+	 - Provide an ARM architecture major version number so we can use the
+	   preprocessor more effectively to select features that ARMv4 and
+	   above contain.
+	 - Fix GCC 3.1 multi-line __asm__ build warnings
+
+<rmk@flint.arm.linux.org.uk>
+	[ARM] Miscellaneous
+	 - Use definitions where possible.
+	 - Fix various errors in comments.
+	 - Fix missing max_pfn initialisation.
+	 - Add missing device.h and errno.h include files.
+	 - Ensure thread->flags is unsigned long for bitops.
+
+<rmk@flint.arm.linux.org.uk>
+	[ARM] Fix build errors caused by fb changes
+	 - Move *_blank function earlier in the file.
+	 - Correctly limit acornfb virtual y resolution.
+
+<rmk@flint.arm.linux.org.uk>
+	[ARM] Acorn DMA/Expansion card fixups
+	 - Allow icside to moan if it tries to change DMA settings while
+	   the DMA is in progress.
+	 - Fix Acorn expansion card IRQ handling.
+	 - Clean up IOMD DMA state machine.
+
+<rmk@flint.arm.linux.org.uk>
+	[ARM] Remove old NetWinder uncompressed kernel image compatibility code.
+	Add/correct comments, including in decompressor code.  Add arm6 cache
+	support to decompressor.
+
+<rmk@flint.arm.linux.org.uk>
+	[ARM] Make Acorn SCSI drivers build again.
+	 Acorn machines will never have "highmem" support, so can
+	 combine page + offset into the scsi pointer structure for
+	 now.
+
+<rmk@flint.arm.linux.org.uk>
+	[ARM] Make etherh.c build again - combine struct ei_device inside our
+	own device specific structure.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	kbuild: Consistent use of [AC]FLAGS_KERNEL and MODFLAGS
+	
+	We have
+	o CFLAGS_KERNEL: Additional flags for files compiled into vmlinux
+	o AFLAGS_KERNEL: Additional flags for files assembled into vmlinux
+	o MODFLAGS: Additonal flags for files compiled as module
+	
+	For consistency, rename MODFLAGS to CFLAGS_MODULE, introduce
+	AFLAGS_MODULE but leave it empty for now.
+	
+	While we're at, removing "MAKING_MODULES=1", nobody is using it.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	kbuild: Rearrange Rules.make
+	
+	Group the variable-processing part together, which figures out what
+	needs to be done. (Nothing actually changes in this cset)
+
+<greg@kroah.com>
+	USB cdc-ether driver compile time fix
+	
+	fix compile time error, due to addition of jiffies.h
+
+<greg@kroah.com>
+	usb.h #include dependancies and whitespace cleanup
+
+<greg@kroah.com>
+	USB storage #include fixup
+	
+	addition of #include <linux/version.h> due to removal from <linux/usb.h>
+
+<greg@kroah.com>
+	USB driver #include cleanups
+	
+	Removed lots of unneeded #includes from the tty style drivers.
+
+<davem@nuts.ninka.net>
+	Fix build fallout from namei.h/jiffies.h changes.
+	- Include dcache.h/namei.h in fs/autofs/autofs_i.h not dirhash.c
+	- Include list.h and spinlock.h in dcache.h
+	- Include list.h in mount.h and namei.h
+
+<davem@nuts.ninka.net>
+	Sparc64 build fixes:
+	- Yes we really do need sched.h in central.c
+	- Include namei.h in solaris syscall emul layer
+	- Use generic_fls in sparc64 bitops.
+	- Add dummy asm-sparc64/suspend.h
+
+<kai@tp1.ruhr-uni-bochum.de>
+	EXPORT_SYMBOL: Remove the option of implicitly exporting symbols
+	
+	We now always allocate the section __ksymtab, which to modutils means
+	not to implicitly export any symbols.
+	
+	That means that EXPORT_NO_SYMBOLS is now default, and thus can go away
+	in the sources.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	EXPORT_SYMBOL: Remove EXPORT_NO_SYMBOLS from arch/*
+
+<kai@tp1.ruhr-uni-bochum.de>
+	EXPORT_SYMBOL: Remove EXPORT_NO_SYMBOLS from drivers/*
+
+<kai@tp1.ruhr-uni-bochum.de>
+	EXPORT_SYMBOL: Remove EXPORT_NO_SYMBOLS from fs/*
+
+<kai@tp1.ruhr-uni-bochum.de>
+	EXPORT_SYMBOL: Remove EXPORT_NO_SYMBOLS from net/*
+
+<kai@tp1.ruhr-uni-bochum.de>
+	EXPORT_SYMBOL: Remove EXPORT_NO_SYMBOLS from sound/*
+
+<kai@tp1.ruhr-uni-bochum.de>
+	ISDN: Fix compiler warnings
+	
+	The copy_to/from_user fixes left some variables unused, which
+	the compiler warned about.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	kbuild: Small cleanups
+	
+	o Use a shorter expression to transform 'foo.o' -> 'foo-objs'
+	o Define EXPORT_FLAGS (as -DEXPORT_SYMTAB) in the main Makefile
+	o Small rearrangement of code in Rules.make
+
+<kai@tp1.ruhr-uni-bochum.de>
+	kbuild: Use standard multi-part object declaration in drivers/char/*
+
+<kai@tp1.ruhr-uni-bochum.de>
+	kbuild: Use standard multi-part object declaration in drivers/video/*
+
+<kai@tp1.ruhr-uni-bochum.de>
+	ISDN: Use 'built-in.o' instead of 'vmlinux-obj.o' as O_TARGET
+
+<kai@tp1.ruhr-uni-bochum.de>
+	kbuild: Assorted small cleanups
+	
+	o Standardize building math-emu.o for arch/alpha
+	o Remove old boilerplate code / redundant comments
+	o Remove unnecessary obj-m := $(sort $(obj-m)) in ALSA
+
+<kai@tp1.ruhr-uni-bochum.de>
+	ISDN: Move AVM Config.help entries to right dir
+	
+	(Christoph Hellwig)
+
+<dhowells@redhat.com>
+	[PATCH] Re: rwsem update
+	
+	The attached patch fixes the compilation problems Andrew Morton has been
+	seeing with the rw-semaphores in the kernel when using gcc 2.95.3 with
+	-O1.
+
+<hch@infradead.org>
+	[PATCH] include buffer_head.h in actual users instead of fs.h (1/10)
+	
+	Now that fs.h grow due to the lock.h removal let's reduce it's overhead
+	again:  Instead of penalizing ever user of fs.h with the overhead of the
+	buffer head interface let it's users include it directly.
+	
+	This also shows nicely which parts of the core kernel still depend on the
+	buffer head interface, and allows that to be cleaned up properly.
+	
+	This is the first of ten patches and adds the includes needed by
+	buffer_head.h to it and fixes it's inclusion guard.
+
+<hch@infradead.org>
+	[PATCH] include buffer_head.h in actual users instead of fs.h (2/10)
+	
+	Declare buffer_init() extern in init/main.c like the other _init so that
+	it doesn't have to include buffer_head.h.  Remove buffer_init() there.
+
+<hch@infradead.org>
+	[PATCH] include buffer_head.h in actual users instead of fs.h (3/10)
+	
+	Remove unused bh_kmap/bh_kunmap inlines from highmem.h.
+
+<hch@infradead.org>
+	[PATCH] include buffer_head.h in actual users instead of fs.h (4/10)
+	
+	Remove two unused declarations in fs/jffs/intrep.h.
+
+<hch@infradead.org>
+	[PATCH] include buffer_head.h in actual users instead of fs.h (5/10)
+	
+	Include buffer_head.h directly in the file in drivers/ that need it
+	(9 files).  Note that most of this uses are layering violations that I
+	will address later.
+
+<hch@infradead.org>
+	[PATCH] include buffer_head.h in actual users instead of fs.h (6/10)
+	
+	Make the 7 file that need it in mm/ include buffer_head.h directly.
+	Once again most files shouln't need it and want fixing.
+
+<hch@infradead.org>
+	[PATCH] include buffer_head.h in actual users instead of fs.h (7/10)
+	
+	Make the 5 headers in include/linux that need it include buffer_head.h
+	directly.
+
+<hch@infradead.org>
+	[PATCH] include buffer_head.h in actual users instead of fs.h (8/10)
+	
+	Make kernel/ksyms.c include buffer_head.h directly.
+
+<hch@infradead.org>
+	[PATCH] include buffer_head.h in actual users instead of fs.h (9/10)
+	
+	Make the 144 files in fs/ that need it include buffer_head.h directly.
+	Again some uses in the VFS files are layering violations and need to
+	be addressed later.  The new include statement gives a nice grep pattern
+	for that :)
+
+<hch@infradead.org>
+	[PATCH] include buffer_head.h in actual users instead of fs.h (10/10)
+	
+	No more need to include buffer_head.h in fs.h.  Finally.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	Fix dummy gameport_{,un}register_port
+	
+	Needs static, otherwise one gets multiple definitions in the final
+	vmlinux image.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	Compiler warning fixes
+	
+	__initcalls are supposed to return a value.
+	Statically initialize the struct instead of doing strcpy() at runtime.
+
+<torvalds@home.transmeta.com>
+	Fix over-eager header file cleanup
+
+<torvalds@home.transmeta.com>
+	Merge DRI CVS tree into standard kernel
+
+<dalecki@evision-ventures.com>
+	[PATCH] 2.5.17 IDE 70
+	
+	 - Apply host chip driver cleanups by Bartomiej Zonierkiewicz.
+	
+	 - Take the draft device type driver implementation from Adam Richter and make
+	    it actually work with some of the drivers we have at hand. Quite a lot
+	    of it was fixed by me as well to have the desired effects.
+	
+	    We have added a attach method for the sub device type drivers to make it
+	    possible dor sub device type drivers to attach devices to the overall
+	    infrastructure. UNIX has something like this SCSI code is implementing
+	    something like this, just for some unknown reasons Linux block device
+	    operations don't have it...
+	
+	 - ide_drive_t is finally gone. Please use struct ata_device instead.
+	
+	    Hint the ide.h specific byte type should go over time as well, sine there
+	    is no need to invent something already handled by the kernel. Please use
+	    the unambigious u8 type instead where possible.
+	
+	 - Add a bit of documentation about cabling issues. ide.txt needs a lot of
+	   improvement at some time still.
+
+<torvalds@penguin.transmeta.com>
+	Clean up tlb_start/end_vma.
+
+<torvalds@penguin.transmeta.com>
+	Fix up header file
+
+<pavel@ucw.cz>
+	[PATCH] swsusp cleanups
+	
+	These are cleanups. They do not change any code, except killing
+	printk's.
+
+<pavel@ucw.cz>
+	[PATCH] swsusp: making myself maintainer
+	
+	I asked Gabor if he'd like me to maintain swsusp, and he liked that
+	idea [<quote>Would you please take over maintaining? I offered this in
+	the list a while ago anyway.</quote>].
+
+<pavel@ucw.cz>
+	[PATCH] swsusp fixes
+	
+	This kills unneccessary include from ide-disk.c, kills #ifdef from
+	reiserfs/journal.c, makes suspend_device local as it should be,
+	abstains from suspending devices two times in a row (typo), and makes
+	sure we do not run_task_queue() while we hold spinlock.
+
+<torvalds@home.transmeta.com>
+	Fix up more headers to make the drm merge compile more cleanly
+
+<kai@tp1.ruhr-uni-bochum.de>
+	Add missing includes
+	
+	Fixes a warning in ieee1394_types.h and an error in include/linux/usb.h
+
+<acme@conectiva.com.br>
+	drivers/char/rio/*.c
+	
+	  - make sure return codes are negative (i.e. return -ENOMEM and not return ENOMEM et al)
+
+<kai@tp1.ruhr-uni-bochum.de>
+	kbuild: Make O_TARGET default to 'built-in.o'
+	
+	If a Makefile defines neither O_TARGET nor L_TARGET, let's assume a
+	default of 'built-in.o'. The goal of this is, of course, to eventually
+	get rid of O_TARGET completely.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	kbuild: Remove now redundant 'O_TARGET := built-in.o' lines
+	
+	(plus a bit of rearranging in the ISDN Makefiles) 
+
+<kai@tp1.ruhr-uni-bochum.de>
+	kbuild: Clean up sound/*/Makefile
+
+<kai@tp1.ruhr-uni-bochum.de>
+	kbuild: Remove usage of L_TARGET in drivers/*
+	
+	We use O_TARGET everywhere else, so let's just convert the remaining
+	users (They get the implicit built-in.o O_TARGET now)
+
+<kai@tp1.ruhr-uni-bochum.de>
+	kbuild: Correct dependencies for generated soundmodem tables
+	
+	Build the headers only when we need them during the build, not always
+	at 'make dep' time.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	kbuild: Simplify linking subdirs in drivers/*/Makefile
+	
+	Use the new
+	
+		obj-$(CONFIG_FOO) += foo/
+	
+	syntax to descend into a subdir and link in the result, if
+	CONFIG_FOO=y.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	kbuild: Beautify ACPI Makefiles
+
+<kai@tp1.ruhr-uni-bochum.de>
+	kbuild: Use standard multi-part object declaration in lib/*
+
+<kai@tp1.ruhr-uni-bochum.de>
+	kbuild: Use standard multi-part object declaration in fs/*
+
+<kai@tp1.ruhr-uni-bochum.de>
+	kbuild: Use standard multi-part object declaration in net/*
+
+<viro@math.psu.edu>
+	[PATCH] kdev_t -> bdev cleanups [1/2]
+	
+	 - kill the last caller of get_hardsect_size() (switching it to
+	   bdev_hardsect_size()).
+	
+	 - kill blk_get_queue() and switching to bdev_get_queue()
+
+<torvalds@home.transmeta.com>
+	Undo block devices changes from floppy fix: incorrect.
+
+<viro@math.psu.edu>
+	[PATCH] kdev_t -> bdev cleanups [2/2]
+	
+	 - move the contents of bdev_get_queue() into do_open() and
+	   check_partitions() and cache the result in new field of struct
+	   block_device
+	
+	 - clean it at the same places that reset ->bd_op, etc.
+	
+	 - make bdev_get_queue() return cached pointer.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	kbuild: Fix some issues I missed before
+	
+	Didn't get the net/ conversion quite right, and apparently overlooked
+	one subdir in sound/. Now fixed.
+
+<torvalds@home.transmeta.com>
+	Update kernel version
+

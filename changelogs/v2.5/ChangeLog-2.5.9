@@ -1,0 +1,1682 @@
+
+	Release notes for v2.5.9
+
+
+
+Summary of changes from v2.5.8 to v2.5.9
+============================================
+
+<kai@tp1.ruhr-uni-bochum.de> (02/03/10 1.369.44.1)
+	fix up a comment in drivers/isdn/icn/Makefile
+
+<davidm@wailua.hpl.hp.com> (02/03/15 1.369.62.5)
+	Cset exclude: davidm@hpl.hp.com|ChangeSet|20020312081510|17850
+
+<kai@tp1.ruhr-uni-bochum.de> (02/03/22 1.369.81.1)
+	Remove list-multi plus associated link rules in various Makefiles.
+
+<davidm@wailua.hpl.hp.com> (02/03/27 1.369.62.6)
+	Fix ia64-version of thread_info.  Add McKinley-optimized copy_page().
+
+<davidm@wailua.hpl.hp.com> (02/03/27 1.369.85.2)
+	Minor tweaks for McKinley-optimized copy_page().
+	Fix configuration for HP Ski simulator.
+
+<davidm@wailua.hpl.hp.com> (02/03/28 1.369.85.3)
+	arch/ia64/defconfig:
+		Update for v2.5.7.
+	
+
+<davidm@hpl.hp.com> (02/03/28 1.369.85.4)
+	[PATCH] First part of sync with 2.5.7 (ACPI still broken, Ski OK)..
+	
+
+<elenstev@mesatop.com> (02/03/28 1.369.85.5)
+	[PATCH] This patch adds 5 help texts to arch/ia64/Config.help.
+	The texts were obtained from Eric S. Raymond's v2.97 Configure.help.
+	
+
+<Matt_Domsch@Dell.com> (02/03/28 1.369.85.6)
+	[PATCH] IA-64 specific part of Matt's patch:
+	
+	changes:
+	* EFI_GUID macro defined per your suggestion - efi_guid_t is now a struct of
+	char[16].  Fixed all GUID definitions.
+	* Made one unified efi_guid_unparse() static inline in asm-ia64/efi.h.
+	Removed three other definitions of similar in efivars.c and mca.c.
+	* fixed endianness of fs/partitions/efi.c - thanks to Richard Hirst and his
+	GPT work in Parted.
+	* cleaned up find_valid_gpt() to make it easier to see what's going on and
+	avoid future NULL ptr deref cases if this code gets modified yet again.
+	* Only use partition table slots 0..max_p.  The previous behaviour would let
+	you delete a partition in the middle of the table, and on next boot all the
+	partition numbers above that would switch down.  This change makes it
+	consistent with the MSDOS concept of primary partitions.  /dev/sdaX exists
+	iff the partition type is not NULL.
+	* Moved CONFIG_PARTITION_EFI help text to fs/partitions/Config.help
+	
+
+<davidm@wailua.hpl.hp.com> (02/04/01 1.369.85.7)
+	Initialize ar.k0 with physical I/O base not just on BP but also on
+	all APs (based on patch by Bjorn Helgaas).
+
+<davidm@wailua.hpl.hp.com> (02/04/02 1.369.85.8)
+	(arch/ia64/kernel/unwind_i.h): Fix typo in comment.
+
+<Matt_Domsch@Dell.com> (02/04/02 1.369.85.9)
+	[PATCH] Wouldn't you know it, but Richard Hirst found that I was *again* unparsing
+	
+	Patch below should apply to both the 2.5.7-pre1 and 2.4.18 trees.
+	
+
+<garyhade@us.ibm.com> (02/04/02 1.369.85.10)
+	[PATCH] arch/ia64/Makefile tweak
+	
+
+<davidm@wailua.hpl.hp.com> (02/04/02 1.369.85.11)
+	arch/ia64/lib/copy_page_mck.S:
+	    Tweak for better performance when data is in L2 or L3 cache.
+
+<davidm@wailua.hpl.hp.com> (02/04/05 1.369.85.12)
+	Fix software I/O TLB to always return <4GB memory for alloc_consistent().
+
+<davidm@wailua.hpl.hp.com> (02/04/05 1.369.85.13)
+	New files for HP zx1 systems.
+
+<bjorn_helgaas@hp.com> (02/04/05 1.369.85.14)
+	[PATCH] Add support for HP zx1 systems.
+	
+
+<davidm@wailua.hpl.hp.com> (02/04/05 1.369.85.15)
+	Fix HP simulator Makefile for merge conflict with zx1 support patch.
+
+<rmk@flint.arm.linux.org.uk> (02/04/06 1.369.112.1)
+	The some of the existing ARM CPU "wait for interrupt" implementations
+	were buggy - they'd test hlt_counter/need_resched with interrupts
+	enabled, and then go to sleep.  An interrupt could be received between
+	the test and sleeping, and we could have 10ms latency before we ran
+	a task.  This changeset fixes this by providing a generic "cpu idle"
+	wrapper that handles these issues.
+
+<rmk@flint.arm.linux.org.uk> (02/04/06 1.369.112.2)
+	Pass the next task 'mm' struct to the CPU mm switching code (so
+	we can access data in mm->context.)
+
+<rmk@flint.arm.linux.org.uk> (02/04/06 1.369.112.3)
+	Fix ISA interrupt initialisation on footbridge machines.
+
+<rmk@flint.arm.linux.org.uk> (02/04/06 1.369.112.4)
+	Some small fixes:
+	 - Fix up decompressor for ARM720T cache handling.
+	 - Set PCI cache line size register while enumerating devices.
+	 - Report correct cache sizes.
+	 - Ensure machine vectors are in memory for instruction fetches
+	   (important when you have write-allocate write back caches).
+	 - Fix bug in ARMv5ej abort handler.
+	 - Update mach-types to latest version.
+
+<rmk@flint.arm.linux.org.uk> (02/04/07 1.369.112.5)
+	Clean up sa1111 initialisation.  Provide sa1111 base 'device' in the
+	device tree.  Move towards using ioremap to map the sa1111 device.
+
+<rmk@flint.arm.linux.org.uk> (02/04/07 1.369.112.6)
+	Fix page_to_phys() and convert virt_to_bus()/virt_to_phys() to
+	page_to_bus()/page_to_phys() in consistent.c
+
+<davidm@wailua.hpl.hp.com> (02/04/08 1.369.85.16)
+	Misc fixes.
+
+<schwab@suse.de> (02/04/08 1.369.85.17)
+	[PATCH] The kernel cannot cope with modules without unwind data, which happens
+	with data-only modules like the fs/nls modules when compiling with gcc
+	3.1.  This patch fixes the problem.
+	
+
+<greg@kroah.com> (02/04/09 1.369.114.14)
+	USB - removed the dc2xx driver
+
+<greg@kroah.com> (02/04/09 1.369.114.15)
+	removed unused usb storage makefile rules.
+
+<david-b@pacbell.net> (02/04/09 1.369.114.16)
+	[PATCH] USB physical paths id
+	
+	This provides something that gets discussed regularly: stable
+	device IDs.  Straightforward; most of it was already present:
+	
+	    - Moves "bus_name" out of HCD framework into usb_bus.
+	      This accounts for _by far the bulk_ of this patch, since
+	      every use of that original field needed to change.
+	
+	    - Make Vojtech's usb_make_path() use bus_name instead
+	      of unstable bus numbers ... and usb_device->devpath
+	      instead of recomputing that same info.  Combine two
+	      stable IDs, and the result is still stable.  And since both
+	      are precomputed, usb_make_path() turns into only an
+	      error check wrapped around snprintf() ... so I inlined it.
+	
+	    - Minor tweak to usb_device->devpath construction.  It
+	      still uses "/" for the root hub (better suggestions?) but
+	      Vojtech wanted "." for separators, so I changed that.
+	
+	    - The older HCDs (uhci.c etc) initialize usb_bus.bus_name,
+	      as well as the sharable HCD framework
+	
+	    - HCD framework no longer uses "bus" member.
+	
+	These IDs are currently exposed in "input" hotplugging, and
+	my next patch addresses that for USB network devices.
+
+<david-b@pacbell.net> (02/04/09 1.369.114.17)
+	[PATCH] USB net drivers, ethtool bus_info
+	
+	USB net drivers, ethtool bus_info
+	
+	This patch makes the USB network drivers that have ethtool support
+	expose only those stable IDs ... no more references to unstable values
+	like dev->bus->busnum (changes depending on order of modprobe)
+	or dev->devnum (assigned not quite randomly during enumeration :).
+	
+	This supports more intelligent policies for user mode tools, such
+	as "always assign this address to the device on that port", as well
+	as making troubleshooting more practical when there are multiple
+	devices (of a given type) present ... you can tell which is which.
+
+<david-b@pacbell.net> (02/04/09 1.369.114.18)
+	[PATCH] USB GeneLink/NDIS tweaks
+	
+	USB GeneLink/NDIS tweaks
+	
+	This patch, from Oliver, discards slightly less data in cases
+	where memory is very tight.  The GeneLink framing can batch
+	several packets in one transmission, so it's always possible to
+	at least report the last one, since it's already sitting in an SKB
+	and we won't need a new one.
+	
+	Random note, this seems to be the same issue I saw
+	mentioned somewhere else recently:  MSFT host drivers
+	with high latency for submitting bulk packets, so rather
+	than just queuing them as they arrive, it turns out to be a
+	win on the MSFT side to batch packets.
+
+<pmanolov@Lnxw.COM> (02/04/09 1.369.114.19)
+	[PATCH] rtl8150 for 2.5
+	
+	This one is fixing the problems Oliver spoted.  Namely:
+		- double free in probe();
+		- Rx skb pool resolves the issue with OOM condition in
+		   read_bulk_callback() which potentially kills the Rx path;
+
+<shaggy@kleikamp.austin.ibm.com> (02/04/10 1.456.1.1)
+	Export discard_bh_page and use block_flushpage in JFS
+	
+	Note: discard_bh_page is already exported in 2.4.
+	
+	Currently the 2.5 version of JFS works around the lack of
+	block_flushpage availability in modules by abusing
+	generic_buffer_fdatasync instead.   Exporting discard_bh_page
+	as in 2.4 solves this.
+	
+	Submitted by Christoph Hellwig
+
+<johannes@erdfelt.com> (02/04/10 1.456.3.2)
+	[PATCH] Re: removing sleep_on in hub.c
+	
+	On Mon, Apr 08, 2002, Oliver Neukum <oliver@neukum.org> wrote:
+	> using sleep_on is a race. The attached patch replaces it with the
+	> new wait_event macro from sched.h. The patch is against the 2.5
+	> from Greg.
+	
+	Greg, I've tested this against 2.4.19-pre6 as well and the attached
+	patch is relative to that.
+	
+	Please apply.
+	
+	Thank Oliver!
+
+<petkan@mastika.lnxw.com> (02/04/10 1.456.3.3)
+	[PATCH] put some usb net devices out of the experimental list
+	
+	USB network drivers
+	
+	put some usb net devices out of the experimental list
+
+<oliver@oenone.homelinux.org> (02/04/10 1.456.3.4)
+	[PATCH] USB kaweth: fix races between timeout, xmit and disconnect
+	
+	USB kaweth driver update
+	
+	 - always set the ASYNC_UNLINK flag for the tx urb
+	 - correct cancelling the tx urb under all circumstances
+	 - detect a running disconnect method in xmit path
+	 - fix a potential deadlock by using GFP_NOIO
+
+<oliver@neukum.org> (02/04/10 1.456.3.5)
+	[PATCH] catc: GFP_KERNEL in interrupt or with spinlocks held
+	
+	bad usage of mem_flags in catc.
+
+<davidm@wailua.hpl.hp.com> (02/04/10 1.369.85.18)
+	Tune __ia64_init_fpu() for better performance and smaller size.
+
+<bjorn_helgaas@hp.com> (02/04/10 1.369.85.19)
+	[PATCH] This patch against 2.4.18+ia64-020226 removes a legacy VGA
+	dependency.  Non-legacy systems may have system memory
+	at 0xA0000, and if that's the case, we don't want to install the
+	VGA console.
+	
+	Restructured conswitchp init slightly so that if both
+	CONFIG_DUMMY_CONSOLE and CONFIG_VGA_CONSOLE
+	are defined, conswitchp is always set to something, even if we
+	don't find VGA at 0xA0000.
+	
+	This work is due to Alex Williamson (alex_williamson@hp.com).
+	
+
+<davidm@wailua.hpl.hp.com> (02/04/10 1.369.85.20)
+	More EFI fixes.
+
+<davidm@wailua.hpl.hp.com> (02/04/10 1.369.85.21)
+	More McKinley tuning and minor do_csum() cleanup.
+
+<davidm@wailua.hpl.hp.com> (02/04/10 1.369.85.22)
+	Manual merge with Paul's 2.4.18 ACPI update.
+
+<rlievin@free.fr> (02/04/10 1.456.3.6)
+	[PATCH] tiglusb mutex bugfix
+	
+	USB tiglusb driver
+	
+	Fixes a locking bug, and changes the command line option, as
+	it was clashing with another part of the kernel.
+
+<davidm@wailua.hpl.hp.com> (02/04/10 1.369.85.23)
+	acpi.c:
+	  Paul's ACPI update.
+
+<davidm@wailua.hpl.hp.com> (02/04/10 1.369.85.25)
+	smpboot.c:
+	  Declare ia64_iobase.
+
+<davidm@wailua.hpl.hp.com> (02/04/10 1.369.85.26)
+	setup.c:
+	  Move disabling of 8259 irqs into iosapic.c.
+
+<davidm@wailua.hpl.hp.com> (02/04/10 1.369.85.27)
+	ia64: Misc fixups.
+
+<davidm@wailua.hpl.hp.com> (02/04/10 1.369.85.28)
+	Cset exclude: davidm@wailua.hpl.hp.com|ChangeSet|20020411000006|41013
+
+<davidm@wailua.hpl.hp.com> (02/04/10 1.369.85.29)
+	minstate.h:
+	  Add mising include of <asm/cache.h>.
+
+<davidm@wailua.hpl.hp.com> (02/04/10 1.456.6.2)
+	ia64: Add asm/cacheflush.h and asm/tlbflush.h.
+
+<greg@kroah.com> (02/04/11 1.456.3.7)
+	USB serial drivers
+	
+	added missing owner fields.
+
+<greg@kroah.com> (02/04/11 1.456.3.8)
+	USB serial core
+	
+	added /proc support through the tty layer.
+
+<davidm@wailua.hpl.hp.com> (02/04/11 1.456.6.3)
+	ia64: Make v2.5.8-pre3 work on ia64.
+
+<davidm@wailua.hpl.hp.com> (02/04/11 1.456.6.4)
+	ia64: make 2.5.8-pre3 work on SMP ia64.
+
+<kai@tp1.ruhr-uni-bochum.de> (02/04/12 1.456.7.2)
+	Handle $(export-objs) ambiguity
+	
+	We use the makefile variable $(foo-objs) to list the objects
+	a composed module foo.o is supposed to be composed of.
+	
+	We use the special varible $(export-objs) to list the object files which
+	export symbols.
+	
+	This oviously clashes in the case of foo == export. There's basically
+	two ways to handle it: (1) rename one of these options, like 
+	foo-objs to foo-parts or something, or (2) simply disallow a composite
+	object called export.o, so you never need $(export-objs) to list its
+	parts.
+	
+	As (1) would affect basically all Makefiles in the tree and (2) doesn't
+	seem much of a limitation, I went for (2).
+
+<david-b@pacbell.com> (02/04/12 1.456.3.9)
+	[PATCH] USB minor ehci cleanup
+	
+	USB minor ehci cleanup
+	
+	This patch just does minor internal cleanup, renaming to
+	match the put/get convention used elsewhere in Linux.
+	(Get ref, put it back ... not "putting a new ref here".)
+
+<david-b@pacbell.net> (02/04/12 1.456.3.10)
+	[PATCH] USB devio device removal fix
+	
+	USB devio device removal fix
+	
+	Fixes problem with using usbfs and a device is removed while the
+	device still has pending events.
+
+<sailer@scs.ch> (02/04/12 1.456.3.11)
+	[PATCH] Wrong sanity check in audio.c
+	
+	Even though I originally implemented it, the sanity check removed
+	by the patch below seems wrong to me...
+
+<davidm@wailua.hpl.hp.com> (02/04/12 1.456.6.5)
+	ia64: clean up to enable 64KB page size.
+
+<davidm@wailua.hpl.hp.com> (02/04/13 1.456.6.6)
+	Make memset() detect the special-case of clear-to-zero and call __bzero() in that case.
+
+<dirk.behme@de.bosch.com> (02/04/14 1.369.59.10)
+	[PATCH] 1101/1: Make armksyms.c compile again with gcc 3.0.2
+	
+	Make arch/arm/kernel/armksyms.c compile again with gcc 3.0.2 because of new EXPORT_SYMBOL_NOVERS(abort); in patch-2_4_18-rmk3.gz. See my mail "EXPORT_SYMBOL_NOVERS(abort) in armksyms.c?" in linux-arm-kernel list from Mon, 25 Mar 2002.
+	
+	Dirk
+
+<alexander.schulz@innominate.com> (02/04/14 1.369.59.11)
+	[PATCH] 1107/1: Shark: defconfig and updates
+	This patch updates the defconfig for the Shark and adds an
+	extern and a define so that the kernel compiles for the Shark.
+	
+	Regards
+	  Alexander
+	
+
+<rmk@flint.arm.linux.org.uk> (02/04/14 1.456.8.2)
+	PCI address mapping macros depend on CONFIG_PCI not CONFIG_SA1111
+
+<rmk@flint.arm.linux.org.uk> (02/04/14 1.456.8.3)
+	KAOS pointed out cyber2000fb doesn't build on x86.  This changeset
+	fixes this problem.
+
+<kai@tp1.ruhr-uni-bochum.de> (02/04/14 1.456.9.1)
+	Fix setup_per_pcu_areas() for UP compile
+	
+	For !CONFIG_SMP we want the empty inline setup_per_cpu_areas().
+	If CONFIG_SMP is set, we never want the empty inline. If we use the
+	generic implementation, we have it here, if not the arch has it somwhere
+	else (hopefully).
+	
+
+<kai@tp1.ruhr-uni-bochum.de> (02/04/14 1.456.9.2)
+	Avoid a compile-time warning in bluesmoke.c
+	
+	(intel_thermal_interrupt() defined but not used)
+
+<kai@tp1.ruhr-uni-bochum.de> (02/04/14 1.456.9.3)
+	Fix neofb.c to use strsep.
+
+<mingo@elte.hu> (02/04/15 1.489.2.1)
+	the IRQ balancing feature is based on the following requirements:
+	
+	- irq handlers should be cache-affine to a large degree, without the
+	  explicit use of /proc/irq/*/smp_affinity.
+	
+	- idle CPUs should be preferred over busy CPUs when directing IRQs towards
+	  them.
+	
+	- the distribution of IRQs should be random, to avoid all IRQs going to
+	  the same CPU, and to avoid 'heavy' IRQs from loading certain CPUs
+	  unfairly over CPUs that handle 'light' IRQs. The IRQ system has no
+	  knowledge about how 'heavy' an IRQ handler is in terms of CPU cycles.
+	
+	here is the design and implementation:
+	
+	- we make per-irq decisions about where the IRQ will go to next. Right
+	  now it's a fastpath and a slowpath, the real stuff happens in the slow
+	  path. The fastpath is very lightweight.
+	
+	- [ i decided not to measure IRQ handler overhead via RDTSC - it ends up
+	    being very messy, and if we want to be 100% fair then we also need to
+	    measure softirq overhead, and since there is no 1:1 relationship
+	    between softirq load and hardirq load, it's impossible to do
+	    correctly. So the IRQ balancer achieves fairness via randomness. ]
+	
+	- we stay affine in the micro timescale, and we are loading the CPUs
+	  fairly in the macro timescale. The IO-APIC's lowest priority
+	  distribution method rotated IRQs between CPUs once per IRQ, which was
+	  the worst possible solution for good cache-affinity.
+	
+	- to achieve fairness and to avoid lock-step situations some real
+	  randomness is needed. The IRQs will wander in the allowed CPU group
+	  randomly, in a brownean motion fashion. This is what the 'move()'
+	  function accomplishes. The IRQ moves one step forward or one step
+	  backwards in the allowed CPU mask. [ Note that this achieves a level of
+	  NUMA affinity as well, nearby CPUs are more likely to be NUMA-affine. ]
+	
+	- the irq balancer has some knowledge about 'how idle' a single CPU is.
+	  The idle task updates the idle_timestamp. Since this update is in the
+	  idle-to-be codepath, it does not increase the latency of idle-wakeup,
+	  the overhead should be zero in all cases that matter. The idle-balancing
+	  happens the following way: when searching for the next target CPU after
+	  a 'IRQ tick' has expired, we first search 'idle enough' CPUs in the
+	  allowed set. If this does not succeed then we search all CPUs.
+	
+	- the patch is fully compatible with the /proc/irq/*/smp_affinity
+	  interface as well, everything works as expected.
+	
+	note that the current implementation can be expressed equivalently in
+	terms of timer-interrupt-driven IRQ redirection. But i wanted to get some
+	real feedback before removing the possibility to do finer grained
+	decisions - and the per-IRQ overhead is very small anyway.
+
+<dalecki@evision-ventures.com> (02/04/15 1.489.1.4)
+	[PATCH] 2.5.8 IDE 34
+	
+	- Synchronize with 2.5.8.
+	
+	- Eliminate the cdrom_log_sense() function.
+	
+	- Pass a struct request to cdrom_analyze_sense_data() since this is the entity
+	   this function is working on. This shows nicely that this function is broken.
+	
+	- Use CDROM_PACKET_SIZE where appropriate.
+	
+	- Kill the obfuscating cmd_buf and cmd_len local variables from
+	   cdrom_transfer_packet_command(). This made it obvious that the parameters of
+	   this function where not adequate - to say the least. Fix this.
+	
+	- Pass a packed command array directly to cdrom_queue_packed_command().  This
+	   is reducing the number of places where we have to deal with the c member of
+	   struct packet_command.
+	
+	- Never pass NULL as sense to cdrom_lockdoor().
+	
+	- Eliminate cdrom_do_block_pc().
+	
+	- Eliminate the c member of struct packet_command. Pass them through struct
+	   request cmd member.
+	
+	- Don't enable TCQ unconditionally if there is a TCQ queue depth defined.
+	
+	- Fix small think in ide_cmd_ioctl() rewrite. (My appologies to everyone who
+	   has to use hdparm to setup his system...)
+	
+	- Fix compilation without PCI support.
+
+<axboe@suse.de> (02/04/15 1.489.1.5)
+	[PATCH] 2.5.8 IDE 35
+	
+	- Expand configure help options a bit
+	- Fix xconfig bug
+	- Decrease queue depth if a command takes too long to complete
+	- Test master/slave stuff. It works, but one device can heavily starve
+	   another. This is the simple approach right now, means that one device
+	   will wait until the other is completely idle before starting any
+	   commands This is not necessary since we can have queued commands on
+	   both devices at the same time. TODO.
+	- Add proc output for oldest command, just for testing.
+	- pci_dev compile fixes.
+	- Make sure ide-disk doesn't BUG if TCQ is not used, basically this was
+	   fixed by off-loading the using_tcq setting to ide-tcq.
+	- Remove warning about 'queued feature set not supported'
+	- Abstract ide_tcq_wait_dataphase() into a function
+
+<rgooch@ras.ucalgary.ca> (02/04/15 1.492)
+	[PATCH] devfs patch for 2.5.8
+	
+	- Updated fs/devfs/util.c to fix shift warning on 64 bit machines
+	  Thanks to Anton Blanchard <anton@samba.org>
+	
+	- Updated README from master HTML file
+
+<dougg@torque.net> (02/04/15 1.493)
+	[PATCH] scsicam lk2.5.8-pre3
+	
+	 - allow detection of pre-existing disk geometry
+
+<dougg@torque.net> (02/04/15 1.494)
+	[PATCH] scsi_debug driver lk2.5.8-pre3
+	
+	 - fixe compile error (scatterlist::address replaced)
+	 - simplify obtaining ram disk memory (using vmalloc)
+	 - improve SCSI INQUIRY and MODE SENSE support
+
+<davej@suse.de> (02/04/15 1.495)
+	[PATCH] PnP BIOS catch up
+	
+	The patch to the PnP BIOS driver that was in 2.5.7-dj and which
+	went into 2.5.8-pre1 did not include Brian Gerst's SMP fix.
+
+<elenstev@mesatop.com> (02/04/15 1.496)
+	[PATCH] 2.5.7-dj2 add 5 help texts to arch/ia64/Config.help
+	
+	This patch adds 5 help texts to arch/ia64/Config.help.  The texts were
+	obtained from Eric S.  Raymond's v2.97 Configure.help.
+
+<akpm@zip.com.au> (02/04/15 1.497)
+	[PATCH] JFS build fix for 2.5.8
+	
+	Missed a page->buffers -> page->private conversion.
+	Apologies..
+
+<davej@suse.de> (02/04/15 1.498)
+	[PATCH] Seperates bfs_sb_info from struct super_block.
+	
+	Originally from Brian Gerst
+	
+	(Includes the bfs fix sent prior to this one to this -- disregard
+	 earlier bfs related email)
+
+<liyang@nerv.cx> (02/04/15 1.499)
+	[PATCH] Bug in NLS UTF-8 code
+	
+	I've recently (actually, last month, but I had been a bit too busy
+	since then) come across a wee problem, in what I originally thought
+	was the VFAT code -- having `utf8' as one of the options, creating
+	UTF-8 file names on a VFAT partition mysteriously gains a couple of
+	(random) characters just after the UTF-8 escaped character: eg.
+	touch "fooCbar" where C is an UTF-8 escape sequence ends up creating
+	a file named "fooCRbar". (R being some random character.)
+	
+	I eventually tracked it down to one line in fs/nls/nls_base.c -- the
+	UCS-2 (wchar_t) string pointer was being incremented too fast. After
+	consulting Ogawa Hirofumi-san on the subject, he mentioned that
+	include/linux/nls.h also needs to be changed for proper UTF-8
+	support in the NLS code.
+
+<akpm@zip.com.au> (02/04/15 1.500)
+	[PATCH] don't allocate ratnodes under PF_MEMALLOC
+	
+	On the swap_out() path, the radix-tree pagecache is allocating its
+	nodes with PF_MEMALLOC set, which allows it to completely exhaust the
+	free page lists(*).  This is fairly easy to trigger with swap-intensive
+	loads.
+	
+	It would be better to make those node allocations fail at an earlier
+	time.  When this happens, the radix-tree can still obtain nodes from its
+	mempool, and we leave some memory available for the I/O layer.
+	(Assuming that the I/O is being performed under PF_MEMALLOC, which it
+	is).
+	
+	So the patch simply drops PF_MEMALLOC while adding nodes to the
+	swapcache's tree.
+	
+	We're still performing atomic allocations, so the rat is still biting
+	pretty deeply into the page reserves - under heavy load the amount of
+	free memory is less than half of what it was pre-rat.
+	
+	It is unfortunate that the page allocator overloads !__GFP_WAIT to also
+	mean "try harder".  It would be better to separate these concepts, and
+	to allow the radix-tree code (at least) to perform atomic allocations,
+	but to not go below pages_min.  It seems that __GFP_TRY_HARDER will be
+	pretty straightforward to implement.  Later.
+	
+	The patch also impements a workaround for the mempool list_head
+	problem, until that is sorted out.
+	
+	
+	
+	(*) The usual result is that the SCSI layer dies at scsi_merge.c:82.
+	It would be nice to have a fix for that - it's going BUG if 1-order
+	allocations fail at interrupt time.  That happens pretty easily.
+
+<rmk@arm.linux.org.uk> (02/04/15 1.501)
+	[PATCH] 2.5.7 ALSA include fixes
+	
+	Include fixes to allow ALSA to compile.
+
+<rmk@arm.linux.org.uk> (02/04/15 1.502)
+	[PATCH] 2.5.7 allow fat to compile
+	
+	This is needed to for 2.5.7 FAT to build on ARM.
+
+<paulus@samba.org> (02/04/15 1.503)
+	[PATCH] fix include/linux/smp.h
+	
+	This patch adds #include <linux/threads.h> to include/linux/smp.h,
+	because it (smp.h) needs the definition of NR_CPUS.  (It so happens
+	that include/asm-i386/smp.h includes <linux/threads.h>, but IMHO
+	include/linux/smp.h shouldn't rely on that).
+
+<haveblue@us.ibm.com> (02/04/15 1.504)
+	[PATCH] fix race and remove BKL from wdt977
+	
+	We've seen this in several other drivers, most recently the indydog one.
+	  If two simultaneous opens occur, they race, they device gets opened
+	twice, blah, blah, blah.  Using atomic bitops fixes this.  The BKL is
+	not needed.
+
+<dougg@torque.net> (02/04/15 1.505)
+	[PATCH] st driver in lk 2.5.7 and beyond
+	
+	Fix oops in st_open..
+
+<axboe@suse.de> (02/04/15 1.506)
+	[PATCH] get_request() starvation fix
+	
+	This is originally from Andrew in the 2.4 series, please apply for 2.5
+	as well.
+
+<paulkf@microgate.com> (02/04/15 1.507)
+	[PATCH] 2.5.8 synclink.c
+	
+	patch to update virt_to_bus functions and remove version depedent #ifdef
+	statements
+
+<paulkf@microgate.com> (02/04/15 1.508)
+	[PATCH] 2.5.8 n_hdlc.c
+	
+	Remove localy defined wait queues and use wait queues
+	in tty structure of same function. This matches the
+	n_tty.c behavior.
+	
+	Handle pty hangup when blocked on read.
+	
+	These 2 changes fix use of n_hdlc with PPPoATM and
+	are mirror changes included in 2.4.19-pre
+
+<jsimmons@transvirtual.com> (02/04/15 1.509)
+	[PATCH] fbdev api cleanup.
+	
+	This patch is the start of the cleanup of the fbdev layer. It has been
+	approved by Geert and has been tested for some time in the Dave Jones
+	tree.
+
+<rml@tech9.net> (02/04/15 1.510)
+	[PATCH] migration_thread preempt fix
+	
+	This fixes a race in migration_thread which results in a deadlock on
+	boot for some SMP systems.  The fix is to to disable preemption inside
+	of set_cpus_allowed.
+	
+	Andrew Morton first noticed the problem and provided the following patch
+	a few weeks back.  I was not affected until the recent migration_init
+	fix, for some odd reason.  Neither Andrew nor I think this is actually
+	kernel preemption's fault but perhaps a race in the tricky behavior of
+	the migration code.
+
+<agrover@groveronline.com> (02/04/15 1.511)
+	[PATCH] fix ACPI patch clobber
+	
+	This fixes the mpparse.c clobbering the last ACPI patch did. Martin, look
+	OK? Again, my apologies.
+
+<rml@tech9.net> (02/04/15 1.512)
+	[PATCH] comment cleanups for cpu affinity syscall
+	
+	A few (anal) comment cleanups and additions in relationship to the new
+	task cpu affinity syscalls.  All no brainers.
+
+<petkan@mastika.lnxw.com> (02/04/15 1.489.4.2)
+	[PATCH] various pegasus and rtl8150 fixes and improvements
+	
+	USB pegasus and rtl8150 fixes and improvements
+	
+	pegasus:
+		- using preallocated skb thus avoiding memcpy in the receive path;
+		- tasklet used to handle failed skb allocations and Rx urb submission;
+		- Lindent run on the result.
+	
+	rtl8150:
+		- better tasklet handling and a few races fixed;
+		- introducing new flag for Rx urb resubmission;
+		- GFP_KERNEL to GFP_ATOMIC flag change in Tx path.
+
+<greg@kroah.com> (02/04/15 1.489.4.3)
+	USB cdc-acm driver
+	
+	Made urb allocation dynamic, as the USB core needs this now.
+
+<torvalds@home.transmeta.com> (02/04/15 1.514)
+	Remove bogus ignore files
+
+<dougg@torque.net> (02/04/15 1.515)
+	[PATCH] Re: [PATCH] advansys scsi driver lk2.5.8-pre3
+	
+	Advansys SCSI driver update:
+	 - locking fixes
+	 - handle the "address" -> "page+offset" switch
+
+<neilb@cse.unsw.edu.au> (02/04/15 1.516)
+	[PATCH] dcache changes for preparing for "export_operations" interface for nfsd to use.
+	
+	Prepare for new export_operations interface (for filehandle lookup):
+	
+	 - define d_splice_alias and d_alloc_anon.
+	 - define shrink_dcache_anon for removing anonymous dentries
+	 - modify d_move to work with anonymous dentries (IS_ROOT dentries)
+	 - modify d_find_alias to avoid anonymous dentries where possible
+	   as d_splice_alias and d_alloc_anon use this
+	 - put in place infrastructure for s_anon allocation and cleaning
+	 - replace a piece of code that is in nfsfh, reiserfs and fat
+	   with a call to d_alloc_anon
+	 - Rename DCACHE_NFSD_DISCONNECTED to DCACHE_DISCONNECTED
+	 - Add documentation at Documentation/filesystems/Exporting
+
+<neilb@cse.unsw.edu.au> (02/04/15 1.517)
+	[PATCH] PATCH - Create "export_operations" interface for filesystems to describe
+	
+	Create "export_operations" interface for filesystems to describe
+	whether and how they should be exported.
+	
+	- add new field in struct super_block "s_export_op" to describe
+	  how a filesystem is exported (i.e. how filehandles are mapped to
+	  dentries).
+	- New module: fs/exportfs for holding helper code for mapping between
+	  filehandles and dentries
+	- Change nfsd to use new interface if it exists.
+	- Change ext2 to provide new interface
+	- Add documention to filesystems/Exporting
+	
+	If s_export_op isn't set, old mechanism still works, but it is
+	planned to remove old method and only use s_export_op.
+
+<kai@tp1.ruhr-uni-bochum.de> (02/04/16 1.489.5.1)
+	Handle $(export-objs) ambiguity
+	
+	We use the makefile variable $(foo-objs) to list the objects
+	a composed module foo.o is supposed to be composed of.
+	
+	We use the special varible $(export-objs) to list the object files which
+	export symbols.
+	
+	This oviously clashes in the case of foo == export. There's basically
+	two ways to handle it: (1) rename one of these options, like 
+	foo-objs to foo-parts or something, or (2) simply disallow a composite
+	object called export.o, so you never need $(export-objs) to list its
+	parts.
+	
+	As (1) would affect basically all Makefiles in the tree and (2) doesn't
+	seem much of a limitation, I went for (2).
+
+<kai@tp1.ruhr-uni-bochum.de> (02/04/16 1.489.6.1)
+	Remove list-multi plus associated link rule in arch/arm/*/Makefile
+
+<kai@tp1.ruhr-uni-bochum.de> (02/04/16 1.489.6.2)
+	Remove list-multi plus associated link rules in drivers/acorn/*/Makefile
+
+<kai@tp1.ruhr-uni-bochum.de> (02/04/16 1.489.8.2)
+	Cleanup drivers/message/fusion/Makefile
+	
+	remove some long obsolete boilerplate code.
+
+<kai@tp1.ruhr-uni-bochum.de> (02/04/16 1.489.8.3)
+	cleanup drivers/char/Makefile
+	
+	very minor cleanup only (I want all references to list-multi gone ;-)
+
+<rusty@rustcorp.com.au> (02/04/16 1.489.4.4)
+	[PATCH] USB set-bit takes a long tweaks
+	
+	This removes gratuitous & operators in front of USB's
+	dev->bus->devmap.devicemap and state->unitbitmap, for bitops.
+	
+	This just makes it so it doesn't warn when set_bit et. al take a
+	long...
+	
+	No object code changes,
+	Rusty.
+
+<oliver@oenone.homelinux.org> (02/04/16 1.489.4.5)
+	[PATCH] kaweth usb driver updates
+	
+	USB kaweth driver updates
+	
+		- fixed race between close and disconnect
+		- disconnect bug
+		- add link state reporting
+		- fix an urb reference counting bug
+		- fix probe oopsability on oom
+		- groundwork for atomic pool depletion
+		- cosmetic changes
+
+<chan@aleph1.co.uk> (02/04/16 1.489.9.1)
+	[PATCH] 1111/1: Re: Anakin framebuffer
+	Resource accounting fix (Anakin framebuffer).
+
+<dalecki@evision-ventures.com> (02/04/16 1.519)
+	[PATCH] 2.5.8 IDE 36
+	
+	- Consolidate ide_choose_drive() and choose_drive() in to one function.
+	
+	- Remove sector data byteswpapping support. Byte-swapping the data is supported
+	   on the file-system level where applicable.  Byte-swapped interfaces are
+	   supported on a lower level anyway. And finally it was used inconsistently.
+	
+	- Eliminate taskfile_input_data() and taskfile_output_data(). This allowed us
+	   to split up ideproc and eliminate the ugly action switch as well as the
+	   corresponding defines.
+	
+	- Remove tons of unnecessary typedefs from ide.h
+	
+	- Prepate the PIO read write code for soon overhaul.
+	
+	- Misc small bits here and there :-).
+
+<dalecki@evision-ventures.com> (02/04/16 1.520)
+	[PATCH] 2.5.8 IDE 37
+	
+	- Don't abuse the sense field for passing failed packet_commands in struct
+	   packet_command use a new field instead.
+	
+	- Apply minor bits forwarded by Dave Jones to me.
+	
+	- Fix ide_raw_taskfile() to flag the ar used there to be no subject of free_req
+	   list management. This solvs the "hang after /proc/ide read" problem, which
+	   was in fact a memory corruption problem.
+
+<aia21@cus.cam.ac.uk> (02/04/16 1.521)
+	[PATCH] nbd compile fix
+	
+	Note patch compiles but is otherwise untested as no kernel after 2.5.7
+	boots on my 2.5 box due to IDE hanging the box hard during device
+	discovery. )-:
+
+<hirofumi@mail.parknet.co.jp> (02/04/16 1.522)
+	[PATCH] #include <asm/bitops.h> -> #include <linux/bitops.h>
+	
+	We have to include linux/bitops.h for arch using generic_xxx().
+	
+	The following patch changes <asm/bitops.h> of include/linux/* to
+	<linux/bitops.h>.
+
+<rusty@rustcorp.com.au> (02/04/16 1.523)
+	[PATCH] set_bit takes a long
+	
+	Finally, this changes set_bit et al. to take a "unsigned long *" on
+	ppc and i386.  This will make the world a better place.
+	
+	Please forward patches for any warnings which crop up in random code
+	to trivial@rustcorp.com.au.
+
+<tigran@aivazian.name> (02/04/16 1.524)
+	[PATCH] fix compiler warning in microcode driver
+	
+	The obvious patch to fix compiler warning when compiled with RH gcc 2.96
+	(and probably others too).
+
+<hugh@veritas.com> (02/04/16 1.526)
+	[PATCH] swapinfo accounting
+	
+	Randy observed that 2.5 /proc/meminfo SwapFree holds steady
+	while SwapTotal goes up and down: wrong way round!
+	
+	Andrew pointed to wrong conditional in si_swapinfo(): 2.5.4
+	updated it incorrectly when new flags bit was briefly added.
+	And pointed out that it also makes si_swapinfo much too slow.
+
+<davidm@napali.hpl.hp.com> (02/04/16 1.527)
+	[PATCH] prctl() patch
+	
+	This is the patch to add support for PR_SET_FPEMU/PR_GET_FPEMU to give
+	per-process control over fp-emulation handling.  It also cleans up the
+	way PR_SET_UNALIGN_CTL/PR_GET_UNALIGN_CTL are implemented.
+
+<davidm@napali.hpl.hp.com> (02/04/16 1.528)
+	[PATCH] arch_consoles_callable() macro
+	
+	Here is the patch to add the arch_consoles_callable() macro as was done
+	in the 2.4 tree.
+
+<haveblue@us.ibm.com> (02/04/16 1.529)
+	[PATCH] fix ips driver compile problems
+	
+	   This patch has been floating inside IBM for a bit, but it appears
+	that no one passed it back up to you, yet.  I don't know who wrote it,
+	but it applies to 2.5.8 and the ServeRAID driver works just fine with it
+	applied.  Without it, the driver fails to compile.
+
+<torvalds@penguin.transmeta.com> (02/04/16 1.530)
+	Fix up some bitops due to strict type checking
+
+<torvalds@penguin.transmeta.com> (02/04/16 1.531)
+	Kernel version update
+
+<mingo@elte.hu> (02/04/17 1.534)
+	bugfix from Maciej: do not ACK timer irqs manually in ExtINT mode.
+
+<rmk@flint.arm.linux.org.uk> (02/04/17 1.489.7.3)
+	This changeset adds a new feature to ARM - the ability to load the
+	kernel zImage almost anywhere in RAM and call it directly, without
+	having to copy it to a specific address.  This removes a dependency
+	between the boot loader and the kernel.
+
+<rmk@flint.arm.linux.org.uk> (02/04/17 1.489.7.4)
+	2.5.8 ARM updates:
+	 - preempt updates
+	 - build fixes
+	 - new tlb flush macro
+	 - add asm/cacheflush.h and asm/tlbflush.h
+
+<rmk@flint.arm.linux.org.uk> (02/04/17 1.489.7.5)
+	Remove MB1.  Use asm/sizes.h instead.
+
+<elenstev@mesatop.com> (02/04/17 1.489.7.6)
+	[PATCH] add 22 help texts to arch/arm/Config.help
+	
+	This is a resend of a previous patch which got mangled by my mailer.
+	Inserting a text file into Evolution works, but cutting and pasting from one
+	window to another doesn't always work as expected.
+	
+	This patch adds 22 help texts to arch/arm/Config.help.
+	The help texts were obtained from ESR's v2.97 Configure.help.
+
+<dalecki@evision-ventures.com> (02/04/18 1.531.1.2)
+	[PATCH] 2.5.8 IDE 38
+	
+	- Fix typo in ide_cmd_ioctl().
+	
+	- Fix typo in cris driver.
+	
+	- Don't retry operations on medium errors. (pointed out by Eric Andersen).
+	
+	- Attach the no_io_32bit, io_32bit, no_unmask, unmask and slow fields to the
+	   ata_channel instead of the ata_device structure. They are a property of the
+	   channel and not just the devices attached to it. This allowed us to fix the
+	   set_io_32bit function by removing the CONFIG_BLK_DEV_DTC2278 conditional. In
+	   fact initialization shows that this is fixing many other host chipsets as
+	   well since all of them did expect sometimes particular values for those
+	   parameters in paralell on both drives attached to a channel but we where
+	   allowed to apply different values on a per drive basis.
+	
+	- The keep_settings flag is now unconditional and we don't mess with any
+	   channel parameters before drive reset. Some chipsets really really expect
+	   unconditionally that the tweaks they apply are always present and this wasn't
+	   honoured thus far! We are expecting the user to have good reasons for
+	   manually tweaking the settings.
+	
+	- Don't reset io_32bit in ata_pre_reset() unconditionally. There are chipsets
+	   out there which expect io_32bit to be *allways* enabled!
+	
+	- Remove many obsolete and nawadays just confusing documentation from ide.txt
+
+<dalecki@evision-ventures.com> (02/04/18 1.531.1.3)
+	[PATCH] 2.5.8 IDE 39
+	
+	Synchronize with Jens Axobe:
+	
+	- Congruent ATA_AR_POOL fix to the ATA_AR_STATIC memmory corruption fix.
+	
+	- Multi sector write handling fix.
+	
+	- Fix drive capability deduction.
+	
+	- Various other minor fixes.
+
+<torvalds@penguin.transmeta.com> (02/04/18 1.531.1.4)
+	Add missing include for "memset()". 
+
+<akpm@zip.com.au> (02/04/18 1.536)
+	[PATCH] pagecache locking bugfix
+	
+	The bug which Anton found.  On the
+	find_or_create_page->__find_lock_page path we're performing
+	a read_unlock of an rwlock which is held for writing.
+	
+	The patch converts that to using a write_lock throughout.
+	
+	Which penalises find_lock_page() a bit.  If it shows up
+	on profiles then we can clone __find_lock_page() and
+	use read_lock()s, but for now I'd opt for saving the
+	cache footprint.
+
+<torvalds@penguin.transmeta.com> (02/04/18 1.537)
+	Change argument usage a bit to avoid compiler warning
+
+<Martin.Bligh@us.ibm.com> (02/04/18 1.538)
+	[PATCH] stop NULL pointer dereference in __alloc_pages
+	
+	This trivial patch will apply to both 2.4.19-pre7 and 2.5.8 with just line
+	offsets. It stops us from following a NULL pointer in classzone in the case
+	where there is a pgdat without a fully populated zone list (ie a node with
+	no ZONE_NORMAL on an ia32 NUMA machine). Without this patch, ia32
+	NUMA machines won't even boot - we dereference the classzone ptr
+	a few lines further down (or try to ;-) ).
+
+<romieu@cogenit.fr> (02/04/18 1.539)
+	[PATCH] 2.4.8 - dscc4 update 0/13
+	
+	- description update;
+	- more #defines;
+	- SCC_REG_START() change (shorter code);
+	- some noise.
+
+<romieu@cogenit.fr> (02/04/18 1.540)
+	[PATCH] 2.4.8 - dscc4 update 1/13
+	
+	- extra argument for dscc4_set_iface() (will be used in following patches).
+
+<romieu@cogenit.fr> (02/04/18 1.541)
+	[PATCH] 2.4.8 - dscc4 update 2/13
+	
+	- dscc4_patch_register() turns into scc_patchl() and should now avoid an
+	  hardware bug quoted in errata sheet;
+	- dscc4_init_registers() interface changes as any caller doesn't really need
+	  to poke into dscc4_dev_priv internal;
+	- scc_{writel/readl}() are added to access some buggy behaving registers;
+	- {read/write}l conversion to the previous functions
+	- dscc4_do_tx() sneaks, sorry. Belongs to HOLD -> LxDA changes.
+
+<romieu@cogenit.fr> (02/04/18 1.542)
+	[PATCH] 2.4.8 - dscc4 update 3/13
+	
+	- space after "if"'s and "while"'s were missing here and there. Now it's easier to read
+	  after some hours in front of a computer.
+
+<romieu@cogenit.fr> (02/04/18 1.543)
+	[PATCH] 2.4.8 - dscc4 update 4/13
+	
+	- dscc4_xpr_ack() busy waiting loop is modified so as to allow long
+	  delay without chewing too much cycles;
+	- more errata sheet magic;
+	- dscc4_set_clock() now has only one return point.
+
+<romieu@cogenit.fr> (02/04/18 1.544)
+	[PATCH] 2.4.8 - dscc4 update 5/13
+	
+	- DEBUG_PARANOIA was bad. "if (debug > x) {" is nice;
+	- state_check() now has only one return point;
+	- try_get_rx_skb() cosmetic;
+	- dscc4_rx_update() belongs to HOLD mode to LxDA changes;
+	- dscc4_wait_ack_cec() behaves like dscc4_xpr_ack();
+	- dscc4_rx_skb() refill logic is ready for LxDA mode and does everything
+	  to fulfill what its name suggests.
+	- document some errata voodoo in dscc4_init_one();
+	- dscc4_init_ring() should handle try_get_rx_skb() failure.
+
+<romieu@cogenit.fr> (02/04/18 1.545)
+	[PATCH] 2.4.8 - dscc4 update 6/13
+	
+	- code removal;
+	- turn old cruft into definitely modern cruft.
+
+<romieu@cogenit.fr> (02/04/18 1.546)
+	[PATCH] 2.4.8 - dscc4 update 7/13
+	
+	- dscc4_do_action() now looks like the others event waiting loops (may be
+	  called from interrupt context however);
+	- dscc4_start_xmit(): cosmetic before LxDA changes + mb() parano;
+	- dscc4_clock_setting(): only one return point, thanks;
+	- dscc4_priv() invocation removed from dscc4_xxx_settings;
+	- minor cleanups.
+
+<romieu@cogenit.fr> (02/04/18 1.547)
+	[PATCH] 2.4.8 - dscc4 update 8/13
+	
+	- new functions for LxDA mode: dscc4_tx_done() and dscc4_tx_quiescent();
+	- dscc4_{rx/tx}_reset() should comply to errata sheet.
+
+<romieu@cogenit.fr> (02/04/18 1.548)
+	[PATCH] 2.4.8 - dscc4 update 9/13
+	
+	- useless code/comment removal;
+	- HOLD mode -> LxDA mode conversion.
+
+<romieu@cogenit.fr> (02/04/18 1.549)
+	[PATCH] 2.4.8 - dscc4 update 10/13
+	
+	- guess what ? Code removal.
+
+<romieu@cogenit.fr> (02/04/18 1.550)
+	[PATCH] 2.4.8 - dscc4 update 11/13
+	
+	- CD/CTS change notification;
+	- more DEBUG/if (debug >...) conversion;
+
+<romieu@cogenit.fr> (02/04/18 1.551)
+	[PATCH] 2.4.8 - dscc4 update 12/13
+	
+	- just say no to +/-1 arithmetic when not needed;
+	- pot-pourri of misc cleanup;
+	- *new*: support of boot-time parameters
+
+<romieu@cogenit.fr> (02/04/18 1.552)
+	[PATCH] 2.4.8 - dscc4 update 13/13
+	
+	- line ending white spaces squadron strikes back;
+	- some fscked tabs are fixed. Nice           after longs        coding sessions.
+
+<rml@tech9.net> (02/04/18 1.553)
+	[PATCH] migration thread fix
+	
+	Attached is a patch that disables interrupts while holding the rq_lock.
+	This is certainly needed to prevent a race against the timer tick, as
+	Erich Focht pointed out.
+
+<torvalds@home.transmeta.com> (02/04/18 1.554)
+	Cset exclude: mingo@elte.hu|ChangeSet|20020417052911|09751
+
+<torvalds@home.transmeta.com> (02/04/18 1.555)
+	Cset exclude: mingo@elte.hu|ChangeSet|20020416054244|19697
+
+<focht@ess.nec.de> (02/04/18 1.556)
+	[PATCH] more migration thread cleanups
+	
+	I'm currently working on a node affine scheduler extension for NUMA
+	machines and the load balancer behaves a bit different from the original.
+	So after a few boot failures with those slowly booting 16 CPU IA64
+	machines I thought there must be a simpler solution than synchronizing and
+	waiting for the load balancer: just let migration_CPU0 do what it is
+	designed for. So my proposal is:
+	   - start all migration threads on CPU#0
+	   - initialize migration_CPU0 (trivial, reliable, as it already is on
+	     the right CPU)
+	   - let all other migration threads use set_cpus_allowed() to get to the
+	     right place
+	
+	The only synchronization needed is the non-zero migration threads waiting
+	for migration_CPU0 to start working, which it will, as it is already on
+	the right CPU. This saves quite some lines of code.
+	
+	I first posted this to LKML on March 6th (BTW, the fix #1, too) and since
+	then it was tested on several big NUMA platforms: 16 CPU NEC AzusA (IA64)
+	(also known as HP rx....), up to 32 CPU SGI IA64, 16 CPU IBM NUMA-Q
+	(IA32). No more lock-ups at boot since then. So I consider it working.
+	
+	There is another good reason for this approach: the integration of the CPU
+	hotplug patch with the new scheduler becomes easier. One just needs to
+	create the new migration thread, it will move itself to the right CPU
+	without any additional magic (which you otherwise need because of the
+	synchronizations which won't be there at hotplug). Kimi Suganuma in the
+	neighboring cube is fiddling this out currently.
+
+<torvalds@home.transmeta.com> (02/04/18 1.557)
+	Fix aic7xxx Makefile for multi-obj cleanup
+
+<kai@tp1.ruhr-uni-bochum.de> (02/04/19 1.558)
+	Fix compiling sym53c8xx_2 into the kernel. 
+	
+	(The O_TARGET is used only internally when linking, the name of the 
+	module is unchanged).
+
+<kai@tp1.ruhr-uni-bochum.de> (02/04/19 1.559)
+	Fix drivers/scsi/aic7xxx/Makefile for building a modular aic7xxx driver
+	
+	Use the (well, one) standard way to build a multi-part module. 
+	Standard except for that we build aix7xxx_mod.o but then rename it
+	at modules_install time (just as it was before).
+
+<gl@dsa-ac.de> (02/04/19 1.531.2.2)
+	[PATCH] 1096/3: trizeps PCMCIA support
+	(a minor fix to the previous version - 1096/2)
+	The enclosed patch includes trizeps-specific PCMCIA code. All
+	modifications are enclosed in
+	#ifdef CONFIG_SA1100_TRIZEPS
+	#endif
+	blocks or are linked as
+	+sa1100_cs-objs-        += sa1100_trizeps.o
+	so, other platforms remain unaffected. The patch is built against
+	2.5.6-rmk1.
+	
+
+<axboe@suse.de> (02/04/19 1.557.1.1)
+	[PATCH] ide updates
+	
+	 - (tcq, general) Remove the 'attempt to keep queue full option'. It worked
+	   on some IBM models, but failed miserably on others. Also removes some
+	   uglies in ide_queue_commands()
+	
+	 - (tcq0 Change default depth back to 32.
+	
+	 - (general) Add isr for no-dataphase taskfile, like task_no_data_intr but
+	   doesn't complain about failure. This is handy for commands what we _know_
+	   will fail, such as WIN_NOP.
+	
+	 - (general) ide_cmd_type_parser() must set a handler to WIN_NOP... Otherwise
+	   we will just hang the ide system issuing a nop.
+	
+	 - (general) HWGROUP(drive)->rq->special -> IDE_CUR_AR(drive)
+	
+	 - (general) Have ide_raw_taskfile() copy back the taskfile after execution,
+	   otherwise we cannot use the info that ide_end_drive_cmd() puts in
+	   there.
+	
+	 - (tcq) Use nIEN bit correctly in ide-tcq
+	
+	 - (tcq) Small ide_tcq_wait_altstat() changes. Do initial 400ns delay (1us
+	   here), then 10us each successive run.
+	
+	 - (tcq) Add beginning for 'nop auto poll' support check.
+	
+	 - (tcq) Arm handler before GET_STAT() service check in
+	   ide_dma_queued_start, WD seemed to trigger interrupt before that.
+	   Makes WD Expert drives work with tcq.
+
+<bgerst@didntduck.org> (02/04/19 1.557.1.2)
+	[PATCH] SSE related security hole
+	
+	Initialize the saved FPU/XMM state in the task struct and fall through
+	to restore_fpu() to make sure that all state is fully initialized.
+	
+	This means that old SSE/SSE2 information cannot ever leak into newly
+	created processes. 
+
+<ak@muc.de> (02/04/20 1.557.1.3)
+	[PATCH] autofs fix for x86-64
+	
+	Minor patch for the x86-64 32bit emulation. Originally proposed by hpa and it
+	makes autofs 32bit/64bit clean for x86-64
+
+<ak@muc.de> (02/04/20 1.557.1.4)
+	[PATCH] Fix console initialization deadlock for x86-64
+	
+	When vt_init happens to run before the keyboard is initialized (the order is random
+	because they're both different initcalls) then set_leds raises an not yet enabled
+	tasklet. This causes an endless loop on the first schedule() call because the tasklet
+	handling cannot handle raised but disabled tasklets.
+	
+	This patch just does not do set_leds in virtual terminal initialization to avoid that.
+	It is done later anyways.
+
+<ak@muc.de> (02/04/20 1.557.1.5)
+	[PATCH] x86-64 architecture specific sync for 2.5.8
+	
+	This patch brings 2.5.8 in sync with the x86-64 2.4 development tree again
+	(excluding device drivers)
+	
+	It has lots of bug fixes and enhancements. It only touches architecture
+	specific files.
+	
+	- Sync with 2.5.8
+	- SMP/APIC supported now.
+	- Module loading works now.
+	- Time keeping bugs fixed.
+	- entry.S streamlined and some bugs fixed.
+	- modify_ldt works now
+	- mostly rewritten FPU support (including FXRSTOR for initial FPU
+	  initialization based on the initial state)
+	- 32bit emulation enhanced and bugs fixed.
+	- rewrote mm initialization and lots of cleanups in the page table handling
+	  __PAGE_OFFSET is now moved to 0x10000000000 and some vmalloc/ioremap
+	  problems have been fixed. They have an own PML4 slot now.
+	- WCHAN reporting support for RIP (but not RSP)
+	- Lots of various other bug fixes and cleanups.
+	
+	Currently broken:
+	- ACPI
+	- MTRR
+	
+	It needs some other bugfixes outside architecture specific code. I sent
+	them all in separate mail.
+
+<rmk@flint.arm.linux.org.uk> (02/04/21 1.531.2.3)
+	Fix build error on multi-tlb configurations.
+	Make cpu type message consistent with cache type message.
+
+<kai@tp1.ruhr-uni-bochum.de> (02/04/21 1.557.2.2)
+	Move all of ISDN config into drivers/isdn/Config.in
+
+<kai@tp1.ruhr-uni-bochum.de> (02/04/21 1.557.2.3)
+	Mark the current ISDN4Linux link layer obsolete
+
+<kai@tp1.ruhr-uni-bochum.de> (02/04/21 1.557.2.4)
+	Move obsolete i4l code from drivers/isdn to drivers/isdn/i4l
+
+<kai@tp1.ruhr-uni-bochum.de> (02/04/21 1.557.2.5)
+	Clean up drivers/isdn/Config.help
+	
+	Remove the repeated information on what a module is.
+
+<kai@tp1.ruhr-uni-bochum.de> (02/04/21 1.557.2.6)
+	Split up drivers/isdn/Config.help and drivers/isdn/i4l/Config.in
+
+<kai@tp1.ruhr-uni-bochum.de> (02/04/21 1.557.2.7)
+	Small fixes for ISDN hisax build / config
+	
+	Make the PCMCIA client drivers depend on hisax.o, 
+	use the right CONFIG_ variable for hisax submodules,
+	handle the case of built-in hisax, modular hisax submodules.
+
+<viro@math.psu.edu> (02/04/22 1.563)
+	[PATCH] (1/6) alpha fixes
+	
+	 - bogus return value type for ->open() and ->release() on nfsd
+	   (generic, caught on alpha since there ssize_t != int)
+
+<viro@math.psu.edu> (02/04/22 1.564)
+	[PATCH] (2/6) alpha fixes
+	
+	 - missing defines/fields/includes for alpha (accumulated since 2.5.0)
+
+<viro@math.psu.edu> (02/04/22 1.565)
+	[PATCH] (3/6) alpha fixes
+	
+	 - s/p_pptr/parent/, s/p_opptr/real_parent/ done for alpha
+
+<viro@math.psu.edu> (02/04/22 1.566)
+	[PATCH] (4/6) alpha fixes
+	
+	 - (dumb) default_idle() provided (alpha)
+
+<viro@math.psu.edu> (02/04/22 1.567)
+	[PATCH] (5/6) alpha fixes
+	
+	 - alpha/mm/init.c forgot to set max_pfn
+
+<viro@math.psu.edu> (02/04/22 1.568)
+	[PATCH] (6/6) alpha fixes
+	
+	 - fixed off-by-PAGE_OFFSET in populate_pmd() (alpha, again)
+
+<viro@math.psu.edu> (02/04/22 1.569)
+	[PATCH] buffer_head leak
+	
+	Fix buffer-head leak on truncate race.
+	
+	The reason why it hadn't been triggered left right and center is that we
+	step on that path only when partial truncate blows away an indirect
+	block shared between truncated and remaining areas _and_ races with
+	ext2_get_block() in the beginning of said area.  IOW, we need
+	
+		* indirect block with hole in the beginning
+		* get_block starting to read that block
+		* truncate killing everything past the hole (and thus freeing indirect
+		  block in question)
+		* get_block completing the read and noticing that block is actually
+		  gone.
+	
+	OK...  IMO we should do that brelse() outside of the loop.
+
+<viro@math.psu.edu> (02/04/22 1.570)
+	[PATCH] (1/5) sane procfs/dcache interaction
+	
+	 - take unhash_process() into sched.c, move zeroing ->pid into it (and
+	   under tasklist_lock)
+
+<viro@math.psu.edu> (02/04/22 1.571)
+	[PATCH] (2/5) sane procfs/dcache interaction
+	
+	 - new helper in fs/proc/base.c - name_to_int(dentry) returns ~0U if name
+	   doesn't match 0|[1-9][0-9]* or is too large.  Otherwise it returns
+	   numeric value of name.  proc_pid_lookup() and proc_lookupfd() converted.
+
+<viro@math.psu.edu> (02/04/22 1.572)
+	[PATCH] (3/5) sane procfs/dcache interaction
+	
+	 - sane dentry retention.  Namely, we don't kill /proc/<pid> dentries at the
+	   first opportunity (as the current tree does).  Instead we do the following:
+		* ->d_delete() kills it only if process is already dead.
+		* all ->lookup() in proc/base.c end with checking if process is still
+		  alive and unhash if it isn't.
+		* proc_pid_lookup() (lookup for /proc/<pid>) caches reference to dentry
+		  in task_struct.  It's _not_ counted in ->d_count.
+		* ->d_iput() resets said reference to NULL.
+		* release_task() (burying a zombie) checks if there is a cached
+		  reference and if there is - shrinks the subtree.
+		* tasklist_lock is used for exclusion.
+	   That way we are guaranteed that after release_task() all dentries in
+	   /proc/<pid> will go away as soon as possible; OTOH, before release_task()
+	   we have normal retention policy - they go away under memory pressure with
+	   the same rules as for dentries on any other fs.
+
+<viro@math.psu.edu> (02/04/22 1.573)
+	[PATCH] (4/5) sane procfs/dcache interaction
+	
+	 - preparation for sane policy for /proc/<pid>/fd/* - don't store
+	   struct file * in these inodes anymore.
+
+<viro@math.psu.edu> (02/04/22 1.574)
+	[PATCH] (5/5) sane procfs/dcache interaction
+	
+	 - sane retention policy for /proc/<pid>/fd/* - ->d_revalidate() says
+	   "kill it" if descriptor is not opened anymore (in addition to checks
+	   for task being dead) and we allow dentries of /proc/<pid>/fd/<n> to
+	   stay around.
+
+<rusty@rustcorp.com.au> (02/04/22 1.575)
+	[PATCH] drivers_net_dl2k.c: missing __devinit's
+	
+	Andrey Panin <pazke@orbita1.ru>: drivers_net_dl2k.c: missing __devinit's:
+	  This patch adds missing __devinit modifiers for read_eeprom() and
+	  parse_eeprom() functions. Patch against 2.5.8. Compiles, but untested.
+
+<rusty@rustcorp.com.au> (02/04/22 1.576)
+	[PATCH] fix a warning in i386_pci-pc.c
+	
+	Andrew Morton <akpm@zip.com.au>: fix a warning in i386_pci-pc.c:
+
+<rusty@rustcorp.com.au> (02/04/22 1.577)
+	[PATCH] drivers_net_eepro100: missing __devinit:
+	
+	Andrey Panin <pazke@orbita1.ru>: drivers_net_eepro100: missing __devinit:
+	  This patch adds missing __devinit modifiers for speedo_found1() and
+	  do_eeprom_cmd() functions. Patch against 2.5.8. Compiles, but untested.
+
+<rusty@rustcorp.com.au> (02/04/22 1.578)
+	[PATCH] drivers_net_sis900.c: misiing __devinit
+	
+	Andrey Panin <pazke@orbita1.ru>: drivers_net_sis900.c: misiing __devinit:
+	  This patch adds missing __devinit modifier for read_eeprom() function.
+	  Patch against 2.5.8. Compiles, but untested.
+
+<rusty@rustcorp.com.au> (02/04/22 1.579)
+	[PATCH] serial.c ISAPNP fix:
+	
+	Andrey Panin <pazke@orbita1.ru>: serial.c ISAPNP fix:
+	  Thist patch fixes buglet which disables ISAPNP support in serial driver.
+	  __ISAPNP__ conditional symbol is used before isapnp.h is included.
+	
+	
+	(Included in 2.2)
+	(Included in 2.4)
+
+<rusty@rustcorp.com.au> (02/04/22 1.580)
+	[PATCH] fcntl returns wrong error code (Updated)
+	
+	Christopher Yeoh <cyeoh@samba.org>: Re: fcntl returns wrong error code (Updated):
+	  At 2002/3/22 00:58+1100  Christopher Yeoh writes:
+	  > btw Stephen Rothwell pointed out that there is a much neater way to
+	  > achieve the same change. I'll post a new patch in the morning.
+	
+	  This is the updated patch.
+	
+	
+	(Included in 2.4)
+
+<rusty@rustcorp.com.au> (02/04/22 1.581)
+	[PATCH] newline in printk in olympic driver
+	
+	Anton Blanchard <anton@au1.ibm.com>: newline in printk in olympic driver:
+
+<rusty@rustcorp.com.au> (02/04/22 1.582)
+	[PATCH] kernel-hacking.tmpl
+	
+	Mark Hymers <markh@linuxfromscratch.org>: Kernel tree patch; Documentation_DocBook_kernel-hacking.tmpl:
+	  Hi,
+	
+	  Just a small thing I noticed when grepping through the kernel source:
+	  one of the templates in Documentation/DocBook has a typo (I think).  I
+	  believe it should refer to MODULE_LICENSE instead of LICENCE.  Please
+	  correct me if I'm wrong though.
+	
+	  Mark
+	
+	
+	(Included in 2.4)
+
+<rusty@rustcorp.com.au> (02/04/22 1.583)
+	[PATCH] clean up fs_exec.c
+	
+	Martin Pool <mbp@samba.org>: trivial kernel patch -- clean up fs_exec.c:
+	
+	(Included in 2.4)
+
+<rusty@rustcorp.com.au> (02/04/22 1.584)
+	[PATCH] 2.5.7 adjtimex and SINGLESHOT
+	
+
+<rusty@rustcorp.com.au> (02/04/22 1.585)
+	[PATCH] ENOTTY for nvram ioctl
+	
+	Paul Gortmaker <p_gortmaker@yahoo.com>: ENOTTY for nvram ioctl:
+	   ioctl(d, valid, crap) --> -EINVAL
+	   ioctl(d, crap, ....)  --> -ENOTTY
+	
+	  man ioctl agrees:
+	
+	         ENOTTY The specified request does not apply to the kind of
+	                object that the descriptor d references.
+	
+	  Currently we return -EINVAL for both cases which is not as
+	  informative for debugging stuff.
+	
+	  Patch is for 2.5.6 but applies cleanly (with minor offset) to 2.4.19p2
+	
+	  Paul.
+	
+	(Included in 2.2)
+	(Included in 2.4)
+
+<rusty@rustcorp.com.au> (02/04/22 1.586)
+	[PATCH] ENOTTY for rtc ioctl
+	
+	Paul Gortmaker <p_gortmaker@yahoo.com>: ENOTTY for rtc ioctl:
+	   ioctl(d, valid, crap) --> -EINVAL
+	   ioctl(d, crap, ....)  --> -ENOTTY
+	
+	  man ioctl agrees:
+	
+	         ENOTTY The specified request does not apply to the kind of
+	                object that the descriptor d references.
+	
+	  Currently we return -EINVAL for both cases which is not as
+	  informative for debugging stuff.
+	
+	  Patch is for 2.5.6 but applies cleanly (with minor offset) to 2.4.19p2
+	
+	  Paul.
+	
+	(Included in 2.2)
+	(Included in 2.4)
+
+<rusty@rustcorp.com.au> (02/04/22 1.587)
+	[PATCH] Message changed in libc
+	
+	Pavel Machek <pavel@ucw.cz>: Message changed in libc:
+	  Hi!
+	
+	  ...so this change makes it way easier to grep...
+	
+	  									Pavel
+
+<rusty@rustcorp.com.au> (02/04/22 1.588)
+	[PATCH] Warn about ioctl collision
+	
+	Pavel Machek <pavel@ucw.cz>: Warn about ioctl collision:
+	  Hi!
+	
+	  It is probably too late to fix it properly, but warning is better than
+	  nothing. (It confused the hell out of me...)
+	  									Pavel
+
+<rusty@rustcorp.com.au> (02/04/22 1.589)
+	[PATCH] typo in BK-usage.txt
+	
+	Pavel Machek <pavel@ucw.cz>: typo in BK-usage.txt:
+	
+	  Them them is not english...
+
+<rusty@rustcorp.com.au> (02/04/22 1.590)
+	[PATCH] make TAGS to work with bitkeeper
+	
+	Peter Chubb <peter@chubb.wattle.id.au>: make TAGS to work with bitkeeper:
+	
+	  If you type, `make TAGS' in the top-level of a kernel tree that's been
+	  created with bk clone (or if you're using sccs to maintain your own
+	  copy), then the sccs control files are included in the TAGS file (sccs
+	  distinguishes its control files with an s. prefix rather than using a
+	  suffix, so the matches on '*.h' etc pick them up.)
+
+<rusty@rustcorp.com.au> (02/04/22 1.591)
+	[PATCH] request_region in acornscsi.c
+	
+	Rusty Russell <rusty@rustcorp.com.au>: 13) request_region check, 11-20:
+
+<rusty@rustcorp.com.au> (02/04/22 1.592)
+	[PATCH] Trivial patch for logibusmouse.c
+	
+	johnpol@2ka.mipt.ru: Re: Trivial patch for logibusmouse.c:
+	  > On Tue, Mar 19, 2002 at 03:22:58PM +1100, Rusty Russell wrote:
+	  > > Hi Russell,
+	  > >
+	  > > 	Please check this request_region() cleanup patch from Evgeniy
+	  > > Polyakov against 2.4 and 2.5.
+	  >
+	  > Both patches look fine, apart from the disgusting formatting being
+	  > different from the rest of the files.
+	
+	  As you wish...
+	
+	  > --
+	  > Russell King (rmk@arm.linux.org.uk)                The developer of
+	  > ARM Linux
+	  > http://www.arm.linux.org.uk/personal/aboutme.html
+	
+	
+	  	Evgeniy Polyakov ( s0mbre )
+
+<rusty@rustcorp.com.au> (02/04/22 1.593)
+	[PATCH] Trivial patch for msbusmouse.c
+	
+	johnpol@2ka.mipt.ru: Re: Trivial patch for msbusmouse.c:
+	  > On Tue, Mar 19, 2002 at 03:22:58PM +1100, Rusty Russell wrote:
+	  > > Hi Russell,
+	  > >
+	  > > 	Please check this request_region() cleanup patch from Evgeniy
+	  > > Polyakov against 2.4 and 2.5.
+	  >
+	  > Both patches look fine, apart from the disgusting formatting being
+	  > different from the rest of the files.
+	
+	  As you wish...
+	
+	  > --
+	  > Russell King (rmk@arm.linux.org.uk)                The developer of
+	  > ARM Linux
+	  > http://www.arm.linux.org.uk/personal/aboutme.html
+	
+	
+	  	Evgeniy Polyakov ( s0mbre )
+
+<rusty@rustcorp.com.au> (02/04/22 1.594)
+	[PATCH] SAK messages
+	
+	vda@port.imtp.ilyichevsk.odessa.ua: SAK messages:
+	  I use SAK from time to time when I have problems with hung processes.
+	
+	  Sometimes it is difficult to figure out what was being killed and why.
+	
+	  For example, Midnight Commander contains a bug: it holds fd#3 open to
+	  the tty. It prevented me from daemonizing processes (like X) - they
+	  died upon SAK.
+	
+	  This little patch makes SAK tell whom and why it kills. Tested.
+	
+	(Included in 2.4)
+
+<torvalds@home.transmeta.com> (02/04/22 1.595)
+	Remove remnants of compile-time PGE configuration, all the real work
+	was already done based on CPU capabilities at run-time
+
+<torvalds@home.transmeta.com> (02/04/22 1.596)
+	Disable PGE on SMP-P4 machines due to bugs.
+
+<torvalds@home.transmeta.com> (02/04/22 1.597)
+	Make "oldconfig" look for old defaults first in .config, then
+	in /etc/kernel-config, and only if that fails in the architecture-
+	specific defconfig.
+
+<torvalds@home.transmeta.com> (02/04/22 1.598)
+	Update defconfigs for PGE and ISDN changes
+
+<dalecki@evision-ventures.com> (02/04/22 1.599)
+	[PATCH] 2.5.8 IDE 40
+	
+	- Make the ide-cd driver usable again in DMA mode by adapting it to the TCQ
+	   related request handling changes and fixing some other minor stuff related to
+	   this. This patch is ugly like hell I know. Cleanup will follow separately.
+	   It was hard enough to make this going agian at all.
+

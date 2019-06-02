@@ -1,0 +1,104 @@
+
+Summary of changes from v2.6.11.5 to v2.6.11.6
+==============================================
+
+<torvalds@osdl.org>
+	[PATCH] isofs: Handle corupted rock-ridge info slightly better
+	
+	Michal Zalewski <lcamtuf@dione.ids.pl> discovers range checking flaws in
+	iso9660 filesystem.
+	
+	http://marc.theaimsgroup.com/?l=bugtraq&m=111110067304783&w=2
+	
+	CAN-2005-0815 is assigned to this issue.
+	
+	From: Linus Torvalds <torvalds@osdl.org>
+	
+	isofs: Handle corupted rock-ridge info slightly better.
+	
+	Keyword here being 'slightly'. The code is a mess.
+	
+	Signed-off-by: Chris Wright <chrisw@osdl.org>
+
+<torvalds@osdl.org>
+	[PATCH] isofs: more "corrupted iso image" error cases
+	
+	Michal Zalewski <lcamtuf@dione.ids.pl> discovers range checking flaws in
+	iso9660 filesystem.
+	
+	http://marc.theaimsgroup.com/?l=bugtraq&m=111110067304783&w=2
+	
+	CAN-2005-0815 is assigned to this issue.
+	
+	From: Linus Torvalds <torvalds@osdl.org>
+	
+	isofs: more "corrupted iso image" error cases
+	
+	Thanks to Michal Zalewski for testing.
+	
+	Signed-off-by: Chris Wright <chrisw@osdl.org>
+
+<chrisw@osdl.org>
+	[PATCH] isofs: more defensive checks against corrupt isofs images
+	
+	Michal Zalewski <lcamtuf@dione.ids.pl> discovers range checking flaws in
+	iso9660 filesystem.
+	
+	http://marc.theaimsgroup.com/?l=bugtraq&m=111110067304783&w=2
+	
+	CAN-2005-0815 is assigned to this issue.
+	
+	Some more defensive checks to keep corrupt isofs images from corrupting
+	memory or causing Oops.
+	
+	Signed-off-by: Chris Wright <chrisw@osdl.org>
+	
+	===== fs/isofs/rock.c 1.23 vs edited =====
+
+<meissner@suse.de>
+	[PATCH] Fix signedness problem at socket creation
+	
+	From: Marcel Holtmann <marcel@holtmann.org>
+	
+	CAN-2005-0750 is assigned to this issue
+	
+	ilja <ilja@suresec.org> discovered potential local root exploit in
+	bluetooth socket creation.
+	
+	This patch fixes a small signedness problem when creating the
+	socket.
+	
+	Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+	Signed-off-by: Chris Wright <chrisw@osdl.org>
+
+<mlafon@arkoon.net>
+	[PATCH] Suspected information leak (mem pages) in ext2
+	
+	From: "Mathieu Lafon" <mlafon@arkoon.net>
+	
+	I think I have discovered a potential security problem in ext2: when a
+	new directory is created, the ext2 block written to disk is not
+	initialized.
+	
+	Included is a proposed patch for Linux 2.6 (ext2_make_empty() function):
+	
+	CAN-2005-0400 is assigned to this issue.
+	
+	Signed-off-by: Chris Wright <chrisw@osdl.org>
+
+<akpm@osdl.org>
+	[PATCH] Potential DOS in load_elf_library
+	
+	From: Herbert Xu <herbert@gondor.apana.org.au>
+	
+	Yichen Xie <yxie@cs.stanford.edu> points out that load_elf_library can
+	modify `elf_phdata' before freeing it.
+	
+	CAN-2005-0749 is assigned to this issue.
+	
+	Signed-off-by: Andrew Morton <akpm@osdl.org>
+	Signed-off-by: Chris Wright <chrisw@osdl.org>
+
+<chrisw@osdl.org>
+	Linux 2.6.11.6
+

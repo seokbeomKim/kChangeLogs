@@ -1,0 +1,799 @@
+
+Summary of changes from v2.5.15 to v2.5.16
+============================================
+
+<dirk.uffmann@nokia.com>
+	[PATCH] 1126/1: Kernel decompression in head.S does not work for ARM 9xx architectures
+	
+	The Kernel decompression hangs after decompression on an ARM Integrator
+	equipped with an ARM920T. There has been no dedicated Cache support for 
+	ARM9 architectures. 
+	
+	The CPU-ID mask used should allow all ARM920 revisions to be detected. 
+	If ARM922 or ARM925 support the same cache methods it might be: 
+	.word   0xff00ff00, allowing all 92x models and revisions to be detected.
+	
+	
+	
+	
+	This time hopefully with TABs instead of white spaces...
+
+<dirk.uffmann@nokia.com>
+	[PATCH] 1127/1: static PCI memory mapping for ARM Integrator reduced
+	
+	ARM Integrator: static memory mapping of PCI register configuration space
+	
+	The statically allocated address range for the internal registers of the V3 PCI-bridge chip has been choosen too big. There are only 64k of registers space in this chip.
+	
+	Additionally, some of the entries in platform.h describing the PCI memory mapping do not match the comments in platform specific mm.c file.
+
+<dirk.uffmann@nokia.com>
+	[PATCH] 1130/1: Remove support for prefetchable PCI memory on ARM Integrator
+	
+	Since prefetchable memory is not beeing allocated correctly behind PCI-to-PCI bridges, this is a work-around to make it possible to uses devices located behind PCI-bridges. E.g. the Matrox G450 now works since prefetchable PCI memory is completly disabled.
+	
+	I saw some very promissing patches from Russel some where around december on the mailing list that bring the behaviour of /driver/pci/setup-bus.c in line with prefetchable memory support for devices on PCI bus 00. This patch was adding a member for prefetchable memory regions to 
+		struct pbus_set_ranges_data
+		{
+		        int found_vga;
+		        unsigned long io_start, io_end;
+		        unsigned long mem_start, mem_end;
+		};
+	used in through-bridge resource allocations. 
+	
+	Russel, do you think your patch could solve the problem more elegant?
+	
+	In addition, I changed some comments and introduced defines from platform.h instead of hard-code values.
+
+<rmk@flint.arm.linux.org.uk>
+	Pass a physical address from the boot loader for the location of the
+	initrd instead of a virtual address; the boot loader has no business
+	knowing the kernel's virtual to physical mappings, which could
+	change in the future.
+
+<rmk@flint.arm.linux.org.uk>
+	[ARM] Fix signedness of address comparisons, causing boots on some
+	ARM platforms to fail.
+
+<rmk@flint.arm.linux.org.uk>
+	[ARM] Localise old param_struct to arch/arm/kernel/compat.c.
+
+<nico@cam.org>
+	[ARM PATCH] 1110/1: fixes to the ARM checksum code
+	The current code is, well, broken, for both little and big endian.  The 
+	corner cases are not all right, and the person to blame is myself.
+	
+	This patch fixes all bugs.  The resulting code was tested with all alignment 
+	and length combinations to test all code paths.
+	
+
+<rmk@flint.arm.linux.org.uk>
+	A pile of missed kernel stack accessing functions were still using
+	the 'task struct' pointer instead of the 'thread_info' pointer.
+	This cset fixes up those missed areas.
+
+<rmk@flint.arm.linux.org.uk>
+	Clean up do_undefinstr - it only needs to take the pt_regs pointer
+	argument.
+
+<rmk@flint.arm.linux.org.uk>
+	Always allow CONFIG_CMDLINE to be set or edited by the user.
+
+<rmk@flint.arm.linux.org.uk>
+	[ARM] SA1100 cleanups:
+	 - Only map Neponset if Neponset is present.
+	 - Remove IRQ debugging
+	 - Move GPIO_11_27_IRQ macro
+	 - Supply CS macros to define physical addresses.
+	 - Remove defunct PCMCIA base addresses definitions.
+
+<rmk@flint.arm.linux.org.uk>
+	[ARM] Don't write to read-only registers.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	ISDN: maintain outstanding CAPI messages in the drivers
+	
+	It's up to the drivers to maintain their list of buffered messages
+	themselves. As most drivers can share common code, provide it
+	in capilib.o, inside of the module kernelcapi.o
+
+<rmk@flint.arm.linux.org.uk>
+	[ARM] Couple of small fixes:
+	 - Disable CONFIG_USB_OHCI for Neponset
+	 - Don't export strsep in armksyms.c - it's exported by kernel/ksyms.c
+
+<tcallawa@redhat.com>
+	Sparc: Use proper sys_{read,write} prototypes in SunOS
+	compat syscalls.
+
+<tcallawa@redhat.com>
+	Sparc64: Export batten_down_hatches
+
+<tcallawa@redhat.com>
+	drivers/video/aty/mach64_gx.c: Include sched.h
+
+<davem@nuts.ninka.net>
+	Sparc64 fixes:
+	- Fix some errors in Sparc ptrace debugging output.
+	- Remove senseless comments above sparc64 copy_thread
+	referring to sparc32 privileged register issues.
+
+<torvalds@penguin.transmeta.com>
+	Make setresuid/setresgid be more consistent wrt fsuid handling
+
+<jgarzik@mandrakesoft.com>
+	Merge 2.4.x changes for old OSS ac97_codec driver:
+	* update Wolfson codec support
+	* add new AC97 codec ids
+
+<jgarzik@mandrakesoft.com>
+	via-rhine net driver minor fixes and cleanups:
+	- fixes comments for Rhine-III
+	- removes W_MAX_TIMEOUT (unused)
+	- adds HasDavicomPhy for Rhine-I (basis: linuxfet driver; my card
+	  is R-I and has Davicom chip, flag is referenced in kernel driver)
+	- sends chip_id as a parameter to wait_for_reset since np is not
+	  initialized on first call
+	- changes mmio "else if (chip_id==VT6102)" to "else" so it will work
+	  for Rhine-III's (documentation says same bit is correct)		
+	- transmit frame queue message is off by one - fixed
+	- adds IntrNormalSummary to "Something Wicked" exclusion list
+	  so normal interrupts will not trigger the message (src: Donald Becker)
+	 
+
+<jgarzik@mandrakesoft.com>
+	Add new pci id to tulip net driver.
+	Contributed by Ohta Kyuma.
+
+<davem@nuts.ninka.net>
+	Sparc64: Delete AOFF_task_fpregs define.
+
+<davem@nuts.ninka.net>
+	tcp_ipv4.c: Do not increment TcpAttemptFails twice.
+
+<davem@nuts.ninka.net>
+	Sparc64: Make pcibios_init return an int.
+
+<davem@nuts.ninka.net>
+	Ingress packet scheduler: Fix compiler error when CONFIG_NET_CLS_POLICE is disabled.
+
+<davem@nuts.ninka.net>
+	Sparc64: Bitops take unsigned long pointer.
+
+<davem@nuts.ninka.net>
+	Sparc64: Fix typos in bitops changes.
+
+<hch@infradead.org>
+	IPv4 Syncookies: Remove pointless CONFIG_SYN_COOKIES ifdef.
+
+<neilb@cse.unsw.edu.au>
+	[PATCH] - kNFSd in 2.5.15 - export_operations support for isofs
+	
+	ISOFS to use export_operations to declare exportability
+	
+	Exporting ISO's has never been very reliable
+	as lookup("..") doesn't work (even though there is
+	some code that tries to pretend that it does).
+	
+	This means that if an inode falls out of cache, any
+	filehandle on it will become stale.
+	
+	This makes that level of support explicit with an empty
+	export_operations structure.  get_parent could be written....
+	but not today.
+
+<neilb@cse.unsw.edu.au>
+	[PATCH] - kNFSd in 2.5.15 - Require export operations for exporting a filesystem
+	
+	This removes the old alternates to export_operations for exporting a
+	filesystem.
+	
+	It removes fh_to_dentry, dentry_to_fh, and s_nfsd_free_path_sem.  It
+	also removes a lot of code.
+	
+	The fs/ntfs change is because it was setting fh_to_dentry and
+	dentry_to_fh (which no longer exist) to NULL.
+
+<torvalds@home.transmeta.com>
+	Fix 'export-objs' usage in Makefiles. 
+	
+	Noted by Keith Owens.
+
+<davem@nuts.ninka.net>
+	Sparc64: Missing parts of previous math-emu fixes.
+
+<shaggy@austin.ibm.com>
+	[PATCH] Prevent deadlock in JFS when flushing data during commit
+	
+	This prevents a deadlock in JFS.
+
+<george@mvista.com>
+	[PATCH] 64-bit jiffies, a better solution
+	
+	Ok, here it is.  The following arch are not covered:
+	Mips, Mips64 in 32-bit mode, parisc in __LP64__ mode.
+	
+	In addition, x86_64 mentions jiffies in the existing script.
+	This may be a problem.
+
+<rgooch@atnf.csiro.au>
+	misc.c:
+	  Do not put miscellaneous character devices in /dev/misc if they
+	  specify their own directory (i.e. contain a '/' character)
+	util.c:
+	  Copied and used macro for error messages from fs/devfs/base.c
+	base.c:
+	  Removed 2.4.x compatibility code
+	  Added BKL to <devfs_open> because drivers still need it
+
+<jt@hpl.hp.com>
+	Fix four similar off-by-one errors in wireless net drvr core.
+
+<jt@hpl.hp.com>
+	IrDA update 1/3:
+	 <Following patch from Jeff Snyder>
+	o [CRITICA] Release the proper region and not NULL pointer
+	o [FEATURE] Fix messages
+
+<jt@hpl.hp.com>
+	IrDA update 2/3, set_bit updates:
+	 <Following patch from Paul Mackerras>
+	o [CORRECT] Argument of set_bit and friends should be unsigned long
+	Should fix all compile warnings ;-)
+
+<jt@hpl.hp.com>
+	IrDA update 3/3:
+	 <Following patch from Christoph Bartelmus, mangled by me>
+	o [CORRECT] replace the global LSAP cache with LSAP caches private
+	to each LAP.
+	Fix a bug where two simultaneous connections from two devices
+	using the same LSAPs would get mixed up.
+	Should also improve performance in similar cases. 
+
+<quintela@mandrakesoft.com>
+	tulip net driver 2114x phy init fix
+
+<jdavid@farfalle.com>
+	Add full duplex support to 3c509 net driver.
+
+<skyrelighten@yahoo.co.kr>
+	Add to list of supported 8139 net boards.
+
+<henrique@cyclades.com>
+	Change maintainer info of PC300 WAN driver.
+
+<os@emlix.com>
+	cs89x0 net driver minor fixes, SH4 support, and cmd line media support
+
+<bunk@fs.tum.de>
+	Include linux/slab.h not linux/malloc.h in pc300 wan driver.
+
+<aia21@cantab.net>
+	NTFS 2.0.7: minor cleanup, remove NULL struct initializers
+
+<paulus@nanango.paulus.ozlabs.org>
+	PPC32: This changeset updates several of the powermac-specific
+	drivers.  Most of this is from 2.4.  Almost all of this work was
+	done by Ben Herrenschmidt.
+
+<aia21@cantab.net>
+	NTFS 2.0.7 release: pure cleanups.
+
+<torvalds@home.transmeta.com>
+	Make arm default to little-endian jiffies.
+	
+	Any potential BE arm port can fix this up later.
+
+<dalecki@evision-ventures.com>
+	[PATCH] 2.5.15 IDE 60
+	
+	 - Rewrite ioctl handling.
+	
+	 - Apply fix for hpt366 "hang on boot" by Andre.
+	
+	 - Remove stale XXX_tune_req. It was no longer used.
+	
+	 - Propagate rq through ide_error(), ide_end_drive_cmd(), ide_dump_status(),
+	   ide_wait_stat().
+	
+	 - Push the current drive down to ata_channel from hwgroup.
+	
+	 - Push the timer down to the ata_channel structure. Most probably it will end
+	   at the drive.
+
+<kasperd@daimi.au.dk>
+	Fix oops-able situation in 3c509 net driver
+	by removing __init marker from read_eeprom()
+
+<wstinson@infonie.fr>
+	request_region janitor cleanup for rtc char driver
+
+<kai@tp1.ruhr-uni-bochum.de>
+	ISDN: Usage count for CAPI controllers
+	
+	We now control rely on ->owner and the upper level to control the
+	module use count.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	ISDN: AVM CAPI drivers: Common revision parsing
+	
+	Use common function for setting the revision strings.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	ISDN: Init ISA AVM CAPI drivers at module load time
+	
+	Don't use a special CAPI solution to tell the drivers about 
+	ISA cards but use module parameters, just as other drivers do.
+	
+	Internally use struct pci_dev to save that data - hopefully
+	one day the device tree will provide a nicer way to achieve this.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	ISDN: Release AVM CAPI controllers at module unload time
+	
+	Use the standard new-style pci_driver::remove to unregister
+	drivers at module unload time.
+	
+	PCMCIA obviously has its own way of handling removing, the ISA
+	drivers unregister at module unload time as well.
+
+<david-b@pacbell.net>
+	[PATCH] -- ehci misc FIXMEs
+	
+	This addresses FIXME comments in the EHCI code, notably:
+	
+	    - telling the hub driver to clear up TT error state
+	      (relies on the hub error recovery patch I just sent)
+	    - using 64bit PCI DMA where appropriate
+	    - handling BIOS handoff as neeed
+
+<david-b@pacbell.net>
+	[PATCH] -- hub/tt error recovery
+	
+	This patch adds missing functionality to the transaction translator
+	support for USB 2.0 hubs:
+	
+	    - moves the 'struct usb_tt' definition to "hub.h" from <linux/usb.h>
+	    - adds state to it as neeed for some control/bulk error recovery
+	    - teaches the hub driver how to use that state (via keventd)
+	    - adds a call letting HCDs trigger that recovery
+
+<johannes@erdfelt.com>
+	[PATCH] uhci.c FSBR timeout
+	
+	There was a discussion a long time ago about how safe the bit operations
+	were as well as recently.
+	
+	set_bit/clear_bit are not safe on x86 UP, nor are they safe on other
+	architectures. It's also unclear from the UHCI spec if the HC's are safe
+	with respect to atomic updates to the status field.
+	
+	This patch ditches all of the uses of set_bit and clear_bit and changes
+	the algorithm that depended on it.
+	
+	The FSBR timeout algorithm would reenable FSBR for transfers when they
+	started making progress again. So instead of trying for this best case,
+	we convert the transfer over to depth first from the standard breadth
+	first. To make sure the transfer doesn't hog all of the bandwidth, every
+	5th TD is left in breadth first mode. This will ensure other transfers
+	get some bandwidth.
+	
+	It's not perfect, but I think it's a good compromise.
+	
+	Note: td->info is read only by the HC, so we can touch it whenever we
+	want.
+
+<greg@kroah.com>
+	USB storage
+	
+	sync up with both the -dj and cvs version of the usb-storage code.
+
+<greg@kroah.com>
+	USB storage
+	
+	fixed typo in variable name.
+
+<greg@kroah.com>
+	USB storage drivers
+	
+	fix for scsi memory address changes.  Now the datafab and jumpshot drivers build properly.
+
+<greg@kroah.com>
+	USB storage
+	
+	added Sandisk SDDR-55 driver from Simon Munton
+
+<rmk@flint.arm.linux.org.uk>
+	2.5.14 updates - for the new memory management pfn() macros.  Also,
+	we fix ARM720T support - this CPU has unified writethrough caches
+	only, so we can't use the Harvard cache operations when copying
+	pages.  Also, we don't have to evict cache entries during copypage.
+
+<rmk@flint.arm.linux.org.uk>
+	[ARM] ADFS updates/fixes.
+	Fixes lockup on SMP boxes, and fixes buggy map scanning code.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	Use standard AS rule.
+
+<david@gibson.dropbear.id.au>
+	[PATCH] Update orinoco driver to 0.11b
+	
+	This patch updates the orinoco wireless driver to 0.11b.  This fixes
+	several kfree()-of-bad-address bugs.
+
+<rgooch@atnf.csiro.au>
+	Fixed race when devfs lookup()/readdir() triggers partition rescanning.
+
+<rusty@rustcorp.com.au>
+	[PATCH] Hotplug CPU prep
+	
+	This changes do_fork() to return the task struct, rather than the PID.
+	
+	Also changes CLONE_PID ("if my pid is 0, copy it") to CLONE_IDLETASK
+	("set child's pid to zero"), and disallows access to the flag from user
+	mode.
+
+<manfred@colorfullife.com>
+	[PATCH] usb-storage locking fixes
+	
+	I found several SMP and UP locking errors in usb-storage, attached is a
+	patch:
+	
+	Changes:
+	* srb->result is a bitfield, several << 1 were missing.
+	* add scsi_lock calls around midlayer calls, release the lock before
+	  calling usb functions that might sleep.
+	* replace the queue semaphore with a queue spinlocks, queuecommand is
+	  called from bh context.
+
+<greg@kroah.com>
+	[PATCH] usb_submit_urb fix for broken usb devices
+	
+	added check for wMaxPacketSize of 0, which is a messed up device, but
+	seems to be legal according to the USB spec.
+	
+	Thanks to Johannes for figuring out the problem, and providing an
+	original version of this patch.
+
+<johannes@erdfelt.com>
+	[PATCH] USB device reference counting fix for uhci.c and usb core
+	
+	Earlier in the 2.5 development cycle a patch was applied that changed
+	the reference counting behaviour for USB devices.
+	
+	There are a couple of problems with the change:
+	- It made the USB code more complicated as a whole with the introduction
+	  of an additional cleanup path for devices. Using the traditional method
+	  of reference counting, cleanup is handled implictly
+	- It reduces functionality by requiring a callback for all references to
+	  the device, but doesn't provide a method of providing callbacks for
+	  references. It relies on the hardcoded device driver ->disconnect and
+	  HCD ->deallocate method for callbacks
+	
+	The traditional method of using reference counting supports as many
+	reference users as needed, without complicating it with mandatory
+	callbacks to cleanup references.
+	
+	The change in 2.5 also only helps catch one subset of programming
+	problem in device drivers, the case where it decrements too many times.
+	That is of dubious debugging value.
+	
+	So, this patch reverts the change and makes the reference counting
+	behave like it does in the rest of the kernel as well as how the USB
+	code does in 2.4.
+	
+	This patch doesn't remove all of the superfluous code. Some drivers,
+	like usb-ohci, ohci-hcd and ehci-hcd have some code that is no longer
+	needed. I wanted to spend some more time with those drivers since the
+	changes weren't as trivial as uhci.c and usb-uhci.c.
+	
+	I've tested with uhci and usb-ohci with no adverse effects.
+
+<greg@kroah.com>
+	[PATCH] USB device reference counting api cleanup changes
+	
+	This patch replaces the awkwardly named usb_inc_dev_use() and
+	usb_dec_dev_use() with usb_get_dev() and usb_put_dev() to match the
+	naming convention of the rest of the kernel's reference counted
+	structures.  It also does away with the special case of usb_free_dev(),
+	and has usb_put_dev() be the same thing (through a #define, just like
+	usb_free_urb() works.)
+	
+	Now when the last person calls usb_put_dev() or usb_free_dev() the
+	structure is cleaned up.  This allows the different host controller
+	drivers to implement their logic differently if they want to (as they
+	do), and everyone can be happy and stop arguing about the "proper" way
+	to write their host controller drivers :)
+
+<dwmw2@infradead.org>
+	[PATCH] zlib_inflate return code fix. Again.
+	
+	This bug, introduced by the fix for ppp_deflate, makes zisofs unhappy
+	with certain input.
+
+<greg@kroah.com>
+	USB sddr55 minor patch to enable a MDSM-B reader
+	
+	This was forgotten in the previous sddr55 patch import, and is needed
+	to support the MDSM-B reader devices.
+	
+	Thanks to Andries.Brouwer@cwi.nl for the 2.4.x version of the patch.
+
+<rgooch@atnf.csiro.au>
+	Minor cleanup of fs/devfs/base.c:scan_dir_for_removable().
+
+<torvalds@penguin.transmeta.com>
+	First cut at proper TLB shootdown for page directory entries.
+
+<torvalds@home.transmeta.com>
+	This improves on the page table TLB shootdown. Almost there.
+
+<torvalds@home.transmeta.com>
+	Fix up some more TLB shootdown issues.
+
+<johannes@erdfelt.com>
+	[PATCH] uhci-hcd for 2.5.15
+	
+	So I finally hunkered down and got uhci-hcd working. I was surprised how
+	easy it was to make the modifications for hcd.c.
+	
+	This patch has received a moderate amount of testing so far. I've played
+	with various devices and haven't had any problems. I won't claim it's
+	bug free yet and I'll continue doing more testing.
+	
+	The patch includes a small change to hcd.c to not call free_config if
+	the HCD doesn't implement it.
+	
+	There are some other messages that get printed such as:
+	
+	hcd.c: usb_hcd_pci_remove 00:10.0, count != 1
+	
+	but it appears from the code that this is just a soft warning that all
+	of the references to the bus aren't freed yet. This isn't a bug.
+	
+	Differences from usb-uhci/usb-uhci-hcd:
+	- Cleaner code. uhci-hcd is based off of uhci, so it maintains the same
+	  look and feel as well as readability.
+	- Faster. The tests I've run so far show that uhci-hcd is faster in
+	  every case than usb-uhci-hcd
+	- It does not have the watchdog type feature for VIA chipsets. It's
+	  something that is definately possible to implement, but I'd like to
+	  find out what Windows does first.
+	
+	Differences from uhci:
+	- Modified to use the hcd.c framework. This removed a significant amount
+	  of code and nesessitated lots of little changes.
+	- Big endian support. I haven't been able to test it on a big endian
+	  machine yet, but atleast 90+% of the work should be done. Once I get
+	  my PowerPC working again, I'll test this and submit any appropriate
+	  patches. This was the biggest functional change between uhci.c.
+	- No more urb->next processing. Completely ripped out.
+	- urb->interval support for Isochronous pipes.
+	- A couple of bug fixes for some problems I noticed while working on the
+	  code. These will be submitted for uhci.c in a seperate email.
+
+<johannes@erdfelt.com>
+	[PATCH] 2.4.19-pre8 uhci.c incorrect bit operations
+	
+	This fixes up a couple of problems I came across while working on
+	uhci-hcd. There are a couple of places where shifts are used where they
+	shouldn't be and others where should be.
+	
+	This cleans up a couple of cases and tidys it up.
+	
+	The patch is relative to 2.4.19-pre8 and my other patches, but it's
+	alright to wait for 2.4.20. It should also be applied to 2.5.
+
+<johannes@erdfelt.com>
+	[PATCH] 2.4.19-pre8 uhci.c incorrect bit operations
+	
+	Woops, I sent the wrong version. There was one extra line that was
+	required.
+
+<rl@hellgate.ch>
+	Cosmetic cleanups, remove unused struct members from via-rhine net driver
+
+<jgarzik@mandrakesoft.com>
+	Update MII generic phy driver to properly report link status.
+
+<jgarzik@mandrakesoft.com>
+	Fix phy id masking in 8139too net driver.
+	Noticed by Eric Bowles.
+
+<greg@kroah.com>
+	Change to the USB core to retry failed devices on startup.
+	
+	Based on a patch from Georg Acher <georg@acher.org>
+
+<acher@in.tum.de>
+	[PATCH] USB-UHCI-HCD
+	
+	After maturing for more than a month, I decided that it's enough...
+	So here's the patch for the HCD-version of usb-uhci, I called it
+	usb-uhci-hcd. For me, the usual devices work (TM).
+	
+	Since the internals haven't changed much, I don't expect much difference to
+	usb-uhci in functionality and performance.
+	
+	There is one major improvement: I've added a (preliminary) watchdog, that
+	regularly checks whether UHCI interrupts are coming through. If they are
+	"missing", ie. the HC halted without saying so, the HC is "re-animated" by a
+	real and clean restart, which is (internally) equivalent to a module-reload.
+	This is especially for VIA-chips which get comatose quite easily by babble
+	or other incorrect transfers.
+	
+	The side effect is, of course, disconnects for all connected devices, but
+	they re-appear after a few seconds and were dead before anyway. So keyboard
+	and mouse work again, which is IMO a _very_ useful thing :-)
+	
+	Another point: The watchdog (currently with moderate 8 interrupts/s) detects
+	IRQ-problems, so the misleading "device doesn't accept new device"-message
+	is replaced by an immediate error.
+	
+	More comments and the separation into multiple files (I've taken ohci-hcd as
+	an example) should make the code more concise...
+	
+	A few things are still on the todo-list and will come later:
+	- A few watchdog modifications (fewer interrupts, better diagnostics)
+	- Support for module "tune"-parameters for breadth/depth search, debug etc.
+	- interval support for ISO
+	- More SMP-tests
+	- maybe changes for reference counting when it is clear what survives :-)
+
+<greg@kroah.com>
+	USB Config.in and Makefile fixups
+	
+	fixed up the Config.in and Makefile merge due to there being 2 uhci-hcd drivers added at once.
+
+<greg@kroah.com>
+	[PATCH] USB - fix a compiler warning in the core code
+	
+	This removes a compiler warning due to my previous patch.
+
+<greg@kroah.com>
+	[PATCH] USB - Host controller Config.in changes
+	
+	- Commented out the usb-ohci driver.  This is part of the migration away from
+	  this driver, to the ohci-hcd driver.
+	- Prevented the two UHCI_HCD drivers from both being compiled into the kernel
+	  at the same time.
+
+<torvalds@home.transmeta.com>
+	Cleanup munmap a lot. Fix Intel P4 TLB corruptions on SMP.
+	
+	Special thanks to Intel for support and traces.
+
+<torvalds@home.transmeta.com>
+	Update kernel version
+
+<rml@tech9.net>
+	[PATCH] clean up maximum priorities
+	
+	This patch further cleans up and separates the code in an effort to
+	allow setting (a) a larger maximum real-time priority than default and
+	(b) a maximum kernel RT priority that is separate than the maximum
+	priority exported to user-space.
+
+<dalecki@evision-ventures.com>
+	[PATCH] 2.5.15 IDE 61
+	
+	- Fix typo in pdc202xx driver.
+	
+	- Fix locking order in ioctl.
+	
+	- Fix wrong time_after usage introduced in 60. Maybe the fact I always get is
+	   wrong is related to the fact that I'm using the mouse with the left hand!?
+	
+	- Apply arch-clean-2 by Bartlomiej Zolnierkiewicz.
+	
+	- Don't disable interrupts during ide_wait_stat(). I see no reason too.
+	
+	- Push flags down from hwgroup to the ata_chaannel structure.
+	
+	- Apply small fixes from Franz Sirl to make AEC6280 working properly again.
+
+<dalecki@evision-ventures.com>
+	[PATCH] 2.5.15 IDE 62a
+	
+	- Streamline device detection reporting to always use ->slot_name.
+	
+	- Apply 64 bit sector size fixes to the overall code.
+	
+	- Push ->handler down to the struct ata_channel.
+	
+	- Introduce channel group based locking instead of a single global lock for all
+	   operations. There are still some places where we have preserved the ide_lock.
+	   We can't lock for queues during device probe and we protect global data
+	   structures during device registration and unregistration in ide.c with it.
+	
+	- Start replacement of serialized access to the registers of
+	   channels which share them with proper host chip driver specific locking.
+	   This affects the following host chip drivers:
+	
+	   cmd640.c, rz1000, ... ?
+	
+	   Seems some are setting the serialize flag just in case. So better let's do it
+	   gradually over time.
+	
+	   Well, I still have to think whatever we really need to put channels sharing
+	   an IRQ line in the same locking group.
+	
+	   From now on the sick concept of a hw group is gone now. We have full blown
+	   per channel request queues! Hopefully I will be able soon to get my hands on
+	   a dual Athlon machine to check how this all behaves on a multi SMP machine.
+	
+	- Move the whole SUPPORT_VLB_SYNC stuff to the only place where it is used: the
+	   pdc4030 host chip driver.  Eliminate it from the global driver part.
+	
+	- Eliminate pseudo portability macros from pdc4030. This is a host chip firmly
+	   based on VLB.
+
+<dalecki@evision-ventures.com>
+	[PATCH] 2.5.15 IDE 63
+	
+	- Propagate the queue handling changes to pmac as well.
+	
+	- Move set_transfer to ide-taskfile.c this is the only place where it's used
+	   and it can be made static there. Same applies to ide_ata66_check().
+	
+	- Move ide_auto_reduce_xfer to ide.c.
+	
+	- Make ide_cmd() local to the only place where it's used. Rename it to
+	   drive_cmd(). Don't pass drive_cmd_intr() as parameter.
+	
+	- Remove ide_next command completion type. Nobody is using it.
+	
+	- Move ide_do_drive_cmd to ide-taskfile. It's used there and in sub-drivers.
+	   Not in ide.c. The usage inside the device type drivers is entirely bogus
+	   inconsistent and so on...
+	
+	- Kill bogus IRQ masking code. The kernel is supposed to handle this properly.
+	   We should not try to work against possible bugs in the overall irq handling
+	   code. Wow this is increasing the systems overall responsibility by a
+	   significant margin.
+	
+	- Remove disfunctional pdcadma code. It is only misleading to the user.
+
+<dalecki@evision-ventures.com>
+	[PATCH] 2.5.15 IDE 64
+	
+	Let's just get over with  this before queue handling will be targeted again...
+	
+	- Implement suggestions by Russell King for improved portability and separation
+	   between PCI and non PCI host code.
+	
+	- pdc202xxx updates from Thierry Vignaud.
+	
+	- Tiny PIO fix from Tomita.
+
+<neilb@cse.unsw.edu.au>
+	[PATCH] Micro Memory battery backed RAM card driver
+	
+	New driver for Micro Memory NVRAM module
+	
+	This driver handles up to 16 PCI based NVRAM cards
+	from MicroMemory.
+	Each card appears like a block device, and can be partitioned
+	using any standard partitioning tool.  Upto 15 partitions are
+	supported.
+	
+	This driver needs its own major device number and so allocates
+	one using register_blkdev.
+
+<hirofumi@mail.parknet.co.jp>
+	[PATCH] Fixed the handling of file name containing 0x05 on vfat
+	
+	This patch fixes the behavior of vfatfs when the file name contains 0x05.
+
+<axboe@suse.de>
+	[PATCH] fix scsi oops on failed sg table allocation
+	
+	This patch fixes the deliberate BUG_ON() on failed sgtable allocations.
+	I left that in because I was too lazy to fix it at the time...
+	
+	Basically make scsi_init_io() return 0 on failure (like before) but this
+	time allow us to recover. scsi_init_io() will end_request on a fatal
+	condition. So now just mark the device/host as starved if needed, and
+	leave the request at the front of the queue for next service.
+

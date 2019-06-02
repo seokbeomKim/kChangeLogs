@@ -1,0 +1,8 @@
+final:
+ - Greg KH: USB update (fix UHCI timeouts, serial unplug)
+ - Christoph Rohland: shmem locking fixes
+ - Al Viro: more mount cleanup
+ - me: fix bad interaction with link_count handling
+ - David Miller: Sparc updates, net cleanup
+ - Tim Waugh: parport update
+ - Jeff Garzik: net driver updates

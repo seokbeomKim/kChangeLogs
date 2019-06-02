@@ -1,0 +1,1724 @@
+
+Summary of changes from v2.5.60 to v2.5.61
+============================================
+
+<sri@us.ibm.com>
+	[SCTP] Changed 'bug' to a static variable. (Arnd Bergmann)
+
+<jgrimm@touki.austin.ibm.com>
+	[SCTP] Don't retransmit Gap-Acked TSNs
+	
+	In general, this isn't a terrible problem at the protocol level 
+	(though inefficient), but causes _horrible_ problems with the way we 
+	do 'flight_size' calculation, eventually hitting xfer deadlock, 
+	since we think we already have more than enough DATA out on the wire.  
+
+<sri@us.ibm.com>
+	[SCTP] Handle non-linear ip re-assembled skb's in sctp_rcv()
+
+<jgrimm@touki.austin.ibm.com>
+	[SCTP] Add get_paddrs/get_laddrs support.  (ardelle.fan)
+
+<sri@us.ibm.com>
+	[SCTP] Fix to correctly update rwnd for non-linear skbs.
+
+<jgrimm@touki.austin.ibm.com>
+	[SCTP] Fix hardcoded stream counts.
+	
+	Code had hardcoded limits to the maximum stream that could be used, 
+	and consequent static data structures.   Now dynamically allocate
+	storage for the SSN maps until _after_ we know what they are.  
+	Protocols such as SIP want to use all possible streams.  
+
+<jgrimm@touki.austin.ibm.com>
+	[SCTP] Add jitter to the heartbeat interval.  (ardelle.fan)
+	
+	Per RFC 2960 (well, impl-guide corrections really) add a jitter in the
+	range of -50% to +50% of the current rto to the heartbeat interval. 
+
+<jgrimm@touki.austin.ibm.com>
+	[SCTP] Turn off hearbeat timers earlier in shutdown. 
+	
+	Per clarifications made in the SCTP implementor's guide, 
+	we should stop sending heartbeats as soon as we either send
+	SHUTDOWN or send SHUTDOWN-ACK.
+	
+	Cleanup sctp_transport_t -> sctp_transport.
+	Fix some missing entries in the statetable for HB related events.
+
+<sri@us.ibm.com>
+	[SCTP] SCTP path mtu discovery support for v4 addresses.
+
+<jgrimm@touki.austin.ibm.com>
+	[SCTP] Fix merge conflicts. 
+
+<jgrimm@touki.austin.ibm.com>
+	[SCTP] Mark as "unsafe" module.  Some dead code removal.
+
+<sri@us.ibm.com>
+	[SCTP] Free chunks in retransmit and control queues on outq_teardown()
+
+<sri@us.ibm.com>
+	[SCTP] Minor fixes to icmp error handler.
+	
+	* Ignore any (ICMP_TIME_EXCEEDED, ICMP_EXC_FRAGTIME) errors due to ip
+	  fragment reassembly timeouts.
+	* Make sure that transport's pmtu is not set to a value lower than
+	  SCTP_DEFAULT_MINSEGMENT even when the value reported by
+	  (ICMP_DEST_UNREACH, ICMP_FRAG_NEEDED) error is lower.
+
+<jgrimm@touki.austin.ibm.com>
+	[SCTP] Overlapping INIT check not right for case 'B'.
+	
+	Auditing code I see that case 'B' is checking against tie-tag fields.
+	This is not right, should be checking against peer_vtag == 0, per the
+	RFC. 
+
+<sri@us.ibm.com>
+	[SCTP] Fix to update rwnd on partial reads.
+
+<jgrimm@touki.austin.ibm.com>
+	[SCTP] Handle requests of 0 streams & missing state cookie.
+	
+	Cleaning up some RFC 2960 corner cases.  We need to ABORT the case
+	where peer requests inbound/outbound streams of value 0.   We need
+	to abort the missing state cookie case. 
+
+<jgrimm@touki.austin.ibm.com>
+	[SCTP] Remove __exit from sctp_proc_exit. 
+	
+
+<sri@us.ibm.com>
+	[SCTP] Cleanup of association bind address list initialization.
+
+<sri@us.ibm.com>
+	[SCTP] Fix af->dst_saddr() to fill in the port.
+
+<jgrimm@touki.austin.ibm.com>
+	[SCTP] Fix large message sends.
+	
+	Fix limitation where we could not send messages that exceeded the
+	maximum data chunk size.   We still need partial data delivery to
+	accept messages with len > rwnd, but this fixes the sending.  Sends
+	are still limited (as per the I-D) to SNDBUF. 
+	
+	Additionally, we can now 'bundle' fragmented DATA with the 
+	Cookie-Echo packet, not just a small message.  
+
+<jgrimm@touki.austin.ibm.com>
+	[SCTP] IPV6_SCTP__ should be a tristate.
+	
+	Otherwise, an invalid configuration of sctp builtin and ipv6 as 
+	a module.  
+
+<sri@us.ibm.com>
+	[SCTP] sctp v6 source address selection support.
+
+<agrover@groveronline.com>
+	ACPI: fix compile on IA64 (Matthew Wilcox)
+
+<zaitcev@redhat.com>
+	[SUNZILOG]: Fix TX and interrupt bugs.
+	- Make sure to clear SUNZILOG_FLAG_TX_ACTIVE
+	- Handle TX completion events properly
+	- Do not forget R1 reg initialization for ttys.
+
+<davem@nuts.ninka.net>
+	[IPV4]: Fix cut&paste error in fold_field.
+
+<ahaas@airmail.net>
+	[NETFILTER]: C99 initializers for net_ipv4_netfilter.
+
+<davem@nuts.ninka.net>
+	[SPARC64]: Add TCSBRKP ioctl translation, thanks Anton.
+
+<rob@osinvestor.com>
+	[SPARC]: Move away from flush_page_to_ram.
+
+<hadi@cyberus.ca>
+	[SCHED GRED]: Another bug found by Stanford Checker.
+
+<ahaas@airmail.net>
+	[NETFILTER]: C99 initializers for net_ipv6_netfilter.
+
+<davej@tetrachloride.(none)>
+	[AGPGART] Fix up lots of 'comparison between signed and unsigned' warnings
+
+<davej@tetrachloride.(none)>
+	[AGPGART] Fix same logic bug in KT400 mode determination.
+
+<davej@tetrachloride.(none)>
+	[AGPGART] Don't oops when deregistering failed to init agp modules.   
+
+<davej@tetrachloride.(none)>
+	[AGPGART] Handle the "KT400 in disguise as a KT266" case.
+
+<davej@tetrachloride.(none)>
+	[AGPGART] Handle failure during initialisation more gracefully.
+
+<davej@tetrachloride.(none)>
+	[AGPGART] Add ident for VIA KT400 in disguise as a KT266
+
+<davej@tetrachloride.(none)>
+	[AGPGART] More failure path sanity checking.
+
+<davej@tetrachloride.(none)>
+	[AGPGART] VIA KT400 Aperture size is 12 bit in AGP3 mode.
+
+<davej@tetrachloride.(none)>
+	[AGPGART] kt400's enable routine can't be __init
+
+<davej@tetrachloride.(none)>
+	[AGPGART] alpha agp infrastructure
+
+<davej@tetrachloride.(none)>
+	[AGPGART] First step towards multiple AGP buses.
+	  
+	The AGP3 spec allows for >1 AGP bus. This is the first of several patches
+	from Jeff Hartmann towards a context-using agp_bridge, by replacing
+	agp_bridge.foo accesses with agp_bridge->foo accesses. For now, there
+	should be no functional differences, as there is still only a single
+	agp_bridge_data struct defined.
+
+<davej@tetrachloride.(none)>
+	[AGPGART] Add extra VIA GART IDs.
+	
+	Based upon information from VIA, this also adds a bunch of placeholder
+	entries that will get filled in over time when they have been proven
+	to work with the code with no extra modification.
+
+<davej@tetrachloride.(none)>
+	[AGPGART] Additional VIA ids.
+
+<davej@tetrachloride.(none)>
+	[AGPGART] Fix missed agp_bridge conversion that caused oops.
+
+<davej@codemonkey.org.uk>
+	[AGPGART] Merge VIA KT400 AGP3 support into main via-agp module.
+	
+	This removes lots of annoying problems trying to prevent both modules
+	from being loaded, and also shares quite a bit of code.
+	CONFIG_AGP3 will disable AGP3 mode operation of KT400s.
+
+<davej@tetrachloride.(none)>
+	[AGPGART] Remove pointless enums from VIA GART driver.
+
+<davej@tetrachloride.(none)>
+	[AGPGART] Enable support for VIA PLE133 chipset
+
+<akpm@digeo.com>
+	[PATCH] Fix synchronous writers to wait properly for the result
+	
+	Mikulas Patocka <mikulas@artax.karlin.mff.cuni.cz> points out a bug in
+	ll_rw_block() usage.
+	
+	Typical usage is:
+	
+		mark_buffer_dirty(bh);
+		ll_rw_block(WRITE, 1, &bh);
+		wait_on_buffer(bh);
+	
+	the problem is that if the buffer was locked on entry to this code sequence
+	(due to in-progress I/O), ll_rw_block() will not wait, and start new I/O.  So
+	this code will wait on the _old_ I/O, and will then continue execution,
+	leaving the buffer dirty.
+	
+	It turns out that all callers were only writing one buffer, and they were all
+	waiting on that writeout.  So I added a new sync_dirty_buffer() function:
+	
+		void sync_dirty_buffer(struct buffer_head *bh)
+		{
+			lock_buffer(bh);
+			if (test_clear_buffer_dirty(bh)) {
+				get_bh(bh);
+				bh->b_end_io = end_buffer_io_sync;
+				submit_bh(WRITE, bh);
+			} else {
+				unlock_buffer(bh);
+			}
+		}
+	
+	which allowed a fair amount of code to be removed, while adding the desired
+	data-integrity guarantees.
+	
+	UFS has its own wrappers around ll_rw_block() which got in the way, so this
+	operation was open-coded in that case.
+
+<akpm@digeo.com>
+	[PATCH] ncpfs compile fix
+	
+	Patch from Joel Becker <Joel.Becker@oracle.com>
+	
+	The task_struct->sig -> task_struct->signal bits.
+
+<akpm@digeo.com>
+	[PATCH] de4x5 compile fix
+	
+	Move the definition of version[] down to where __initdata has been defined.
+
+<rddunlap@osdl.org>
+	[PATCH] checker bounds/limits fixes
+	
+	Part of the bounds checking bugs found by the Stanford checker.
+	
+	The 4 fixes below have been acked by their maintainers.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	kbuild: sed compatibility fixes
+	
+	Some versions of sed seem to think \w, as in word, doesn't include
+	digits, which breaks the build with CONFIG_MODVERSIONS. So we
+	just use the more compatible [<space><tab>]*.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	kbuild: Handle the "no modules" case
+	
+	When the user selects CONFIG_MODVERSIONS but doesn't build anything
+	modular, the post-processing step does nothing (right, as there is
+	nothing to be done), but it also gave an error, which it shouldn't.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	kbuild: cosmetics
+	
+	From ram <ram@curvesoft.com>:
+	
+	> Appended below is a small patch to the top-level makefile; it
+	> -- replaces a call to $(shell/echo/sed) with $(subst) and adds a 
+	>    comment
+	> -- fixes some typos.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	kbuild: Customflags for cmd_objcopy
+	
+	From Konrad Eisele:
+	
+	> like with cmd_ld in scripts/Makefile.lib having possibility to add 
+	> customflags with cmd_objcopy would be nice. When building a
+	> ROMKernel I'd like to use:
+	> OBJCOPYFLAGS_rompiggydata := --remove-section=.text
+	> OBJCOPYFLAGS_$(MODEL)piggytext := --only-section=.text
+
+<kai@tp1.ruhr-uni-bochum.de>
+	kbuild: Allow for ',$ in commands
+	
+	Quote ',$ before passing them to the shell - ' must be escaped for
+	echo, $$ will be converted to $ by make.
+	
+	This allows to use e.g. perl commands in the build with support
+	from the generic $(call if_changed,...).
+	
+	by Konrad Eisele
+
+<davej@codemonkey.org.uk>
+	[WATCHDOG] PNP API conversion.
+	Done by Adam Belay.
+
+<akpm@digeo.com>
+	[PATCH] uninline get_jiffies_64() for 32-bit architectures
+	
+	uninline get_jiffies_64() for 32-bit architectures
+
+<akpm@digeo.com>
+	[PATCH] use per-cpu data for ia32 profiler
+	
+	Patch from Ravikiran G Thirumalai <kiran@in.ibm.com>
+	
+	Converts the ia32 kernel profiler to use use the percpu area infrastructure.
+
+<akpm@digeo.com>
+	[PATCH] NUMAQ io_apic programming fix
+	
+	Patch from William Lee Irwin III <wli@holomorphy.com>
+	
+	Don't touch IO-APIC physid's on NUMA-Q. The BIOS pre-programs them.
+
+<akpm@digeo.com>
+	[PATCH] ext3: Remove journal_try_start()
+	
+	journal_try_start() is a function which nonblockingly attempts to open a JBD
+	transaction handle.  It was added a long time ago when there were concerns
+	that ext3_writepage() could block kswapd for too long.
+	
+	It was never clearly necessary.
+	
+	So the patch throws it all away and just calls the blocking journal_start()
+	from ext3_writepage().
+
+<akpm@digeo.com>
+	[PATCH] DAC960 Stanford Checker fix
+	
+	Patch from Dave Olien <dmo@osdl.org>
+	
+	This was found by the Standford Checker.
+	The LogicalDeviceNumber bad range test was changed from > to >=
+	I also replaced a couple of panic() calls with error messages,
+	since panic-ing seemed a little extreme.
+
+<akpm@digeo.com>
+	[PATCH] Add David Olien MAINTAINERs for DAC960
+	
+	(I asked Dave for this...)
+	
+	From: Dave Olien <dmo@osdl.org>
+	
+	Add me as maintainer for DAC960 driver.
+
+<akpm@digeo.com>
+	[PATCH] nforce2 IDE support for the amd74xx driver
+	
+	Patch from James Curbo <phoenix@sandwich.net>
+	
+	The amd74xx IDE driver in 2.5.59 has support for the nforce IDE controller,
+	but not explicitly for the nforce2 IDE controller (which has a different PCI
+	ID, which is in the kernel already).  I'm not sure if the nforce and nforce2
+	controllers are identical, but I made a small patch that made the amd74xx
+	driver recognize the nforce2 IDE, and it boots for me, seems to work fine, as
+	my drives were tuned to their highest transfer rate automatically (udma5).
+	
+	I don't know if this patch is proper or correct, but it Works for Me [tm].
+	Patch is attached.
+	
+	Vojtech has acked this change.
+
+<akpm@digeo.com>
+	[PATCH] hugetlbpage MAP_FIXED fix
+	
+	We need to validate that the address and length of a MAP_FIXED request are
+	suitable for hugetlb pages.
+
+<akpm@digeo.com>
+	[PATCH] remove unneeded test from radix_tree_extend()
+	
+	Patch from: Szabolcs Berecz <szabi@mplayerhq.hu>
+	
+	No need to check root->rnode in the loop. In the loop it remains nonzero.
+
+<akpm@digeo.com>
+	[PATCH] ext3 commenting cleanup
+	
+	Redo the (strange) layout of some of Roger's comments.
+
+<akpm@digeo.com>
+	[PATCH] Don't run unlock_super() in ext3_fill_super()
+	
+	A very long time ago ext3_fill_super() was beng called under the VFS's
+	lock_super(), and it had to drop that lock for deadlock avoidance reasons.
+	
+	But the VFS was later changed to not take lock_super() across ->fill_super(),
+	so we're upping a non-downed semaphore.
+	
+	Just take it out.
+
+<akpm@digeo.com>
+	[PATCH] remove the buffer_head mempool
+	
+	mempools have the wrong semantics for use by buffer_heads.  The problem
+	scenario:
+	
+	- Process A calls mempool_alloc(), asking for a buffer_head.
+	
+	- While process A sleeps, process B frees up a ton of memory.
+	
+	That's it.  There is no longer any memory pressure, so nobody frees any
+	buffer_heads, so process A does not get woken up.  I managed to trigger this
+	in some testing recently.
+	
+	One approach would be to use a schedule_timeout(2) in mempool_alloc().
+	
+	Anyway, the importance of buffer_head allocation was lessened when swapout
+	stopped using them, so let's just drop the mempool out of it for now.
+
+<akpm@digeo.com>
+	[PATCH] fix current->user->processes leak
+	
+	Patch from: Eric Lammerts <eric@lammerts.org>
+	
+	Every time you do a loop mount, a kernel thread is started (those
+	processes are called "loop0", "loop1", etc.). The problem is that when
+	it starts, it's counted as one of your processes. Then, it's
+	changed to be a root-owned process without correcting that count.
+	
+	Patch below fixes the problem. It moves the bookkeeping of changing
+	current->user to a new function switch_uid() (which is now also used
+	by exec_usermodehelper() in kmod.c). The patch is tested.
+
+<akpm@digeo.com>
+	[PATCH] 3c509 compile fix
+	
+	Patch from Marc Zyngier <mzyngier@freesurf.fr>
+	
+	Fix compilation of 3c509.c
+
+<akpm@digeo.com>
+	[PATCH] Get 3c59x to compile on non-PCI systems
+	
+	Patch from Marc Zyngier <mzyngier@freesurf.fr>
+	
+	My previous round of EISA hacking left the 3c59x driver unable to
+	compile on non-PCI systems (that is, EISA only...).
+	
+	This small patch fixes it.
+
+<rusty@rustcorp.com.au>
+	[AF_UNIX] Cleanup forall_unix_sockets.
+
+<rusty@rustcorp.com.au>
+	[X25]: Fix improper | precendence, pointed out by Joern Engel.
+
+<rusty@rustcorp.com.au>
+	[ECONET]: Add comment to point out a bug spotted by Joern Engel.
+
+<rob@osinvestor.com>
+	[SPARC]: HEAD --> HEAD_Y
+
+<rob@osinvestor.com>
+	[SPARC]: ADd init_sighand.
+
+<davem@nuts.ninka.net>
+	[TULIP DE4X5]: Cannot use initdata before including linux/init.h
+
+<davem@nuts.ninka.net>
+	[TCP]: Do not bump backoff too high during 0-window probes.
+
+<davem@nuts.ninka.net>
+	[SIGNAL]: Allow more platforms to use generic get_signal_to_deliver.
+	
+	The few platforms that cannot use the generic
+	get_signal_to_deliver implementation cannot do
+	so because they do special things for ptraced
+	children.  This can be easily avoided and thus
+	all of the signal handling code duplication can
+	be eliminated.
+	
+	This is the first part, which adds a platform hook
+	right before the parent of the ptraced child is woken.
+	Data can be passed in via a cookie argument.
+	
+	The next part will be dealing with platforms
+	that need to muck with breakpoints in the child
+	in this same code block.
+
+<randy.dunlap@verizon.net>
+	[PATCH] ftape divide-by-zero found by Stanford Checker
+	
+	This fixes a potential divide-by-zero found by the Stanford Checker.
+
+<randy.dunlap@verizon.net>
+	[PATCH] bounds/limits fixes (Stanford Checker)
+	
+	This fixes several trivial bounds/limits errors that were pointed out by
+	the Stanford Checker.
+
+<akpm@digeo.com>
+	[PATCH] sched_init enables interrupts too early
+	
+	wake_up_forked_process() unconditionally enables interrupts.  It is called
+	from sched_init().  Enabling interrupts that early makes Anton's ppc64
+	machine lock up.
+
+<Andries.Brouwer@cwi.nl>
+	[PATCH] signal error return fix
+
+<Andries.Brouwer@cwi.nl>
+	[PATCH] genhd device unregistration fix
+
+<torvalds@home.transmeta.com>
+	If we set TIF_SIGPENDING for SIGCONT, we have to wake up any sleeping
+	tasks (even if we don't otherwise need to wake anything up), since
+	otherwise later signals would see that signals are already pending and
+	wouldn't cause wakeups.
+
+<levon@movementarian.org>
+	[PATCH] oprofile: Pentium IV support
+	
+	The below patch implements a P4 driver for OProfile, mostly written
+	by Graydon Hoare.
+
+<levon@movementarian.org>
+	[PATCH] oprofile: CPU type as string
+	
+	This patch updates the horrible enum for the logical CPU type with a
+	string instead.
+
+<levon@movementarian.org>
+	[PATCH] oprofile: fix oprofilefs integer files base
+	
+	This patch allows the oprofilefs files to take entry in any base
+	instead of just base 10
+
+<levon@movementarian.org>
+	[PATCH] oprofile: kernel/user addresses fix
+	
+	This patch replaces the assumption that > PAGE_OFFSET == kernel address
+	with testing for user_mode(regs) and inserting switch codes instead.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	kbuild: scripts/fixdep.c doesn't close files when finished
+	
+	From Chris Wedgwood:
+	
+	> fixdep doesn't close files when finished with them... normally this
+	> doesn't matter unless you have strict ulimits in place.
+	>
+	> Trivial fix is:
+
+<torvalds@penguin.transmeta.com>
+	Report shared pending signals in /proc/<pid>/status
+	
+	Patch from Roland McGrath.
+
+<torvalds@penguin.transmeta.com>
+	Sanitize kernel daemon signal handling and process naming.
+	
+	Add a name argument to daemonize() (va_arg) to avoid all the
+	kernel threads having to duplicate the name setting over and
+	over again.
+	
+	Make daemonize() disable all signals by default, and add a
+	"allow_signal()" function to let daemons say they explicitly
+	want to support a signal.
+	
+	Make flush_signal() take the signal lock, so that callers do
+	not need to.
+
+<torvalds@penguin.transmeta.com>
+	Add macthing 'va_end()' to the 'va_start()' in daemonize().
+	
+	Not that it makes any difference on x86, but there may be
+	architectures that actually need it.
+
+<Andries.Brouwer@cwi.nl>
+	[PATCH] nfs fix
+	
+	nfs must not use MINORBITS - that fails with 32-bit dev_t
+
+<davej@codemonkey.org.uk>
+	[AGPGART] Remove unneeded AMD8151 shadowing in the K8 GART driver.
+	The 8151 GART registers aren't actually necessary to poke, and are
+	only there for 'legacy reasons' aparently.
+
+<davej@codemonkey.org.uk>
+	[AGPGART] Cache K8 northbridges pci_devs instead of scanning whole PCI bus
+
+<sfr@canb.auug.org.au>
+	[PATCH] apm daemonize
+	
+	Since daemonize now blocks all signals, this simplification is trivially
+	correct.
+
+<ak@muc.de>
+	[PATCH] x86-64 merge
+	
+	This brings the x86-64 port uptodate in 2.5.60. Unfortunately I cannot
+	test too much because i constantly get deadlocks in exit/wait in initscripts
+	on SMP bootup. The kernel seems to still lose a lot of SIGCHLD. 2.5.59/SMP
+	had the same problem. Uniprocessor and SMP kernel on UP seems to work.
+	
+	This patch only touches x86-64 specific files. It requires a few simple
+	changes to arch independent files that I will send separately.
+	
+	 - Fixed a lot of obsolete/misleading configure help texts.
+	 - Remove old bootblock disk loader and support fdimage target for syslinux
+	   instead (H. Peter Anvin)
+	 - Fix potential fpu signal restore problem on 32bit emulation.
+	 - Merge with 2.5.60 i386 (hugetlbfs, acpi etc.)
+	 - Some fixes for local apic disabled modus.
+	 - Beginngs of S3 ACPI wakeup from real-mode (not working yet, don't use)
+	 - Beginnings of NUMA/CONFIG_DISCONTIGMEM support for AMD K8 (work in progress,
+	   port from 2.4): clean up memory mapping at bootup, generalize bootmem etc.
+	 - Fix 64bit GS base reload problem and reenable (Karsten Keil)
+	 - Fix race with vmalloc accesses from interrupt handlers disturbing page fault/
+	   similar race for the debug handler (thanks to Andrew Morton)
+	 - Merge cpu access primitives with i386
+	 - Revert to private module list for now because putting modules
+	   nto vmlist triggered too many problems.
+	 - Some cleanups, removal of unneeded code.
+	 - Let early __get_free_pages see consistent pda
+	 - Preempt disabled for now because it is too broken right now
+	 - Signal handler fixes
+	 - Fix do_gettimeofday to be completely lockless and reenable vsyscalls
+	 - Optimize context switch path a bit (should be ported to i386)
+	 - Get thread_info via stack for better code
+	 - Don't leak pmd pages
+	 - Clean up hardcoded task stack sizes.
+
+<sfr@canb.auug.org.au>
+	[SPARC64]: sigprocmask/sigpending compat layer conversion.
+
+<sfr@canb.auug.org.au>
+	[PATCH] parisc compatibility layer update
+	
+	At Linux Conf AU, Willy asked me to send any further parisc compatibility
+	changes directly to you, so this is what I have outstanding.  Basically,
+	it is just the uses of compat_sigset_t that seemed to have been missed in
+	the previous merges.
+
+<sfr@canb.auug.org.au>
+	[PATCH] x86_64 compatibility layer update
+	
+	Andi has asked that I send these straight forward compatibility patches
+	to you and he will fix up any merge problems later.  These are the
+	outstanding patches for x86_64 against 2.5.60.
+
+<ahaas@airmail.net>
+	[PATCH]: C99 initializers for net/ipv6/sysctl_net_ipv6.c
+
+<ahaas@airmail.net>
+	[PATCH]: C99 initializers for net/core/sysctl_net_core.c
+
+<ahaas@airmail.net>
+	[PATCH]: C99 initializers for net/ipv4/sysctl_net_ipv4.c
+
+<vojtech@suse.cz>
+	input: Update AT+PS/2 mouse and keyboard drivers:
+		- Fix a possible deadlock with 0xfe resend command (atkbd)
+		- Make ->ack variables volatile (they're updated from irq)
+		- Fix the GETID one/two byte command to avoid any races
+		- Fix Logitech PS2++ extended packet detection
+		- Use RESET_BAT on reboot to make notebooks happy
+
+<jsimmons@maxwell.earthlink.net>
+	input: Remove include/linux/pc_keyb.h and old PS/2 code
+	from drivers/char/misc.c
+
+<vojtech@suse.cz>
+	input: Only generate rawmode warnings if the event we cannot handle
+		is a real key and not just a button or something.
+
+<zaitcev@redhat.com>
+	input: Let newly connected keyboards pickup the LED state.
+
+<vojtech@suse.cz>
+	input: Get rid of the kbd_pt_regs variable, and instead pass the
+		value all the way from an interrupt handler to keyboard.c
+		that can display it.
+
+<tomita@cinet.co.jp>
+	input: Support for NEC PC-9800 beeper and support for Kana Lock LED.
+
+<vojtech@suse.cz>
+	input: HID update
+		- Fix a bad #define for HID_QUIRK_BADPAD
+		- Set absfuzz and absflat for joysticks/gamepads only
+		- Add TangTop quirk
+
+<vojtech@suse.cz>
+	input.c: joydev/mousedev update
+		- relax requirements on devices, joydev now allows joysticks
+		  without buttons to work with throttles and pedals, mousedev
+		  allows a separate mouse wheel
+		- remove a stray semicolon in joydev
+
+<vojtech@suse.cz>
+	input: Give preferential treatment to gameport at 0x201, and use
+	  the odd addresses for access.
+
+<zinx@epicsol.org>
+	input: Add support for ThrustMaster ForceFeedback USB HID devices.
+
+<will@sowerbutts.com>
+	input: PowerMate driver update
+		- work around an undocumented firmware bug
+		- fix handling of LED brightness
+
+<vojtech@suse.cz>
+	input: Resurrect usb_set_report for Aiptek and Wacom tablets.
+
+<vojtech@suse.cz>
+	input: Add two new serio type #defines
+
+<vojtech@suse.cz>
+	input: sunkbd.c - fix reading beyond end of keycode array.
+
+<szepe@pinerecords.com>
+	[PATCH] export allow_signal()
+	
+	Export allow_signal().  It's needed by lockd, sunrpc and other modules.
+
+<ink@jurassic.park.msu.ru>
+	[PATCH] alpha: Add missing sighand bits
+
+<torvalds@penguin.transmeta.com>
+	Don't wake up processes unnecessarily for ignored signals
+
+<pavel@ucw.cz>
+	[PATCH] Fix stack handling in acpi_wakeup.S
+	
+	This fixes stack handling in acpi_wakeup.S, and makes stack smaller so
+	that wakeup code actually fits inside memory allocated for it. Plus
+	someone renamed .L1432 to something meaningful.
+
+<mochel@osdl.org>
+	sleep: fix /proc/acpi/sleep write handling.
+	
+	- Prevent users from screwing themselves by removing support for entering
+	  S5 from the proc file. S5 is 'soft-off' and the state the system enters
+	  when powering down. It needs to be preceded by a proper shutdown sequence
+	  and should not be triggered manually. 
+	- Fix a potential unchecked array reference using the written value as the
+	  index.
+
+<davej@codemonkey.org.uk>
+	[CPUFREQ] Properly set memory allocated by x86 cpufreq drivers to zero.
+	From Dominik Brodowski
+
+<davej@codemonkey.org.uk>
+	[CPUFREQ] add support for cpufreq governors.
+	More bits from Dominik.
+	
+	Most cpufreq drivers (in fact, all except one, longrun) or even most
+	cpu frequency scaling algorithms only offer the CPU to be set to one
+	frequency. In order to offer dynamic frequency scaling, the cpufreq
+	core must be able to tell these drivers of a "target frequency". So
+	these specific drivers will be transformed to offer a "->target"
+	call instead of the existing "->setpolicy" call. For "longrun", all
+	stays the same, though.
+	
+	How to decide what frequency within the CPUfreq policy should be used?
+	That's done using "cpufreq governors". Two are already in this patch
+	-- they're the already existing "powersave" and "performance" which
+	set the frequency statically to the lowest or highest frequency,
+	respectively. At least two more such governors will be ready for
+	addition in the near future, but likely many more as there are various
+	different theories and models about dynamic frequency scaling
+	around. Using such a generic interface as cpufreq offers to scaling
+	governors, these can be tested extensively, and the best one can be
+	selected for each specific use.
+	
+	Basically, it's the following flow graph:
+	
+	CPU can be set to switch independetly    |         CPU can only be set
+	      within specific "limits"           |       to specific frequencies
+	
+	                                 "CPUfreq policy"
+	                consists of frequency limits (policy->{min,max})
+	                     and CPUfreq governor to be used
+	                         /                    \
+	                        /                      \
+	                       /                       the cpufreq governor decides
+	                      /                        (dynamically or statically)
+	                     /                         what target_freq to set within
+	                    /                          the limits of policy->{min,max}
+	                   /                                \
+	                  /                                  \
+	        Using the ->setpolicy call,              Using the ->target call,
+	            the limits and the                    the frequency closest
+	             "policy" is set.                     to target_freq is set.
+	                                                  It is assured that it
+	                                                  is within policy->{min,max}
+	
+
+<mochel@osdl.org>
+	acpi sleep: move sleep support into own subdirectory. 
+
+<davej@codemonkey.org.uk>
+	[CPUFREQ] fix longrun min/max confusion.
+
+<akpm@digeo.com>
+	[PATCH] genhd warnings fix
+	
+	I have a whole bunch of silly compile warning fixes here, arising from
+	building the kernel for a 64-bit target.  Some are trivial, some are genuine
+	printk bugs.
+	
+	assuming dev_t is unsigned generates a warning on ppc64.  Cast it.
+
+<akpm@digeo.com>
+	[PATCH] kill warning in vmscan.c
+	
+	Make the "duplicate const" warning go away.  Arguably a compiler bug...
+
+<akpm@digeo.com>
+	[PATCH] kill some ppc64 warnings in knfsd
+	
+	Don't assume that dev_t is an unsigned.  Cast it.
+
+<akpm@digeo.com>
+	[PATCH] fix ppc64 wanings in fs/partitions/check.c
+	
+	cast dev_t when printing
+
+<akpm@digeo.com>
+	[PATCH] fix ppc64 nfs warning
+	
+	Don't assume that dev_t is unsigned.  Cast it.
+
+<akpm@digeo.com>
+	[PATCH] fs/reiserfs/hashes.c warning fix
+	
+	printk needs kernel.h
+
+<akpm@digeo.com>
+	[PATCH] fix drivers/scsi/st.c warning
+	
+	kdev_t.value is not an int.  Code looks fishy.
+
+<akpm@digeo.com>
+	[PATCH] provide uniproc write_trylock()
+	
+	Patch from Oleg Drokin <green@namesys.com>, Nikita Danilov <Nikita@Namesys.COM>
+	
+	There is no uniprocessor definition of _raw_write_trylock(), so
+	write_trylock() doesn't work on UP.
+
+<akpm@digeo.com>
+	[PATCH] disassociate_ctty SMP fix
+	
+	Patch from Rik van Riel <riel@conectiva.com.br>
+	
+	the following patch, against today's BK tree, fixes a small
+	SMP race in disassociate_ctty.  This function gets called
+	from do_exit, without the BKL held.
+	
+	However, it sets the *tty variable before grabbing the bkl,
+	then makes decisions on what the variable was set to before
+	the lock was grabbed, despite the fact that another process
+	could modify its ->tty pointer in this same function.
+
+<akpm@digeo.com>
+	[PATCH] make the adaptec driver compile
+	
+	make the adaptec driver compile
+
+<akpm@digeo.com>
+	[PATCH] sunrpc dcache cleanup
+	
+	Patch from Dipankar Sarma <dipankar@in.ibm.com>
+	
+	All fs should be using dcache APIs to manipulate dcache hash lists.  This is
+	in line with the dcache cleanup patch (dcache_rcu-1) from Maneesh that Linus
+	accepted.  This seems like a reasonable cleanup.  One change though, we don't
+	need to grab dcache_lock while deleting dentries from the private list and
+	__d_drop() should suffice here.
+
+<akpm@digeo.com>
+	[PATCH] jiffies wrap fixes
+	
+	Patch from Tim Schmielau <tim@physik3.uni-rostock.de>
+	
+	Converts many open-coded jiffy comparisons to use time_after/before/etc.
+
+<akpm@digeo.com>
+	[PATCH] EATA driver fix
+	
+	This driver is calling down into scsi_register with local interrupts
+	disabled.  scsi_register performs blocking allocations, starts kernel
+	threads, etc.  slab debugging gets offended by someone performing blocking
+	operations with local interrupts disabled.
+
+<akpm@digeo.com>
+	[PATCH] make drivers/net/arlan.c compile again
+	
+	Someone typed `config' when they meant `conf'.
+	
+	Also fix a function-defined-but-not-used warning.
+
+<akpm@digeo.com>
+	[PATCH] Allow summit kernels to boot on normal systems
+	
+	Patch from: john stultz <johnstul@us.ibm.com>
+	
+	This patch simply fixes the summit subarch to allow summit kernels to
+	boot on normal systems.
+
+<akpm@digeo.com>
+	[PATCH] Make drivers/media/video/saa7110.c compile
+	
+	Patch from: Frank Davis <fdavis@si.rr.com>
+	
+	The following patch addresses bugzilla bug # 341.
+
+<akpm@digeo.com>
+	[PATCH] drivers/media/video/saa5249.c compile fix
+	
+	Patch from: Frank Davis <fdavis@si.rr.com>
+	
+	The following addresses bugzilla bug # 340.
+
+<akpm@digeo.com>
+	[PATCH] fix fadvise64() return type
+	
+	Patch from: David Mosberger <davidm@napali.hpl.hp.com>
+	
+	Please remember to declare the return-type of syscall stubs as "long".
+	On 64-bit platforms, it's generally necessary to ensure that the
+	entire 64-bit return value is valid (and can be checked against
+	negative values).
+
+<akpm@digeo.com>
+	[PATCH] OSS CS4232 locking fixes
+	
+	Patch from: Peter Waechtler <pwaechtler@mac.com>
+	
+	Addresses BUGME bug #331.  "OSS CS4232 nasty spinlock printks on boot"
+	
+	The locking in some OSS modules is really lousy.
+	Because save_flags/cli/restore_flags could be used recursivly - the
+	programmers pushed the locking too far the lower level.
+	
+	Because on ISA cards the register sets are usually multiplexed
+	you had to write to an address latch and then access the data port
+	in an "atomic" manner.
+	
+	I suggest removing the locking from ad_read/ad_write +
+	ad_{enter|leave}_MCE and clamping the locks wherever the functions
+	are called. I hope the attached patch does that correctly.
+	
+	Yes, I don't like all the timeout loops while holding the locks:
+	high chances that a cpu is spinning in interrupt context :(
+
+<akpm@digeo.com>
+	[PATCH] epoll timeout and syscall return types
+	
+	Patch from Davide Libenzi <davidel@xmailserver.org>
+	
+	Changes :
+	 - Timeout overflow check
+	 - Ceil()ing of ms->jif conversion
+	 - Syscalls return type int->long
+
+<akpm@digeo.com>
+	[PATCH] MAP_FIXED|MAP_ANON crash fix
+	
+	An anonymous fixed mmap with CONFIG_HUGETLB_PAGE=y will dereference NULL.  We
+	recur into the pagefault handler with mmap_sem held and lock up.
+
+<akpm@digeo.com>
+	[PATCH] u14-34f fix
+	
+	Need to reenable interrupts around the call to scsi_register(), which blocks.
+
+<akpm@digeo.com>
+	[PATCH] fix adaptec diagnostics for ppc64
+	
+	The return type of sizeof() is size_t.  On many architectrues size_t is
+	unsigned long, and may not be printed with %d.  Use %Zu instead.
+
+<akpm@digeo.com>
+	[PATCH] printk size_t qualifier confusion
+	
+	My printf manpage says:
+	
+	       z      A  following  integer  conversion  corresponds to a
+	              size_t or ssize_t argument. (Linux libc5 has Z with
+	              this meaning. Don't use it.)
+	
+	And the opengroup spec says
+	
+	z Specifies that a following d , i , o , u , x , or X conversion specifier
+	  applies to a size_t or the corresponding signed integer type argument; or
+	  that a following n conversion specifier applies to a pointer to a signed
+	  integer type corresponding to a size_t argument.
+	
+	
+	yet our vsnprintf implementation has
+	
+					/* 'z' support added 23/7/1999 S.H.    */
+					/* 'z' changed to 'Z' --davidm 1/25/99 */
+	
+	
+	I guess the path of least surprise is to support both.  gcc-3.2.1 doesn't
+	  seem to care.
+
+<mochel@osdl.org>
+	acpi: make source files look for headers in <acpi/ (top level files)
+
+<mochel@osdl.org>
+	acpi: make source files look in <acpi/ (dispatcher files)
+
+<mochel@osdl.org>
+	acpi: make source files look for headers in <acpi/...> (event files)
+
+<mochel@osdl.org>
+	acpi: make source files look for headers in <acpi...> (executor files)
+
+<mochel@osdl.org>
+	acpi: make source files look for headers in <acpi/...> (hardware files)
+
+<mochel@osdl.org>
+	acpi: make source files look in <acpi/...> for headers (namespace files).
+
+<acme@conectiva.com.br>
+	[SUNZILOG]: fix DEVFS device name
+
+<mochel@osdl.org>
+	acpi: make source files look in <acpi/...> for headers. (parser files).
+
+<mochel@osdl.org>
+	acpi: make source files look in <acpi/...> for headers (resources files). 
+
+<mochel@osdl.org>
+	acpi: make source files look in <acpi/...> for headers (tables files).
+
+<mochel@osdl.org>
+	acpi: make source files look for headers in <acpi/...>.
+
+<mochel@osdl.org>
+	acpi: make headers look in <acpi/...> for other headers.
+
+<mochel@osdl.org>
+	acpi: make source files look in <acpi/...> for headers. (other top-level files)
+
+<davej@codemonkey.org.uk>
+	[WATCHDOG] pcwd.c: if cpu has overheated, we want to shutdown, not panic.
+	Based on a patch from Tariq Shureih <tariq@linux.co.intel.com>
+
+<davej@codemonkey.org.uk>
+	[WATCHDOG] printk levels for pcwd.c
+
+<mochel@osdl.org>
+	acpi: remove some acpi-specific compiler definitions in favor of standard ones.
+	
+	- Check if __linux__ is defined in include/acpi/platform/acenv.h, instead
+	  of -D_LINUX (defined by drivers/acpi/Makefile).
+	- Remove -D_LINUX from custom CFLAGS.
+	- Remove include path of include/acpi, since all headers are looked for in
+	  include/acpi.
+
+<davej@codemonkey.org.uk>
+	[WATCHDOG] More panic -> shutdown replacements in pcwd.c
+
+<agrover@groveronline.com>
+	ACPI: Lower errorlevel of a debug message (Matthew Wilcox)
+
+<mochel@osdl.org>
+	acpi: fix recently introduced proc-related bugs.
+	
+	Recently, the acpi proc files were changed to use the seq_file interface.
+	As a result of this, the write methods became top-level write() methods
+	(i.e. not called by the proc layer). 
+	
+	Whoever made these changes, did not take into account that the parameters 
+	passed to these changed. The fourth parameter previously was a void*, that
+	pointed to the private data for the owner of the file, and some of the 
+	methods still expected this, even though the parameter is now an loff_t*,
+	and points to the offset into the file that is being written. Huge Bug. 
+	
+	This fixes the broken methods to look in the same place as the other 
+	methods (i.e. in the file's private data).
+	 
+
+<mochel@osdl.org>
+	acpi: split sleep support into generic portion, and procfs-handlers.
+
+<mochel@osdl.org>
+	Consolidate ACPI and APM sysrq implementations.
+	
+	Each power management scheme was implmenting a sysrq callback for 'o' which
+	would call their respective power off routines. 
+	
+	This moves the installation of the sysrq handler to kernel/pm.c, and calls
+	pm_power_off(), which will work for any platform that has that method
+	defined. 
+
+<mochel@osdl.org>
+	acpi sleep: divorce sleep functionality from power off functionality.
+	
+	When ACPI turns the system off on shutdown, it actually enters S5, a sleep
+	state. This functionality is dependent on CONFIG_ACPI_SLEEP, which is 
+	dependent on CONFIG_SOFTWARE_SUSPEND.
+	
+	This patch breaks the power off functionality into a separate file, and 
+	removes the dependency on the above-mentioned crap. Finally, power off works
+	for me again. 
+	
+	Thanks to Tobias Ringstrom for the original patch.
+
+<zaitcev@redhat.com>
+	[SUNZILOG]: Fix off-by-1 in spinlock initialization loop.
+
+<ahaas@airmail.net>
+	[PATCH] C99 initializers for net/sunrpc/sysctl.c
+
+<ahaas@airmail.net>
+	[PATCH] C99 initializers for net/unix/sysctl_net_unix.c
+
+<ahaas@airmail.net>
+	[PATCH] C99 initializers for net/ipv4/netfilter files
+
+<ahaas@airmail.net>
+	[PATCH] C99 initializers for net/sctp/sysctl.c
+
+<ahaas@airmail.net>
+	[PATCH] C99 initializers for net/ipv6/netfilter/ip6_queue.c
+
+<ahaas@airmail.net>
+	[PATCH] C99 initializers for net/ax25/sysctl_net_ax25.c
+
+<ahaas@airmail.net>
+	[PATCH] C99 initializers for net/irda/irsysctl.c
+
+<jgarzik@redhat.com>
+	[netdrvr fc/iphase] correct PCI probe loop-end test logic [#323]
+	
+	Fixes bugzilla bug #323.
+
+<jgarzik@redhat.com>
+	[tokenring smctr] remove stray ';' that prevented a loop from working [#312]
+	
+	Fixes broken node address check, and bugzilla bug #312.
+
+<jgarzik@redhat.com>
+	[netdrvr amd8111e] remove stray ';', fixing register dump [#311]
+	
+	Fixes bugzilla bug #311.
+
+<latten@austin.ibm.com>
+	[IPSEC]: Make AF_KEY allow NULL encryption.
+
+<toml@us.ibm.com>
+	[IPSEC]: Make sure to clear sin_zero in AF_KEY.
+
+<davem@nuts.ninka.net>
+	[IPSEC]: Add missed bit of sin_zero fix.
+
+<jgarzik@redhat.com>
+	[netdrvr tg3] DMA MRM bit only exists on 5700, 5701
+	
+	Fixed by David Miller, spotted by Manish Lachwani.
+
+<toml@us.ibm.com>
+	[IPSEC] Make sure SADB_X_SPDADD messages have proper spid.
+
+<jgarzik@redhat.com>
+	[netdrvr arlan] fix the fixed fix. really.
+	
+	struct arlan_private clearly needs to be a pointer.
+
+<jt@hpl.hp.com>
+	[irda][CORRECT] Properly initialise IrCOMM status line (DCE settings)
+	                <Patch from Jan Kiszka>
+
+<jt@hpl.hp.com>
+	[irda] better poll bit handling during times of packet loss
+	
+	        o [CORRECT] fix the secondary function to send RR and frames without
+	                the poll bit when it detect packet losses
+
+<jt@hpl.hp.com>
+	[irda] rx/tx wrapper path rewrites and cleanup:
+	        o [FEATURE] Properly inline in wrapper Tx path
+	        o [FEATURE] Rewrite/simplify/optimise wrapper Rx path
+	                Lower CPU overhead *and* kernel image size
+	        o [FEATURE] Add ZeroCopy in wrapper Rx path for drivers that support it
+	                I'll update drivers later on...
+
+<davem@nuts.ninka.net>
+	[IPSEC]: Fix mis-patch of previous changes.
+
+<kunihiro@ipinfusion.com>
+	[IPSEC]: Add ipv6 support infrastructure.
+
+<davem@nuts.ninka.net>
+	[IPSEC]: ipv6_syms needs net/xfrm.h
+
+<davem@nuts.ninka.net>
+	[IPSEC]: Fix af_key.c build.
+
+<davej@codemonkey.org.uk>
+	[WATCHDOG] missing printk level in acquirewdt
+
+<davej@codemonkey.org.uk>
+	[WATCHDOG] printk levels for alim7101_wdt.c
+
+<davej@codemonkey.org.uk>
+	[WATCHDOG] C99 struct initialisers for sc1200wdt
+
+<davej@codemonkey.org.uk>
+	[WATCHDOG] fix sc1200wdt for CONFIG_PNP=n
+
+<davej@codemonkey.org.uk>
+	[WATCHDOG] C99 struct intiialisers for remaining drivers.
+
+<davej@codemonkey.org.uk>
+	[WATCHDOG] Remove unneeded EXPORT_NO_SYMBOLS from sc1200wdt
+
+<davej@codemonkey.org.uk>
+	[CPUFREQ] Add powernow-k7 driver for AMD mobile Athlon/Duron CPUs.
+
+<davem@nuts.ninka.net>
+	[IPSEC]: Mark pfkey_sadb_addr2xfrm_addr static again.
+
+<davej@codemonkey.org.uk>
+	[WATCHDOG] Merge sma cpu5 watchdog driver.
+	By Heiko Ronsdorf, has been around linux-kernel a few days, and has
+	been through some rounds of cleanup.
+
+<davej@codemonkey.org.uk>
+	[WATCHDOG] Remove unneeded includes & EXPORT_NO_SYMBOLS from cpu5wdt
+
+<davej@codemonkey.org.uk>
+	[AGPGART] Export needed symbols for AMD K8 GART
+
+<davej@codemonkey.org.uk>
+	[CPUFREQ] powernow-k7.c: Zeropad the VID or we get 1.50V instead of 1.050V
+
+<torvalds@home.transmeta.com>
+	Missed initialization of "curr_target" in execve() dethreading case.
+
+<torvalds@home.transmeta.com>
+	Make dequeue_signal() take the process as an argument.
+	
+	This simplifies it and makes it more generic.
+
+<akpm@digeo.com>
+	[PATCH] set unplug_timer.function inside blk_queue_make_request
+	
+	Patch from Neil Brown <neilb@cse.unsw.edu.au>
+	
+	Initialise the queue's unplug_timer inside blk_queue_make_request.  This
+	makes the new auto-unplugging more accessable by other clients of
+	blk_queue_make_request - e.g.  raid5, umem.
+
+<akpm@digeo.com>
+	[PATCH] make imm.c build
+	
+	Patch from: Ingo Oeser <ingo.oeser@informatik.tu-chemnitz.de>
+	
+	Cure imm.c of the recent scsi core damage.
+
+<akpm@digeo.com>
+	[PATCH] fix hugetlbfs_forget_inode() oddity
+	
+	- hugetlbfs_forget_inode() should be using ||
+
+<akpm@digeo.com>
+	[PATCH] sysfs error handling fix
+	
+	Patch from: Rusty Lynch <rusty@linux.co.intel.com>
+	
+	Attempting to cat a sysfs file that returns an error will result in an
+	endless dump of garbage to the screen because the result of the specific show
+	operation was being saved to a size_t (unsigned) and then later checked for a
+	negative value.
+	
+	Here is a trivial patch to fix the error.
+
+<akpm@digeo.com>
+	[PATCH] ia32 TSC timer cleanup
+	
+	Patch from: john stultz <johnstul@us.ibm.com>
+	
+	This cleanup patch makes fast_gettimeoffset_quotient (a timer_tsc specific
+	variable) static, and replaces its usage with cpu_khz, making it timer_opt
+	independent.
+
+<akpm@digeo.com>
+	[PATCH] Cyclone timer fixes
+	
+	Patch from: john stultz <johnstul@us.ibm.com>
+	
+	        This patch "fixes" the timer_cyclone code by having it
+	initialize fast_gettimeoffset_quotient and cpu_khz in the same manner as
+	timer_tsc. This is required for enabling the timer_cyclone code on the
+	x440.
+	
+	Ideally fast_gettimeoffset_quotient would not be used outside timer_tsc
+	and cpu_khz would be initialized generically outside the timer
+	subsystem. I have patches to do this, but they touch quite a bit of
+	generic code, and I'd rather not make the timer_cyclone enablement
+	(patch to follow) depend on these larger changes.
+
+<akpm@digeo.com>
+	[PATCH] Enable timer_cyclone code
+	
+	Patch from john stultz <johnstul@us.ibm.com>
+	
+	        This patch simply enables the existing timer_cyclone code for
+	Summit/x440 systems.
+
+<akpm@digeo.com>
+	[PATCH] hugetlbfs i_size fix
+	
+	Growing i_size in hugetlbfs_prefault() isn't right - if we run out of pages,
+	do_mmap_pgoff() will chop the partially-instantiated pages off again.
+	
+	So update i_size in hugetlbfs_file_mmap() if the whole mmap attempt was
+	successful.
+
+<akpm@digeo.com>
+	[PATCH] xattr: lock_kernel() balancing fix
+	
+	Patch from Andreas Gruenbacher <agruen@suse.de>
+	
+	This patch fixes an unbalanced lock_kernel()/unlock_kernel() path in the ext3
+	extended attributes code.  Instead of fixing this in fs/ext3/xattr_user.c,
+	the locking code is moved to fs/ext3/xattr.c, since most other types of
+	extended attributes will need the exact same functionality.
+
+<mochel@osdl.org>
+	acpi: Split i386 support up. 
+	
+	- Created arch/i386/kernel/acpi/
+	- Split file into boot.c and sleep.c.
+	- Moved acpi_wakeup.S into there.
+
+<mochel@osdl.org>
+	acpi: Only build sleep directory if we have rest of bus support. 
+
+<torvalds@home.transmeta.com>
+	Fix acl_set_handle() compile that got broken by the xattr
+	updates.
+
+<davej@codemonkey.org.uk>
+	[PATCH] ES1370 OSS fix
+	
+	from 2.4
+	only register gameport if the port is active
+
+<davej@codemonkey.org.uk>
+	[PATCH] ES1371 OSS fix
+	
+	from 2.4
+	only register gameport if the port is active
+
+<mochel@osdl.org>
+	acpi sleep: demote sleep proc file creation.
+	
+	- Make acpi_sleep_proc_init() a late_initcall(), and not called from 
+	  acpi_sleep_init(). This guarantees that the acpi proc hierarchy is at 
+	  least there when we create the dang file.
+
+<davej@codemonkey.org.uk>
+	[PATCH] improve K7 SMP tainting.
+	
+	If we have a non-SMP approved CPU, but its in a UP system,
+	we should allow SMP kernels.
+
+<davej@codemonkey.org.uk>
+	[PATCH] VIA C3 Nehemiah cachesize errata fix.
+	
+	Whoops, VIA goofed, and it reports L2 size as 65KB.
+
+<davej@codemonkey.org.uk>
+	[PATCH] fix sigio on tty drivers outgoing
+	
+	This went into 2.4.18
+
+<davej@codemonkey.org.uk>
+	[PATCH] nvram driver uses incorrect types in llseek method
+
+<davej@codemonkey.org.uk>
+	[PATCH] i2c namespace pollution.
+	
+	adap_lock is a little generic for a global..
+
+<davej@codemonkey.org.uk>
+	[PATCH] nwflash driver uses wrong types in llseek methods
+	
+	from 2.4
+
+<davej@codemonkey.org.uk>
+	[PATCH] proc_file_read documentation/buffer overflow detection.
+	
+	This one has been around for ages, has Rusty's name
+	all over it, but wasn't from him.
+	48 lines of comments, and no swearing? 8-)
+	
+	Mostly documentation, but also has some buffer overflow
+	detection in there.
+
+<davej@codemonkey.org.uk>
+	[PATCH] nec vrc5477 oss driver update
+	
+	Fixes from 2.4 + compile fixes from me.
+
+<davej@codemonkey.org.uk>
+	[PATCH] Missing maintainer.
+	
+	Forgot to bring this bit forward when I updated the watchdog drivers.
+
+<davej@codemonkey.org.uk>
+	[PATCH] VIA C3 Nehemiah support.
+	
+	The new C3s won't boot a C3 kernel as they dropped 3dnow support in
+	favour of SSE.  It now also has cmov though and can be scheduled as a
+	686 CPU.
+	
+	I've a patch for gcc pending inclusion that adds the -march=c3-2 option.
+
+<davej@codemonkey.org.uk>
+	[PATCH] OSS rme96xx update.
+	
+	Lingering around for a while. 2.4 forward port.
+
+<David_Jeffery@adaptec.com>
+	[PATCH] ips: missing reboot notifier and Mode Sense P8
+	
+	This adds back the reboot_notifier hook that was accidentally removed in
+	the last set of patches.
+	
+	It also adds support handle a Mode Page 8 command so the scsi layer
+	won't complain anymore.  And the movement to using ->device to get scsi
+	numbers resulted in 2 typos in debug code.  These are also fixed.
+
+<David_Jeffery@adaptec.com>
+	[PATCH] ips: 2.4 compatability code
+	
+	This adds a few bits of code and couple #ifdefs that are needed to
+	enable this driver to work for 2.4 as well as 2.5.
+
+<David_Jeffery@adaptec.com>
+	[PATCH] ips: remove LinuxVersionCode
+	
+	This removes the old LinuxVersionCode() and replaces it with
+	KERNEL_VERSION().  Thanks go to Adrian Bunk for sending the initial
+	version.
+
+<David_Jeffery@adaptec.com>
+	[PATCH] ips: use scsi_add_host
+	
+	This converts the driver to use the new scsi_add_host() interface to add
+	scsi controllers.
+
+<mochel@osdl.org>
+	acpi sleep: demote acpi_sleep_init() to a late_initcall.
+	
+	- It depends on the rest of the subsys_initcalls in acpi to be done to get
+	  the sleep info from the firmware. 
+	- It doesn't need to be available any earlier...
+
+<davej@codemonkey.org.uk>
+	[CPUFREQ] powernow-k7.c: Fix incorrect multiplier.
+	This should fix the x1.0 multiplier bug (should be x10.0)
+	Spotted by Dominik Brodowski
+
+<agrover@groveronline.com>
+	ACPI: Fix whitespace (Pavel Machek)
+
+<jochen@scram.de>
+	[tokenring smctr] fix MAC address input
+	
+	After taking a second look, i just recognized that both cases (MAC adress
+	all-zero or not) are handled exactly the same (by duplicated code), so the
+	whole stuff is unnecessary.
+	
+	The whole function just reduces to a simple copy loop:
+
+<ionut@badula.org>
+	[PATCH] starfire driver update for 2.5.60
+	
+	This is a rather large update for the starfire network driver,
+	implementing VLAN support, 64-bit dma_addr_t support, and NAPI support. It
+	also fixes a couple of show-stopper bugs in the old driver which were
+	biting real people out there.
+	
+	I've had a few positive test results with this version, including one from
+	Martin Bligh who tested it on his monster SMP boxes. So I'm pretty
+	confident that it's mostly all right, and certainly better than what's
+	currently in the tree.
+
+<roland@frob.com>
+	[PATCH] Ctrl-C-ing strace
+	
+	This patch fix es the signals vs strace problem.  The signal code
+	assumes that anybody who is TAK_STOPPED will check signals before
+	resuming, and the ptrace paths didn't do that.
+
+<davej@codemonkey.org.uk>
+	[AGPGART] remove panic() from intel-agp, replace with no setup, and failure propagate.
+
+<agrover@groveronline.com>
+	ACPI: Fix some compilation issues
+
+<trond.myklebust@fys.uio.no>
+	[PATCH] further rpc_pipefs cleanups...
+	
+	 - Only set up pipefs entries for those RPC services that actually
+	   need them (for the moment NFS only). Portmap, lockd,... shouldn't
+	   need to make upcalls.
+	
+	 - Add in missing semaphore in rpc_populate().
+	
+	 - Make inode/dentry variable names in rpc_depopulate/rpc_populate
+	   more consistent w.r.t other functions in rpc_pipe.c
+	
+	 - Call shrink_dcache_parent() in order to clean up child entries
+	   before we rmdir().
+
+<trond.myklebust@fys.uio.no>
+	[PATCH] Clean up and fix SMP issue w.r.t. XID allocation
+	
+	This problem was identified by Olaf Kirch:
+	
+	In xprt_request_init(), the XID allocation needs to be protected by a
+	global spinlock.
+
+<davej@codemonkey.org.uk>
+	[netdrvr sunqe] remove incorrect kfree()
+	
+	Use of init_etherdev's second argument causes the ->priv member
+	to be allocated at the same time as the struct net_device
+	itself.  Therefore, no additional kfree() is needed for the
+	struct net_device ->priv member in this case.
+
+<jgarzik@redhat.com>
+	[netdrvr bmac] Remove unneeded memset()
+	
+	init_etherdev zeroes this memory for us, no need to do it again.
+	Spotted by Dave Jones.
+
+<akpm@digeo.com>
+	[PATCH] ACPI sleep build fix
+	
+	If you have !CONFIG_ACPI_SLEEP and CONFIG_PROC_FS, drivers/acpi/sleep/proc.o
+	is built, but drivers/acpi/sleep/main.o is not.
+	
+	But proc.o needs symbols from main.o
+
+<davej@codemonkey.org.uk>
+	[netdrvr sungem] be verbose about RX MAC fifo overflow
+	
+	Syncing this driver with the 2.4.x version.
+
+<davej@codemonkey.org.uk>
+	[netdrvr sunbmac] probe path cleanup
+	
+	Merged from 2.4.x.
+
+<Kare.Sars@lmf.ericsson.se>
+	[atm nicstar] fix incorrect traffic class assumption
+	
+	I have encountered a bug in the nicstar ATM driver for linux.
+	If you open a CBR TX only connection on a specific vpi/vci and later open a RX 
+	only connection on the same vpi/vci, the RX connection will overwrite the 
+	pointer to the SCQ of the TX connection. This changes the cell rate of the TX 
+	channel and what is worse is that when the TX connection is closed we get a 
+	segmentationfault and the TX part of the vpi/vci remains reserved.
+	
+	The bug in the driver is that if the opened channel is not TX CBR, the driver 
+	assumes it is TX UBR. I have attached a patch that adds a check for TX UBR. 
+	The patch is against RedHat kernel 2.4.18-3. I have checked linux vanilla 
+	kernels 2.4.19 and 2.5.49 and not found a fix.
+
+<dave@thedillows.org>
+	The initial release of the driver for the 3Com 3cr990 "Typhoon"
+	series of network interface cards.
+	
+	Does:
+	- NAPI
+	- Zero copy Tx
+	- VLAN hardware acceleration
+	- TCP Segmentation offload
+
+<bbosch@iphase.com>
+	[netdrvr ns83820] big endian fixes
+
+<fubar@us.ibm.com>
+	[netdrvr 3c59x] move netif_carrier_off() call outside vortex_debug test
+
+<meissner@suse.de>
+	[netdrvr pcnet32] fix multicast on big endian
+
+<pazke@orbita1.ru>
+	[netdrvr eepro100] add PIO config option
+	
+	this trivial patch adds EEPRO100_PIO config option, which forces eepro100.c
+	driver to use pio instead of mmio. This option is necessary to support
+	onboard i82557 on sgi visual workstation.
+
+<green@angband.namesys.com>
+	reiserfs: Move mark_buffer_uptodate in front of mark_buffer_dirty in resizer.
+	  This is needed because mark_buffer_dirty is now checking if buffer is up to date.
+	  Noticed by Alex Tomas <bzzz@tmi.comex.ru>
+
+<jochen@scram.de>
+	[tokenring madgemc] fix mem leaks, add proper refcounting
+
+<jochen@scram.de>
+	Update several token ring drivers:
+	
+	New low level tms380 driver for Proteon 1392 / 1392+ cards
+	(port from existing 2.2 kernel code)
+	
+	Add spinlock to fix race condition in tms380tr.
+	
+	Fix startup of tmsisa to not register and unregister devices multiple
+	times, so hotplug doesn't run wild.
+	
+	Add support for statically compiling tmsisa into kernel.
+	
+	Remove unnecessary console SPAM during boot.
+	
+	Fixed probing of ISA devices in tmsisa.
+	
+	Fixed unsafe reference counting.
+	
+	Fixed __init function causing Oops with new module system.
+	
+	Rename tmsisa to skisa.
+	
+
+<mochel@osdl.org>
+	[PATCH] Fix up ACPI build issues
+	
+	The following patches should fix those last two issues - compiling boot.c
+	for UP and compiling proc.c by default.
+
+<dwmw2@infradead.org>
+	[PATCH] Restore SYSENTER setup on swsusp resume.
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] Remove i2o-lan
+	
+	There are no known cards outside of labs that used i2o_lan. The only
+	exception is the Redcreek VPN, which has its own driver anyway. Note
+	i2o_lan.h is left as i2o_config can still understand i2o_lan devices
+	such as the RedCreek.
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] Make mca-legacy bitch at users
+	
+	This lets me put mca-legacy into drivers to fix them for now without
+	worrying about losing the fact they want more attention
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] Fix cciss scsi breakage
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] Fix 3036 tuner
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] Fix i2o_scsi (submission from Randy)
+	
+	Just approving this as maintainer of i2o_scsi
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] Fix scsi parts of iph5526
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] Make starfire compile
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] Fix aha1740
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] Fix fd_mcs build for scsi changes, mca compt
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] Fix ibm MCA adapter for new scsi, use mca_legacy for now
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] Fix ppa for new scsi
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] Fix NCR53c406a for new scsi
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] Fix seagate for new scsi
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] Fix sym53c416 for new scsi
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] Fix ultrastor for new scsi
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] Fix wd7000 for new scsi
+
+<alan@lxorguk.ukuu.org.uk>
+	[PATCH] New drivers needing mca-legacy for now
+
+<torvalds@penguin.transmeta.com>
+	Linux 2.5.61
+

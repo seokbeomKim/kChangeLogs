@@ -1,0 +1,1272 @@
+
+Summary of changes from v2.5.22 to v2.5.23
+============================================
+
+<acme@conectiva.com.br>
+	net/core/neighbour.c
+	  - remove spurious spaces and tabs at end of lines
+	  - make sure if, while, for, switch has a space before the opening '('
+	  - make sure no line has more than 80 chars
+	  - move initializations to the declaration line where possible
+	  - bitwise, logical and arithmetic operators have spaces before and after,
+	    improving readability of complex expressions
+	  - use named initializations in structs
+	  - minor size optimizations
+	
+	Sizes:
+	Before:
+	   text    data     bss     dec     hex filename
+	  13024    1152       8   14184    3768 net/core/neighbour.o
+	After:
+	   text    data     bss     dec     hex filename
+	  12880    1152       8   14040    36d8 net/core/neighbour.o
+
+<acme@conectiva.com.br>
+	net/llc/*.c
+	
+	Forward port of LLC from 2.4 to 2.5. This is the forward port of the LLC stack
+	released by Procom Inc. for Linux 2.0.30, I have heavily modified it to make
+	it similar to other Linux network stacks, using of struct sk_buff to represent
+	in-transit packets and doing massive code cleanups.
+	
+	Jay Schullist contributed support for BSD Sockets, as the original code had
+	only a simple in kernel API for use by upper layer protocols, such as the
+	NetBEUI stack also provided by Procom for 2.0.30.
+	
+	This code is basically what I had previously submitted to Alan Cox for his
+	2.4-ac series and that is even shipped in source form, in the Red Hat 7.3
+	kernel package, plus cleanups wrt standard syntax for labeled elements and
+	further use of this C construct to make the code more resilient to editing
+	mistakes, using the compiler to further check the source code.
+	
+	TODO:
+	
+	Make it completely SMP safe, as the reports of successful usage up to now and
+	the testing is done on UP.
+	
+	Completely remove the old LLC code in the kernel, that is still there for things
+	like Appletalk, IPX, etc to use, also check that all these protocols work
+	correctly with this new LLC stack.
+	
+	This code is already being used in the linux-sna project and Jay Schullist
+	has been developing support for things like DLSw and other protocols that works
+	on top of 802.2.
+	
+	I'll be releasing patches with the NetBEUI stack and updated samba-2.0.6 patches
+	for use with NetBEUI and this LLC stack in the future. But the NetBEUI code
+	is available already in my kernel.org ftp area at:
+	
+	ftp://ftp.kernel.org/pub/linux/kernel/people/acme.
+	
+	Please report problems to me or the linux-sna mailing list, instructions on how
+	to subscribe are available at http://www.linux-sna.org website.
+
+<acme@conectiva.com.br>
+	# net/core/datagram.c
+	#   - remove spurious spaces and tabs at end of lines
+	#   - make sure if, while, for, switch has a space before the opening '('
+	#   - make sure no line has more than 80 chars
+	#   - move initializations to the declaration line where possible
+	#   - bitwise, logical and arithmetic operators have spaces before and after,
+	#     improving readability of complex expressions
+	#   - use named initializations in structs
+	#   - transform existing function comments into kernel-doc style
+	#   - minor size optimizations
+	# 
+	# Sizes:
+	# Before:
+	#    text    data     bss     dec     hex filename
+	#    2736       0       0    2736     ab0 net/core/datagram.o
+	# After:
+	#    2720       0       0    2720     aa0 net/core/datagram.o
+
+<acme@conectiva.com.br>
+	net/core/skbuff.c
+	include/linux/skbuff.h
+	  - remove spurious spaces and tabs at end of lines
+	  - make sure if, while, for, switch has a space before the opening '('
+	  - make sure no line has more than 80 chars
+	  - move initializations to the declaration line where possible
+	  - bitwise, logical and arithmetic operators have spaces before and after,
+	    improving readability of complex expressions
+	  - remove uneeded () in returns
+	  - use kdoc comments
+	  - other minor cleanups
+	
+	Sizes:
+	Before:
+	   text    data     bss     dec     hex filename
+	   7088       8    2080    9176    23d8 net/core/skbuff.o
+	After:
+	   text    data     bss     dec     hex filename
+	   7056       4    2080    9140    23b4 net/core/skbuff.o
+
+<davem@nuts.ninka.net>
+	skbuff.c: Fix preempt fix lossage from acme cleanups.
+
+<sam@mars.ravnborg.org>
+	ip_gre.c: Use named struct initializers
+
+<davem@nuts.ninka.net>
+	tg3.c: Fix typo in GA302T board ID.
+
+<davem@nuts.ninka.net>
+	Tigon3: Make fibre PHY support work.
+
+<davem@nuts.ninka.net>
+	ip-sysctl.txt fixes
+
+<davem@nuts.ninka.net>
+	Tigon3: More fiber PHY tweaks.
+
+<davem@nuts.ninka.net>
+	MAINTAINERS: Remove Andi from networking as per his request.
+
+<rusty@rustcorp.com.au>
+	ipv4/route.c: Cleanup ip_rt_acct_read
+
+<jes@wildopensource.com>
+	Tigon3: Use unsigned type for dest_idx_unmasked in tg3_recycle_rx.
+
+<jes@wildopensource.com>
+	Tigon3: MAX_WAIT_CNT is too large.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	kbuild: asm offset generation for x86_64
+	
+	Switch to a new way of generating a header file defining the offsets
+	into C structs for use in assembler code.
+	
+	This method will hopefully be shared by all archs in the future.
+	
+	The way to do handle things is taken from (or at least inspired by) 
+	Keith Owens' kbuild-2.5, so credit for this and the following patches
+	goes to him ;)
+
+<kai@tp1.ruhr-uni-bochum.de>
+	kbuild: asm offset generation for ARM
+	
+	Switch ARM to the new way of asm offset generation.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	kbuild: Remove remaining references to mkdep
+	
+	Since mkdep is gone, calling it is surely no a good idea anymore.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	kbuild: Add support for alpha asm offset generation
+	
+	Now we have three archs and three different prefixes in front of
+	numbers: #,$,none. We'll see what the others bring...
+
+<kai@tp1.ruhr-uni-bochum.de>
+	kbuild: Remove dead "make dep" commands.
+	
+	These didn't have any associated rules, so they can as well just go.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	kbuild: Remove archdep
+	
+	Since we don't do dependencies up front anymore, archdep does not make
+	too much sense anymore. It was mostly unused now anyway, move the
+	remaining users to the "prepare" target, which is exactly what is wanted:
+	Do some work before the actual build gets started.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	kbuild: modversions fix
+	
+	As pointed out by Mikael Pettersson, we didn't generate checksums for
+	all exporting objects, due to a thinko of mine.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	kbuild: Handle removed headers
+	
+	New and old way to handle dependencies would choke when a file
+	#include'd by other files was removed, since the dependency on it was
+	still recorded, but since it was gone, make has no idea what to do about
+	it (and would complain with "No rule to make <file> ...")
+	
+	We now add targets for all the previously included files, so make will
+	just ignore them if they disappear.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	kbuild: Improve error message
+	
+	(Andries Brouwer)
+
+<axboe@suse.de>
+	[PATCH] ide locking botch
+	
+	I took a quick look at why 2.5.21 hung at boot detecting partitions,
+	because a 2.5.22 did the exact same thing on my test box today... The
+	tcq locking is completely screwed now, and as I said before the weekend
+	I think the entire locking is just getting worse now.
+	
+	Anyways, this patch at least attempts to make tcq follow the channel
+	lock usage to make it work for me.
+
+<willy@debian.org>
+	[PATCH] Remove SCSI_BH
+	
+	This patch switches SCSI from a bottom half to a tasklet.  It's been
+	reviewed, tested & approved by Andrew Morton, James Bottomley & Doug
+	Gilbert.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	kbuild: Fix "make dep clean bzImage" and the like
+	
+	make got confused in some cases when we had both targets which
+	do and do not need .config included on the command line. Simplify
+	and fix it by just re-calling make for each target separately
+	in this case.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	kbuild: Remove all .*.cmd files on make mrproper
+	
+	We skip removing scripts/lxdialog/.*.cmd on make clean, which is
+	on purpose since we want lxdialog to survive here. But on
+	make mrproper these should go as well.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	kbuild: Improve output and error behavior when making modversions.
+	
+	Reduce the amount of output in verbose (default) mode and stop
+	immediately on error.
+	
+	(Sam Ravnborg/me)
+
+<michaelw@foldr.org>
+	sparc64: Use SUNW,power-off to power off some Ultra systems.
+
+<davem@nuts.ninka.net>
+	LLC: Hand merge in of toplevel Makefile bits.
+
+<bcrl@redhat.com>
+	[PATCH] add wait queue function callback support
+	
+	This adds support for wait queue function callbacks, which are used by
+	aio to build async read / write operations on top of existing wait
+	queues at points that would normally block a process.
+
+<bcrl@redhat.com>
+	[PATCH] add __fput for aio
+	
+	This patch splits fput into fput and __fput.  __fput is needed by aio to
+	construct a mechanism for performing a deferred fput during io
+	completion, which typically occurs during interrupt context.
+
+<davem@nuts.ninka.net>
+	Sparc64: Update for scheduler changes.
+
+<rmk@arm.linux.org.uk>
+	net/ipv6/tcp_ipv6.c: Fix new socket creation.
+
+<davem@nuts.ninka.net>
+	arch/sparc64/defconfig: Update.
+
+<mikpe@csd.uu.se>
+	[PATCH] fix x86 initrd breakage
+	
+	Summary: 2.5.17 broke initrd on x86. Fix below.
+	
+	Why: Kai's patch in 2.5.17 to move x86-specific options from
+	Makefile to arch/i386/boot/Makefile unfortunately lost the fact
+	that the orginal "#export RAMDISK = -DRAMDISK=512" statement
+	was commented out. (I suspect a typo.) RAMDISK is obsolete since
+	1.3.something, and uncommenting it has "interesting" effects
+	since the ram_size field has a very different meaning now.
+	
+	The patch below reverts the statement to its pre-2.5.17 state.
+	Perhaps it should be removed altogether?
+
+<rusty@rustcorp.com.au>
+	[PATCH] Latest nonlinear CPU patches
+	
+	This patch removes the concept of "logical" CPU numbers, in
+	preparation for CPU hotplugging.
+
+<rusty@rustcorp.com.au>
+	[PATCH] Make NTFS use a single uncompression-buffer
+	
+	This was done by inspection, is it OK Anton?  It's very simple:
+
+<mingo@elte.hu>
+	  sched_yield() is misbehaving.
+	
+	  the current implementation does the following to 'give up' the CPU:
+	
+	   - it decreases its priority by 1 until it reaches the lowest level
+	   - it queues the task to the end of the priority queue
+	
+	  this scheme works fine in most cases, but if sched_yield()-active tasks
+	  are mixed with CPU-using processes then it's quite likely that the
+	  CPU-using process is in the expired array. In that case the yield()-ing
+	  process only requeues itself in the active array - a true context-switch
+	  to the expired process will only occur once the timeslice of the
+	  yield()-ing process has expired: in ~150 msecs. This leads to the
+	  yield()-ing and CPU-using process to use up rougly the same amount of
+	  CPU-time, which is arguably deficient.
+	
+	  i've fixed this problem by extending sched_yield() the following way:
+	
+	  +        * There are three levels of how a yielding task will give up
+	  +        * the current CPU:
+	  +        *
+	  +        *  #1 - it decreases its priority by one. This priority loss is
+	  +        *       temporary, it's recovered once the current timeslice
+	  +        *       expires.
+	  +        *
+	  +        *  #2 - once it has reached the lowest priority level,
+	  +        *       it will give up timeslices one by one. (We do not
+	  +        *       want to give them up all at once, it's gradual,
+	  +        *       to protect the casual yield()er.)
+	  +        *
+	  +        *  #3 - once all timeslices are gone we put the process into
+	  +        *       the expired array.
+	  +        *
+	  +        *  (special rule: RT tasks do not lose any priority, they just
+	  +        *  roundrobin on their current priority level.)
+	  +        */
+	
+
+<mingo@elte.hu>
+	- comment and coding style fixes.
+
+<mingo@elte.hu>
+	- sync wakeup affinity fix: do not fast-migrate threads
+	  without making sure that the target CPU is allowed.
+
+<mingo@elte.hu>
+	- fix preemption bug in cli().
+
+<mingo@elte.hu>
+	- sti() preemption fix.
+
+<torvalds@home.transmeta.com>
+	More IDE locking fixes. Found by Nick Piggin.
+
+<stelian.pop@fr.alcove.com>
+	[PATCH] export pci_bus_type to modules.
+	
+	This exports the pci_bus_type symbol to modules, needed by (at least)
+	the recent changes in pcmcia/cardbus.c.
+
+<ak@suse.de>
+	[PATCH] change_page_attr and AGP update
+	
+	Add change_page_attr to change page attributes for the kernel linear map.
+	
+	Fix AGP driver to use change_page_attr for the AGP buffer.
+	
+	Clean up AGP driver a bit (only tested on i386/VIA+AMD)
+	
+	Change ioremap_nocache to use change_page_attr to avoid mappings with
+	conflicting caching attributes.
+
+<rusty@rustcorp.com.au>
+	[PATCH] Net updates / CPU hotplug infrastructure missed merge
+	
+	Ironically enough, both were written by me.
+	
+	Fixed thus.
+
+<akpm@zip.com.au>
+	[PATCH] writeback tunables
+	
+	Adds five sysctls for tuning the writeback behaviour:
+	
+		dirty_async_ratio
+		dirty_background_ratio
+		dirty_sync_ratio
+		dirty_expire_centisecs
+		dirty_writeback_centisecs
+	
+	these are described in Documentation/filesystems/proc.txt  They are
+	basically the tradiditional knobs which we've always had...
+	
+	We are accreting a ton of obsolete sysctl numbers under /proc/sys/vm/.
+	I didn't recycle these - just mark them unused and remove the obsolete
+	documentation.
+
+<akpm@zip.com.au>
+	[PATCH] ext3 corruption fix
+	
+	Stephen and Neil Brown recently worked this out.  It's a
+	rare situation which only affects data=journal mode.
+	
+	Fix problem in data=journal mode where writeback could be left pending on a
+	journaled, deleted disk block.  If that block then gets reallocated, we can
+	end up with an alias in which the old data can be written back to disk over
+	the new.  Thanks to Neil Brown for spotting this and coming up with the
+	initial fix.
+
+<akpm@zip.com.au>
+	[PATCH] update_atime cleanup
+	
+	Remove unneeded do_update_atime(), and convert update_atime() to C.
+
+<akpm@zip.com.au>
+	[PATCH] grab_cache_page_nowait deadlock fix
+	
+	- If grab_cache_page_nowait() is to be called while holding a lock on
+	  a different page, it must perform memory allocations with GFP_NOFS.
+	  Otherwise it could come back onto the locked page (if it's dirty) and
+	  deadlock.
+	
+	  Also tidy this function up a bit - the checks in there were overly
+	  paranoid.
+	
+	- In a few of places, look to see if we can avoid a buslocked cycle
+	  and dirtying of a cacheline.
+
+<akpm@zip.com.au>
+	[PATCH] mark_buffer_dirty() speedup
+	
+	mark_buffer_dirty() is showing up on Anton's graphs.  Avoiding the
+	buslocked RMW if the buffer is already dirty should fix that up.
+
+<akpm@zip.com.au>
+	[PATCH] go back to 256 requests per queue
+	
+	The request queue was increased from 256 slots to 512 in 2.5.20.  The
+	throughput of `dbench 128' on Randy's 384 megabyte machine fell 40%.
+	
+	We do need to understand why that happened, and what we can learn from
+	it.  But in the meanwhile I'd suggest that we go back to 256 slots so
+	that this known problem doesn't impact people's evaluation and tuning
+	of 2.5 performance.
+
+<akpm@zip.com.au>
+	[PATCH] mark_buffer_dirty_inode() speedup
+	
+	buffer_insert_list() is showing up on Anton's graphs.  It'll be via
+	ext2's mark_buffer_dirty_inode() against indirect blocks.  If the
+	buffer is already on an inode queue, we know that it is on the correct
+	inode's queue so we don't need to re-add it.
+
+<akpm@zip.com.au>
+	[PATCH] leave swapcache pages unlocked during writeout
+	
+	Convert swap pages so that they are PageWriteback and !PageLocked while
+	under writeout, like all other block-backed pages.  (Network
+	filesystems aren't doing this yet - their pages are still locked while
+	under writeout)
+
+<akpm@zip.com.au>
+	[PATCH] direct-to-BIO I/O for swapcache pages
+	
+	This patch changes the swap I/O handling.  The objectives are:
+	
+	- Remove swap special-casing
+	- Stop using buffer_heads -> direct-to-BIO
+	- Make S_ISREG swapfiles more robust.
+	
+	I've spent quite some time with swap.  The first patches converted swap to
+	use block_read/write_full_page().  These were discarded because they are
+	still using buffer_heads, and a reasonable amount of otherwise unnecessary
+	infrastructure had to be added to the swap code just to make it look like a
+	regular fs.  So this code just has a custom direct-to-BIO path for swap,
+	which seems to be the most comfortable approach.
+	
+	A significant thing here is the introduction of "swap extents".  A swap
+	extent is a simple data structure which maps a range of swap pages onto a
+	range of disk sectors.  It is simply:
+	
+		struct swap_extent {
+			struct list_head list;
+			pgoff_t start_page;
+			pgoff_t nr_pages;
+			sector_t start_block;
+		};
+	
+	At swapon time (for an S_ISREG swapfile), each block in the file is bmapped()
+	and the block numbers are parsed to generate the device's swap extent list.
+	This extent list is quite compact - a 512 megabyte swapfile generates about
+	130 nodes in the list.  That's about 4 kbytes of storage.  The conversion
+	from filesystem blocksize blocks into PAGE_SIZE blocks is performed at swapon
+	time.
+	
+	At swapon time (for an S_ISBLK swapfile), we install a single swap extent
+	which describes the entire device.
+	
+	The advantages of the swap extents are:
+	
+	1: We never have to run bmap() (ie: read from disk) at swapout time.  So
+	   S_ISREG swapfiles are now just as robust as S_ISBLK swapfiles.
+	
+	2: All the differences between S_ISBLK swapfiles and S_ISREG swapfiles are
+	   handled at swapon time.  During normal operation, we just don't care.
+	   Both types of swapfiles are handled the same way.
+	
+	3: The extent lists always operate in PAGE_SIZE units.  So the problems of
+	   going from fs blocksize to PAGE_SIZE are handled at swapon time and normal
+	   operating code doesn't need to care.
+	
+	4: Because we don't have to fiddle with different blocksizes, we can go
+	   direct-to-BIO for swap_readpage() and swap_writepage().  This introduces
+	   the kernel-wide invariant "anonymous pages never have buffers attached",
+	   which cleans some things up nicely.  All those block_flushpage() calls in
+	   the swap code simply go away.
+	
+	5: The kernel no longer has to allocate both buffer_heads and BIOs to
+	   perform swapout.  Just a BIO.
+	
+	6: It permits us to perform swapcache writeout and throttling for
+	   GFP_NOFS allocations (a later patch).
+	
+	(Well, there is one sort of anon page which can have buffers: the pages which
+	are cast adrift in truncate_complete_page() because do_invalidatepage()
+	failed.  But these pages are never added to swapcache, and nobody except the
+	VM LRU has to deal with them).
+	
+	The swapfile parser in setup_swap_extents() will attempt to extract the
+	largest possible number of PAGE_SIZE-sized and PAGE_SIZE-aligned chunks of
+	disk from the S_ISREG swapfile.  Any stray blocks (due to file
+	discontiguities) are simply discarded - we never swap to those.
+	
+	If an S_ISREG swapfile is found to have any unmapped blocks (file holes) then
+	the swapon attempt will fail.
+	
+	The extent list can be quite large (hundreds of nodes for a gigabyte S_ISREG
+	swapfile).  It needs to be consulted once for each page within
+	swap_readpage() and swap_writepage().  Hence there is a risk that we could
+	blow significant amounts of CPU walking that list.  However I have
+	implemented a "where we found the last block" cache, which is used as the
+	starting point for the next search.  Empirical testing indicates that this is
+	wildly effective - the average length of the list walk in map_swap_page() is
+	0.3 iterations per page, with a 130-element list.
+	
+	It _could_ be that some workloads do start suffering long walks in that code,
+	and perhaps a tree would be needed there.  But I doubt that, and if this is
+	happening then it means that we're seeking all over the disk for swap I/O,
+	and the list walk is the least of our problems.
+	
+	rw_swap_page_nolock() now takes a page*, not a kernel virtual address.  It
+	has been renamed to rw_swap_page_sync() and it takes care of locking and
+	unlocking the page itself.  Which is all a much better interface.
+	
+	Support for type 0 swap has been removed.  Current versions of mkwap(8) seem
+	to never produce v0 swap unless you explicitly ask for it, so I doubt if this
+	will affect anyone.  If you _do_ have a type 0 swapfile, swapon will fail and
+	the message
+	
+		version 0 swap is no longer supported. Use mkswap -v1 /dev/sdb3
+	
+	is printed.  We can remove that code for real later on.  Really, all that
+	swapfile header parsing should be pushed out to userspace.
+	
+	This code always uses single-page BIOs for swapin and swapout.  I have an
+	additional patch which converts swap to use mpage_writepages(), so we swap
+	out in 16-page BIOs.  It works fine, but I don't intend to submit that.
+	There just doesn't seem to be any significant advantage to it.
+	
+	I can't see anything in sys_swapon()/sys_swapoff() which needs the
+	lock_kernel() calls, so I deleted them.
+	
+	If you ftruncate an S_ISREG swapfile to a shorter size while it is in use,
+	subsequent swapout will destroy the filesystem.  It was always thus, but it
+	is much, much easier to do now.  Not really a kernel problem, but swapon(8)
+	should not be allowing the kernel to use swapfiles which are modifiable by
+	unprivileged users.
+
+<akpm@zip.com.au>
+	[PATCH] fix loop driver for large BIOs
+	
+	Fix the loop driver for loop-on-blockdev setups.
+	
+	When presented with a multipage BIO, loop_make_request overindexes the
+	first page and corrupts kernel memory.  Fix it to walk the individual
+	pages.
+	
+	BTW, I suspect the IV handling in loop may be incorrect for multipage
+	BIOs.  Should we not be recalculating the IV for each page in the BIOs,
+	or incrementing the offset by the size of the preceding pages, or such?
+
+<akpm@zip.com.au>
+	[PATCH] kmap_atomic fix in bio_copy()
+	
+	bio_copy is doing
+	
+		vfrom = kmap_atomic(bv->bv_page, KM_BIO_IRQ);
+		vto = kmap_atomic(bbv->bv_page, KM_BIO_IRQ);
+	
+	which, if I understand atomic kmaps, is incorrect.  Both source and
+	dest will get the same pte.
+	
+	The patch creates a separate atomic kmap member for the destination and
+	source of this copy.
+
+<akpm@zip.com.au>
+	[PATCH] ext3: clean up journal_try_to_free_buffers()
+	
+	Clean up ext3's journal_try_to_free_buffers().  Now that the
+	releasepage() a_op is non-blocking and need not perform I/O, this
+	function becomes much simpler.
+
+<akpm@zip.com.au>
+	[PATCH] clean up alloc_buffer_head()
+	
+	alloc_bufer_head() does not need the additional argument - GFP_NOFS is
+	always correct.
+
+<akpm@zip.com.au>
+	[PATCH] take bio.h out of highmem.h
+	
+	highmem.h includes bio.h, so just about every compilation unit in the
+	kernel gets to process bio.h.
+	
+	The patch moves the BIO-related functions out of highmem.h and into
+	bio-related headers.  The nested include is removed and all files which
+	need to include bio.h now do so.
+
+<akpm@zip.com.au>
+	[PATCH] remove set_page_buffers() and clear_page_buffers()
+	
+	The set_page_buffers() and clear_page_buffers() macros are each used in
+	only one place.  Fold them into their callers.
+
+<akpm@zip.com.au>
+	[PATCH] allow GFP_NOFS allocators to perform swapcache writeout
+	
+	One weakness which was introduced when the buffer LRU went away was
+	that GFP_NOFS allocations became equivalent to GFP_NOIO.  Because all
+	writeback goes via writepage/writepages, which requires entry into the
+	filesystem.
+	
+	However now that swapout no longer calls bmap(), we can honour
+	GFP_NOFS's intent for swapcache pages.  So if the allocation request
+	specifies __GFP_IO and !__GFP_FS, we can wait on swapcache pages and we
+	can perform swapcache writeout.
+	
+	This should strengthen the VM somewhat.
+
+<akpm@zip.com.au>
+	[PATCH] rename get_hash_table() to find_get_block()
+	
+	Renames the buffer_head lookup function `get_hash_table' to
+	`find_get_block'.
+	
+	get_hash_table() is too generic a name. Plus it doesn't even use a hash
+	any more.
+
+<akpm@zip.com.au>
+	[PATCH] Reduce the radix tree nodes to 64 slots
+	
+	Reduce the radix tree nodes from 128 slots to 64.
+	
+	- The main reason for this is that on 64-bit/4k page machines, the
+	  slab allocator has decided that radix tree nodes will require an
+	  order-1 allocation.  Shrinking the nodes to 64 slots pulls that back
+	  to an order-0 allocation.
+	
+	- On x86 we get fifteen 64-slot nodes per page rather than seven
+	  129-slot nodes, for a modest memory saving.
+	
+	- Halving the node size will approximately halve the memory use in
+	  the worrisome really-large, really-sparse file case.
+	
+	Of course, the downside is longer tree walks.  Each level of the tree
+	covers six bits of pagecache index rather than seven.  As ever, I am
+	guided by Anton's profiling on the 12- and 32-way PPC boxes.
+	radix_tree_lookup() is currently down in the noise floor.
+	
+	Now, there is one special case: one file which is really big and which
+	is accessed in a random manner and which is accessed very heavily: the
+	blockdev mapping.  We _are_ showing some locking cost in
+	__find_get_block (used to be __get_hash_table) and in its call to
+	find_get_page().  I have a bunch of patches which introduce a generic
+	per-cpu buffer LRU, and which remove ext2's private bitmap buffer LRUs.
+	I expect these patches to wipe the blockdev mapping lookup lock contention
+	off the map,  but I'm awaiting test results from Anton before deciding
+	whether those patches are worth submitting.
+
+<akpm@zip.com.au>
+	[PATCH] msync(bad address) should return -ENOMEM
+	
+	Heaven knows why, but that's what the opengroup say, and returning
+	-EFAULT causes 2.5 to fail one of the Linux Test Project tests.
+	
+	[ENOMEM]
+	          The addresses in the range starting at addr and continuing
+	          for len bytes are outside the range allowed for the address
+	          space of a process or specify one or more pages that are not
+	          mapped.
+	
+	2.4 has it right, but 2.5 doesn't.
+
+<ak@muc.de>
+	[PATCH] x86-64 merge
+	
+	x86_64 core updates.
+	
+	 - Make it compile again (switch_to macros etc., add dummy suspend.h)
+	 - reenable strength reduce optimization
+	 - Fix ramdisk (patch from Mikael Pettersson)
+	 - Some merges from i386
+	 - Reimplement lazy iobitmap allocation.  I reimplemented it based
+	   on bcrl's idea.
+	 - Fix IPC 32bit emulation to actually work and move into own file
+	 - New fixed mtrr.c from DaveJ ported from 2.4 and reenable it.
+	 - Move tlbstate into PDA.
+	 - Add some changes that got lost during the last merge.
+	 - new memset that seems to actually work.
+	 - Align signal handler stack frames to 16 bytes.
+	 - Some more minor bugfixes.
+
+<ak@muc.de>
+	[PATCH] Move jiffies_64 down into architectures
+	
+	x86-64 needs an own special declaration of jiffies_64.
+	
+	prepare for this by moving the jiffies_64 declaration from
+	kernel/timer.c down into each architecture.
+
+<willy@debian.org>
+	[PATCH] remove tqueue.h from sched.h
+	
+	This is actually part of the work I've been doing to remove BHs, but it
+	stands by itself.
+
+<willy@debian.org>
+	[PATCH] Remove sync_timers
+	
+	Nobody's using it any more, kill:
+
+<makisara@abies.metla.fi>
+	[PATCH] 2.5.22 SCSI tape buffering changes
+	
+	This contains the following changes to the SCSI tape driver:
+	
+	- one buffer is used for each tape (no buffer pool)
+	- buffers allocated when needed and freed when device closed
+	- common code from read and write moved to a function
+	- default maximum number of scatter/gather segments increased to 64
+	- tape status set to "no tape" after succesful unload
+
+<pmenage@ensim.com>
+	[PATCH] Push BKL into ->permission() calls
+	
+	This patch (against 2.5.22) removes the BKL from around the call
+	to i_op->permission() in fs/namei.c, and pushes the BKL into those
+	filesystems that have permission() methods that require it.
+
+<sfr@canb.auug.org.au>
+	[PATCH] remove getname32
+	
+	arch/ppc64/kernel/sys_ppc32.c has a getname32 function.  The only
+	difference between it and getname() is that it calls do_getname32()
+	instead of do_getname() (see fs/namei.c).  The difference between
+	do_getname and do_getname32 is that the former checks to make sure that
+	the pointer it is passed is less that TASK_SIZE and restricts the length
+	copied to the lesser of PATH_MAX and (TASK_SIZE - pointer).
+	do_getname32 uses PAGE_SIZE instead of PATH_MAX.
+	
+	Anton Blanchard says it is OK to remove getname32.
+	
+	arch/ia64/ia32/sys_ia32.c defined a getname32(), but nothing used it.
+	
+	This patch removes both.
+
+<sfr@canb.auug.org.au>
+	[PATCH] 2.5.22 compile fixes
+	
+	I needed these to make 2.5.22 build for me.
+
+<sfr@canb.auug.org.au>
+	[PATCH] Make copy_siginfo_to_user mode explicit
+	
+	This patch makes copy_siginfo_to_user excplicitly copy the correct
+	union member.  Previously we were getting the correct result but
+	really by accident.
+
+<sfr@canb.auug.org.au>
+	[PATCH] make file leases work as they should
+	
+	This patch fixes the following problems in the file lease:
+		when there are multiple shared leases on a file, all the
+			lease holders get notified when someone opens the
+			file for writing (used to be only the first).
+		when a nonblocking open breaks a lease, it will time out
+			as it should (used to never time out).
+	
+	This should make the leases code more usable (hopefully).
+
+<axboe@suse.de>
+	[PATCH] missing tag blkdev.h stuff
+	
+	For some odd reason, the blkdev.h changes did not get patched into your
+	tree from the patch I sent?! Anyways, here's that change:
+
+<bunk@fs.tum.de>
+	[PATCH] drivers/char/rio/func.h needs linux/kdev_t.h
+	
+	It seems func.h needs to inlude linux/kdev_t.h:
+
+<zwane@linux.realnet.co.sz>
+	[PATCH] Make SMP/APIC config option earlier
+	
+	Patch to reorder the APIC configuration so that dependencies are
+	determined beforehand for MCE. Keith Owens pointed this out a whiles back
+	actually.
+
+<jack@suse.cz>
+	[PATCH] Rename of xqm.h
+	
+	This renames 'xqm.h' to a bit better (more consistent with rest of
+	sources) name.
+
+<ak@muc.de>
+	[PATCH] Fix incorrect inline assembly in RAID-5
+	
+	Pure luck that this ever worked at all. The optimized assembly for XOR
+	in RAID-5 declared did clobber registers, but did declare them as read-only.
+	I'm pretty sure that at least the 4 disk and possibly the 5 disk cases
+	did corrupt callee saved registers. The others probably got away because
+	they were always used in own functions (and only clobbering caller saved
+	registers)and only called via pointers, preventing inlining.
+	
+	Some of the replacements are a bit complicated because the functions
+	exceed gcc's 10 asm argument limit when each input/output register needs
+	two arguments. Works around that by saving/restoring some of the registers
+	manually.
+	
+	I wasn't able to test it in real-life because I don't have a RAID
+	setup and the RAID code didn't compile since several 2.5 releases.
+	I wrote some test programs that did test the XOR and they showed
+	no regression.
+	
+	Also aligns to XMM save area to 16 bytes to save a few cycles.
+
+<martin.schwidefsky@debitel.net>
+	[PATCH] 2.5.22: s390 fixes.
+	
+	some recent changes in the s390 architectures files:
+	1) Makefile fixes.
+	2) Add missing include statements.
+	3) Convert all parametes in the 31 bit emulation wrapper of sys_futex.
+	4) Remove semicolons after 'fi' in Config.in
+	5) Fix scheduler defines in system.h
+	6) Simplifications in qdio.c
+
+<Andries.Brouwer@cwi.nl>
+	[PATCH] small makefile correction
+	
+
+<martin.schwidefsky@debitel.net>
+	[PATCH] 2.5.22: common code changes for s/390.
+	
+	1) Add __s390__ to the list of architectures that use unsigned int as
+	   type for rautofs_wqt_t. __s390__ is defined for both 31-bit and 64-bit
+	   linux for s/390. Both architectures are fine with unsigned int since
+	   sizeof(unsigned int) == sizeof(unsigned long) for 31 bit s/390.
+	2) Remove early initialization call ccwcache_init(). It doesn't exists
+	   anymore.
+	3) Remove special case for irq_stat. We moved the irq_stat structure out
+	   of the lowcore.
+	4) Replace acquire_console_sem with down_trylock & return to avoid an
+	   endless trap loop if console_unblank is called from interrupt context
+	   and the console semaphore is taken.
+
+<martin.schwidefsky@debitel.net>
+	[PATCH] 2.5.22: dasd patches.
+	
+	1) Replace is_read_only with bdev_read_only. The last user of is_read_only
+	   is gone...
+	2) Remove alloc & free of the label array in dasd_genhd. This is needed for
+	   the label array extension but this is a patch of its own.
+	3) Maintain the old behaviour of /proc/dasd/devices. Its is possible again
+	   to use "add <devno>" instead of "add device <devno>" or "add range=<devno>".
+
+<martin.schwidefsky@debitel.net>
+	[PATCH] 2.5.22: elevator exports.
+	
+	The dasd driver as a module needs to call elevator_init/elavator_exit to
+	change the elevator algorithm to elevator_noop.
+
+<martin.schwidefsky@debitel.net>
+	[PATCH] 2.5.22: new xpram driver.
+	
+	seems someone else was faster fixing the hardsects problem in the xpram
+	driver.  We continued with my new version of the xpram driver.  Arnd
+	Bergmann found some bugs and added support for the driverfs.
+
+<martin.schwidefsky@debitel.net>
+	[PATCH] 2.5.22: ibm partition support.
+	
+	another resend of the partition patch for ibm.c. Nobody sent a veto so far
+	so please add it.
+
+<Andries.Brouwer@cwi.nl>
+	[PATCH] remove path_init
+	
+	It looks like there are no in-tree users of path_init.
+	Maybe it can be removed.
+
+<fdavis@si.rr.com>
+	[PATCH] 2.5.22 : include/linux/intermezzo_psdev.h
+	
+	   The following patch fixes a compile error regarding a name change
+	within task_struct, which affects ISLENTO().
+
+<fdavis@si.rr.com>
+	[PATCH] 2.5.22 : fs/intermezzo/vfs.c
+	
+	  The following patch addresses a name change (i_zombie --> i_sem) within
+	struct inode, which affects fs/intermezzo/vfs.c.
+
+<torvalds@home.transmeta.com>
+	Missed parts of patch from Andries. 
+	
+	Damn it, use the normal "-p1" format for patches!
+
+<torvalds@home.transmeta.com>
+	Missing tqueue.h includes from sched.h cleanup
+
+<torvalds@home.transmeta.com>
+	Compiler warning - unused variable
+
+<torvalds@home.transmeta.com>
+	Missing include file
+
+<mdharm-usb@one-eyed-alien.net>
+	[PATCH] USB storage: cleanup storage_probe()
+	
+	Attached is a BK patch which cleans up the usb-storage driver
+	storage_probe() function.  This patch is courtsey Alan Stern.
+	
+	Basically, it removes some redundant checks, moves all the error-path code
+	to one place (reducing code duplication), and fixes some spelling errors.
+
+<mdharm-usb@one-eyed-alien.net>
+	[PATCH] USB storage: change atomic_t to bitfield, consolidate #defines
+	
+	This patch changes from using an atomic_t with two states to using a
+	bitfield to determine if a device is attached.  It also moves some common
+	#defines into a common header file.
+	
+	courtsey of Alan Stern <stern@rowland.org>
+
+<david-b@pacbell.net>
+	[PATCH] ohci misc fixes
+	
+	This patch applies on top of the other two (for init problems):
+	
+	- Uses time to balance interrupt load, not number of transfers.
+	   One 8-byte lowspeed transfer costs as much as ten same-size
+	   at full speed ... previous code could overcommit branches.
+	- Shrinks the code a smidgeon, mostly in the submit path.
+	- Updates comments, remove some magic numbers, etc.
+	- Adds some debug dump routines for EDs and TDs, which can
+	   be rather helpful when debugging!
+	- Lays ground work for a "shadow" <linux/list.h> TD queue
+	   (but doesn't enlarge the TD or ED on 32bit cpus)
+	
+	I'm not sure anyone would have run into that time/balance
+	issue, though some folk have talked about hooking up lots
+	of lowspeed devices and that would have made trouble.
+
+<torvalds@home.transmeta.com>
+	Physical address 0 is normal for ACPI - don't complain
+
+<oliver@neukum.name>
+	[PATCH] make kaweth use the sk_buff directly on tx
+	
+	this change set against 2.5 will make kaweth put its private header
+	into the sk_buff directly if possible or else allocate a temporary sk_buff.
+	It saves memory and usually a copy.
+
+<greg@kroah.com>
+	USB usb-midi driver: remove check for kernel version, as it's not needed.
+
+<neilb@cse.unsw.edu.au>
+	[PATCH] plugging initialisation
+	
+	While this initialisation could be done in individual drivers, it is
+	better to have it central...
+	
+	Init plug_list for make_request_fn devices: blk_queue_make_request
+	should init ->plug_list just like blk_init_queue does.
+
+<neilb@cse.unsw.edu.au>
+	[PATCH] Umem 1 of 2 - Fix compile warning in umem.c
+	
+	Cast to u64 before >>32, incase it was only u32 - thanks to Alan Cox.
+
+<neilb@cse.unsw.edu.au>
+	[PATCH] Umem 2 of 2 - Make device plugging work for umem
+	
+	We embed a request_queue_t in the card structure and so have a separate
+	one for each card.  This is used for plugging.
+	
+	Given this embeded request_queue_t, mm_make_request no-longer needs to
+	make from device number to mddev, but can map from the queue to the card
+	instead.
+
+<neilb@cse.unsw.edu.au>
+	[PATCH] md 1 of 22 - Fix three little compile problem when md or raid5 compiled with debugging
+	
+	md: "dev" isn't defined any more.
+	raid5: must report on "bi" before reusing the variable
+	raid5: buffer_head should be bio (not a debugging thing)
+
+<neilb@cse.unsw.edu.au>
+	[PATCH] md 2 of 22 - Make device plugging work for md/raid5
+	
+	We embed a request_queue_t in the mddev structure and so
+	have a separate one for each mddev.
+	This is used for plugging (in raid5).
+	
+	Given this embeded request_queue_t, md_make_request no-longer
+	needs to make from device number to mddev, but can map from
+	the queue to the mddev instead.
+
+<neilb@cse.unsw.edu.au>
+	[PATCH] md 3 of 22 - Remove md_maxreadahead
+	
+	..as it is nolonger used.
+
+<neilb@cse.unsw.edu.au>
+	[PATCH] md 4 of 22 - Make raid5 work for big bios
+	
+
+<neilb@cse.unsw.edu.au>
+	[PATCH] md 5 of 22 - Fix various list.h list related problems in md.c
+	
+	Several awkard constructs could be replaced by
+	list_del_init, list_for_each or list_empty.
+	
+	Also two bugs fixes:
+	 free_device_names was freeing the wrong thing
+	 same_set wasn't initialised.
+
+<neilb@cse.unsw.edu.au>
+	[PATCH] md 6 of 22 - Discard "param" from mddev structure
+	
+	It isn't needed.  Only the chunksize is used, and it
+	can be found in the superblock.
+
+<neilb@cse.unsw.edu.au>
+	[PATCH] md 7 of 22 - Use wait_event_interuptible in md_thread
+	
+	It currently has several lines of code where one will do.
+
+<neilb@cse.unsw.edu.au>
+	[PATCH] md 8 of 22 - Discard md_make_request in favour of per-personality make_request functions.
+	
+	As we now have per-device queues, we don't need a common make_request
+	function that dispatches, we can dispatch directly.
+	
+	Each *_make_request function is changed to take a request_queue_t
+	from which it extract the mddev that it needs, and to deduce the
+	"rw" flag directly from the bio.
+
+<neilb@cse.unsw.edu.au>
+	[PATCH] md 9 of 22 - Discard functions that have been "not yet" for a long time
+	
+	Discard functions that have been "not yet" for a long time
+	
+	It is not clear what these should do, or if they will ever be
+	needed, so let's clean them out.  They can easily be recreated
+	if there is a need.
+
+<neilb@cse.unsw.edu.au>
+	[PATCH] md 10 of 22 - Remove nb_dev from mddev_s
+	
+	The nb_dev field is not needed.
+	Most uses are the test if it is zero or not, and they can be replaced
+	by tests on the emptiness of the disks list.
+	
+	Other uses are for iterating through devices in numerical order and
+	it makes the code clearer (IMO) to unroll the devices into an array first
+	(which has to be done at some stage anyway) and then walk that array.
+	
+	This makes ITERATE_RDEV_ORDERED un-necessary.
+	
+	Also remove the "name" field which is never used.
+
+<neilb@cse.unsw.edu.au>
+	[PATCH] md 11 of 22 - Get rid of "OUT" macro in md.c
+	
+	It doesn't really help clarity or brevity.
+
+<neilb@cse.unsw.edu.au>
+	[PATCH] md 12 of 22 - Remove "data" from dev_mapping and tidy up
+	
+	The mapping from minor number to mddev structure allows for a
+	'data' that is never used.  This patch removes that and explicitly
+	inlines some inline functions that become trivial.
+	mddev_map also becomes completely local to md.c
+
+<neilb@cse.unsw.edu.au>
+	[PATCH] md 13 of 22 - First step to tidying mddev recounting and locking.
+	
+	First step to tidying mddev recounting and locking.
+	
+	This patches introduces
+	  mddev_get   which incs the refcount on an mddev
+	  mddev_put   which decs it and, if it becomes unused, frees it
+	  mddev_find  which finds or allocated an mddev for a given minor
+	              This is mostly the old alloc_mddev
+	
+	
+	free_mddev no longer actually frees it.  It just disconnects all drives
+	so that mddev_put will do the free.
+	
+	Now the test for "does an mddev exist" is not "mddev != NULL"
+	but involves checking if the mddev has disks or a superblock
+	attached.
+	
+	This makes the semantics of do_md_stop a bit cleaner.  Previously
+	if do_md_stop succeed for a real stop (not a read-only stop) then
+	you didn't have to unlock the mddev, otherwise you did.  Now
+	you always unlock the mddev after do_md_stop.
+
+<neilb@cse.unsw.edu.au>
+	[PATCH] md 14 of 22 - Second step to tidying mddev refcounts and locking
+	
+	This patch gets md_open to use mddev_find instead of kdev_to_mddev, thus
+	creating the mddev if necessary.
+	This guarantees that md_release will be able to find an mddev to
+	mddev_put.
+	
+	Now that we are certain of getting the refcount right at open/close time,
+	we don't need the "countdev" stuff.  If START_ARRAY happens to start and
+	array other than that the one that is currently opened, it won't confuse
+	things at all.
+
+<neilb@cse.unsw.edu.au>
+	[PATCH] md 15 of 22 - Get rid of kdev_to_mddev
+	
+	Only two users of kdev_to_mddev remain, md_release and
+	md_queue_proc.
+	
+	For md_release we can store the mddev in the md_inode
+	at md_open time so we can find it easily.
+	
+	For md_queue_proc, we use mddev_find because we only have the
+	device number to work with.  Hopefully the ->queue function
+	will get more arguements one day...
+
+<neilb@cse.unsw.edu.au>
+	[PATCH] md 16 of 22 - Next small step to improved mddev management.
+	
+	md_ioctl doesn't need to mddev_find, as the mddev must
+	be in the bd_inode->u.generic_ip.  This means we don't need
+	to mddev_put either.
+
+<neilb@cse.unsw.edu.au>
+	[PATCH] md 17 of 22 - Strengthen the locking of mddev.
+	
+	Strengthen the locking of mddev.
+	
+	mddev is only ever locked in md.c, so we move {,un}lock_mddev
+	out of the header and into md.c, and rename to mddev_{,un}lock
+	for consistancy with mddev_{get,put,find}.
+	
+	When building arrays (typically at boot time) we now lock, and unlock
+	as it is the "right" thing to do.  The lock should never fail.
+	
+	When generating /proc/mdstat, we lock each array before inspecting it.
+	
+	In md_ioctl, we lock the mddev early and unlock at the end, rather than
+	locking in two different places.
+	
+	In md_open we make sure we can get a lock before completing the open.  This
+	ensures that we sync with do_md_stop properly.
+	
+	In md_do_recovery, we lock each mddev before checking it's status.
+	
+	md_do_recovery must unlock while recovery happens, and a do_md_stop at this
+	point will deadlock when md_do_recovery tries to regain the lock.  This will be
+	fixed in a later patch.
+
+<neilb@cse.unsw.edu.au>
+	[PATCH] md 18 of 22 - More mddev tidyup - remove recovery_sem and resync_sem
+	
+	More mddev tidyup - remove recovery_sem and resync_sem
+	
+	recovery_sem and resync_sem get replaced by careful use
+	of recovery_running protected by reconfig_sem.
+	
+	As part of this, the creative:
+		down(&mddev->recovery_sem);
+		up(&mddev->recovery_sem);
+	
+	when stopping an array gets replaced by a more obvious
+	
+		wait_event(resync_wait, mddev->recovery_running <= 0);
+
+<neilb@cse.unsw.edu.au>
+	[PATCH] md 19 of 22 - Improve serialisation of md syncing
+	
+	If two md arrays which share real devices (i.e they each own a partition
+	on some device) need to sync/reconstruct at the same time, it is much
+	more efficient to have one wait while the other completes.
+	
+	The current code uses interruptible_sleep_on which isn't SMP safe (without the BKL).
+	This patch re-does this code to make it more secure.  Even it two start simultaneously,
+	one will reliably get priority, and the other wont wait for ever.
+
+<neilb@cse.unsw.edu.au>
+	[PATCH] md 20 of 22 - Provide SMP safe locking for all_mddevs list.
+	
+	Provide SMP safe locking for all_mddevs list.
+	
+	the all_mddevs_lock is added to protect all_mddevs and mddev_map.
+	
+	ITERATE_MDDEV is moved to md.c (it isn't needed elsewhere) and enhanced
+	to take the lock appropriately and always have a refcount on the object
+	that is given to the body of the loop.
+	
+	mddev_find is changed so that the structure is allocated outside a lock,
+	but test-and-set is done inside the lock.
+
+<neilb@cse.unsw.edu.au>
+	[PATCH] md 21 of 22 - Improve handling of MD super blocks
+	
+	1/ don't free the rdev->sb on an error -- it might be
+	   accessed again later.  Just wait for the device to be
+	   exported.
+	2/ Change md_update_sb to __md_update_sb and have it
+	   clear the sb_dirty flag.
+	   New md_update_sb locks the device and calls __md_update_sb
+	   if sb_dirty.  This avoids any possbile races around
+	   updating the superblock
+
+<neilb@cse.unsw.edu.au>
+	[PATCH] md 22 of 22 - Generalise md sync threads
+	
+	Previously each raid personality (Well, 1 and 5) started their
+	own thread to do resync, but md.c had a single common thread to do
+	reconstruct.  Apart from being untidy, this means that you cannot
+	have two arrays reconstructing at the same time, though you can have
+	to array resyncing at the same time..
+	
+	This patch changes the personalities so they don't start the resync,
+	but just leave a flag to say that it is needed.
+	The common thread (mdrecoveryd) now just monitors things and starts a
+	separate per-array thread whenever resync or recovery (or both) is
+	needed.
+	When the recovery finishes, mdrecoveryd will be woken up to re-lock
+	the device and activate the spares or whatever.
+	
+	raid1 needs to know when resync/recovery starts and ends so it can
+	allocate and release resources.
+	It allocated when a resync request for stripe 0 is received.
+	Previously it deallocated for resync in it's own thread, and
+	deallocated for recovery when the spare is made active or inactive
+	(depending on success).
+	
+	As raid1 doesn't own a thread anymore this needed to change.  So to
+	match the "alloc on 0", the md_do_resync now calls sync_request one
+	last time asking to sync one block past the end.  This is a signal to
+	release any resources.
+
+<torvalds@penguin.transmeta.com>
+	revert broken select optimizations
+	Cset exclude: torvalds@penguin.transmeta.com|ChangeSet|20020619003306|07760
+	Cset exclude: ak@muc.de|ChangeSet|20020618172743|19150
+
+<torvalds@penguin.transmeta.com>
+	Linux version 2.5.23
+

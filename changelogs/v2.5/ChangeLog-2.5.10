@@ -1,0 +1,215 @@
+
+	Release notes for v2.5.10
+
+
+
+Summary of changes from v2.5.9 to v2.5.10
+============================================
+
+<kai@tp1.ruhr-uni-bochum.de> (02/04/16 1.532)
+	Rename O_TARGET to <subdir>.o in drivers/usb.
+
+<kai@tp1.ruhr-uni-bochum.de> (02/04/16 1.533)
+	Cleanup drivers/usb/Makefile and Config.in's
+	
+	Use the fact that now O_TARGET == <subdir.o> to simplify the
+	Makefile.
+	Correct mod-subdirs use.
+	Remove unneeded code from drivers/usb/*/Config.in
+
+<tony@cantech.net.au> (02/04/17 1.531.4.1)
+	[PATCH] Change "return EBLAH" to "return -EBLAH in drivers/*
+	
+	Hello All,
+		This is a simple patch that changes several "return EBLAH"'s in drivers/*
+	for "return -EBLAH".  I have done my best to check the call stack to ensure
+	that the change in sign of the return values wont break anything.
+	
+	The patch supplied is agaist linux-2.4.19-pre6
+
+<oliver@neukum.name> (02/04/19 1.531.4.2)
+	[PATCH] USB hpusbscsi device added
+	
+	USB hpusbscsi driver
+	
+	 - device added
+
+<greg@kroah.com> (02/04/19 1.531.4.3)
+	USB keyspan driver
+	
+	Added support for the 19QI and 19QW devices.
+	Updated the firmware images with new versions.
+	minor cleanups to the driver.
+
+<greg@kroah.com> (02/04/19 1.531.4.4)
+	USB core
+	
+	Took out the limitation that drivers had to take up 16 minors.  Now
+	they can use only 1 if they want to.
+
+<kai@tp1.ruhr-uni-bochum.de> (02/04/21 1.531.6.8)
+	Move CAPI subsystem and AVM drivers to their new place in the tree.
+
+<s.doyon@videotron.ca> (02/04/22 1.536)
+	[PATCH] added Tieman Voyager USB Braille driver
+	
+	 added Tieman Voyager USB Braille driver
+
+<mark@hal9000.dyndns.org> (02/04/22 1.537)
+	This updates the ov511 driver to the latest stable version (1.60).
+	  
+	  Summary of changes:
+	  - Remove palette conversion and related code
+	  - Full OV518 support (except for color), initial OV518+ support
+	  - Improved OV6620 quality (Credit: Alexandre F.)
+	  - ov51x_init_isoc() should exit if usb_submit_urb() fails
+	  - ISO completion handler should only issue warning if bad data is received
+	  - Added "mirror" module parameter; reverses image horizontally
+	  - Changed USB control transaction fields to match Windows driver
+	  - New decompression module locking (decomp_ops->owner), per Greg's advice
+	  - EXPORT_SYMBOL_NOVERS => EXPORT_SYMBOL
+	  - New devices: Lifeview USB Live TV PAL/SECAM and PAL D/K+B/G
+	  - Disabled buf_timeout feature. It was calling vfree() in interrupt
+	    context, which is illegal. Memory is deallocated immediately on close().
+	  - Most sensors thought to be OV7620AE were actually OV76BE. Changed code
+	    to reflect this, and emit a warning if an OV7620AE is encountered.
+	  - Miscellaneous cleanups and bug fixes
+
+<greg@kroah.com> (02/04/22 1.538)
+	USB ov511 driver
+	
+	changed test_bit() call.
+
+<petkan@mastika.lnxw.com> (02/04/22 1.539)
+	USB pegasus and rtl8150
+	
+	Rx tasklet cleanups for both pegasus and rtl8150
+
+<greg@kroah.com> (02/04/22 1.540)
+	USB keyspan driver
+	  
+	  general cleanups:
+	  	- removed commented out function prototypes
+	  	- removed duplicate function prototypes
+	  	- removed unneeded #include
+	  	- added named initializers
+	  	- merged lots of the individual device structures into general 1, 2, and 4 port structures.
+
+<david-b@pacbell.net> (02/04/22 1.541)
+	[PATCH] PATCH: 2.5.8 ehci, submit errors
+	
+	It fixes problems with interrupt transfers, which I think that
+	nobody else has run into (or I'd surely have heard of it :).
+	Looks like not many folk are using USB 2.0 hubs yet.
+	
+	    - wasn't checking enough of the periodic schedule to
+	      detect bandwidth overcommit (would BUG out)
+	    - frames to uframes is rightshift 3, not 8 :)
+	    - properly cleans up (no oops!) after certain rare errors
+	      in the interrupt submit path (just my luck to hit one)
+	    - use that cleanup to bypass some old implementation
+	      shortcuts in the control and bulk submit paths
+	    - there are also some other minor updates/cleanups
+
+<david-b@pacbell.net> (02/04/22 1.542)
+	[PATCH] Re: PATCH: 2.5.8 ehci, submit errors
+	
+	Oh, and for non-x86 platforms with interesting pci
+	mapping, this tweak to one new routine would be
+	important in a particular error path I've yet to see ... :)
+
+<dkuhlen@fhm.edu> (02/04/22 1.543)
+	[PATCH] fix USB documentation bug
+	
+	USB fix documentation bug
+	
+	 After some source investigations I discovered a harmless mistake:
+	 The description of the  usb_control_msg(...) function says
+	 it returns 0, or less than 0 if an error occured, but
+	 the usb_internal_control_msg returns length, which is sometimes >0
+	 (success) or <0 if error.
+
+<kai@tp1.ruhr-uni-bochum.de> (02/04/22 1.531.7.1)
+	Remove one occurence of list-multi in drivers/isdn/tpam/Makefile
+
+<kai@tp1.ruhr-uni-bochum.de> (02/04/22 1.531.7.2)
+	Remove list-multi in drivers/net/*/Makefile
+
+<kai@tp1.ruhr-uni-bochum.de> (02/04/22 1.531.7.3)
+	Remove list-multi in sound/*/Makefile
+
+<torvalds@home.transmeta.com> (02/04/22 1.544.2.1)
+	Duh. Re-fix the UP setup_per_cpu_areas() case that got
+	fixed a few times too many already ;)
+
+<anton@samba.org> (02/04/22 1.544.2.2)
+	[PATCH] double down() in nfsd_symlink
+	
+	As a result of the recent BKL removal in notify_change, nfsd_symlink
+	downs the inode semaphore twice (the first time is in fh_lock).
+
+<kai@tp1.ruhr-uni-bochum.de> (02/04/23 1.547)
+	Fix a typo which left aic7xxx/Makefile broken
+	
+	Now it really works (I tried).
+
+<torvalds@home.transmeta.com> (02/04/23 1.548)
+	Fix some strange (and incorrect) reiserfs bit-op casts..
+	
+	No object-code changes, but removes warnings from the stricter
+	typechecking.
+
+<torvalds@home.transmeta.com> (02/04/23 1.549)
+	Add a "const" qualifier to test_bit() on x86, to avoid
+	warnings for proper usage.
+
+<torvalds@home.transmeta.com> (02/04/23 1.550)
+	Update to version 2.5.10
+
+<torvalds@home.transmeta.com> (02/04/23 1.551)
+	Add ATI Radeon 8500 ID
+
+<torvalds@home.transmeta.com> (02/04/23 1.552)
+	Bitops need "unsigned long".
+
+<oliendm@us.ibm.com> (02/04/23 1.553)
+	[PATCH] 2.5.9 SEM_UNDO patch
+	
+	As we discussed some time ago, here is a patch for the SEM_UNDO change
+	that can be applied to linux-2.5.9.
+
+<haveblue@us.ibm.com> (02/04/23 1.554)
+	[PATCH] Locking in sync_old_buffers
+	
+	Move BKL into the fs-specific write_super()'s.
+
+<kuebelr@email.uc.edu> (02/04/23 1.555)
+	[PATCH] spelling mistakes
+	
+	Fix a few spelling mistakes in documentation (arch/i386/boot/setup.S,
+	Documentation/sysrq.txt).
+
+<smurf@osdl.org> (02/04/23 1.556)
+	[PATCH] MegaRAID - compile fix for 2.5.9
+	
+	  This fixes compile errors.  It has been tested with a weekend of Bonnie++ 8GB
+	runs on a RAID0 setup at the OSDL.  This was built against and tested on 2.5.8
+	and applies cleanly to 2.5.9.
+	
+	  LSI told me they have a version 2.0 of the driver in development but
+	it would be really nice to have the dang thing working now ;-)
+
+<ak@muc.de> (02/04/23 1.557)
+	[PATCH] x86-64 next sync for 2.5.9
+	
+	This patch fixes up some lose ends left over from the last x86-64 jumbo merge.
+	
+	 - make it compile again. ia32_ioctl was referencing IDE ioctls that got
+	   remove in a merge race
+	 - Use the memset/FXRSTOR way to initialize the FPU, as discussed.
+	 - Fix semctl/shmctl ABI (thanks to Andreas Schwab)
+	 - Other minor fixes.
+
+<torvalds@home.transmeta.com> (02/04/23 1.558)
+	Fix include files for write_super BKL move.
+

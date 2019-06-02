@@ -1,0 +1,47 @@
+final:
+ - David Miller: sparc updates, FAT fs fixes, btaudio build fix
+ - David Gibson: Orinoco driver update
+ - Kevin Fleming: more disks the HPT controller doesn't like
+ - David Miller: "min()/max()" cleanups. Understands signs and sizes.
+ - Ben LaHaise: make vma merging more generous, help Mozilla /proc/<>/maps
+ - Jens Axboe: CD updates
+ - Trond Myklebust: save away NFS credentials in inode, so that mmap can
+   writeout. 
+ - Mark Hemment: HIGHMEM ops cleanups
+ - Jes Sorensen: use "unsigned long" for flags in various drivers
+
+pre4:
+ - Tim Hockin: NatSemi ethernet update
+ - Kurt Garloff: make PS/2 mouse reconnect adjustable like 2.2.x
+ - Daniel Phillips: unlazy use-once
+ - David Miller: undo poll() limit braindamage
+ - me: make return value from do_try_to_free_pages() meaningful
+
+pre3:
+ - Patrick Mochel: fix PCI:PCI bridge 64-bit memory type detection
+ - me: more forgotten nfsd off_t -> loff_t
+ - Alan Cox: ide driver merge
+ - Eric Lammerts, Rik van Riel: when oom, kill all threads.
+ - Ben LaHaise: use down_read, not down_write() in map_user_kiobuf.
+   We don't change the mappings, we just read them.
+ - Kai Germaschewski: ISDN updates
+ - Roland Fehrenbacher: sparse lun check
+ - Tim Waugh: handle awkward Titan parallel/serial port cards
+ - Stephen Rothwell: APM updates
+ - Anton Altaparmakov: NTFS updates
+
+pre2:
+ - me: fix forgotten nfsd usage of filldir off_t -> loff_t change
+ - Alan Cox: more driver merges
+
+pre1:
+ - Rui Sousa: emu10k1 module fixes, remove joystick part.
+ - Alan Cox: driver merges
+ - Andrea Arkangeli: alpha updates
+ - David Woodhouse: up_and_exit -> complete_and_exit
+ - David Miller: sparc and network update
+ - Andrew Morton: update 3c59x driver
+ - Neil Brown: NFS export VFAT, knfsd cleanups, raid fixes
+ - Ben Collins: ieee1394 updates
+ - Paul Mackerras: PPC update
+ - me: make sure we don't lose position bits in "filldir()"

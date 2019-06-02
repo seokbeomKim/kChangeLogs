@@ -1,0 +1,157 @@
+
+Summary of changes from v2.6.11.7 to v2.6.11.8
+==============================================
+
+<js@linuxtv.org>
+	[PATCH] [fix Bug 4395] modprobe bttv freezes the computer
+	
+	Here's a patch that fixes
+	http://bugme.osdl.org/show_bug.cgi?id=4395.
+	
+	Patch by Manu Abraham and Gerd Knorr:
+	Remove redundant bttv_reset_audio() which caused the computer to
+	freeze with some bt8xx based DVB cards when loading the bttv driver.
+	
+	Signed-off-by: Johannes Stezenbach <js@linuxtv.org>
+	Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
+	Signed-off-by: Gerd Knorr <kraxel@bytesex.org>
+
+<khali@linux-fr.org>
+	[PATCH] I2C: Fix incorrect sysfs file permissions in it87 and via686a drivers
+	
+	The it87 and via686a hardware monitoring drivers each create a sysfs
+	file named "alarms" in R/W mode, while they should really create it in
+	read-only mode. Since we don't provide a store function for these files,
+	write attempts to these files will do something undefined (I guess) and
+	bad (I am sure). My own try resulted in a locked terminal (where I
+	attempted the write) and a 100% CPU load until next reboot.
+	
+	As a side note, wouldn't it make sense to check, when creating sysfs
+	files, that readable files have a non-NULL show method, and writable
+	files have a non-NULL store method? I know drivers are not supposed to
+	do stupid things, but there is already a BUG_ON for several conditions
+	in sysfs_create_file, so maybe we could add two more?
+	
+	Signed-off-by: Jean Delvare <khali@linux-fr.org>
+	Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
+
+<akpm@osdl.org>
+	[PATCH] Fix reproducible SMP crash in security/keys/key.c
+	
+	Jani Jaakkola <jjaakkol@cs.Helsinki.FI> wrote:
+	>
+	> SMP race handling is broken in key_user_lookup() in security/keys/key.c
+	
+	This was fixed post-2.6.11.  Can you confirm that 2.6.12-rc2 works OK?
+	
+	This is the patch we used.  It should go into -stable if it's not already
+	there.
+	
+	
+	From: Alexander Nyberg <alexn@dsv.su.se>
+	
+	I looked at some of the oops reports against keyrings, I think the problem
+	is that the search isn't restarted after dropping the key_user_lock, *p
+	will still be NULL when we get back to try_again and look through the tree.
+	
+	It looks like the intention was that the search start over from scratch.
+	
+	Signed-off-by: Alexander Nyberg <alexn@dsv.su.se>
+	Cc: David Howells <dhowells@redhat.com>
+	Signed-off-by: Andrew Morton <akpm@osdl.org>
+	Signed-off-by: Chris Wright <chrisw@osdl.org>
+	Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
+
+<blaisorblade@yahoo.it>
+	[PATCH] uml: quick fix syscall table
+	
+	I'm resending this for inclusion in the -stable tree. I've deleted whitespace
+	cleanups, and hope this can be merged. I've been asked to split the former
+	patch, I don't know if I must split again this one, even because I don't want
+	to split this correct patch into multiple non-correct ones by mistake.
+	
+	Uml 2.6.11 does not compile with gcc 2.95.4 because some entries are
+	duplicated, and that GCC does not accept this (unlike gcc 3). Plus various
+	other bugs in the syscall table definitions, resulting in probable wrong
+	syscall entries:
+	
+	  *) 223 is a syscall hole (i.e. ni_syscall) only on i386, on x86_64 it's a
+	  valid syscall (thus a duplicated one).
+	
+	  *) __NR_vserver must be only once with sys_ni_syscall, and not multiple
+	  times with different values!
+	
+	  *) syscalls duplicated in SUBARCHs and in common files (thus assigning twice
+	  to the same array entry and causing the GCC 2.95.4 failure mentioned above):
+	  sys_utimes, which is common, and sys_fadvise64_64, sys_statfs64,
+	  sys_fstatfs64, which exist only on i386.
+	
+	  *) syscalls duplicated in each SUBARCH, to put in common files:
+	  sys_remap_file_pages, sys_utimes, sys_fadvise64
+	
+	  *) 285 is a syscall hole (i.e. ni_syscall) only on i386, on x86_64 the range
+	  does not arrive to that point.
+	
+	  *) on x86_64, the macro name is __NR_kexec_load and not __NR_sys_kexec_load.
+	  Use the correct name in either case.
+	
+	Note: as you can see, part of the syscall table definition in UML is
+	arch-independent (with everywhere defined syscalls), and part is
+	arch-dependant. This has created confusion (some syscalls are listed in both
+	places, some in the wrong one, some are wrong on one arch or another).
+	
+	Signed-off-by: Paolo 'Blaisorblade' Giarrusso <blaisorblade@yahoo.it>
+	Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
+
+<davem@davemloft.net>
+	[PATCH] sparc: Fix PTRACE_CONT bogosity
+	
+	SunOS aparently had this weird PTRACE_CONT semantic which
+	we copied.  If the addr argument is something other than
+	1, it sets the process program counter to whatever that
+	value is.
+	
+	This is different from every other Linux architecture, which
+	don't do anything with the addr and data args.
+	
+	This difference in particular breaks the Linux native GDB support
+	for fork and vfork tracing on sparc and sparc64.
+	
+	There is no interest in running SunOS binaries using this weird
+	PTRACE_CONT behavior, so just delete it so we behave like other
+	platforms do.
+	
+	From: "David S. Miller" <davem@davemloft.net>
+	Signed-off-by: Chris Wright <chrisw@osdl.org>
+	Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
+
+<davem@davemloft.net>
+	[PATCH] sparc64: Fix copy_sigingo_to_user32()
+	
+	From: jurij@wooyd.org
+	
+	Because this routine was not filling in the siginfo
+	values for si_band and si_fd, this broke applications
+	trying to actually get at this data.
+	
+	This makes the sparc64 code in line with PowerPC64's
+	implementation, which already gets it right.
+	
+	Signed-off-by: David S. Miller <davem@davemloft.net>
+	Signed-off-by: Chris Wright <chrisw@osdl.org>
+	Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
+
+<davem@davemloft.net>
+	[PATCH] : sparc64: use message queue compat syscalls
+	
+	A couple message queue system call entries for compat tasks
+	were not using the necessary compat_sys_*() functions, causing
+	some glibc test cases to fail.
+	
+	From: "David S. Miller" <davem@davemloft.net>
+	Signed-off-by: Chris Wright <chrisw@osdl.org>
+	Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
+
+<gregkh@suse.de>
+	Linux 2.6.11.8
+

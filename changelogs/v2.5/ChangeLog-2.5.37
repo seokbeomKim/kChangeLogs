@@ -1,0 +1,1742 @@
+
+Summary of changes from v2.5.36 to v2.5.37
+============================================
+
+<jejb@mulgrave.(none)>
+	Split x86 into a generic component and a visws component
+
+<jejb@mulgrave.(none)>
+	Arch Abstraction small correction
+	
+	Add missing \n to config.in
+
+<jejb@mulgrave.(none)>
+	X86 arch split
+	
+	Add hook for MCA NMI
+
+<jejb@mulgrave.(none)>
+	Add arch split to setup.h
+
+<jejb@mulgrave.(none)>
+	add ARCH_SETUP hook
+
+<jejb@mulgrave.(none)>
+	More x86 arch splits
+	
+	- Make hyperthreading a separate config parameter
+	- split out the reboot through bios parameters
+
+<jejb@mulgrave.(none)>
+	More Separation
+	
+	- add do_timer_overflow() function for coping with tick overflow
+	- make find_smp_config() gated by its own define
+	- bug fixes and corrections
+
+<jejb@mulgrave.(none)>
+	[arch-split]
+	
+	Final resolve of entry.S problems caused by change set 1.446.
+	
+	Introduces new machine specific entry_arch.h file for defining
+	the SMP interrupts.
+
+<jejb@mulgrave.(none)>
+	[arch-split]
+	
+	move irq_vectors.h to machine specific directory (and add one
+	for visws)
+
+<jejb@mulgrave.(none)>
+	[arch-split]
+	
+	more clean ups of where irq_vectors.h resides (place it in machine
+	specific directory)
+	
+	also tidy up hyperthreading define
+
+<jejb@mulgrave.(none)>
+	move smp_thermal_interrupt from i8259.c to hook in smpboot.c
+
+<jejb@mulgrave.(none)>
+	Remove visws from kernel/pci/Makefile
+
+<jejb@mulgrave.(none)>
+	[ARCH SPLIT]
+	
+	Add back missing hook lost in hand merger
+
+<jejb@mulgrave.(none)>
+	[ARCH SPLIT]
+	
+	Get rid of kludges in setup_arch.h and separate them into
+	setup_arch_pre.h and setup_arch_post.h
+
+<jejb@mulgrave.(none)>
+	Simple fix: move load_cr3 to new reboot.c file
+
+<jejb@mulgrave.(none)>
+	Kill compile warning and correct bitkeeper mismerge
+
+<jejb@mulgrave.(none)>
+	[ARCH-SPLIT]
+	
+	add back thermal interrupt correctly
+
+<jejb@mulgrave.(none)>
+	Add back specific CONFIG_X86_HT gate for Xeon/P4 hyperthreading
+
+<jejb@mulgrave.(none)>
+	[x86 arch split]
+	
+	Add better documentation to the hooks.
+
+<jejb@mulgrave.(none)>
+	[arch/i386 subarch split] rename directories, move mpparse back to kernel
+
+<jejb@mulgrave.(none)>
+	Remove last CONFIG_VISWS remnants from arch/i386/kernel
+
+<jejb@mulgrave.(none)>
+	Add comment change back to visws
+
+<ralf@dea.linux-mips.net>
+	Redo locking of ax25_list with spinlocks.
+
+<ralf@dea.linux-mips.net>
+	Properly handle sleep race without cli.
+
+<ralf@dea.linux-mips.net>
+	Brain is short, so ...
+
+<ralf@dea.linux-mips.net>
+	Properly protect ax25_uid_list with a spinlock.
+
+<ralf@dea.linux-mips.net>
+	Protect ax25_route_list by a spinlock.
+
+<ralf@dea.linux-mips.net>
+	Replace cli / sti with spinlock for protection of protocol_list.
+
+<ralf@dea.linux-mips.net>
+	Protect ax25_dev_list with it's own spinlock replacing the previous
+	cli / sti mess.
+
+<ralf@dea.linux-mips.net>
+	Protect linkfail_list with a spinlock instead of the previous cli / sti mess.
+
+<ralf@dea.linux-mips.net>
+	Initialize spinlock.
+
+<ralf@dea.linux-mips.net>
+	Protect the ax25 fragmentation code with it's own spinlock.
+
+<ralf@dea.linux-mips.net>
+	Protect listen_list also with a spinlock instead of cli / sti.
+
+<jejb@mulgrave.(none)>
+	[arch split] merge cli->local_irq_disable change
+
+<ralf@dea.linux-mips.net>
+	Eleminate SOCKOPS_WRAPPED by using the BKL directly.
+
+<ralf@dea.linux-mips.net>
+	Convert ax25_route_list by a rw_lock, no longer an interrup-save
+	spinlock.
+	Reformat switch statements.
+
+<ralf@dea.linux-mips.net>
+	Split ax25_rt_ioctl() into several functions.
+
+<ralf@dea.linux-mips.net>
+	Eleminate race caused by static variable in ax25_rt_find_route.
+
+<ralf@dea.linux-mips.net>
+	Use ISO style labeled initializers.
+
+<ralf@dea.linux-mips.net>
+	Don't use deliver_to_old_ones anymore.
+
+<ralf@dea.linux-mips.net>
+	Reformat.
+
+<ralf@dea.linux-mips.net>
+	Delete dead code.
+
+<ralf@dea.linux-mips.net>
+	Implement reference counting and delayed destruction of routes.
+	Fix arguments to write_lock & co. of which many were passed the lock, not a pointer to one.
+
+<ralf@dea.linux-mips.net>
+	Implement reference counting for routes.
+
+<ralf@dea.linux-mips.net>
+	Redo race avoidance with cli with wait_event-like construction.
+
+<ralf@dea.linux-mips.net>
+	Replace cli & co for synchronization with spinlocks.
+
+<ralf@dea.linux-mips.net>
+	Kill remaining sti().
+
+<ralf@dea.linux-mips.net>
+	Move ax25_put_route to <net/ax25.h>.
+
+<ralf@dea.linux-mips.net>
+	Add missing lock_kernel() to ax25_connect.
+	Implement proper locking in ax25_accept() and nr_accept().
+	Add back line of code lost in last manual merge.
+
+<ralf@dea.linux-mips.net>
+	Implement locking of internal data for NET/ROM and ROSE.
+	Do socket locking for AX.25
+	Delete trailing whitespace.
+	Exchange prehistoric changelogs in headers with GPL + copyright header.
+	Reformat some of the NET/ROM and ROSE code to 80 columns.
+
+<ralf@dea.linux-mips.net>
+	More reformatting of switch statements.
+
+<ralf@dea.linux-mips.net>
+	Implement socket locking for AX.25, NET/ROM and ROSE timers.
+
+<ralf@dea.linux-mips.net>
+	Replace interrupt-safe spinlocks with their bh-safe equivalents.
+
+<ralf@dea.linux-mips.net>
+	Update todo list.
+
+<ralf@dea.linux-mips.net>
+	Kill trailing whitespace.
+
+<ralf@dea.linux-mips.net>
+	Add XID and TEST frame definitions.
+
+<jejb@mulgrave.(none)>
+	Merge by hand
+
+<mochel@osdl.org>
+	Update driver model documentation.
+
+<mochel@osdl.org>
+	Add class_data field to struct device, for the class drivers to use.
+
+<mochel@osdl.org>
+	Add add() callback to struct bus_type. 
+	
+	This is so other entities in the kernel can inform the bus about devices
+	that it either doesn't know about yet (like when using the firmware to 
+	enumerate the system) or that it wouldn't otherwise find (for the same 
+	reason, or because they're weird legacy devices that won't be probed for).
+
+<mochel@osdl.org>
+	Add struct bus_type platform_bus and document its intentions.
+	
+	The platform bus is a pseudo-bus meant to group legacy devices. Not only 
+	does it give legacy devices a common parent and bus type, it provides the
+	necessary infrastructure to allow for firmware-based enumeration of the
+	system's devices (using the platform's add() callback).
+
+<mochel@osdl.org>
+	clean up driverfs removal of directories
+	
+	- Make sure we have a valid inode when deleting a dentry
+	- use list_for_each_safe instead of manually walking ->d_subdirs
+	- don't do dget() in driverfs_mknod, since we already have a reference to it via driverfs_create_*
+	- so, remove extra dput() in driverfs_remove_dir and driverfs_remove_file
+	- Don't do get_mount() in driverfs_create_file, since it was done for the directory
+	- so remove extrra put_mount() from driverfs_remove_*
+	- Call d_invalidate() to unhash the files and directories instead of d_delete
+	- Remove our own d_unhash(), since d_invalidate() does the equivalent
+	- inline driverfs_rmdir in driverfs_remove_dir since its the only user and it prevents us from
+	  taking the dir's semaphore twice.
+
+<thockin@freakshow.cobalt.com>
+	Change drivers/net/natsemi.c to use netif_msg_*()
+	Clean up some output messages in natsemi enet driver
+
+<thockin@freakshow.cobalt.com>
+	get rid of a couple extraneous natsemi enet error messages
+
+<thockin@freakshow.cobalt.com>
+	Natsemi ethernet driver fixes:
+	* smaller ring
+	* no more CONFIG_CABLE_MAGIC
+	* new short-cable bug detection (from NSC)
+	* comment previously undocumented stuff
+	* protect PGSEL with the lock
+
+<thockin@freakshow.cobalt.com>
+	Natsemi ethernet fixes:
+	* cleanup options
+	* formatting
+	* fix RX FIFO Overrun
+	* WoL interrupt fix
+
+<thockin@freakshow.cobalt.com>
+	Natsemi enet: catch wraparound in ETHTOOL_GEEPROM
+
+<thockin@freakshow.cobalt.com>
+	natsemi enet double decl compile fix
+
+<ralf@dea.linux-mips.net>
+	Taking over maintenance for AX.25, ROSE and NET/ROM for 2.5.
+
+<agrover@groveronline.com>
+	ACPI: Blacklist improvements
+	1) Split blacklist code out into a separate file.
+	2) Move checking the blacklist to very early. Previously, we would use ACPI
+	tables, and then halfway through init, check the blacklist -- too late.
+	Now, it's early enough to completely fall-back to non-ACPI.
+	3) Some FACP -> FADT cleanups, too.
+
+<agrover@groveronline.com>
+	ACPI: New blacklist entries (Andi Kleen)
+
+<agrover@groveronline.com>
+	ACPI:
+	- Use early table mapping code from acpitable.c (Andi Kleen)
+	- Make a warning a little more verbose
+
+<agrover@groveronline.com>
+	ACPI: Include proper header for acpi_enter_sleep_state() in suspend.c
+
+<mochel@osdl.org>
+	driver model: Don't reset dev->driver until after we call dev->driver->remove. 
+	
+	This fixes an Oops in the USB code that was using ->driver, both for checking what driver to
+	use and calling into it. 
+	
+	From Greg KH.
+
+<mochel@osdl.org>
+	PCI: make sure the devices are named before they're registered.
+
+<mochel@osdl.org>
+	driver model: use list_for_each_safe in device_shutdown(), since devices can be
+	removed from the global list in the process.
+	
+	Also, call put_device() on the last device. 
+	
+	Origintally from Andrew Morton.
+
+<mochel@osdl.org>
+	ACPI: move PREFIX to a common header
+
+<mochel@osdl.org>
+	ACPI: Move sleep code from system.c to sleep.c
+	
+	struct acpi_system was removed, because it was an unncessary abstraction (a single array suffices).
+	All functions have been updated to reference the array. 
+	
+	Unnecessary headers were removed, including ones implicitly included.
+	
+	procfs files controlling sleep support were moved. 
+	
+	sysrq handler and registration were removed. 
+	
+	acpi_sleep_init() made an implicit subsys_initcall.
+
+<mochel@osdl.org>
+	ACPI: Remove unnecessary objects and code from drivers/acpi/system.c
+	
+	First, we remove acpi_system_driver, since it's not really a driver, and making it its own 
+	object is just silly. This allows us to not have to register it, and we can hence remove
+	the add and remove callbacks. 
+	
+	For initialization, acpi_system_add_fs() has been inlined in acpi_system_init(). The proc file
+	creation was cleaned up to use create_proc_read_entry() where possible. Any failures now
+	result in a goto Error, which prints the error message previously replicated after each
+	failure. We also remove all the files that were created if that happens. acpi_system_init()
+	was made a subsys_initcall and declared static. 
+	
+	The acpi_system_exit() code and friends was removed, since it's never, ever called. 
+
+<mochel@osdl.org>
+	ACPI: break procfs handlers for acpi events and debug levels out of drivers/acpi/system.c and into their own files.
+
+<mochel@osdl.org>
+	ACPI: make CONFIG_ACPI_SLEEP _not_ dependent on CONFIG_SOFTWARE_SUSPEND
+	and add help text.
+
+<mochel@osdl.org>
+	ACPI: Remove dead code from drivers/acpi/bus.c
+	
+	CONFIG_LDM is useless; you're stuck with it now :)
+	
+	Also, the struct device_driver callbacks have never been used. The objects that are being
+	called 'devices' aren't really devices anyway; they're merely firmware representations of them...
+	
+	Remove the unused (wrapped in #ifdef 0) functions acpi_platform_add() and acpi_platform_remove().
+	
+	Remove the unused (commented out) functions acpi_add_device_fs() and acpi_remove_device_fs().
+
+<mochel@osdl.org>
+	ACPI: Remove acpi_exit() and friends, since it's never called. 
+	
+	Also, make sure acpi_init() is declared static and not prototyped anywhere.
+
+<agrover@groveronline.com>
+	ACPI: Fix Config.in to allow CONFIG_ACPI_SLEEP to be set properly
+
+<agrover@groveronline.com>
+	ACPI: Print the DSDT stats on boot, just like the other ACPI tables.
+
+<mochel@osdl.org>
+	ACPI: set acpi_disabled = 1 if acpi_bus_init() fails, and check this in the
+	init functions for the other components.
+	
+
+<mochel@osdl.org>
+	ACPI: Move all namespace scanning functions from drivers/acpi/bus.c to drivers/acpi/scan.c
+	
+	Also, trigger bus scanning in acpi_scan_init(), which is made into an initcall.
+
+<mochel@osdl.org>
+	ACPI: remove the rest of the explicit init function calls and move them 
+	into the various files and make them initcalls.
+	
+
+<mochel@osdl.org>
+	ACPI: Remove call to acpi_ec_ecdt_probe() in acpi_bus_init() and make it a part 
+	of acpi_ec_init().
+
+<mochel@osdl.org>
+	ACPI: Treat acpi_root_dir as acpi_root_dir when initializing (not acpi_device_dir(acpi_root))
+	(and fix OOPS on boot because acpi_root is NULL).
+	
+
+<mochel@osdl.org>
+	ACPI: Move per-componet defines into component files. Only share in headers what is needed by 
+	multiple users.
+
+<mochel@osdl.org>
+	ACPI: Add call to acpi_ec_ecdt_probe() from acpi_bus_init() again and fix the comment to 
+	explicitly say that it must be called before acpi_initialize_objects().
+
+<mochel@osdl.org>
+	ACPI: Don't use driver model for struct acpi_device; use driverfs directly.
+	
+	Instead of initializing and registering a struct device for each acpi_device, just
+	initialize and create a driverfs directory for each one. ACPI devices aren't devices,
+	and shouldn't be treated as such. They are firmware objects that describe devices.
+	They should still have representation in driverfs (and symlinks to the devices they
+	describe), but none of the other driver model overhead. 
+	
+	In order to do this, we also add some ACPI bindings for driverfs. It gets its own top-
+	level directory now (though it will soon be under a more generic 'platform' directory).
+
+<mochel@osdl.org>
+	ACPI: move sleep file defines to drivers/acpi/sleep.c (where they're used)
+
+<mochel@osdl.org>
+	ACPI: greatly simplify acpi device and acpi driver binding.
+	
+	First, introduce a global acpi device list, and insert devices into it when they're discovered. Now,
+	instead of having to recurse through our own device tree, we simply walk the list of devices. Access
+	is protected using a new spinlock. This completely obviates the need for the complicated acpi_bus_walk(). 
+	
+	acpi_bus_attach() and acpi_bus_unattach() become acpi_driver_attach() and acpi_driver_detach() to better
+	identify what they're doing. They do the walking of the device list themselves.
+	
+	acpi_bus_find_driver() is converted to list_for_each_safe() and use the same new spinlock.
+	
+	struct acpi_driver::references is changed from an int to an atomic_t. No lock is needed anymore for 
+	incrementing/decrementing the refcount. 
+
+<anton@samba.org>
+	ppc64: remove old debug, crashme found it pretty fast
+
+<acme@conectiva.com.br>
+	[LLC] change semantics of recvmsg and sendmsg
+	
+	Now recvmsg will not discard the packet after reading less than
+	skb->len, keeping the rest of the skb data in receive_queue.
+	
+	sendmsg will not barf if a packet bigger than the mtu is sent,
+	it'll politely only copy what is possible and tell this to
+	userland.
+	
+	With this my openssh with PF_LLC works flawlessly 8) Time to
+	securely connect to a machine that has no ip address :-) This is
+	just to test how robust is PF_LLC, but sekurity guys may like it
+	for things like stealth IDS or bridge boxes with no IP addresses.
+
+<anton@samba.org>
+	ppc64: ppc_md cleanup
+
+<anton@samba.org>
+	ppc64: pci updates
+
+<paulus@samba.org>
+	PPC32: Rip out the BK Id tags from arch/ppc and include/asm-ppc.
+	
+	The tags were slightly useful when the kernel maintainers weren't
+	using BK, but these days they are more trouble than they are worth.
+	They tend to cause patch rejects, and often end up getting turned
+	into the fixed form (rather than the %x% tag form).
+
+<anton@samba.org>
+	ppc64: the the strikes again
+
+<anton@samba.org>
+	ppc64: we use rtas for all config accesses, so remove the unecessary ioremaps
+
+<anton@samba.org>
+	ppc64: Allocate hugepages and exit_group syscalls
+
+<anton@samba.org>
+	ppc64: sanity check PC and SP before preloading them
+
+<anton@samba.org>
+	ppc64: DISCONTIGMEM updates
+
+<anton@samba.org>
+	ppc64: enable exit_group syscall
+
+<paulus@samba.org>
+	PPC32: Don't count up the "zombie" MMU hashtable entries.
+	
+	We used to get MMU hashtable entries which weren't associated
+	with any current process.  Since the low-level PPC MM code no
+	longer does this, there is no use counting these entries, since
+	there are never any of them.
+
+<davem@nuts.ninka.net>
+	[TIGON3]: Fiber WOL support, chip clock bug fix.
+	- Support wake-on-lan with Fiber connections properly,
+	when possible.
+	- On device probe and device open, get out of 44MHZ core
+	clock rate if necessary.
+
+<davem@nuts.ninka.net>
+	arch/sparc64/kernel/sparc64_ksyms.c: Remove kbd_pt_regs export, kernel/ksyms.c does it.
+
+<davem@nuts.ninka.net>
+	[SPARC]: Move over to for_each_process.
+
+<zaitcev@redhat.com>
+	[SPARC]: Fix noncache leaks.
+
+<davem@nuts.ninka.net>
+	[TIGON3]: Comment out tg3_enable_ints PCI write flush for now.
+
+<bart.de.schuymer@pandora.be>
+	[BRIDGE]: Add Ethernet bridge tables support.
+
+<taka@valinux.co.jp>
+	arch/i386/lib/checksum.S:csum_partial Handle oddly addressed buffers correctly.
+
+<mochel@osdl.org>
+	ACPI: lots of minor cleanups in drivers/acpi/scan.c
+	
+	These should clean up the code a bit by doing:
+	
+	- removing unncessary checks.
+	- removing the commented-out code
+	- remove some function tracing from the small, benign functions
+	- streamline the code in acpi_bus_match
+	- invert a few instances of if (!true) err else do_something; to if (true) do_something else err;
+	- break acpi_bus_add into 5 more distinct helper functions
+
+<davem@nuts.ninka.net>
+	[SPARC]: First cut of hugetlb on sparc64, 4MB currently.
+
+<davem@nuts.ninka.net>
+	arch/sparc64/defconfig: Update.
+
+<anton@samba.org>
+	ppc64: Actually restore FP regs in rt_sigreturn
+
+<trini@kernel.crashing.org>
+	PPC32: Boot wrapper updates.
+	
+	The major changes here are:
+	
+	(1) Combine the pmac and chrp directories into a single
+	`openfirmware' directory, since both use Open Firmware and the code
+	was very similar.
+	
+	(2) Move the Open Firmware interfaces out to a `of1275' directory
+	and put them in separate files so we only include the ones we need.
+	This work is due to Leigh Brown.
+	
+	(3) On PReP and embedded, get the memory size from the memory
+	controller.  Don't try to ask Open Firmware even on PRePs which
+	have it.
+
+<anton@samba.org>
+	ppc64: fix handling of sigaltstack
+
+<mochel@osdl.org>
+	ACPI: don't match every device to every driver.
+	
+	acpi_bus_match() wasn't returning an error if the device's hid didn't match
+	and it didn't have a _CID.
+	
+	Also, don't let gcc complain about unused variables when debugging isn't 
+	enabled.
+
+<davem@nuts.ninka.net>
+	[TIGON3]: Fix link polarity setting on all non-5700 chips.
+
+<davem@nuts.ninka.net>
+	[TIGON3]: Optimize NAPI irq masking a bit.
+
+<agrover@groveronline.com>
+	ACPI: Add missing include to sleep.c
+
+<davem@nuts.ninka.net>
+	[TIGON3]: Define NIC_SRAM_MBUF_POOL_SIZE64 properly.
+
+<anton@samba.org>
+	ppc64: Use generic asm/offset.h creation rules
+
+<anton@samba.org>
+	ppc64: fix some compiler warnings
+
+<anton@samba.org>
+	ppc64: print cpus in hex since we ask for them in hex
+
+<davem@nuts.ninka.net>
+	fs/filemap.c: Add back mistakedly removed flush_dcache_page.
+
+<zaitcev@redhat.com>
+	[SPARC32]: Fix console, sunsu, and IO macros.
+
+<anton@samba.org>
+	ppc64: clean up some 2.4 - 2.5 differences
+
+<akpm@digeo.com>
+	[PATCH] move madvise implementation into madvise.c
+	
+	Patch from Christoph Hellwig moves the madvise implementation out of
+	filemap.c and into its own .c file.  No other changes are made.
+
+<akpm@digeo.com>
+	[PATCH] consolidate the VMA splitting code
+	
+	Patch from Christoph Hellwig.  250 lines of code go away.
+	
+	The three syscalls madvice/mlock/mprotect all change attributes of
+	memory regions.  These attributes are stored in vm_area_structs (VMAs).
+	
+	The current code for those syscalls does this by having four
+	subroutines each, for changing a whole VMA, one for just setting new
+	flags if a full VMA is affected, one that creates a new VMA in the
+	right part of the old one and sets the flags there, one for the left
+	part, and one that splits of both the left and the right part and sets
+	the new flags in the middle.
+	
+	This patch makes those routines create new VMAs on the left and on te
+	right hand first and then always setting the flags in the old VMA.
+	Together with using a library function (split_vma) to to the split this
+	simplies the code and makes it more readable.  As a side affect it
+	fixes some VM accounting bugs observed by Hugh Dickins.
+
+<akpm@digeo.com>
+	[PATCH] mmap cleanup and lock ranking fixes
+	
+	Patch by Christoph Hellwig.
+	
+	This patch is cleanup of mmap.c with the side-effect of making the lock
+	order of mapping->i_shared_lock and mm->page_table_lock consistant.
+	
+	__remove_shared_vm_struct is merged into its only caller,
+	remove_shared_vm_struct, which now also does the job of
+	{lock,unlock}_vma_mappings itself, to avoid duplicate checks.
+	
+	Similarly, vma_link is updated to take and release i_shared_lock
+	itself, fixing the lock order.  split_vma is updated to use
+	insert_vm_struct instead of using __insert_vm_struct and taking
+	page_table_lock and i_shared_lock itself (wrongly).  __insert_vm_struct
+	is removed as it is unused now.
+
+<akpm@digeo.com>
+	[PATCH] export unmap_underlying__metadata()
+	
+	From Anton Altaparmakov
+	
+	The below bk patch against your current bk repository adds an export
+	for fs/buffer.c::unmap_underlying_metadata() to modules.
+	
+	It is required to make ntfs compile as a module in the current kernel.
+	
+	Note that NTFS doesn't currently dirty bufferheads of the underlying
+	blockdevice and as such could probably live without calling
+	unmap_underlying_metadata() but as soon as we enable writing to
+	compressed files it will do so and considering some of the
+	infrastructure code is already present I would rather not rip it out
+	now.
+
+<akpm@digeo.com>
+	[PATCH] move the buffer_head IO functions into buffer.c
+	
+	Patch from Christoph Hellwig.
+	
+	Move the buffer_head-based IO functions out of ll_rw_blk.c and into
+	fs/buffer.c.  So the buffer IO functions are all in buffer.c, and
+	ll_rw_blk.c knows nothing about buffer_heads.
+	
+	This patch has been acked by Jens.
+
+<akpm@digeo.com>
+	[PATCH] Add /proc/meminfo:Slab
+	
+	Display the total slab memory in /proc/meminfo.  Handy while we play
+	with the slab pruning code.
+	
+	This info is also available via /proc/slabinfo, but I think this
+	convenience is worth the extra few lines.
+
+<ahaas@neosoft.com>
+	[PATCH] designated initializer patches fs_freevxfs
+	
+	  Here's a C99 designated initializer patch for fs/freevxfs. The
+	  patch is against 2.5.35.
+
+<bhards@bigpond.net.au>
+	[PATCH] Re: header cleanup - drivers_char_eurotechwdt.c
+	
+	   <linux/smp_lock.h> has the normal idempotent construction.
+	
+	   The attached file removes the second #include.
+
+<james@cobaltmountain.com>
+	[PATCH] Typos in drivers_s390_net_iucv.c
+	
+
+<lucasvr@terra.com.br>
+	[PATCH] 2.5.31_drivers_i2c_i2c-philips-par.c
+	
+	  This is a trivial patch already applied in the -ac tree for the 2.4.19 kernel.
+	  Patch for i2c-philips-par.c free() the memory in the case of problems loading
+	  the adapter.
+
+<rusty@rustcorp.com.au>
+	[PATCH] Re: per_cpu data question
+	
+	  I suck.  Lvalues continue to haunt me.  This works for me.
+	
+	  BTW, I prefer to have bug reports cc'd to linux-kernel, so the
+	  results are archived.  Plus, public humiliation is good for the
+	  soul.
+
+<rusty@rustcorp.com.au>
+	[PATCH] Designated initializers for drivers_bluetooth
+	
+	The old form of designated initializers are obsolete: we need to
+	replace them with the ISO C forms before 2.6.  Gcc has always supported
+	both forms anyway.
+
+<ahaas@neosoft.com>
+	[PATCH] designated initializer patches for fs_
+	
+	  Here's a resend of C99 patches for the files in fs.
+
+<bunk@fs.tum.de>
+	[PATCH] fix cyclades.c compile error
+	
+	cyclades.c doesn't compile cleanly: the problem is that older -dj
+	patches contained patches to both cyclades.c and cyclades.h but only the
+	former one went into your tree.  This syncs up the header file too.
+
+<urban@teststation.com>
+	[PATCH] smbfs - C99 stuff
+	
+	Art Haas did these.
+
+<anton@samba.org>
+	ppc64: remove some old syscalls from the 64bit syscall table
+
+<anton@samba.org>
+	ppc64: implement dump_stack
+
+<anton@samba.org>
+	ppc64: CLEARTID/SETTID fixes
+
+<jejb@mulgrave.(none)>
+	add back acpi targets lost in arch-split merge
+
+<axboe@suse.de>
+	[PATCH] impose sane queue restrictions
+	
+	Impose sane limits on queue restrictions. that means:
+	
+	 - q->max_sectors must be able to at least span a page
+	 - q->max_phys_segments and q->max_hw_segments must be at least 1
+	 - q->max_segment_size must be at least page sized
+	 - q->seg_boundary_mask must be at least PAGE_CACHE_SIZE-1
+
+<axboe@suse.de>
+	[PATCH] bio_add_page()
+	
+	This is bio_add_page(), 100% identical to the version I sent out for
+	comments earlier this week.  With the previous queue restriction patch,
+	this guarentees that we can always add a page worth of data to the bio.
+	bio_add_page() returns 0 on success, and 1 on failure.  Either the page
+	is added completely, or the attempt is aborted.
+	
+	bio_add_page() uses the normal queue restrictions to determine whether
+	we an add the page or not. if a queue has further restrictions, it can
+	define a q->merge_bvec_fn() to further impose limits.
+	
+	Patch also includes changes to ll_rw_kio(), if for nothing else to
+	demonstrate how to use this piece of instrastructure.
+
+<axboe@suse.de>
+	[PATCH] make mpage use bio_add_page()
+	
+	This makes mpage use bio_add_page().  It has the added advantage that
+	users don't need to have deep knowledge about what the different bio
+	fields mean, nor does it have to abuse some of them while building the
+	bio.
+
+<axboe@suse.de>
+	[PATCH] partial bio completion notification
+	
+	Make bio->bi_end_io() take bytes_done and actual error as argument. This
+	enables partial completion of bio's, which is important for latency
+	reasons (bio can be huge, for slow media we want page-by-page
+	completions).
+	
+	I think I got most of the bi_end_io() functions out there, but I might
+	have missed a few. For the record, if you don't care about partial
+	completions and just want to be notified when the entire bio completes,
+	add a
+	
+		if (bio->bi_size)
+			return 1;
+	
+	to the top of your bi_end_io(). It should return 0 on completion.
+	bio_endio() will decrement bio->bi_size appropriately, it's recommended
+	for people to go through that. Otherwise they will have to control
+	BIO_UPTODATE and bi_size decrement themselves, there's really no reason
+	to do that. I've deliberately avoided doing any functional changes to
+	any of the end_io functions, as I think that would only make the patch
+	more complex. It's simple right now, but this being i/o paths I prefer
+	(as usual) to be careful and take small steps. The mpage_end_io_read()
+	do-vecs-at-the-time change can come right after this, for instance.
+
+<axboe@suse.de>
+	[PATCH] jfs and xfs update
+	
+	missed updating xfs and jfs to new bi_end_io handling
+
+<axboe@suse.de>
+	[PATCH] scsi doesn't need locking around end_that_request_first()
+	
+	Seems James introduced this one, it's not needed though. Will take a
+	look at eh thread now...
+
+<axboe@suse.de>
+	[PATCH] xfs, use bio_add_page()
+	
+	XFS now needs to use bio_add_page() as not to build bio's of the wrong
+	size. Also makes the bio build nicer.
+
+<torvalds@home.transmeta.com>
+	Missing EOL noticed by Chuck Lever
+
+<torvalds@home.transmeta.com>
+	Make pid_max grow dynamically as needed.
+
+<drow@false.org>
+	[PATCH] Fix for ptrace breakage
+	
+	This patch consolidates zap_thread into reparent_thread, and fixes
+	__will_become_orphaned_pgrp to check p->real_parent instead of
+	p->parent.
+
+<cel@citi.umich.edu>
+	[PATCH] (1/2) clean up RPC over TCP transport socket connect
+	
+	This provides clean up and bug fixes for the RPC layer's TCP socket
+	connection management logic.  Trond, Alexey, and DaveM have seen this
+	patch.  i've been running it for several weeks here and feel it is ready
+	for wider testing.  these two patches are prerequisites for further
+	clean-ups and fixes for RPC over TCP.
+	
+	bugs fixed:
+	+  TCP connection establishment now times out after 60 seconds instead of
+	   hanging for ten minutes.  60 seconds is more in line with how long a
+	   server takes to reboot.
+	+  on a soft-mounted file system, TCP reconnections now time out and fail
+	   the RPC request, like most other NFS clients, instead of hanging the
+	   NFS client until the server comes back.
+	+  on hard-mounted file systems, the RPC layer now delays 15 seconds
+	   before retrying after a failed connection attempt instead of retrying
+	   as soon as it can.
+	+  TCP connection error recovery is now more verbose so users can see why
+	   their NFS sessions are hung.  this can be tuned with future patches if
+	   it is unreasonably noisy.
+	+  the TCP connect logic is cleaned up so adding checks for new errnos
+	   is easier.
+	+  the same code now handles both initial connection and reconnection.
+	   the original initial connection code did not have comprehensive error
+	   handling.
+	+  some obscure design elements are now documented in comments.
+	+  kfree was used by mistake in xprt_destroy.
+
+<cel@citi.umich.edu>
+	[PATCH] (2/2) clean up RPC over TCP transport socket connect
+	
+	This renames *reconn* to *conn* since the same code now handles both
+	initial TCP connect, and TCP reconnection, and corrects some comments.
+	against 2.5.36, requires earlier patch (1/1).
+
+<cel@citi.umich.edu>
+	[PATCH] stricter type checking for rpc auth flavors
+	
+	This implements stricter type checking for rpc auth flavors.  it is a
+	prerequisite for RPC GSSAPI and its authentication pseudoflavors.
+	please apply it.
+
+<cel@citi.umich.edu>
+	[PATCH] rename svc_get/putlong as svc_get/putu32
+	
+	This renames the svc_getlong and svc_putlong macros as svc_getu32 and
+	svc_putu32.  this is simple clean up and is obviously correct.  it was
+	part of the patch that implements stricter type checking for rpc auth
+	flavors.
+
+<axboe@suse.de>
+	[PATCH] bio_endio() cleanups
+	
+	Make BIO_UPTODATE a sticky good flag, only clearing it on error.
+	
+	I pondered leaving the BIO_UPTODATE clearing up to the bi_end_io()
+	functions, but decided against that and left it in bio_endio() as
+	before.
+	
+	I also added a bit of debug in bio_endio() to detect callers specifying
+	more than bi_size i/o complete.  And to top it all of, bio_endio()
+	documentation.  This is mainly to clear my back when people bitch about
+	using bio_endio(), I can say RTFM without worry :-)
+
+<axboe@suse.de>
+	[PATCH] umem and DAC960 bio_endio()
+	
+	update DAC960 and umem to new bio_endio() completions
+
+<hch@lst.de>
+	[PATCH] remove scsi_queue.c
+	
+	it has just one function nowdays, and that one would be much better
+	static in scsi.c
+
+<jgarzik@mandrakesoft.com>
+	synchronize_irq fixups for old-OSS audio driver cs4281
+
+<jgarzik@mandrakesoft.com>
+	Add netif_carrier_xxx support to 3c59x net driver
+	(based on patch from Nelson Tan Gin Hwa, via Andrew Morton)
+
+<axboe@suse.de>
+	[PATCH] Update md to new i/o completions
+	
+
+<jgarzik@mandrakesoft.com>
+	Merge up to version 1.04 of sundance net driver:
+	* New Rx polling scheme to prevent congestion
+	* Tx timeout recovery
+	* Enhanced ethtool support
+	* Fix problems with multiport sundance boards
+	(contributed by Edward Peng @ D-Link)
+
+<davem@nuts.ninka.net>
+	arch/sparc64/Makefile: Undef sparc too when building vmlinux.lds.s
+
+<zaitcev@redhat.com>
+	[SPARC]: RTC build fixes and allow as a module.
+
+<jgarzik@mandrakesoft.com>
+	Add support for Cirrus Logic GD7548 chip to clgenfb fbdev driver
+	(contributed by gabucino@mplayerhq.hu)
+
+<manfred@colorfullife.com>
+	[RANDOM]: Fix bugs in ipv{4,6} ID/SEQ generation, mostly SMP issues.  Reviewed by Ted Tso
+
+<zaitcev@redhat.com>
+	[SPARC]: Export syms necessary for rtc as module.
+
+<zaitcev@redhat.com>
+	drivers/net/tun.c: Fix warning and missing overflow check.
+
+<jt@hpl.hp.com>
+	irda update 1/6:
+	o [CRITICA] Remove correct IAS Attribute/Object even if name is dup'ed
+	o [CORRECT] Make irqueue 64 bit compliant (__u32 -> long)
+	o [FEATURE] Don't use random handle for IrLMP handle, use self
+	  Remove dependancy on random generator in stack init
+
+<jt@hpl.hp.com>
+	irda update 2/6:
+	o [CORRECT] Make sure LAP address is sane, which mean not NULL,
+	  not BROADCAST and not already in use by another link.
+
+<davem@nuts.ninka.net>
+	drivers/char/rtc.c: For sparc, include linux/pci.h instead of asm/pci.h
+
+<jt@hpl.hp.com>
+	irda update 3/6:
+	o [FEATURE] New hashbin locking scheme for irqueue
+	o [FEATURE] Get rid of old broken hashbin locking schemes
+	o [FEATURE] Lock hasbins while enumerating it in various places
+	o [CORRECT] Remove all remaining "save_flags(flags);cli();"
+	o [CORRECT] Fix two "return with spinlock" found by Stanford checker
+
+<kaos@ocs.com.au>
+	[PATCH] Remove Keith Owens from MAINTAINERS
+	
+
+<jt@hpl.hp.com>
+	irda update 4/6:
+	o [FEATURE] Do the hashbin locking fixes for IrCOMM and IrLAN
+	o [CORRECT] Remove all "save_flags(flags);cli();" in IrCOMM/IrLAN
+	o [CORRECT] Fix other locking issues in IrCOMM
+
+<jt@hpl.hp.com>
+	irda update 5/6:
+	o [CORRECT] Remove all "save_flags(flags);cli();" in IrDA driver
+	o [FEATURE] Rework broken locking in irport
+	o [FEATURE] Finish locking cleanup in nsc-ircc
+	o [FEATURE] Improve locking in smc-ircc & w83977af_ir
+
+<jt@hpl.hp.com>
+	irda update 6/6:
+	o [CORRECT] Remove all "save_flags(flags);cli();" in IrDA ali driver
+
+<davem@nuts.ninka.net>
+	kernel/signal.c: Handle SIGEMT.
+
+<davem@nuts.ninka.net>
+	[SPARC]: Source net/ax25/Config.in
+
+<davem@nuts.ninka.net>
+	[AX25]: Make ax25_rt_destroy return void.
+
+<jgarzik@mandrakesoft.com>
+	Fix __FUNCTION__ breakage in several irda drivers
+
+<davem@nuts.ninka.net>
+	[AX25]: Remove unused label from ax25_get_socket, add XXX comment.
+
+<davem@nuts.ninka.net>
+	[NETROM]: Fix setting of nr in nr_transmit_buffer.
+
+<davem@nuts.ninka.net>
+	[ROSE]: Kill 64-bit warning in rose_connect.
+
+<anton@samba.org>
+	ppc64: only calculate local when we need it, from paulus
+
+<jgarzik@mandrakesoft.com>
+	Add two NETIF_MSG_xxx constants to linux/netdevice.h,
+	that are used in natsemi net driver
+
+<kai@tp1.ruhr-uni-bochum.de>
+	kbuild: Remove O_TARGETS which creeped back in
+	
+	O_TARGET should basically be dead for non arch-specific code in 2.5
+	(it's still functional, though), so kill the cases where it creeped back
+	in. 
+
+<agrover@groveronline.com>
+	ACPI: Interpreter update to 20020918
+
+<kai@tp1.ruhr-uni-bochum.de>
+	kbuild: Remove O_TARGET in arch/i386/*
+	
+	Of course it's possible to use the standard "built-in.o" in arch/* as well,
+	so do it for i386 - other archs still using O_TARGET are not affected by
+	this change.
+
+<acme@conectiva.com.br>
+	[LLC] timer cleanup: use mod_timer
+	
+	. Use a smaller default for LLC_ACK_TIME.
+	. Added much more info about core sock internal state in /proc/net/802.2
+
+<agrover@groveronline.com>
+	ACPI: Ensure that the SCI has the proper polarity and trigger, even
+	on systems that do not have an interrupt override entry in the MADT.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	kbuild: Remove O_TARGET from {kernel,mm,fs,...}/Makefile
+	
+	It's gone almost everywhere else already, and will eventually make for
+	a nicer top-level Makefile.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	kbuild: Use new $(libs-y) in arch/i386/Makefile
+	
+	It's shorter and more along the lines of the other "new-style"
+	statements.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	kbuild: Always make an L_TARGET "lib.a"
+	
+	As we have a standard O_TARGET ("built-in.o"), use a standard L_TARGET
+	as well ("lib.a"), which is what was used in the majority cases already,
+	anyway.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	kbuild: Lost update to top-level Makefile
+	
+	Sometimes bk still gets me... The previous changes won't work without
+	the updated top-level Makefile ;)
+
+<kai@tp1.ruhr-uni-bochum.de>
+	ISDN: Fix typo for hisax/st5481 driver
+	
+	Fix a typo which was introduced when updating st5481 for the
+	USB API changes.
+
+<jt@hpl.hp.com>
+	This is Wireless Extension v15. Mostly enhanced iwpriv support
+	for the HostAP driver, with few cleanups and new unused
+	definitions. The most contention change is that this version now
+	requires user space to provide the buffer size when making a GET (to
+	check buffer overrun), which will break very old version of Wireless
+	Tools (v22 and earlier).
+
+<jt@hpl.hp.com>
+	A few cleanups for the old ISA wavelen wireless driver:
+	- Set dev->trans_start to avoid filling the logs
+	- Handle better spurious/bogus interrupt
+	- Avoid deadlocks in mmc_out()/mmc_in()
+
+<jt@hpl.hp.com>
+	Cleanups for the wavelan pcmcia wireless driver:
+	- Set dev->trans_start to avoid filling the logs
+		(and generating useless abort commands)
+	- Avoid deadlocks in mmc_out()/mmc_in()
+
+<jt@hpl.hp.com>
+	This add spinlock protection to the Netwave wireless driver and gets
+	rid of save_flags();cli();. I was pleasantly surprised that the driver
+	was working fine on my SMP system with those obvious fixes. Tested on
+	2.5.32 SMP.
+
+<davem@nuts.ninka.net>
+	[TIGON3]: TSO fixes, but still disabled because the performance is dreadful.
+
+<jgarzik@mandrakesoft.com>
+	merge most of hppa support for tulip net driver
+
+<rmk@arm.linux.org.uk>
+	This patch fixes a bug in handling the timeout in pcnet_cs.c, where
+	it uses the following test to determine whether the timeout has
+	expired:
+	
+	        if (jiffies - dma_start > PCNET_RDC_TIMEOUT) {
+	
+	Unfortunately, PCNET_RDC_TIMEOUT is defined to be "0x02", so the
+	length of the timeout is only two jiffy ticks, rather than being
+	the expected 20ms.  This patch fixes this.
+	
+	Also, the above (and one other place) should be converted to
+	time_after().
+
+<hch@lst.de>
+	Add basic ethtool support to axnet_cs, wavelan_cs net drivers
+	(originally by Arjan, merged and re-merged by hch)
+
+<rl@hellgate.ch>
+	Remove ancient ETHER_STATS statistics from various net drivers, that haven't been
+	compile-enabled nor compileable in ages.
+
+<jgarzik@mandrakesoft.com>
+	Fixes for little-used paths and obscure races, in 8139cp net driver
+	(contributed by matthias@waechter.wiz.at)
+
+<kafai0928@yahoo.com>
+	Use SET_MODULE_OWNER in eepro100 net driver instead of
+	MOD_{INC,DEC}_USE_COUNT, eliminating a small race
+
+<agrover@groveronline.com>
+	Use ACPI fix map region instead of IOAPIC region, since it is undefined
+	in non-SMP.
+
+<jgarzik@mandrakesoft.com>
+	Update list of airo wireless commands, and two RIDs, from
+	linux-wlan-ng sources and online sources
+
+<khc@pm.waw.pl>
+	A bunch of HDLC (WAN driver) bug fixes, plus much improves
+	device and protocol attach/detach support.
+	
+	Overall, this is in preparation for update of HDLC API
+
+<alan@lxorguk.ukuu.org.uk>
+	Merge 2.4.x updates to hppa-specific net driver lasi_82596
+
+<alan@lxorguk.ukuu.org.uk>
+	hp100 net driver update (probably from HP originally):
+	* add EISA 10/100 card id
+	* properly align rx skbs
+
+<trini@kernel.crashing.org>
+	PPC-specific 3c509 net driver update:
+	s/insl_unswapped/insl_ns/ inside #ifdef __powerpc__
+
+<silicon@falcon.sch.bme.hu>
+	comx-hw-munich WAN driver "performance fix": remove hideous udelay.
+	Also, some cleanups.
+
+<axboe@suse.de>
+	[PATCH] nbd bio_endio()
+	
+	Switch nbd bio_endio() over to new semantics
+
+<akpm@zip.com.au>
+	Fix "multiple definition of 'smc_init'" error in smc-ircc irda driver,
+	by making 'smc_init' static.
+
+<acme@conectiva.com.br>
+	[LLC] Don't call sock_alloc_send_skb with the socket lock held...
+
+<axboe@suse.de>
+	[PATCH] cleanup + fix bounce end_io handling
+	
+	Andrew found out that bounce end_io handling did not work for him, so I
+	fixed the bug (not consistent checking of bi_size). I cleaned it up and
+	moved the bi_size checking out of bounce_end_io() (the main worker) and
+	into the individual bi_end_io() handlers instead. Please apply to make
+	highmem bouncing work again.
+
+<kai@tp1.ruhr-uni-bochum.de>
+	kbuild: Remove leftover debugging line
+
+<kai@tp1.ruhr-uni-bochum.de>
+	kbuild: Fix build number generation
+	
+	For some inexplicable reason, I broke the dependency on a new build number
+	some time ago - it worked fine before, and now it does again.
+	
+	(Whenever vmlinux is relinked, the build number is incremented, and now it
+	ends in the version string again, as it should)
+	
+	Noted by Anton Blanchard.
+
+<axboe@suse.de>
+	[PATCH] fix ide highmem bounce enable
+	
+	ide_toggle_bounce() was called prior to init'ing the block queue,
+	which then reset the bounce_pfn back to BLK_BOUNCE_HIGH. Make
+	ide_toggle_bounce() an ide-lib helper, and call it when setting up
+	the queue as well.
+
+<jgarzik@mandrakesoft.com>
+	sundance net driver fixes, and a few cleanups too:
+	- Remove unused/constant members from struct pci_id_info
+	  (which then allows removal of 'drv_flags' from private struct)
+	- If no phy is found, fail to load that board
+	- Always start phy id scan at id 1 to avoid problems (Donald Becker)
+	- Autodetect where mii_preable_required is needed,
+	  default to not needed.  (Donald Becker)
+
+<jgarzik@mandrakesoft.com>
+	clean up previous sundance net driver fixes:
+	        - Remove mii_preamble_required module parameter (Donald Becker)
+	        - Add per-interface mii_preamble_required (setting is autodetected)
+	          (Donald Becker)
+	        - Remove unnecessary cast from void pointer
+	        - Re-align comments in private struct
+
+<acme@conectiva.com.br>
+	[LLC] check if we have space in the socket to receive the packet
+	
+	Now we have llc_conn_space and use it to see if we can accept the
+	packet in the core llc state machine. Transfers of 80 megabytes now
+	are safe 8)
+
+<jgarzik@mandrakesoft.com>
+	sundance modernization:
+	* support bitmapped printk message levels
+	* don't hand-code ethtool media support, use standard API/lib
+
+<torvalds@home.transmeta.com>
+	If slab debugging is enabled, don't batch slabs on the per-cpu
+	lists by default. The batching avoids some debug tests.
+
+<jgarzik@mandrakesoft.com>
+	Update eepro100 hardware resume to latest Becker eepro100.c
+
+<jgarzik@mandrakesoft.com>
+	more fixes for sundance net driver:
+	* default to PIO (fixes bugs in some chips), but add CONFIG_xxx option
+	  for MMIO
+	* proper support for variable MTU sizes
+	* add missing unregister_netdev in an error path
+	(with a kudos to Jason Lunz for merging most of this)
+
+<mingo@elte.hu>
+	[PATCH] generic-pidhash-2.5.36-J2, BK-curr
+	
+	This is the latest version of the generic pidhash patch.  The biggest
+	change is the removal of separately allocated pid structures: they are
+	now part of the task structure and the first task that uses a PID will
+	provide the pid structure.  Task refcounting is used to avoid the
+	freeing of the task structure before every member of a process group or
+	session has exited.
+	
+	This approach has a number of advantages besides the performance gains.
+	Besides simplifying the whole hashing code significantly, attach_pid()
+	is now fundamentally atomic and can be called during create_process()
+	without worrying about task-list side-effects.  It does not have to
+	re-search the pidhash to find out about raced PID-adding either, and
+	attach_pid() cannot fail due to OOM.  detach_pid() can do a simple
+	put_task_struct() instead of the kmem_cache_free().
+	
+	The only minimal downside is the potential pending task structures after
+	session leaders or group leaders have exited - but the number of orphan
+	sessions and process groups is usually very low - and even if it's
+	higher, this can be regarded as a slow execution of the final
+	deallocation of the session leader, not some additional burden.
+
+<mingo@elte.hu>
+	[PATCH] session handling using pid lists..
+	
+	These are the debated tty_io.c changes to use the session group lists to
+	maintain controlling tty information.
+
+<davem@nuts.ninka.net>
+	fs/nfs/nfs{2,3}xdr.c: Use correct printf format for size_t.
+
+<davem@nuts.ninka.net>
+	drivers/ide/ide-taskfile.c: u64 != long long
+
+<davem@nuts.ninka.net>
+	drivers/ide/ide.c: u64 != long long
+
+<davem@nuts.ninka.net>
+	drivers/ide/ide-proc.c: u64 != long long
+
+<davem@nuts.ninka.net>
+	drivers/net/ppp_generic.c:ppp_receive_frame Delete unused label err.
+
+<davem@nuts.ninka.net>
+	fs/xfs/linux/xfs_aops.c:linvfs_get_block_core Use min_t.
+
+<davem@nuts.ninka.net>
+	drivers/pci/pool.c:show_pools Use correct size_t printf format.
+
+<davem@nuts.ninka.net>
+	drivers/usb/serial/visor.c: Kill 64-bit cast ptr to int warnings.
+
+<davem@nuts.ninka.net>
+	kernel/pid.c:next_free_map Pass 3rd arg to cmpxchg as pointer.
+
+<jgarzik@mandrakesoft.com>
+	Improve sundance net driver RX buf size calculation
+	(suggested by Donald Becker)
+
+<davem@nuts.ninka.net>
+	drivers/ieee1394/dv1394.c: Protect devfs stuff properly.
+
+<davem@nuts.ninka.net>
+	drivers/ieee1394/dv1394.c: Fix typo in previous change.
+
+<davem@redhat.com>
+	Fix compiler warnings in e100 net driver
+
+<jes@wildopensource.com>
+	acenic net driver update:
+	* PCI write posting fixes, remove pa-specific code
+	* support 2.5.x kernels (synchronize_irq, cli/sti cleanups)
+
+<davem@nuts.ninka.net>
+	drivers/ieee1394/dv1394.c: Protect more devfs stuff.
+
+<jgarzik@mandrakesoft.com>
+	Hey... where did those e100 warnings come from?
+	(kill more e100 compiler warnings)
+
+<scottm@somanetworks.com>
+	[PATCH] Small pcihpfs dnotify fix
+	
+	I've been working on a userspace daemon to go with my CompactPCI driver,
+	and yesterday I discovered an oversight in pci_hp_change_slot_info - it
+	doesn't call dnotify_parent, so dnotify based clients basically don't
+	work against pcihpfs.  The following patch (against 2.5 BK) reworks
+	things to just update the mtime (since we're modifying the file after
+	all), and then call dnotify_parent.
+
+<torvalds@home.transmeta.com>
+	Remove bogus timer optimization - even if the timer isn't pending,
+	it might be actively running on another CPU, so we still need to
+	do the synchronous wait.
+
+<greg@kroah.com>
+	export __inode_dir_notify so that dnotify can be called from filesystems in modules.
+
+<greg@kroah.com>
+	PCI Hotplug: added max bus speed and current bus speed files to the pci hotplug core.
+	      
+	Patch based on work done by Irene Zubarev <zubarev@us.ibm.com>
+
+<greg@kroah.com>
+	PCI Hotplug: added speed status to the Compaq driver.
+
+<greg@kroah.com>
+	PCI Hotplug: added speed status to the IBM driver.
+
+<greg@kroah.com>
+	PCI Hotplug Core: Add allocation sanity checks.  Patch from Silvio Cesare
+
+<greg@kroah.com>
+	PCI Hotplug: created /proc/bus/pci/slots for pcihpfs to be mounted on.
+	
+	proc_bus_pci_dir had to be exported for this to work properly.
+
+<jgarzik@mandrakesoft.com>
+	Update eepro100 net driver's mdio_{read,write} functions
+	to take 'struct net_device *' not 'long' as their first
+	argument.  This makes eepro100 compatible with the standard
+	MII ethtool API, preparing it for that support.
+	
+	No functional changes should occur with this patch, if anything
+	changes at all it is a bug.  (and testing shows no changes...)
+
+<jgarzik@mandrakesoft.com>
+	update eepro100 net driver to use standard MII phy API/lib,
+	when implementing ethtool media ioctls.
+	
+	No behavior should change with this patch (except the ethtool media
+	ioctls now work, of course)
+	
+	Also, re-format comments to the right of the private struct to line up.
+
+<davem@nuts.ninka.net>
+	include/asm-sparc64/system.h: Remove CHECK_LOCKS debugging.
+
+<davem@nuts.ninka.net>
+	[SPARC64]: Trap kernel bogus program counter at fault time.
+
+<davem@nuts.ninka.net>
+	arch/sparc64/defconfig: Update.
+
+<paulus@au1.ibm.com>
+	PPC32: Update config.in and Makefile in arch/ppc
+
+<paulus@au1.ibm.com>
+	PPC32: Simplify the code in arch/ppc/kernel/ppc_htab.c a bit
+	(no change in function).
+
+<paulus@au1.ibm.com>
+	PPC32: remove the last couple of BK tag lines
+
+<torvalds@home.transmeta.com>
+	Fix up some merge issues for the Makefle changes in the arch-splitup
+
+<davem@redhat.com>
+	[PATCH] block device oopses on shutdown in 2.5.x
+	
+	The partition code registers a generic device for disks
+	which have a dev->driver non-NULL but whose dev->driver->remove
+	points into outer space.  So when reboot happens --> OOPS
+	in drivers/base/power.c:device_shutdown()
+	
+	Ok, amusingly in my case dev->driver == &scsi_done(), hehe :-)
+	
+	Two cases of uninitialized memory spotted, here is the patch.
+
+<akpm@digeo.com>
+	[PATCH] clean up argument passing in writeback paths
+	
+	The writeback code paths which walk the superblocks and inodes are
+	getting an increasing arguments passed to them.
+	
+	The patch wraps those args into the new `struct writeback_control',
+	and uses that instead.  There is no functional change.
+	
+	The new writeback_control structure is passed down through the
+	writeback paths in the place where the old `nr_to_write' pointer used
+	to be.
+	
+	writeback_control will be used to pass new information up and down the
+	writeback paths.  Such as whether the writeback should be non-blocking,
+	and whether queue congestion was encountered.
+
+<akpm@digeo.com>
+	[PATCH] free_area_init cleanup
+	
+	Patch from Martin Bligh.  It should only affect machines using
+	discontigmem.
+	
+	"This patch cleans up free_area_init stuff, and undefines mem_map and
+	max_mapnr for discontigmem, where they were horrible kludges anyway
+	...  We just use the lmem_maps instead, which makes much more sense.
+	It also kills pgdat->node_start_mapnr, which is tarred with the same
+	brush.
+	
+	It breaks free_area_init_core into a couple of sections, pulls the
+	allocation of the lmem_map back into the next higher function, and
+	passes more things via the pgdat.  But that's not very interesting,
+	the objective was to kill mem_map for discontigmem, which seems to
+	attract bugs like flypaper.  This brings any misuses to obvious
+	compile-time errors rather than wierd oopses, which I can't help but
+	feel is a good thing.
+	
+	It does break other discontigmem architectures, but in a very obvious
+	way (they won't compile) and it's easy to fix.  I think that's a small
+	price to pay ...  ;-) At some point soon I will follow up with a patch
+	to remove free_area_init_node for the contig mem case, or at the very
+	least rename it to something more sensible, like __free_area_init.
+	
+	Christoph has grander plans to kill mem_map more extensively in
+	addition to the attatched, but I've heard nobody disagree that it
+	should die for the discontigmem case at least.
+	
+	Oh, and I renamed mem_map in drivers/pcmcia/sa1100 to pc_mem_map
+	because my tiny little brain (and cscope) find it confusing like that.
+	
+	Tested on 16-way NUMA-Q with discontigmem + NUMA support and on a
+	standard PC (well, boots and appears functional).  On top of
+	2.5.33-mm4"
+
+<akpm@digeo.com>
+	[PATCH] _alloc_pages cleanup
+	
+	Patch from Martin Bligh.  It should only affect machines using
+	discontigmem.
+	
+	"This patch is was originally from Andrea's tree (from SGI??), and has
+	been tweaked since by both Christoph (who cleaned up all the code),
+	and myself (who just hit it until it worked).
+	
+	It removes _alloc_pages, and adds all nodes to the zonelists
+	directly, which also changes the fallback zone order to something more
+	sensible ...  instead of: "foreach (node) { foreach (zone) }" we now
+	do something more like "foreach (zone_type) { foreach (node) }"
+	
+	Christoph has a more recent version that's fancier and does a couple
+	more cleanups, but it seems to have a bug in it that I can't track
+	down easily, so I propose we do the simple thing for now, and take the
+	rest of the cleanups when it works ...  it seems to build nicely on
+	top of this seperately to me.
+	
+	Tested on 16-way NUMA-Q with discontigmem + NUMA support."
+
+<akpm@digeo.com>
+	[PATCH] remove statm_pgd_range
+	
+	Bill Irwin's patch to avoid having to walk pagetables while generating
+	/proc/stat output.
+	
+	It can significantly overstate the size of various mappings because it
+	assumes that all VMAs are fully populated.
+	
+	But spending 100% of one of my four CPUs running top(1) is a bug.
+	
+	Bill says this fixes a bug, too.  The `SIZE' parameter is supposed to
+	display the amount of memory which the process would consume if it
+	faulted everything in.  But "before it only showed instantiated
+	3rd-level pagetables, so if something within a 4MB aligned range hadn't
+	been faulted in it would slip past the old one".
+
+<akpm@digeo.com>
+	[PATCH] remove /proc/sys/vm/dirty_sync_thresh
+	
+	This was designed to be a really sterm throttling threshold: if dirty
+	memory reaches this level then perform writeback and actually wait on
+	it.
+	
+	It doesn't work.  Because memory dirtiers are required to perform
+	writeback if the amount of dirty AND writeback memory exceeds
+	dirty_async_ratio.
+	
+	So kill it, and rely just on the request queues being appropriately
+	scaled to the machine size (they are).
+	
+	This is basically what 2.4 does.
+
+<akpm@digeo.com>
+	[PATCH] swapout fix
+	
+	Silly bug which was halving swapout bandwidth: we've taken a copy of
+	page->mapping into a local convenience variable, but forgot to update
+	that local after adding the page to swapcache.
+
+<akpm@digeo.com>
+	[PATCH] writev speedup
+	
+	A patch from Hirokazu Takahashi to speed up the new sped-up writev
+	code.
+	
+	Instead of running ->prepare_write/->commit_write for each individual
+	segment, we walk the segments between prepage and commit.  So
+	potentially much larger amounts of data are passed to commit_write(),
+	and prepare_write() is called much less often.
+	
+	Added bonus: the segment walk happens inside the kmap_atomic(), so we
+	run kmap_atomic() once per page, not once per segment.
+	
+	We've demonstrated a speedup of over 3x.  This is writing 1024-segment
+	iovecs where the individual segments have an average length of 24
+	bytes, which is a favourable case for this patch.
+
+<akpm@digeo.com>
+	[PATCH] readv/writev bounds checking fixes
+	
+	- writev currently returns -EFAULT if _any_ of the segments has an
+	invalid address.  We should only return -EFAULT if the first segment
+	has a bad address.
+	
+	If some of the first segments have valid addresses we need to write
+	them and return a partial result.
+	
+	- The current code only checks if the sum-of-lengths is negative.  If
+	individual segments have a negative length but the result is positive
+	we miss that.
+	
+	So rework the code to detect this, and to be immune to odd wrapping
+	situations.
+	
+	As a bonus, we save one pass across the iovec.
+	
+	- ditto for readv.
+	
+	The check for "does any segment have a negative length" has already
+	been performed in do_readv_writev(), but it's basically free here, and
+	we need to do it for generic_file_read/write anyway.
+	
+	This all means that the iov_length() function is unsafe because of
+	wrap/overflow isues.  It should only be used after the
+	generic_file_read/write or do_readv_writev() checking has been
+	performed.  Its callers have been reviewed and they are OK.
+	
+	The code now passes LTP testing and has been QA'd by Janet's team.
+
+<akpm@digeo.com>
+	[PATCH] fix suppression of page allocation failure warnings
+	
+	Somebody somewhere is stomping on PF_NOWARN, and page allocation
+	failure warnings are coming out of the wrong places.
+	
+	So change the handling of current->flags to be:
+	
+	int pf_flags = current->flags;
+	
+	current->flags |= PF_NOWARN;
+	...
+	current->flags = pf_flags;
+	
+	which is a generally more robust approach.
+
+<akpm@digeo.com>
+	[PATCH] fix mmap(MAP_LOCKED)
+	
+	From Hubertus Franke.
+	
+	The MAP_LOCKED flag to mmap() currently does nothing.  Hubertus' patch
+	fixes it so that the relevant mapping is locked into memory, if the
+	called has CAP_IPC_LOCK.
+
+<akpm@digeo.com>
+	[PATCH] remove smp_lock.h inclusions from mm/*
+	
+	From Christoph Hellwig.
+	
+	There are no lock_kernel() calls in mm/
+
+<akpm@digeo.com>
+	[PATCH] hugetlbpages cleanup
+	
+	From Christoph Hellwig, acked by Rohit.
+	
+	- fix config.in description: we know we're on i386 and we also know
+	that a feature can only be enabled if the hw supports it, the code
+	alone is not enough
+	
+	- the sysctl is VM-releated, so move it from /proc/sys/kernel tp
+	/proc/sys/vm
+	
+	- adopt to standard sysctl names
+
+<akpm@digeo.com>
+	[PATCH] blk_init() cleanups
+	
+	From Christoph Hellwig, acked by Jens.
+	
+	- remove some unneeded runtime initializers.
+	
+	- remove the explicit call to hd_init() - it already goes through
+	module_init(), so we're currently running hd_init() twice.
+
+<akpm@digeo.com>
+	[PATCH] misc fixes
+	
+	- Spell Jeremy's name correctly.
+	
+	- Fix compile warning in raw.c
+	
+	- Do a waitqueue_active() test before waking klogd in printk.
+	
+	  Not only is is negligibly faster, but the wake_up() in there causes
+	  deadlocks when you try to print debug info out from inside scheduler
+	  code.
+	
+	  This patch gives a delightfully obscure way of avoiding the
+	  deadlock: kill off klogd.
+	
+	- Fix a couple of compile warnings in the mtrr code.
+
+<akpm@digeo.com>
+	[PATCH] reduced locking in release_pages()
+	
+	From Marcus Alanen <maalanen@ra.abo.fi>
+	
+	Don't retake the zone lock after spilling a batch of pages into the
+	buddy.
+	
+	Instead, just clear local variable `zone' to indicate that no lock is
+	held.
+	
+	This is actually a common case - whenever release_pages() is called
+	with exactly 16 pages (truncate, page reclaim..) Marcus' patch will
+	save a lock and an unlock.
+	
+	Also, remove some lock-avoidance heuristics in
+	pagevec_deactivate_inactive(): the caller has already made these
+	checks, and the chance of the check here actually doing anything useful
+	is negligible.
+
+<akpm@digeo.com>
+	[PATCH] permit hugetlb pages to be allocated from highmem
+	
+	Patch from Rohit Seth: allow hugetlb pages to be allocated from the
+	highmem zone.
+
+<anton@samba.org>
+	ppc64: Add MAP_LOCKED
+
+<anton@samba.org>
+	ppc64: wrap pidhash reference for the moment
+
+<anton@samba.org>
+	ppc64: fix sys32_select race with max_fdset
+
+<anton@samba.org>
+	ppc64: DISCONTIGMEM updates
+
+<anton@samba.org>
+	ppc64: kill node_startnr, implement node_end_pfn
+
+<mingo@elte.hu>
+	[PATCH] pidhash-fix-2.5.36-A0
+	
+	the attached patch (against BK-curr) fixes a bug in the new PID allocator,
+	which bug can cause incorrect hashing of the PID structure which causes
+	infinite loops in find_pid(). [and potentially other problems.]
+
+<axboe@suse.de>
+	[PATCH] IDE maintainer updates
+	
+
+<torvalds@home.transmeta.com>
+	Linux 2.5.37
+
